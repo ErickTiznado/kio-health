@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --color-kanji: #8a72d1;
+  --color-cruz: #ddd3fa;
+  --color-kio: #ae93fe;
+  --color-kio-light: rgba(174, 147, 254, 0.28);
+  --color-text: #213547;
+  --color-bg: #f8f7fc;
+  --color-white: #ffffff;
+}
+
+:root {
+  font-family: 'Roboto', sans-serif;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+body {
+  margin: 0;
+}
+

@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  ADMIN
+  CLINICIAN
+}
+
+enum ClinicianType {
+  PSYCHOLOGIST
+  NUTRITIONIST
+}
+
+enum PatientStatus {
+  ACTIVE
+  ARCHIVED
+  WAITLIST
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+// ============================================
+// MODELS
+// ============================================
+
+model User {
+  id           String            @id @default(uuid()) @db.Uuid
+  email        String            @unique
+  passwordHash String            @map("password_hash")
+  role         UserRole
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+  profile      ClinicianProfile?
+
+  @@map("users")
+}
+
+model ClinicianProfile {
+  id                     String        @id @default(uuid()) @db.Uuid
+  userId                 String        @unique @map("user_id") @db.Uuid
+  type                   ClinicianType
+  licenseNumber          String?       @map("license_number")
+  currency               String        @default("USD")
+  sessionDefaultDuration Int           @default(50) @map("session_default_duration")
+  sessionDefaultPrice    Decimal       @default(0.00) @map("session_default_price") @db.Decimal(10, 2)
+  createdAt              DateTime      @default(now()) @map("created_at")
+  updatedAt              DateTime      @updatedAt @map("updated_at")
+
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patients     Patient[]
+  appointments Appointment[]
+  transactions FinanceTransaction[]
+
+  @@map("clinician_profiles")
+}
+
+model Patient {
+  id               String        @id @default(uuid()) @db.Uuid
+  clinicianId      String        @map("clinician_id") @db.Uuid
+  fullName         String        @map("full_name")
+  status           PatientStatus @default(ACTIVE)
+  contactPhone     String?       @map("contact_phone")
+  emergencyContact Json?         @map("emergency_contact")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  clinician    ClinicianProfile @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+  nutriRecords NutriRecord[]
+  psychNotes   PsychNote[]
+
+  @@map("patients")
+}
+
+model Appointment {
+  id            String            @id @default(uuid()) @db.Uuid
+  patientId     String            @map("patient_id") @db.Uuid
+  clinicianId   String            @map("clinician_id") @db.Uuid
+  startTime     DateTime          @map("start_time")
+  endTime       DateTime          @map("end_time")
+  status        AppointmentStatus @default(SCHEDULED)
+  paymentStatus PaymentStatus     @default(PENDING) @map("payment_status")
+  price         Decimal           @db.Decimal(10, 2)
+  notes         String?
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+
+  patient     Patient             @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  clinician   ClinicianProfile    @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
+  psychNote   PsychNote?
+  transaction FinanceTransaction?
+
+  @@map("appointments")
+}
+
+model PsychNote {
+  id            String   @id @default(uuid()) @db.Uuid
+  appointmentId String   @unique @map("appointment_id") @db.Uuid
+  patientId     String   @map("patient_id") @db.Uuid
+  templateType  String   @map("template_type")
+  content       Json
+  moodRating    Int?     @map("mood_rating")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  patient     Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("psych_notes")
+}
+
+model NutriRecord {
+  id            String   @id @default(uuid()) @db.Uuid
+  patientId     String   @map("patient_id") @db.Uuid
+  anthropometry Json
+  calculations  Json
+  date          DateTime @default(now())
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("nutri_records")
+}
+
+model FinanceTransaction {
+  id            String          @id @default(uuid()) @db.Uuid
+  clinicianId   String          @map("clinician_id") @db.Uuid
+  appointmentId String?         @unique @map("appointment_id") @db.Uuid
+  type          TransactionType
+  amount        Decimal         @db.Decimal(10, 2)
+  description   String?
+  date          DateTime        @default(now())
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  clinician   ClinicianProfile @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
+  appointment Appointment?     @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+
+  @@map("finance_transactions")
+}
