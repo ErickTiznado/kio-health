@@ -96,6 +96,15 @@ export const PaymentStatus: {
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
 
 
+export const PaymentMethod: {
+  CASH: 'CASH',
+  CARD: 'CARD',
+  TRANSFER: 'TRANSFER'
+};
+
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
+
+
 export const TransactionType: {
   INCOME: 'INCOME',
   EXPENSE: 'EXPENSE'
@@ -124,6 +133,10 @@ export const AppointmentStatus: typeof $Enums.AppointmentStatus
 export type PaymentStatus = $Enums.PaymentStatus
 
 export const PaymentStatus: typeof $Enums.PaymentStatus
+
+export type PaymentMethod = $Enums.PaymentMethod
+
+export const PaymentMethod: typeof $Enums.PaymentMethod
 
 export type TransactionType = $Enums.TransactionType
 
@@ -5102,6 +5115,7 @@ export namespace Prisma {
     endTime: Date | null
     status: $Enums.AppointmentStatus | null
     paymentStatus: $Enums.PaymentStatus | null
+    paymentMethod: $Enums.PaymentMethod | null
     price: Decimal | null
     notes: string | null
     createdAt: Date | null
@@ -5116,6 +5130,7 @@ export namespace Prisma {
     endTime: Date | null
     status: $Enums.AppointmentStatus | null
     paymentStatus: $Enums.PaymentStatus | null
+    paymentMethod: $Enums.PaymentMethod | null
     price: Decimal | null
     notes: string | null
     createdAt: Date | null
@@ -5130,6 +5145,7 @@ export namespace Prisma {
     endTime: number
     status: number
     paymentStatus: number
+    paymentMethod: number
     price: number
     notes: number
     createdAt: number
@@ -5154,6 +5170,7 @@ export namespace Prisma {
     endTime?: true
     status?: true
     paymentStatus?: true
+    paymentMethod?: true
     price?: true
     notes?: true
     createdAt?: true
@@ -5168,6 +5185,7 @@ export namespace Prisma {
     endTime?: true
     status?: true
     paymentStatus?: true
+    paymentMethod?: true
     price?: true
     notes?: true
     createdAt?: true
@@ -5182,6 +5200,7 @@ export namespace Prisma {
     endTime?: true
     status?: true
     paymentStatus?: true
+    paymentMethod?: true
     price?: true
     notes?: true
     createdAt?: true
@@ -5283,6 +5302,7 @@ export namespace Prisma {
     endTime: Date
     status: $Enums.AppointmentStatus
     paymentStatus: $Enums.PaymentStatus
+    paymentMethod: $Enums.PaymentMethod | null
     price: Decimal
     notes: string | null
     createdAt: Date
@@ -5316,6 +5336,7 @@ export namespace Prisma {
     endTime?: boolean
     status?: boolean
     paymentStatus?: boolean
+    paymentMethod?: boolean
     price?: boolean
     notes?: boolean
     createdAt?: boolean
@@ -5334,6 +5355,7 @@ export namespace Prisma {
     endTime?: boolean
     status?: boolean
     paymentStatus?: boolean
+    paymentMethod?: boolean
     price?: boolean
     notes?: boolean
     createdAt?: boolean
@@ -5350,6 +5372,7 @@ export namespace Prisma {
     endTime?: boolean
     status?: boolean
     paymentStatus?: boolean
+    paymentMethod?: boolean
     price?: boolean
     notes?: boolean
     createdAt?: boolean
@@ -5366,13 +5389,14 @@ export namespace Prisma {
     endTime?: boolean
     status?: boolean
     paymentStatus?: boolean
+    paymentMethod?: boolean
     price?: boolean
     notes?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type AppointmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "clinicianId" | "startTime" | "endTime" | "status" | "paymentStatus" | "price" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["appointment"]>
+  export type AppointmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "clinicianId" | "startTime" | "endTime" | "status" | "paymentStatus" | "paymentMethod" | "price" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["appointment"]>
   export type AppointmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     patient?: boolean | PatientDefaultArgs<ExtArgs>
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
@@ -5404,6 +5428,7 @@ export namespace Prisma {
       endTime: Date
       status: $Enums.AppointmentStatus
       paymentStatus: $Enums.PaymentStatus
+      paymentMethod: $Enums.PaymentMethod | null
       price: Prisma.Decimal
       notes: string | null
       createdAt: Date
@@ -5842,6 +5867,7 @@ export namespace Prisma {
     readonly endTime: FieldRef<"Appointment", 'DateTime'>
     readonly status: FieldRef<"Appointment", 'AppointmentStatus'>
     readonly paymentStatus: FieldRef<"Appointment", 'PaymentStatus'>
+    readonly paymentMethod: FieldRef<"Appointment", 'PaymentMethod'>
     readonly price: FieldRef<"Appointment", 'Decimal'>
     readonly notes: FieldRef<"Appointment", 'String'>
     readonly createdAt: FieldRef<"Appointment", 'DateTime'>
@@ -9743,6 +9769,7 @@ export namespace Prisma {
     endTime: 'endTime',
     status: 'status',
     paymentStatus: 'paymentStatus',
+    paymentMethod: 'paymentMethod',
     price: 'price',
     notes: 'notes',
     createdAt: 'createdAt',
@@ -9984,6 +10011,20 @@ export namespace Prisma {
    * Reference to a field of type 'PaymentStatus[]'
    */
   export type ListEnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'PaymentMethod'
+   */
+  export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod'>
+    
+
+
+  /**
+   * Reference to a field of type 'PaymentMethod[]'
+   */
+  export type ListEnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod[]'>
     
 
 
@@ -10254,6 +10295,7 @@ export namespace Prisma {
     endTime?: DateTimeFilter<"Appointment"> | Date | string
     status?: EnumAppointmentStatusFilter<"Appointment"> | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFilter<"Appointment"> | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentMethodNullableFilter<"Appointment"> | $Enums.PaymentMethod | null
     price?: DecimalFilter<"Appointment"> | Decimal | DecimalJsLike | number | string
     notes?: StringNullableFilter<"Appointment"> | string | null
     createdAt?: DateTimeFilter<"Appointment"> | Date | string
@@ -10272,6 +10314,7 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
+    paymentMethod?: SortOrderInput | SortOrder
     price?: SortOrder
     notes?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -10293,6 +10336,7 @@ export namespace Prisma {
     endTime?: DateTimeFilter<"Appointment"> | Date | string
     status?: EnumAppointmentStatusFilter<"Appointment"> | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFilter<"Appointment"> | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentMethodNullableFilter<"Appointment"> | $Enums.PaymentMethod | null
     price?: DecimalFilter<"Appointment"> | Decimal | DecimalJsLike | number | string
     notes?: StringNullableFilter<"Appointment"> | string | null
     createdAt?: DateTimeFilter<"Appointment"> | Date | string
@@ -10311,6 +10355,7 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
+    paymentMethod?: SortOrderInput | SortOrder
     price?: SortOrder
     notes?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -10333,6 +10378,7 @@ export namespace Prisma {
     endTime?: DateTimeWithAggregatesFilter<"Appointment"> | Date | string
     status?: EnumAppointmentStatusWithAggregatesFilter<"Appointment"> | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusWithAggregatesFilter<"Appointment"> | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentMethodNullableWithAggregatesFilter<"Appointment"> | $Enums.PaymentMethod | null
     price?: DecimalWithAggregatesFilter<"Appointment"> | Decimal | DecimalJsLike | number | string
     notes?: StringNullableWithAggregatesFilter<"Appointment"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Appointment"> | Date | string
@@ -10815,6 +10861,7 @@ export namespace Prisma {
     endTime: Date | string
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
     price: Decimal | DecimalJsLike | number | string
     notes?: string | null
     createdAt?: Date | string
@@ -10833,6 +10880,7 @@ export namespace Prisma {
     endTime: Date | string
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
     price: Decimal | DecimalJsLike | number | string
     notes?: string | null
     createdAt?: Date | string
@@ -10847,6 +10895,7 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10865,6 +10914,7 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10881,6 +10931,7 @@ export namespace Prisma {
     endTime: Date | string
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
     price: Decimal | DecimalJsLike | number | string
     notes?: string | null
     createdAt?: Date | string
@@ -10893,6 +10944,7 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10907,6 +10959,7 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11599,6 +11652,13 @@ export namespace Prisma {
     not?: NestedEnumPaymentStatusFilter<$PrismaModel> | $Enums.PaymentStatus
   }
 
+  export type EnumPaymentMethodNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentMethod | EnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    in?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumPaymentMethodNullableFilter<$PrismaModel> | $Enums.PaymentMethod | null
+  }
+
   export type PatientScalarRelationFilter = {
     is?: PatientWhereInput
     isNot?: PatientWhereInput
@@ -11622,6 +11682,7 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
+    paymentMethod?: SortOrder
     price?: SortOrder
     notes?: SortOrder
     createdAt?: SortOrder
@@ -11640,6 +11701,7 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
+    paymentMethod?: SortOrder
     price?: SortOrder
     notes?: SortOrder
     createdAt?: SortOrder
@@ -11654,6 +11716,7 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
+    paymentMethod?: SortOrder
     price?: SortOrder
     notes?: SortOrder
     createdAt?: SortOrder
@@ -11682,6 +11745,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPaymentStatusFilter<$PrismaModel>
     _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
+  }
+
+  export type EnumPaymentMethodNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentMethod | EnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    in?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumPaymentMethodNullableWithAggregatesFilter<$PrismaModel> | $Enums.PaymentMethod | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
+    _max?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
   }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -12319,6 +12392,10 @@ export namespace Prisma {
     set?: $Enums.PaymentStatus
   }
 
+  export type NullableEnumPaymentMethodFieldUpdateOperationsInput = {
+    set?: $Enums.PaymentMethod | null
+  }
+
   export type PatientUpdateOneRequiredWithoutAppointmentsNestedInput = {
     create?: XOR<PatientCreateWithoutAppointmentsInput, PatientUncheckedCreateWithoutAppointmentsInput>
     connectOrCreate?: PatientCreateOrConnectWithoutAppointmentsInput
@@ -12735,6 +12812,13 @@ export namespace Prisma {
     not?: NestedEnumPaymentStatusFilter<$PrismaModel> | $Enums.PaymentStatus
   }
 
+  export type NestedEnumPaymentMethodNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentMethod | EnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    in?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumPaymentMethodNullableFilter<$PrismaModel> | $Enums.PaymentMethod | null
+  }
+
   export type NestedEnumAppointmentStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.AppointmentStatus | EnumAppointmentStatusFieldRefInput<$PrismaModel>
     in?: $Enums.AppointmentStatus[] | ListEnumAppointmentStatusFieldRefInput<$PrismaModel>
@@ -12753,6 +12837,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPaymentStatusFilter<$PrismaModel>
     _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPaymentMethodNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentMethod | EnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    in?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumPaymentMethodNullableWithAggregatesFilter<$PrismaModel> | $Enums.PaymentMethod | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
+    _max?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
   }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -12984,6 +13078,7 @@ export namespace Prisma {
     endTime: Date | string
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
     price: Decimal | DecimalJsLike | number | string
     notes?: string | null
     createdAt?: Date | string
@@ -13000,6 +13095,7 @@ export namespace Prisma {
     endTime: Date | string
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
     price: Decimal | DecimalJsLike | number | string
     notes?: string | null
     createdAt?: Date | string
@@ -13136,6 +13232,7 @@ export namespace Prisma {
     endTime?: DateTimeFilter<"Appointment"> | Date | string
     status?: EnumAppointmentStatusFilter<"Appointment"> | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFilter<"Appointment"> | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentMethodNullableFilter<"Appointment"> | $Enums.PaymentMethod | null
     price?: DecimalFilter<"Appointment"> | Decimal | DecimalJsLike | number | string
     notes?: StringNullableFilter<"Appointment"> | string | null
     createdAt?: DateTimeFilter<"Appointment"> | Date | string
@@ -13212,6 +13309,7 @@ export namespace Prisma {
     endTime: Date | string
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
     price: Decimal | DecimalJsLike | number | string
     notes?: string | null
     createdAt?: Date | string
@@ -13228,6 +13326,7 @@ export namespace Prisma {
     endTime: Date | string
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
     price: Decimal | DecimalJsLike | number | string
     notes?: string | null
     createdAt?: Date | string
@@ -13680,6 +13779,7 @@ export namespace Prisma {
     endTime: Date | string
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
     price: Decimal | DecimalJsLike | number | string
     notes?: string | null
     createdAt?: Date | string
@@ -13697,6 +13797,7 @@ export namespace Prisma {
     endTime: Date | string
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
     price: Decimal | DecimalJsLike | number | string
     notes?: string | null
     createdAt?: Date | string
@@ -13757,6 +13858,7 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13774,6 +13876,7 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13925,6 +14028,7 @@ export namespace Prisma {
     endTime: Date | string
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
     price: Decimal | DecimalJsLike | number | string
     notes?: string | null
     createdAt?: Date | string
@@ -13942,6 +14046,7 @@ export namespace Prisma {
     endTime: Date | string
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
     price: Decimal | DecimalJsLike | number | string
     notes?: string | null
     createdAt?: Date | string
@@ -14010,6 +14115,7 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14027,6 +14133,7 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14051,6 +14158,7 @@ export namespace Prisma {
     endTime: Date | string
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
     price: Decimal | DecimalJsLike | number | string
     notes?: string | null
     createdAt?: Date | string
@@ -14110,6 +14218,7 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14126,6 +14235,7 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14141,6 +14251,7 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14187,6 +14298,7 @@ export namespace Prisma {
     endTime: Date | string
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
     price: Decimal | DecimalJsLike | number | string
     notes?: string | null
     createdAt?: Date | string
@@ -14218,6 +14330,7 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14234,6 +14347,7 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14249,6 +14363,7 @@ export namespace Prisma {
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

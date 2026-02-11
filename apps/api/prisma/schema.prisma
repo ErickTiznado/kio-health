@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./generated/client"
 }
 
 datasource db {
@@ -37,6 +36,12 @@ enum AppointmentStatus {
 enum PaymentStatus {
   PENDING
   PAID
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
 }
 
 enum TransactionType {
@@ -105,6 +110,7 @@ model Appointment {
   endTime       DateTime          @map("end_time")
   status        AppointmentStatus @default(SCHEDULED)
   paymentStatus PaymentStatus     @default(PENDING) @map("payment_status")
+  paymentMethod PaymentMethod?    @map("payment_method")
   price         Decimal           @db.Decimal(10, 2)
   notes         String?
   createdAt     DateTime          @default(now()) @map("created_at")

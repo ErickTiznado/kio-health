@@ -90,10 +90,6 @@ export function SessionPage() {
 
   const elapsedTime = formatElapsedTime(elapsedSeconds);
 
-  // Silence unused var — appointmentId will be used for real API fetching
-  const _appointmentId = appointmentId;
-  void _appointmentId;
-
   // Derive clinician type from the authenticated user's profile
   const clinicianType = user?.profile?.type ?? 'PSYCHOLOGIST';
   const isPsychologist = clinicianType === 'PSYCHOLOGIST';
@@ -126,6 +122,7 @@ export function SessionPage() {
       <SessionCheckoutModal
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
+        appointmentId={appointmentId ?? ''}
       />
     </>
   );

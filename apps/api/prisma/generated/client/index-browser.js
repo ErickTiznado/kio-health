@@ -160,6 +160,7 @@ exports.Prisma.AppointmentScalarFieldEnum = {
   endTime: 'endTime',
   status: 'status',
   paymentStatus: 'paymentStatus',
+  paymentMethod: 'paymentMethod',
   price: 'price',
   notes: 'notes',
   createdAt: 'createdAt',
@@ -254,6 +255,12 @@ exports.AppointmentStatus = exports.$Enums.AppointmentStatus = {
 exports.PaymentStatus = exports.$Enums.PaymentStatus = {
   PENDING: 'PENDING',
   PAID: 'PAID'
+};
+
+exports.PaymentMethod = exports.$Enums.PaymentMethod = {
+  CASH: 'CASH',
+  CARD: 'CARD',
+  TRANSFER: 'TRANSFER'
 };
 
 exports.TransactionType = exports.$Enums.TransactionType = {

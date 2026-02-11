@@ -1,6 +1,5 @@
-import { useState, type FC } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { addWeeks, addDays, addMonths, format } from 'date-fns';
+import type { FC } from 'react';
+import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
   CheckCircle,
@@ -13,82 +12,58 @@ import {
   Mail,
   DollarSign,
   Save,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
+import { useSessionCheckout } from '../../hooks/use-session-checkout';
+import type { PaymentMethod } from '../../types/appointments.types';
 
-/* ── Types ───────────────────────────────────────── */
+/* ── Static config (hoisted outside component — rendering-hoist-jsx) ─── */
 
-type PaymentStatus = 'PENDING' | 'PAID';
-type PaymentMethod = 'CASH' | 'CARD' | 'TRANSFER';
 type ScheduleOption = '1_WEEK' | '15_DAYS' | '1_MONTH' | 'MANUAL';
 
-interface SessionCheckoutModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  /** Default amount shown in the input. */
-  defaultAmount?: number;
-}
-
-/* ── Schedule helpers ────────────────────────────── */
-
-const SCHEDULE_OPTIONS: { key: ScheduleOption; label: string; icon?: typeof CalendarPlus }[] = [
+const SCHEDULE_OPTIONS: {
+  key: ScheduleOption;
+  label: string;
+  icon?: typeof CalendarPlus;
+}[] = [
   { key: '1_WEEK', label: 'En 1 semana' },
   { key: '15_DAYS', label: 'En 15 días' },
   { key: '1_MONTH', label: 'En 1 mes' },
   { key: 'MANUAL', label: 'Agendar Manualmente', icon: CalendarPlus },
 ];
 
-function computeSuggestedDate(option: ScheduleOption): Date {
-  const today = new Date();
-
-  if (option === '1_WEEK') return addWeeks(today, 1);
-  if (option === '15_DAYS') return addDays(today, 15);
-  return addMonths(today, 1);
-}
-
-/* ── Payment-method config ───────────────────────── */
-
-const PAYMENT_METHODS: { key: PaymentMethod; label: string; icon: typeof Banknote }[] = [
+const PAYMENT_METHODS: {
+  key: PaymentMethod;
+  label: string;
+  icon: typeof Banknote;
+}[] = [
   { key: 'CASH', label: 'Efectivo', icon: Banknote },
   { key: 'CARD', label: 'Tarjeta', icon: CreditCard },
   { key: 'TRANSFER', label: 'Transferencia', icon: ArrowRightLeft },
 ];
 
+/* ── Props ───────────────────────────────────────── */
+
+interface SessionCheckoutModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  appointmentId: string;
+  defaultAmount?: number;
+}
+
 /**
- * Checkout modal that appears when the clinician clicks "Finalizar Consulta".
- * Two-step grid: Finances (left) + Continuity/Re-scheduling (right).
- * Footer with email checkbox and primary "Cerrar y Guardar" CTA.
+ * Presentational checkout modal — all business logic lives in useSessionCheckout.
+ * ISP: component depends only on what it renders.
  */
 export const SessionCheckoutModal: FC<SessionCheckoutModalProps> = ({
   isOpen,
   onClose,
+  appointmentId,
   defaultAmount = 500,
 }) => {
-  const navigate = useNavigate();
-
-  /* ── Local state ── */
-  const [amount, setAmount] = useState<string>(String(defaultAmount));
-  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('PENDING');
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CASH');
-  const [scheduleOption, setScheduleOption] = useState<ScheduleOption | null>(null);
-  const [manualDate, setManualDate] = useState<string>('');
-  const [shouldSendEmail, setShouldSendEmail] = useState(false);
-
-  const suggestedDate =
-    scheduleOption === 'MANUAL' && manualDate
-      ? new Date(manualDate + 'T12:00:00')
-      : scheduleOption && scheduleOption !== 'MANUAL'
-        ? computeSuggestedDate(scheduleOption)
-        : null;
-
-  /* ── Handlers ── */
-
-  const handleSaveAndClose = () => {
-    // TODO: persist checkout data via API
-    onClose();
-    navigate('/dashboard');
-  };
-
-  const handleOverlayClick = () => onClose();
+  const { state, actions, suggestedDate, isSubmitting, error } =
+    useSessionCheckout(appointmentId, defaultAmount, onClose);
 
   return (
     <>
@@ -99,14 +74,12 @@ export const SessionCheckoutModal: FC<SessionCheckoutModalProps> = ({
             ? 'bg-black/40 backdrop-blur-sm opacity-100'
             : 'opacity-0 pointer-events-none'
         }`}
-        onClick={handleOverlayClick}
+        onClick={onClose}
         role="presentation"
       />
 
       {/* ── Modal Panel ── */}
-      <div
-        className={`fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none`}
-      >
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
           className={`relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl pointer-events-auto transition-all duration-300 ease-out ${
             isOpen
@@ -174,8 +147,8 @@ export const SessionCheckoutModal: FC<SessionCheckoutModalProps> = ({
                     id="checkout-amount"
                     type="number"
                     min={0}
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    value={state.amount}
+                    onChange={(e) => actions.setAmount(e.target.value)}
                     className="w-full pl-8 pr-4 py-3 bg-gray-50/80 border border-gray-200/60 rounded-2xl text-lg font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-kanji/30 focus:border-kanji/40 transition-all"
                   />
                 </div>
@@ -183,13 +156,15 @@ export const SessionCheckoutModal: FC<SessionCheckoutModalProps> = ({
 
               {/* Payment status toggle */}
               <div>
-                <p className="text-xs font-semibold text-gray-500 mb-2">Estado</p>
+                <p className="text-xs font-semibold text-gray-500 mb-2">
+                  Estado
+                </p>
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => setPaymentStatus('PENDING')}
+                    onClick={() => actions.setPaymentStatus('PENDING')}
                     className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
-                      paymentStatus === 'PENDING'
+                      state.paymentStatus === 'PENDING'
                         ? 'bg-amber-100 text-amber-700 shadow-sm ring-1 ring-amber-200'
                         : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
                     }`}
@@ -198,9 +173,9 @@ export const SessionCheckoutModal: FC<SessionCheckoutModalProps> = ({
                   </button>
                   <button
                     type="button"
-                    onClick={() => setPaymentStatus('PAID')}
+                    onClick={() => actions.setPaymentStatus('PAID')}
                     className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
-                      paymentStatus === 'PAID'
+                      state.paymentStatus === 'PAID'
                         ? 'bg-emerald-100 text-emerald-700 shadow-sm ring-1 ring-emerald-200'
                         : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
                     }`}
@@ -212,15 +187,17 @@ export const SessionCheckoutModal: FC<SessionCheckoutModalProps> = ({
 
               {/* Payment method icons */}
               <div>
-                <p className="text-xs font-semibold text-gray-500 mb-2">Método</p>
+                <p className="text-xs font-semibold text-gray-500 mb-2">
+                  Método
+                </p>
                 <div className="flex gap-2">
                   {PAYMENT_METHODS.map(({ key, label, icon: Icon }) => (
                     <button
                       key={key}
                       type="button"
-                      onClick={() => setPaymentMethod(key)}
+                      onClick={() => actions.setPaymentMethod(key)}
                       className={`flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl text-[10px] font-bold transition-all duration-200 cursor-pointer ${
-                        paymentMethod === key
+                        state.paymentMethod === key
                           ? 'bg-kanji/10 text-kanji shadow-sm ring-1 ring-kanji/20'
                           : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
                       }`}
@@ -251,25 +228,22 @@ export const SessionCheckoutModal: FC<SessionCheckoutModalProps> = ({
                     <button
                       key={key}
                       type="button"
-                      onClick={() => {
-                        setScheduleOption((prev) => (prev === key ? null : key));
-                        if (key !== 'MANUAL') setManualDate('');
-                      }}
+                      onClick={() => actions.selectScheduleOption(key)}
                       className={`w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
-                        scheduleOption === key
+                        state.scheduleOption === key
                           ? 'bg-kanji/10 text-kanji ring-1 ring-kanji/20 shadow-sm'
                           : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
                       }`}
                     >
-                      {OptionIcon && <OptionIcon size={15} />}
+                      {OptionIcon ? <OptionIcon size={15} /> : null}
                       {label}
                     </button>
                   ))}
                 </div>
 
                 {/* Manual date picker */}
-                {scheduleOption === 'MANUAL' && (
-                  <div className="animate-[fadeSlideUp_0.25s_ease-out]">
+                {state.scheduleOption === 'MANUAL' && (
+                  <div className="animate-[fadeSlideUp_0.25s_ease-out] mt-3">
                     <label
                       htmlFor="manual-date-input"
                       className="text-xs font-semibold text-gray-500 mb-1.5 block"
@@ -279,9 +253,9 @@ export const SessionCheckoutModal: FC<SessionCheckoutModalProps> = ({
                     <input
                       id="manual-date-input"
                       type="date"
-                      value={manualDate}
+                      value={state.manualDate}
                       min={new Date().toISOString().split('T')[0]}
-                      onChange={(e) => setManualDate(e.target.value)}
+                      onChange={(e) => actions.setManualDate(e.target.value)}
                       className="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/60 rounded-2xl text-sm font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-kanji/30 focus:border-kanji/40 transition-all cursor-pointer"
                     />
                   </div>
@@ -311,6 +285,14 @@ export const SessionCheckoutModal: FC<SessionCheckoutModalProps> = ({
 
           {/* ── Footer ── */}
           <div className="px-8 py-5 border-t border-gray-100/80 bg-gray-50/40 rounded-b-3xl">
+            {/* Error feedback */}
+            {error && (
+              <div className="flex items-center gap-2 text-red-600 text-sm mb-3 bg-red-50 p-3 rounded-xl animate-[fadeSlideUp_0.2s_ease-out]">
+                <AlertCircle size={16} />
+                {error}
+              </div>
+            )}
+
             {/* Email checkbox */}
             <label
               htmlFor="send-email-check"
@@ -319,8 +301,8 @@ export const SessionCheckoutModal: FC<SessionCheckoutModalProps> = ({
               <input
                 id="send-email-check"
                 type="checkbox"
-                checked={shouldSendEmail}
-                onChange={(e) => setShouldSendEmail(e.target.checked)}
+                checked={state.shouldSendEmail}
+                onChange={(e) => actions.setShouldSendEmail(e.target.checked)}
                 className="w-4.5 h-4.5 rounded-md border-gray-300 text-kanji focus:ring-kanji/40 cursor-pointer accent-kanji"
               />
               <span className="flex items-center gap-1.5 text-sm text-gray-500 group-hover:text-gray-700 transition-colors">
@@ -332,12 +314,22 @@ export const SessionCheckoutModal: FC<SessionCheckoutModalProps> = ({
             {/* Primary CTA */}
             <button
               type="button"
-              onClick={handleSaveAndClose}
-              className="w-full bg-gradient-to-r from-kio to-kanji text-white py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+              onClick={actions.handleSaveAndClose}
+              disabled={isSubmitting}
+              className="w-full bg-gradient-to-r from-kio to-kanji text-white py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
               style={{ boxShadow: '0 8px 30px rgba(138, 114, 209, 0.30)' }}
             >
-              <Save size={18} />
-              Cerrar y Guardar
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Guardando…
+                </>
+              ) : (
+                <>
+                  <Save size={18} />
+                  Cerrar y Guardar
+                </>
+              )}
             </button>
           </div>
         </div>
