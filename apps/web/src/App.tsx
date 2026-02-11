@@ -5,6 +5,8 @@ import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { AgendaPage } from './pages/AgendaPage';
+import { SessionPage } from './pages/SessionPage';
 
 function RootRedirect() {
   const { isAuthenticated, user } = useAuthStore();
@@ -33,6 +35,22 @@ function App() {
         element={
           <RequireAuth>
             <DashboardPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/agenda"
+        element={
+          <RequireAuth>
+            <AgendaPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/session/:appointmentId"
+        element={
+          <RequireAuth>
+            <SessionPage />
           </RequireAuth>
         }
       />

@@ -1,0 +1,174 @@
+import { useState, useMemo, type FC } from 'react';
+import { TrendingDown, TrendingUp, Minus, Activity, Ruler } from 'lucide-react';
+
+/** Mock previous appointment data — will come from API later. */
+const PREVIOUS_WEIGHT_KG = 72;
+const DEFAULT_HEIGHT_M = 1.65;
+
+interface AnthropometryField {
+  readonly id: string;
+  readonly label: string;
+  readonly unit: string;
+  readonly placeholder: string;
+  readonly isReadonly?: boolean;
+  readonly defaultValue?: string;
+  readonly colSpan?: number;
+}
+
+const FIELDS: readonly AnthropometryField[] = [
+  { id: 'currentWeight', label: 'Peso Actual', unit: 'kg', placeholder: '0.0' },
+  {
+    id: 'previousWeight',
+    label: 'Peso Anterior',
+    unit: 'kg',
+    placeholder: '—',
+    isReadonly: true,
+    defaultValue: String(PREVIOUS_WEIGHT_KG),
+  },
+  { id: 'bodyFat', label: '% Grasa Corporal', unit: '%', placeholder: '0.0' },
+  { id: 'waist', label: 'Cintura', unit: 'cm', placeholder: '0.0' },
+  { id: 'hip', label: 'Cadera', unit: 'cm', placeholder: '0.0' },
+] as const;
+
+/**
+ * Bento-grid of anthropometric input cards.
+ * Calculates BMI in real-time and shows weight-trend feedback.
+ */
+export const AnthropometryTab: FC = () => {
+  const [values, setValues] = useState<Record<string, string>>({
+    previousWeight: String(PREVIOUS_WEIGHT_KG),
+  });
+
+  const handleFieldChange = (fieldId: string, rawValue: string) => {
+    const sanitized = rawValue.replace(/[^0-9.]/g, '');
+    setValues((prev) => ({ ...prev, [fieldId]: sanitized }));
+  };
+
+  /* ── Derived calculations ── */
+  const currentWeight = parseFloat(values.currentWeight ?? '');
+  const previousWeight = PREVIOUS_WEIGHT_KG;
+
+  const bmiValue = useMemo(() => {
+    if (!currentWeight || currentWeight <= 0) return null;
+    return currentWeight / (DEFAULT_HEIGHT_M * DEFAULT_HEIGHT_M);
+  }, [currentWeight]);
+
+  const bmiCategory = useMemo(() => {
+    if (bmiValue === null) return null;
+    if (bmiValue < 18.5) return { label: 'Bajo peso', color: 'text-blue-500' };
+    if (bmiValue < 25) return { label: 'Normal', color: 'text-emerald-500' };
+    if (bmiValue < 30) return { label: 'Sobrepeso', color: 'text-amber-500' };
+    return { label: 'Obesidad', color: 'text-red-500' };
+  }, [bmiValue]);
+
+  const weightTrend = useMemo(() => {
+    if (!currentWeight || currentWeight <= 0) return 'neutral';
+    if (currentWeight < previousWeight) return 'down';
+    if (currentWeight > previousWeight) return 'up';
+    return 'neutral';
+  }, [currentWeight, previousWeight]);
+
+  return (
+    <div className="h-full overflow-y-auto p-6">
+      {/* ── Bento Grid ── */}
+      <div className="grid grid-cols-2 gap-4">
+        {FIELDS.map((field) => (
+          <div
+            key={field.id}
+            className={`
+              bg-white rounded-3xl p-5 border border-gray-100/60
+              shadow-sm hover:shadow-md transition-shadow duration-200
+              ${field.colSpan === 2 ? 'col-span-2' : ''}
+              ${field.isReadonly ? 'opacity-70' : ''}
+            `}
+          >
+            {/* Label */}
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                {field.label}
+              </span>
+
+              {/* Weight trend indicator — only on current weight */}
+              {field.id === 'currentWeight' && weightTrend !== 'neutral' && (
+                <span
+                  className={`
+                    flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full
+                    ${weightTrend === 'down' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'}
+                  `}
+                >
+                  {weightTrend === 'down' ? (
+                    <TrendingDown size={13} />
+                  ) : (
+                    <TrendingUp size={13} />
+                  )}
+                  {Math.abs(currentWeight - previousWeight).toFixed(1)} kg
+                </span>
+              )}
+            </div>
+
+            {/* Large Number Input */}
+            <div className="flex items-baseline gap-2">
+              <input
+                type="text"
+                inputMode="decimal"
+                readOnly={field.isReadonly}
+                value={values[field.id] ?? field.defaultValue ?? ''}
+                onChange={(e) => handleFieldChange(field.id, e.target.value)}
+                placeholder={field.placeholder}
+                className={`
+                  w-full text-3xl font-bold tracking-tight border-none outline-none bg-transparent
+                  placeholder:text-gray-200
+                  ${field.isReadonly ? 'text-gray-400 cursor-default' : 'text-gray-900'}
+                `}
+              />
+              <span className="text-base font-semibold text-gray-300 shrink-0">
+                {field.unit}
+              </span>
+            </div>
+          </div>
+        ))}
+
+        {/* ── IMC Highlighted Card ── */}
+        <div className="col-span-2 bg-gradient-to-br from-kio/10 via-kanji/5 to-transparent rounded-3xl p-6 border border-kio/20 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-xl bg-kio/20 flex items-center justify-center">
+              <Activity size={16} className="text-kanji" />
+            </div>
+            <span className="text-[11px] font-bold text-kanji/70 uppercase tracking-widest">
+              IMC — Índice de Masa Corporal
+            </span>
+          </div>
+
+          <div className="flex items-baseline gap-3">
+            <span className="text-5xl font-black text-kanji tracking-tight">
+              {bmiValue !== null ? bmiValue.toFixed(1) : '—'}
+            </span>
+            {bmiCategory && (
+              <span className={`text-sm font-bold ${bmiCategory.color}`}>
+                {bmiCategory.label}
+              </span>
+            )}
+          </div>
+
+          {/* Formula hint */}
+          <div className="flex items-center gap-1.5 mt-3">
+            <Ruler size={12} className="text-gray-300" />
+            <span className="text-[10px] text-gray-400">
+              Altura ref: {DEFAULT_HEIGHT_M}m · Fórmula: peso / altura²
+            </span>
+          </div>
+
+          {/* Neutral weight indicator */}
+          {weightTrend === 'neutral' && currentWeight > 0 && (
+            <div className="flex items-center gap-1.5 mt-2">
+              <Minus size={12} className="text-gray-400" />
+              <span className="text-[10px] text-gray-400">
+                Sin cambio respecto a cita anterior
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};

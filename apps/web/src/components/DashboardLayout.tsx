@@ -60,8 +60,8 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
       {/* Fixed Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col fixed h-full z-10">
         {/* Logo */}
-        <div className="h-16 flex items-center gap-3 px-5 border-b border-gray-100">
-          <div className="w-9 h-9 bg-gradient-to-br from-kio to-kanji rounded-xl flex items-center justify-center shadow-sm">
+        <div className="h-16 flex items-center gap-3 px-5">
+          <div className="w-9 h-9 bg-gradient-to-br from-kio to-kanji rounded-xl flex items-center justify-center">
             <span className="text-white font-bold text-sm">K</span>
           </div>
           <div>
