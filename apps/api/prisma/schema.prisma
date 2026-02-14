@@ -17,7 +17,6 @@ enum UserRole {
 
 enum ClinicianType {
   PSYCHOLOGIST
-  NUTRITIONIST
 }
 
 enum PatientStatus {
@@ -96,7 +95,6 @@ model Patient {
 
   clinician    ClinicianProfile @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
   appointments Appointment[]
-  nutriRecords NutriRecord[]
   psychNotes   PsychNote[]
 
   @@map("patients")
@@ -138,20 +136,6 @@ model PsychNote {
   patient     Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
   @@map("psych_notes")
-}
-
-model NutriRecord {
-  id            String   @id @default(uuid()) @db.Uuid
-  patientId     String   @map("patient_id") @db.Uuid
-  anthropometry Json
-  calculations  Json
-  date          DateTime @default(now())
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
-
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-
-  @@map("nutri_records")
 }
 
 model FinanceTransaction {

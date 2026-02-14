@@ -6,8 +6,6 @@ import {
   Brain,
   Target,
   Hash,
-  Weight,
-  Activity,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -29,23 +27,13 @@ interface PsychologistContext {
   totalSessions: number;
 }
 
-/* ── Nutritionist-specific context ── */
-
-interface NutritionistContext {
-  currentWeight: number;
-  bmi: number;
-  nutritionalGoal: string;
-  totalSessions: number;
-}
-
 /* ── Props ── */
 
 interface PatientContextPanelProps {
   patientName: string;
   patientAge: number;
-  clinicianType: 'PSYCHOLOGIST' | 'NUTRITIONIST';
+  clinicianType: 'PSYCHOLOGIST';
   psychContext?: PsychologistContext;
-  nutriContext?: NutritionistContext;
   sessionHistory: SessionHistoryItem[];
 }
 
@@ -60,7 +48,6 @@ export const PatientContextPanel: FC<PatientContextPanelProps> = ({
   patientAge,
   clinicianType,
   psychContext,
-  nutriContext,
   sessionHistory,
 }) => {
   const [expandedSessionIds, setExpandedSessionIds] = useState<Set<string>>(new Set());
@@ -105,8 +92,6 @@ export const PatientContextPanel: FC<PatientContextPanelProps> = ({
         <div className="space-y-2.5">
           {isPsychologist && psychContext ? (
             <PsychologistDataCards context={psychContext} />
-          ) : nutriContext ? (
-            <NutritionistDataCards context={nutriContext} />
           ) : null}
         </div>
       </div>
@@ -211,54 +196,6 @@ const PsychologistDataCards: FC<{ context: PsychologistContext }> = ({ context }
             </p>
           ))}
         </div>
-      </div>
-    </div>
-
-    {/* Session Count */}
-    <div className="flex items-center gap-2.5">
-      <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center">
-        <Hash size={14} className="text-blue-500" />
-      </div>
-      <div>
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-          Sesiones Totales
-        </p>
-        <p className="text-sm font-bold text-gray-800">{context.totalSessions}</p>
-      </div>
-    </div>
-  </>
-);
-
-const NutritionistDataCards: FC<{ context: NutritionistContext }> = ({ context }) => (
-  <>
-    {/* Current Weight + BMI */}
-    <div className="flex items-center gap-2.5">
-      <div className="w-8 h-8 rounded-xl bg-rose-50 flex items-center justify-center">
-        <Weight size={14} className="text-rose-400" />
-      </div>
-      <div>
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-          Peso Actual
-        </p>
-        <p className="text-sm font-semibold text-gray-800">
-          {context.currentWeight} kg
-          <span className="text-xs font-normal text-gray-400 ml-1.5">
-            IMC {context.bmi.toFixed(1)}
-          </span>
-        </p>
-      </div>
-    </div>
-
-    {/* Nutritional Goal */}
-    <div className="flex items-start gap-2.5">
-      <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 mt-0.5">
-        <Activity size={14} className="text-emerald-500" />
-      </div>
-      <div>
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-          Objetivo Nutricional
-        </p>
-        <p className="text-sm font-semibold text-gray-800">{context.nutritionalGoal}</p>
       </div>
     </div>
 

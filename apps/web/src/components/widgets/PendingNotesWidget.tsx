@@ -6,7 +6,7 @@ interface PendingNotesWidgetProps {
 
 export function PendingNotesWidget({ count }: PendingNotesWidgetProps) {
   return (
-    <div className="p-6 bg-white padding-2 rounded-[40px] rounded-br-none rounded-bl-none rounded-tr-none">
+    <div className="p-6 bg-bg padding-2 rounded-[40px] rounded-br-none rounded-bl-none rounded-tr-none">
       <div className="bg-amber-50 rounded-3xl p-6 border border-amber-100 relative overflow-hidden flex flex-col justify-between h-full shadow-[10px_10px_20px_0_rgba(0,0,0,0.1)]">
 
         {/* 1. Encabezado: Título y Subtítulo + Icono Flotante */}

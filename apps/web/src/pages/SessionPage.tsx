@@ -3,9 +3,8 @@ import { useParams } from 'react-router-dom';
 import { SessionLayout } from '../components/session/SessionLayout';
 import { PatientContextPanel } from '../components/session/PatientContextPanel';
 import { PsychologistEditor } from '../components/session/PsychologistEditor';
-import { NutritionistPanel } from '../components/session/NutritionistPanel';
 import { SessionCheckoutModal } from '../components/session/SessionCheckoutModal';
-import { useAuthStore } from '../stores/auth.store';
+// import { useAuthStore } from '../stores/auth.store';
 
 /* ── Mock data — replace with real API calls when backend is ready ── */
 
@@ -23,14 +22,6 @@ const MOCK_PSYCH_CONTEXT = {
     'Mejorar calidad de sueño (≥7h)',
   ],
   totalSessions: 8,
-};
-
-/** Nutritionist-specific patient context. */
-const MOCK_NUTRI_CONTEXT = {
-  currentWeight: 68,
-  bmi: 24.2,
-  nutritionalGoal: 'Recomposición corporal — déficit calórico moderado',
-  totalSessions: 5,
 };
 
 const MOCK_SESSION_HISTORY = [
@@ -75,7 +66,7 @@ function formatElapsedTime(totalSeconds: number): string {
  */
 export function SessionPage() {
   const { appointmentId } = useParams<{ appointmentId: string }>();
-  const user = useAuthStore((state) => state.user);
+  // const user = useAuthStore((state) => state.user); // Unused for now as we enforce Psychologist
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
@@ -91,8 +82,8 @@ export function SessionPage() {
   const elapsedTime = formatElapsedTime(elapsedSeconds);
 
   // Derive clinician type from the authenticated user's profile
-  const clinicianType = user?.profile?.type ?? 'PSYCHOLOGIST';
-  const isPsychologist = clinicianType === 'PSYCHOLOGIST';
+  const clinicianType = 'PSYCHOLOGIST';
+  // const isPsychologist = true; // Unused
 
   return (
     <>
@@ -108,13 +99,12 @@ export function SessionPage() {
             patientName={MOCK_PATIENT.name}
             patientAge={MOCK_PATIENT.age}
             clinicianType={clinicianType}
-            psychContext={isPsychologist ? MOCK_PSYCH_CONTEXT : undefined}
-            nutriContext={!isPsychologist ? MOCK_NUTRI_CONTEXT : undefined}
+            psychContext={MOCK_PSYCH_CONTEXT}
             sessionHistory={MOCK_SESSION_HISTORY}
           />
 
           {/* Right — Role-specific panel */}
-          {isPsychologist ? <PsychologistEditor /> : <NutritionistPanel />}
+          <PsychologistEditor />
         </div>
       </SessionLayout>
 

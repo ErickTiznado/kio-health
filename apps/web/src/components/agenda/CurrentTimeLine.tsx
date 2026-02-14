@@ -45,8 +45,8 @@ export function CurrentTimeLine() {
       />
       {/* Line */}
       <div
-        className="flex-1 h-[2.5px] bg-gradient-to-r from-red-400 via-kio to-kanji"
-        style={{ boxShadow: '0 0 10px rgba(239, 68, 68, 0.5), 0 0 20px rgba(174, 147, 254, 0.4)' }}
+        className="flex-1 h-[2px] bg-red-400"
+        style={{ boxShadow: '0 0 10px rgba(239, 68, 68, 0.4)' }}
       />
     </div>
   );

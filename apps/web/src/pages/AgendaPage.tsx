@@ -97,17 +97,17 @@ export function AgendaPage() {
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 pt-4 pb-3">
           <div>
-            <h1 className="text-2xl font-bold text-kanji tracking-tight">Mi Agenda</h1>
-            <p className="text-sm text-gray-400 mt-0.5 capitalize">{dateLabel}</p>
+            <h1 className="text-2xl font-bold text-[var(--color-kanji)] tracking-tight">Mi Agenda</h1>
+            <p className="text-sm text-[var(--color-text)] opacity-60 mt-0.5 capitalize">{dateLabel}</p>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Navigation */}
-            <div className="flex items-center gap-1 bg-white rounded-2xl border border-gray-100 shadow-sm p-1">
+            <div className="flex items-center gap-1 bg-[var(--color-white)] rounded-[24px] border border-[var(--color-cruz)] shadow-sm p-1">
               <button
                 type="button"
                 onClick={navigatePrevious}
-                className="p-2 rounded-xl hover:bg-gray-50 text-gray-500 hover:text-kanji transition-colors"
+                className="p-2 rounded-xl hover:bg-[var(--color-bg)] text-[var(--color-text)] opacity-70 hover:opacity-100 hover:text-[var(--color-kanji)] transition-all"
                 aria-label={previousAriaLabel}
               >
                 <ChevronLeft size={16} />
@@ -115,14 +115,14 @@ export function AgendaPage() {
               <button
                 type="button"
                 onClick={navigateToToday}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-kanji hover:bg-kio-light transition-colors"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-[var(--color-kanji)] hover:bg-[var(--color-kio-light)] transition-colors"
               >
                 Hoy
               </button>
               <button
                 type="button"
                 onClick={navigateNext}
-                className="p-2 rounded-xl hover:bg-gray-50 text-gray-500 hover:text-kanji transition-colors"
+                className="p-2 rounded-xl hover:bg-[var(--color-bg)] text-[var(--color-text)] opacity-70 hover:opacity-100 hover:text-[var(--color-kanji)] transition-all"
                 aria-label={nextAriaLabel}
               >
                 <ChevronRight size={16} />
@@ -130,14 +130,14 @@ export function AgendaPage() {
             </div>
 
             {/* View Toggle */}
-            <div className="flex items-center bg-white rounded-2xl border border-gray-100 shadow-sm p-1">
+            <div className="flex items-center bg-[var(--color-white)] rounded-[24px] border border-[var(--color-cruz)] shadow-sm p-1">
               <button
                 type="button"
                 onClick={switchToWeekView}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
                   activeView === 'week'
-                    ? 'bg-kanji text-white shadow-sm'
-                    : 'text-gray-500 hover:text-kanji'
+                    ? 'bg-[var(--color-kanji)] text-white shadow-sm'
+                    : 'text-[var(--color-text)] opacity-70 hover:text-[var(--color-kanji)] hover:opacity-100'
                 }`}
               >
                 <CalendarDays size={14} className="inline mr-1.5 -mt-0.5" />
@@ -148,8 +148,8 @@ export function AgendaPage() {
                 onClick={switchToDayView}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
                   activeView === 'day'
-                    ? 'bg-kanji text-white shadow-sm'
-                    : 'text-gray-500 hover:text-kanji'
+                    ? 'bg-[var(--color-kanji)] text-white shadow-sm'
+                    : 'text-[var(--color-text)] opacity-70 hover:text-[var(--color-kanji)] hover:opacity-100'
                 }`}
               >
                 <Calendar size={14} className="inline mr-1.5 -mt-0.5" />
