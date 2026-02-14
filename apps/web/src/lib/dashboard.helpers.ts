@@ -85,6 +85,7 @@ export interface CalendarDay {
     density: string;
     status: string;
     freeHours: string[];
+    appointmentCount: number;
 }
 
 /** Build 28 calendar day objects from a day-summary map for the AvailabilityWidget. */
@@ -93,7 +94,33 @@ export function buildCalendarDays(daySummary: DaySummary | undefined): CalendarD
 
     return Array.from({ length: 28 }, (_, i) => {
         const dayDate = addDays(monthStart, i);
-        const count = daySummary?.[format(dayDate, 'yyyy-MM-dd')] ?? 0;
+        const dateKey = format(dayDate, 'yyyy-MM-dd');
+        const summary = daySummary?.[dateKey];
+        const count = summary?.count ?? 0;
+
+        // Calculate free hours logic
+        // Office hours: 09:00 - 18:00 (9 hours total)
+        const OFFICE_START = 9;
+        const OFFICE_END = 18;
+        const allSlots = Array.from({ length: OFFICE_END - OFFICE_START }, (_, k) => k + OFFICE_START); // [9, 10, ... 17]
+
+        // Get busy hours from appointments (simple hour extraction)
+        // This is a naive implementation; for real production we'd check full ranges.
+        // But for this widget, integer start hours are sufficient.
+        const busyHours = new Set<number>();
+        if (summary?.appointments) {
+            summary.appointments.forEach(apt => {
+                const hour = new Date(apt.startTime).getHours();
+                busyHours.add(hour);
+                // If duration > 60, block next hour too
+                if (apt.duration > 60) busyHours.add(hour + 1);
+            });
+        }
+
+        const freeHours = allSlots
+            .filter(h => !busyHours.has(h))
+            .map(h => `${h}:00`);
+
 
         let density = 'free';
         let status = 'Disponible';
@@ -109,9 +136,15 @@ export function buildCalendarDays(daySummary: DaySummary | undefined): CalendarD
             status = 'Demanda media';
         } else if (count >= 1) {
             density = 'low';
-            status = `${count} cita${count > 1 ? 's' : ''}`;
+            status = 'Poca demanda';
         }
 
-        return { day: dayDate.getDate(), density, status, freeHours: [] };
+        return {
+            day: dayDate.getDate(),
+            density,
+            status,
+            freeHours: freeHours,
+            appointmentCount: count
+        };
     });
 }

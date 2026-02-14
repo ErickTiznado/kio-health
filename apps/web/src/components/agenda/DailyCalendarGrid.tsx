@@ -26,38 +26,38 @@ export function DailyCalendarGrid({ selectedDay, appointments, onSelectAppointme
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
-      <div className="p-4 font-bold border-b text-center">
+      <div className="p-4 font-bold border-b border-[var(--color-cruz)] text-center text-[var(--color-kanji)]">
         {format(selectedDay, 'EEEE, d MMMM', { locale: es })}
       </div>
       <div className="relative flex-1">
-         {hours.map(hour => {
-           const hourDate = new Date(selectedDay);
-           hourDate.setHours(hour, 0, 0, 0);
+        {hours.map(hour => {
+          const hourDate = new Date(selectedDay);
+          hourDate.setHours(hour, 0, 0, 0);
 
-           const slotAppointments = appointments.filter(a => {
-             const d = new Date(a.startTime);
-             return d.getDate() === selectedDay.getDate() && 
-                    d.getMonth() === selectedDay.getMonth() && 
-                    d.getFullYear() === selectedDay.getFullYear() && 
-                    d.getHours() === hour;
-           });
+          const slotAppointments = appointments.filter(a => {
+            const d = new Date(a.startTime);
+            return d.getDate() === selectedDay.getDate() &&
+              d.getMonth() === selectedDay.getMonth() &&
+              d.getFullYear() === selectedDay.getFullYear() &&
+              d.getHours() === hour;
+          });
 
-           return (
-             <div key={hour} className="flex border-b min-h-[5rem]">
-               <div className="w-16 text-right pr-2 text-sm text-gray-500 pt-2">
-                 {hour}:00
-               </div>
-               <div 
-                 className="flex-1 p-1 hover:bg-gray-50 cursor-pointer"
-                 onClick={() => onSlotClick(hourDate)}
-               >
-                  {slotAppointments.map(a => (
-                    <AppointmentPill key={a.id} appointment={a} onSelect={onSelectAppointment} />
-                  ))}
-               </div>
-             </div>
-           );
-         })}
+          return (
+            <div key={hour} className="flex border-b border-[var(--color-cruz)] min-h-[5rem]">
+              <div className="w-16 text-right pr-2 text-sm text-[var(--color-kanji)]/50 pt-2">
+                {hour}:00
+              </div>
+              <div
+                className="flex-1 p-1 hover:bg-[var(--color-kio-light)]/20 cursor-pointer transition-colors"
+                onClick={() => onSlotClick(hourDate)}
+              >
+                {slotAppointments.map(a => (
+                  <AppointmentPill key={a.id} appointment={a} onSelect={onSelectAppointment} />
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

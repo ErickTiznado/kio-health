@@ -39,20 +39,20 @@ export function CurrentTimeLine() {
       style={{ top: `${topPosition}px` }}
     >
       {/* Time Label */}
-      <div className="absolute -left-12 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-sm shadow-sm flex items-center justify-center">
+      <div className="absolute -left-12 bg-[var(--color-kio)] text-white text-[9px] font-black px-1.5 py-0.5 rounded-sm shadow-sm flex items-center justify-center">
         AHORA
       </div>
 
       {/* Circle indicator */}
       <div
-        className="w-4 h-4 rounded-full bg-red-500 -ml-[8px] shrink-0 z-10 border-2 border-white"
-        style={{ boxShadow: '0 0 10px rgba(239, 68, 68, 0.7), 0 0 20px rgba(239, 68, 68, 0.3)' }}
+        className="w-4 h-4 rounded-full bg-[var(--color-kio)] -ml-[8px] shrink-0 z-10 border-2 border-white"
+        style={{ boxShadow: '0 0 10px rgba(174, 147, 254, 0.7), 0 0 20px rgba(174, 147, 254, 0.3)' }}
       />
-      
+
       {/* Line */}
       <div
-        className="flex-1 h-[2px] bg-red-500/80"
-        style={{ boxShadow: '0 0 8px rgba(239, 68, 68, 0.4)' }}
+        className="flex-1 h-[2px] bg-[var(--color-kio)]/80"
+        style={{ boxShadow: '0 0 8px rgba(174, 147, 254, 0.4)' }}
       />
     </div>
   );

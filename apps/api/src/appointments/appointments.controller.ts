@@ -8,7 +8,9 @@ import {
   Query,
   UseGuards,
   ParseUUIDPipe,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AppointmentsService } from './appointments.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -18,6 +20,7 @@ import { CompleteCheckoutDto } from './dto/complete-checkout.dto';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { RescheduleAppointmentDto } from './dto/reschedule-appointment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { CreatePsychNoteDto } from './dto/create-psych-note.dto';
 
 @Controller('appointments')
 @UseGuards(JwtAuthGuard)
@@ -95,6 +98,28 @@ export class AppointmentsController {
     return this.appointmentsService.getSessionContext(user.userId, appointmentId);
   }
 
+  @Get(':id/export/pdf')
+  async exportPdf(
+    @CurrentUser() user: { userId: string; email: string; role: string },
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+    @Query('includePrivate') includePrivate: string,
+    @Res() res: Response,
+  ) {
+    const buffer = await this.appointmentsService.exportPdf(
+      user.userId,
+      appointmentId,
+      includePrivate === 'true',
+    );
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="session-${appointmentId}.pdf"`,
+      'Content-Length': buffer.length,
+    });
+
+    res.end(buffer);
+  }
+
   @Patch(':id/checkout')
   async completeCheckout(
     @CurrentUser() user: { userId: string; email: string; role: string },
@@ -130,6 +155,31 @@ export class AppointmentsController {
     @Param('id', ParseUUIDPipe) appointmentId: string,
   ) {
     return this.appointmentsService.markNoShow(user.userId, appointmentId);
+  }
+
+  @Get(':id/notes')
+  async getPsychNote(
+    @CurrentUser() user: { userId: string; email: string; role: string },
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+  ) {
+    return this.appointmentsService.getPsychNote(user.userId, appointmentId);
+  }
+
+  @Post(':id/notes')
+  async upsertPsychNote(
+    @CurrentUser() user: { userId: string; email: string; role: string },
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+    @Body() dto: CreatePsychNoteDto,
+  ) {
+    return this.appointmentsService.upsertPsychNote(user.userId, appointmentId, dto);
+  }
+
+  @Patch(':id/notes/pin')
+  async togglePin(
+    @CurrentUser() user: { userId: string; email: string; role: string },
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+  ) {
+    return this.appointmentsService.togglePin(user.userId, appointmentId);
   }
 
   @Patch(':id/notes')

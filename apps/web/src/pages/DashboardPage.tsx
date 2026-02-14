@@ -8,6 +8,8 @@ import { AvailabilityWidget } from '../components/widgets/AvailabilityWidget';
 import { PendingNotesWidget } from '../components/widgets/PendingNotesWidget';
 import { RecentPatientsWidget } from '../components/widgets/RecentPatientsWidget';
 import { QuickActionsWidget } from '../components/widgets/QuickActionsWidget';
+import { TodayAgendaWidget } from '../components/widgets/TodayAgendaWidget';
+import { useDocumentTitle } from '../hooks/use-document-title';
 
 /**
  * Dashboard Page — Composition-only component.
@@ -23,10 +25,18 @@ export function DashboardPage() {
     recentPatients,
     calendarDays,
     pendingNotesCount,
+    todayAppointments,
     isLoading,
+    isTodayLoading,
   } = useDashboardData();
 
   const userName = user?.email?.split('@')[0] ?? 'Doctor';
+
+  const titleLabel =
+    todayAppointments.length > 0
+      ? `Kio (${todayAppointments.length} ${todayAppointments.length === 1 ? 'Cita' : 'Citas'})`
+      : 'Dashboard';
+  useDocumentTitle(titleLabel);
 
   return (
     <DashboardLayout>
@@ -77,10 +87,16 @@ export function DashboardPage() {
           </div>
         </div>
 
-        {/* LOWER SECTION (Modular Grid) */}
+        {/* MAIN CONTENT AREA */}
         <div className="grid grid-cols-12 gap-6 px-4 mt-6 pb-10">
           <RecentPatientsWidget patients={recentPatients} />
-          <QuickActionsWidget />
+          
+          <div className="col-span-12 lg:col-span-5 flex flex-col gap-6 h-full">
+            <div className="flex-1 min-h-0">
+              <TodayAgendaWidget appointments={todayAppointments} isLoading={isTodayLoading} />
+            </div>
+            <QuickActionsWidget />
+          </div>
         </div>
       </div>
     </DashboardLayout>

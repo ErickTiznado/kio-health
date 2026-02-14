@@ -3,7 +3,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { QueryPatientsDto } from './dto/query-patients.dto';
+import { QueryTimelineDto } from './dto/query-timeline.dto';
 import { Patient, Prisma } from '../../prisma/generated/client';
+import { EncryptionService } from '../lib/encryption';
 
 @Injectable()
 export class PatientsService {
@@ -124,6 +126,121 @@ export class PatientsService {
       .reduce((sum, app) => sum + Number(app.price), 0);
 
     return { ...patient, totalDebt };
+  }
+
+  async getTimeline(
+    id: string,
+    clinicianId: string,
+    query: QueryTimelineDto,
+  ) {
+    const { page = 1, limit = 10, search } = query;
+    const skip = (page - 1) * limit;
+
+    // Check patient existence/access
+    await this.findOne(id, clinicianId);
+
+    const where: Prisma.AppointmentWhereInput = {
+      patientId: id,
+      clinicianId,
+      status: 'COMPLETED', // Only completed appointments have history? Or maybe all? "Citas pasadas" implies completed or past.
+      // Usually timeline is about clinical history, so COMPLETED.
+      // But maybe we want to see future ones too? "Trae todas las notas + citas pasadas".
+      // Let's assume past/completed for now.
+    };
+
+    if (search) {
+      where.OR = [
+        { reason: { contains: search, mode: 'insensitive' } },
+        { notes: { contains: search, mode: 'insensitive' } },
+        // Searching inside PsychNote content JSON is complex via Prisma API directly without Raw.
+        // We'll skip deep JSON search for this MVP iteration or rely on client filtering for loaded items.
+      ];
+    }
+
+    const [appointments, total] = await Promise.all([
+      this.prisma.appointment.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { startTime: 'desc' },
+        include: {
+          psychNote: true,
+        },
+      }),
+      this.prisma.appointment.count({ where }),
+    ]);
+
+    // Process appointments to decrypt private notes
+    const data = appointments.map((apt) => {
+      if (apt.psychNote && apt.psychNote.privateNotes) {
+        try {
+          const decrypted = EncryptionService.decrypt(apt.psychNote.privateNotes);
+          return {
+            ...apt,
+            psychNote: { ...apt.psychNote, privateNotes: decrypted },
+          };
+        } catch (e) {
+          console.error(`Failed to decrypt note for appointment ${apt.id}`, e);
+          return apt;
+        }
+      }
+      return apt;
+    });
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        lastPage: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async getMoodHistory(id: string, clinicianId: string) {
+    await this.findOne(id, clinicianId);
+
+    const notes = await this.prisma.psychNote.findMany({
+      where: {
+        patientId: id,
+        appointment: { clinicianId }, // Redundant but safe
+        moodRating: { not: null },
+      },
+      select: {
+        moodRating: true,
+        appointment: {
+          select: { startTime: true },
+        },
+      },
+      orderBy: { appointment: { startTime: 'asc' } },
+    });
+
+    return notes.map(n => ({
+      date: n.appointment.startTime,
+      mood: n.moodRating,
+    }));
+  }
+
+  async getLastNote(id: string, clinicianId: string) {
+    await this.findOne(id, clinicianId);
+
+    const lastNote = await this.prisma.psychNote.findFirst({
+      where: {
+        patientId: id,
+        appointment: { clinicianId },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (lastNote && lastNote.privateNotes) {
+      try {
+        lastNote.privateNotes = EncryptionService.decrypt(lastNote.privateNotes);
+      } catch (e) {
+        lastNote.privateNotes = null;
+      }
+    }
+
+    return lastNote;
   }
 
   async update(id: string, clinicianId: string, updatePatientDto: UpdatePatientDto) {

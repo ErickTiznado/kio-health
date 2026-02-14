@@ -2,16 +2,20 @@ import { useNavigate, Link } from 'react-router-dom';
 import { X, CreditCard, FileText, Clock, Stethoscope, ClipboardList, Calendar, Edit2, Ban, ExternalLink } from 'lucide-react';
 import { format, parseISO, formatDistanceToNowStrict } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { toast } from 'sonner';
 import type { Appointment } from '../../types/appointments.types';
 
 import { useState } from 'react';
 
 import { PaymentModal } from './PaymentModal';
+import { ScheduleAppointmentModal } from './ScheduleAppointmentModal';
 
 interface AppointmentDrawerProps {
   appointment: Appointment | null;
   isOpen: boolean;
   onClose: () => void;
+  onReschedule: (id: string, date: Date) => void;
+  onCancel: (id: string) => void;
 }
 
 const TYPE_LABELS: Record<string, string> = {
@@ -32,9 +36,10 @@ const STATUS_CONFIG: Record<string, { label: string; className: string; dotColor
  * Opens from the right with backdrop overlay.
  * Includes patient info, history, payment, and CTA to start session.
  */
-export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentDrawerProps) {
+export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, onCancel }: AppointmentDrawerProps) {
   const navigate = useNavigate();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
 
   // Derived state for display
   const amount = Number(appointment?.price) || 0;
@@ -58,11 +63,46 @@ export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentD
   // Relative time context
   const relativeTime = formatDistanceToNowStrict(startDate, { addSuffix: true, locale: es });
   const isFuture = startDate > new Date();
-  const timeBadgeColor = isFuture ? 'bg-blue-50 text-blue-700' : 'bg-orange-50 text-orange-700';
+  const timeBadgeColor = isFuture ? 'bg-[var(--color-kio-light)]/20 text-[var(--color-kanji)]' : 'bg-[var(--color-cruz)]/30 text-[var(--color-kanji)]/60';
 
   const handleStartSession = () => {
     onClose();
     navigate(`/session/${appointment.id}`);
+  };
+
+  const handleCancelClick = () => {
+    toast.custom((t) => (
+      <div className="bg-white p-5 rounded-[24px] shadow-2xl border border-red-100 flex flex-col gap-4 w-[360px] animate-in fade-in slide-in-from-top-5 duration-300">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center text-red-500 shrink-0">
+             <Ban size={24} />
+          </div>
+          <div>
+            <h3 className="font-bold text-[var(--color-kanji)] text-lg leading-tight">¿Cancelar cita?</h3>
+            <p className="text-xs text-[var(--color-text)] opacity-70 mt-1.5 leading-relaxed">
+              Esta acción es irreversible. El horario quedará libre y se notificará al paciente.
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-3 pt-2">
+          <button 
+            onClick={() => toast.dismiss(t)} 
+            className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-[var(--color-kanji)] hover:bg-[var(--color-cruz)]/20 transition-colors"
+          >
+            No, volver
+          </button>
+          <button 
+            onClick={() => {
+              onCancel(appointment.id);
+              toast.dismiss(t);
+            }} 
+            className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/20 transition-all active:scale-95"
+          >
+            Sí, cancelar
+          </button>
+        </div>
+      </div>
+    ), { duration: Infinity, position: 'top-center' }); // Persistent until interaction, center screen
   };
 
   // Check for history empty state
@@ -72,7 +112,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentD
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 z-40 transition-all duration-300 ${isOpen ? 'bg-black/25 backdrop-blur-sm opacity-100' : 'opacity-0 pointer-events-none'
+        className={`fixed inset-0 z-40 transition-all duration-300 ${isOpen ? 'bg-[var(--color-kanji)]/10 backdrop-blur-sm opacity-100' : 'opacity-0 pointer-events-none'
           }`}
         onClick={onClose}
         role="presentation"
@@ -90,29 +130,32 @@ export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentD
             <button
               type="button"
               title="Editar Cita"
-              className="p-2 rounded-xl hover:bg-white/60 text-gray-500 hover:text-blue-600 transition-colors"
+              className="p-2 rounded-xl hover:bg-[var(--color-kio-light)]/20 text-[var(--color-kanji)]/60 hover:text-[var(--color-kio)] transition-colors"
+              onClick={() => toast.info('Edición completa próximamente', { description: 'Utiliza "Reagendar" para cambiar la fecha.' })}
             >
               <Edit2 size={16} />
             </button>
             <button
               type="button"
               title="Reagendar"
-              className="p-2 rounded-xl hover:bg-white/60 text-gray-500 hover:text-amber-600 transition-colors"
+              className="p-2 rounded-xl hover:bg-[var(--color-kio-light)]/20 text-[var(--color-kanji)]/60 hover:text-[var(--color-kanji)] transition-colors"
+              onClick={() => setIsRescheduleModalOpen(true)}
             >
               <Calendar size={16} />
             </button>
             <button
               type="button"
               title="Cancelar Cita"
-              className="p-2 rounded-xl hover:bg-white/60 text-gray-500 hover:text-red-600 transition-colors"
+              className="p-2 rounded-xl hover:bg-[var(--color-kio-light)]/20 text-[var(--color-kanji)]/60 hover:text-[var(--color-kanji)] transition-colors"
+              onClick={handleCancelClick}
             >
               <Ban size={16} />
             </button>
-            <div className="w-px h-4 bg-gray-300 mx-1" />
+            <div className="w-px h-4 bg-[var(--color-cruz)] mx-1" />
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl hover:bg-white/60 text-gray-400 hover:text-gray-700 transition-colors"
+              className="p-2 rounded-xl hover:bg-[var(--color-kio-light)]/20 text-[var(--color-kanji)]/40 hover:text-[var(--color-kanji)] transition-colors"
             >
               <X size={18} />
             </button>
@@ -121,7 +164,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentD
           <div className="flex items-center gap-4 mt-6">
             {/* Deep Linking Avatar */}
             <Link
-              to={`/patient/${appointment.patientId}`}
+              to={`/patients/${appointment.patientId}`}
               className="w-16 h-16 bg-[var(--color-kanji)] rounded-[20px] flex items-center justify-center shrink-0 shadow-sm relative overflow-hidden group cursor-pointer hover:shadow-md transition-all"
             >
               <span className="text-white font-bold text-xl relative z-10">{initials}</span>
@@ -134,13 +177,13 @@ export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentD
             <div className="flex-1 min-w-0">
               {/* Deep Linking Name */}
               <Link
-                to={`/patient/${appointment.patientId}`}
+                to={`/patients/${appointment.patientId}`}
                 className="group flex items-center gap-2"
               >
-                <p className="text-lg font-bold text-gray-900 truncate group-hover:text-[var(--color-kanji)] transition-colors">
+                <p className="text-lg font-bold text-[var(--color-kanji)] truncate group-hover:text-[var(--color-kio)] transition-colors">
                   {appointment.patient.fullName}
                 </p>
-                <ExternalLink size={12} className="text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ExternalLink size={12} className="text-[var(--color-kanji)]/40 opacity-0 group-hover:opacity-100 transition-opacity" />
               </Link>
 
               <div className="flex items-center gap-2 mt-2.5">
@@ -156,15 +199,15 @@ export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentD
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
           {/* Time & Type Card */}
-          <div className="bg-gray-50/80 rounded-2xl p-4 space-y-3 border border-gray-100">
+          <div className="bg-[var(--color-bg)] rounded-2xl p-4 space-y-3 border border-[var(--color-cruz)]">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-kanji/10 flex items-center justify-center text-kanji">
+              <div className="w-9 h-9 rounded-xl bg-[var(--color-kanji)]/10 flex items-center justify-center text-[var(--color-kanji)]">
                 <Clock size={16} />
               </div>
               <div>
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Horario</p>
+                <p className="text-[10px] font-bold text-[var(--color-kanji)]/60 uppercase tracking-widest">Horario</p>
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-gray-800">
+                  <p className="text-sm font-semibold text-[var(--color-kanji)]">
                     {format(startDate, 'hh:mm a')} — {format(endDate, 'hh:mm a')}
                   </p>
                   {/* Relative Time Context */}
@@ -176,12 +219,12 @@ export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentD
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-kanji/10 flex items-center justify-center text-kanji">
+              <div className="w-9 h-9 rounded-xl bg-[var(--color-kanji)]/10 flex items-center justify-center text-[var(--color-kanji)]">
                 <Stethoscope size={16} />
               </div>
               <div>
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Tipo</p>
-                <p className="text-sm font-semibold text-gray-800">{typeLabel}</p>
+                <p className="text-[10px] font-bold text-[var(--color-kanji)]/60 uppercase tracking-widest">Tipo</p>
+                <p className="text-sm font-semibold text-[var(--color-kanji)]">{typeLabel}</p>
               </div>
             </div>
           </div>
@@ -190,12 +233,12 @@ export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentD
           {appointment.reason && (
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <FileText size={14} className="text-gray-500" />
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Motivo de consulta</p>
+                <FileText size={14} className="text-[var(--color-kanji)]/60" />
+                <p className="text-[10px] font-bold text-[var(--color-kanji)]/60 uppercase tracking-widest">Motivo de consulta</p>
               </div>
               <div className="pl-6 relative">
-                <div className="absolute left-[3px] top-1 bottom-1 w-0.5 bg-gray-200 rounded-full" />
-                <p className="text-sm text-gray-700 leading-relaxed pl-4 py-1">
+                <div className="absolute left-[3px] top-1 bottom-1 w-0.5 bg-[var(--color-cruz)] rounded-full" />
+                <p className="text-sm text-[var(--color-text)] leading-relaxed pl-4 py-1">
                   {appointment.reason}
                 </p>
               </div>
@@ -206,37 +249,40 @@ export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentD
           <div>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <ClipboardList size={14} className="text-gray-500" />
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Historial reciente</p>
+                <ClipboardList size={14} className="text-[var(--color-kanji)]/60" />
+                <p className="text-[10px] font-bold text-[var(--color-kanji)]/60 uppercase tracking-widest">Historial reciente</p>
               </div>
               {history.length > 0 && (
-                <button className="text-[10px] font-bold text-kanji hover:underline">Ver todo</button>
+                <button className="text-[10px] font-bold text-[var(--color-kanji)] hover:underline">Ver todo</button>
               )}
             </div>
 
             <div className="pl-6">
               {/* Empty State (Guidance) */}
               {history.length === 0 ? (
-                <div className="bg-gray-50 rounded-xl p-4 border border-dashed border-gray-200 text-center">
-                  <p className="text-xs font-semibold text-gray-600 mb-1">Primera sesión</p>
-                  <p className="text-[10px] text-gray-400 mb-3">Este paciente no tiene historial clínico previo.</p>
-                  <button className="text-xs font-bold text-kanji flex items-center justify-center gap-1.5 mx-auto hover:bg-kanji/5 px-3 py-1.5 rounded-lg transition-colors">
+                <div className="bg-[var(--color-bg)] rounded-xl p-4 border border-dashed border-[var(--color-cruz)] text-center">
+                  <p className="text-xs font-semibold text-[var(--color-kanji)]/80 mb-1">Primera sesión</p>
+                  <p className="text-[10px] text-[var(--color-text)]/60 mb-3">Este paciente no tiene historial clínico previo.</p>
+                  <Link 
+                    to={`/patients/${appointment.patientId}`} 
+                    className="text-xs font-bold text-[var(--color-kanji)] flex items-center justify-center gap-1.5 mx-auto hover:bg-[var(--color-kanji)]/5 px-3 py-1.5 rounded-lg transition-colors"
+                  >
                     <FileText size={12} />
                     Ver cuestionario de admisión
-                  </button>
+                  </Link>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {history.map((note) => (
                     <div key={note.id} className="group relative">
                       {/* Timeline dot */}
-                      <div className="absolute -left-[27px] top-1.5 w-2.5 h-2.5 rounded-full border-[2px] border-white ring-1 ring-gray-200 bg-gray-300 group-hover:bg-kanji group-hover:ring-kanji/30 transition-colors z-10" />
+                      <div className="absolute -left-[27px] top-1.5 w-2.5 h-2.5 rounded-full border-[2px] border-white ring-1 ring-[var(--color-cruz)] bg-[var(--color-cruz)] group-hover:bg-[var(--color-kanji)] group-hover:ring-[var(--color-kanji)]/30 transition-colors z-10" />
                       {/* Timeline line */}
-                      <div className="absolute -left-[23px] top-3.5 bottom-[-14px] w-px bg-gray-200 group-last:hidden" />
+                      <div className="absolute -left-[23px] top-3.5 bottom-[-14px] w-px bg-[var(--color-cruz)] group-last:hidden" />
 
-                      <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm hover:shadow-md hover:border-kanji/20 transition-all cursor-default">
+                      <div className="bg-white rounded-xl p-3 border border-[var(--color-cruz)] shadow-sm hover:shadow-md hover:border-[var(--color-kanji)]/20 transition-all cursor-default">
                         <div className="flex items-center justify-between mb-1.5">
-                          <p className="text-[10px] font-bold text-gray-500">
+                          <p className="text-[10px] font-bold text-[var(--color-kanji)]/60">
                             {format(parseISO(note.date), "d 'de' MMM", { locale: es })}
                           </p>
                           <div className="flex gap-1">
@@ -247,7 +293,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentD
                             ))}
                           </div>
                         </div>
-                        <p className="text-xs text-gray-600 leading-relaxed">
+                        <p className="text-xs text-[var(--color-text)] leading-relaxed">
                           {note.summary}
                         </p>
                       </div>
@@ -260,19 +306,19 @@ export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentD
         </div>
 
         {/* Visual Separation: Administrative/Financial Block (Proximity Law) */}
-        <div className="bg-gray-50/50 border-t border-gray-100 p-6 space-y-4">
+        <div className="bg-[var(--color-bg)]/80 border-t border-[var(--color-cruz)] p-6 space-y-4">
           {/* Payment Actionable (Fitts's Law) */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <CreditCard size={14} className="text-gray-500" />
-              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Estado del Pago</p>
+              <CreditCard size={14} className="text-[var(--color-kanji)]/60" />
+              <p className="text-[10px] font-bold text-[var(--color-kanji)]/60 uppercase tracking-widest">Estado del Pago</p>
             </div>
-            <div className="flex items-center justify-between bg-white rounded-xl p-3 border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between bg-white rounded-xl p-3 border border-[var(--color-cruz)] shadow-sm">
               <div className="flex flex-col">
-                <p className="text-sm font-bold text-gray-800">${amount} MXN</p>
+                <p className="text-sm font-bold text-[var(--color-kanji)]">${amount} MXN</p>
                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md w-fit mt-1 ${appointment.paymentStatus === 'PAID'
-                  ? 'bg-emerald-100 text-emerald-700'
-                  : 'bg-amber-100 text-amber-700'
+                  ? 'bg-[var(--color-kio-light)]/40 text-[var(--color-kio)]'
+                  : 'bg-[var(--color-cruz)]/40 text-[var(--color-kanji)]'
                   }`}>
                   {appointment.paymentStatus === 'PAID' ? 'PAGADO' : 'PENDIENTE'}
                 </span>
@@ -280,7 +326,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentD
 
               <button
                 onClick={() => setIsPaymentModalOpen(true)}
-                className="px-4 py-2 bg-gray-900 text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1.5"
+                className="px-4 py-2 bg-[var(--color-kanji)] text-white text-xs font-bold rounded-lg hover:bg-[var(--color-kio)] transition-colors flex items-center gap-1.5"
               >
                 <CreditCard size={14} />
                 Gestionar
@@ -307,6 +353,18 @@ export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentD
           </button>
         </div>
       </aside>
+
+      {/* Reschedule Modal (Reused) */}
+      <ScheduleAppointmentModal
+        isOpen={isRescheduleModalOpen}
+        onClose={() => setIsRescheduleModalOpen(false)}
+        initialDate={startDate}
+        onConfirm={(newDate) => {
+          onReschedule(appointment.id, newDate);
+          setIsRescheduleModalOpen(false);
+        }}
+        isRescheduleMode={true}
+      />
     </>
   );
 }

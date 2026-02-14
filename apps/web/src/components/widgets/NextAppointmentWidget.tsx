@@ -230,3 +230,5 @@ export function NextAppointmentWidget({ appointment, isLoading }: NextAppointmen
     </div>
   );
 }
+// Force refresh
+

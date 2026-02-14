@@ -131,14 +131,14 @@ export function WeeklyCalendarGrid({ weekStart, appointments, onSelectAppointmen
   };
 
   return (
-    <div className="bg-white border-t border-gray-100 overflow-hidden h-full flex flex-col">
+    <div className="bg-white border-t border-[var(--color-cruz)] overflow-hidden h-full flex flex-col">
       {/* Day Headers */}
       <div
-        className="grid border-b border-gray-200"
+        className="grid border-b border-[var(--color-cruz)]"
         style={{ gridTemplateColumns: `${HOUR_COLUMN_WIDTH} repeat(7, 1fr)` }}
       >
         {/* Empty corner cell */}
-        <div className="p-3 border-r border-gray-100" />
+        <div className="p-3 border-r border-[var(--color-cruz)]" />
 
         {weekDays.map((day) => {
           const isDayToday = isToday(day);
@@ -147,13 +147,13 @@ export function WeeklyCalendarGrid({ weekStart, appointments, onSelectAppointmen
               key={day.toISOString()}
               className="py-3 px-2 text-center"
             >
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+              <p className="text-xs font-bold text-[var(--color-kanji)]/60 uppercase tracking-wider">
                 {format(day, 'EEE', { locale: es })}
               </p>
               <div
                 className={`inline-flex items-center justify-center w-10 h-10 mt-1 rounded-full text-base font-bold transition-colors ${isDayToday
-                  ? 'bg-kanji text-white shadow-md'
-                  : 'text-gray-700'
+                  ? 'bg-[var(--color-kanji)] text-white shadow-md'
+                  : 'text-[var(--color-kanji)]'
                   }`}
               >
                 {format(day, 'd')}
@@ -173,10 +173,10 @@ export function WeeklyCalendarGrid({ weekStart, appointments, onSelectAppointmen
             <div key={`row-${hour}`} className="contents">
               {/* Hour Label */}
               <div
-                className="pr-3 pt-0 text-right border-r border-dashed border-gray-100/60 flex items-start justify-end"
+                className="pr-3 pt-0 text-right border-r border-dashed border-[var(--color-cruz)]/60 flex items-start justify-end"
                 style={{ height: `${HOUR_HEIGHT_PX}px` }}
               >
-                <span className="text-xs font-medium text-gray-400 -mt-2 select-none">
+                <span className="text-xs font-medium text-[var(--color-kanji)]/50 -mt-2 select-none">
                   {formatHourLabel(hour)}
                 </span>
               </div>
@@ -189,7 +189,7 @@ export function WeeklyCalendarGrid({ weekStart, appointments, onSelectAppointmen
                 return (
                   <div
                     key={`${dayStr}-${hour}`}
-                    className="relative border-r border-gray-100 hover:bg-gray-50/50 transition-colors"
+                    className="relative border-r border-[var(--color-cruz)] hover:bg-[var(--color-kio-light)]/10 transition-colors"
                     style={{ height: `${HOUR_HEIGHT_PX}px` }}
                     onMouseMove={(e) => handleMouseMove(e, day, hour)}
                     onMouseLeave={handleMouseLeave}
@@ -199,14 +199,14 @@ export function WeeklyCalendarGrid({ weekStart, appointments, onSelectAppointmen
                     {/* Ghost Slot UI */}
                     {isHovered && (
                       <div
-                        className="absolute left-1 right-1 border-2 border-dashed border-violet-500/50 bg-violet-500/10 rounded-lg flex items-center justify-center z-10 transition-all duration-75 ease-out cursor-pointer"
+                        className="absolute left-1 right-1 border-2 border-dashed border-[var(--color-kio)]/50 bg-[var(--color-kio)]/10 rounded-lg flex items-center justify-center z-10 transition-all duration-75 ease-out cursor-pointer"
                         style={{
                           top: ghostSlot.minute === 0 ? '2px' : '50%',
                           height: 'calc(50% - 2px)',
                         }}
                         onClick={handleGhostClick}
                       >
-                        <div className="flex items-center gap-1.5 text-violet-600">
+                        <div className="flex items-center gap-1.5 text-[var(--color-kio)]">
                           <Plus size={14} strokeWidth={3} />
                           <span className="text-xs font-bold">
                             {hour}:{ghostSlot.minute === 0 ? '00' : '30'}
@@ -244,7 +244,7 @@ export function WeeklyCalendarGrid({ weekStart, appointments, onSelectAppointmen
                 {/* Past Time Shading */}
                 {isDayToday && (
                   <div
-                    className="absolute top-0 left-0 right-0 bg-gray-50/40 border-b border-gray-100/50 pointer-events-none z-0"
+                    className="absolute top-0 left-0 right-0 bg-[var(--color-cruz)]/20 border-b border-[var(--color-cruz)]/50 pointer-events-none z-0"
                     style={{ height: `${pastTimeHeight}px` }}
                   />
                 )}

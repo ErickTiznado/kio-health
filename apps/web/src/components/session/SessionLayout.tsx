@@ -8,6 +8,7 @@ interface SessionLayoutProps {
   patientId: string;
   patientName: string;
   patientAge?: number;
+  sessionNumber?: number;
   elapsedTime: string;
   totalBalance: number;
   lastVisit: string | null;
@@ -22,6 +23,7 @@ export const SessionLayout: FC<SessionLayoutProps> = ({
   patientId,
   patientName,
   patientAge,
+  sessionNumber,
   elapsedTime,
   totalBalance,
   lastVisit,
@@ -51,7 +53,7 @@ export const SessionLayout: FC<SessionLayoutProps> = ({
 
           <div className="flex flex-col">
             <h1 className="text-lg font-bold text-gray-900 leading-tight">
-              {patientName}
+              {patientName} <span className="text-gray-400 font-normal">#{sessionNumber || 1}</span>
             </h1>
             <div className="flex items-center gap-3 text-xs text-gray-500">
               {patientAge !== undefined && <span>{patientAge} años</span>}

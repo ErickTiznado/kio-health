@@ -6,6 +6,8 @@ import {
     fetchRecentPatients,
     fetchDaySummary,
     fetchPendingNotesCount,
+    fetchAppointmentsByDate,
+    getTodayDateString,
 } from '../lib/appointments.api';
 import {
     mapRecentPatients,
@@ -21,6 +23,7 @@ const QUERY_KEYS = {
     recentPatients: ['recent-patients'] as const,
     daySummary: (from: string, to: string) => ['day-summary', from, to] as const,
     pendingNotes: ['pending-notes-count'] as const,
+    todayAppointments: ['today-appointments'] as const,
 } as const;
 
 /* ── Return type ─────────────────────────────────── */
@@ -34,8 +37,12 @@ export interface DashboardData {
     calendarDays: CalendarDay[];
     /** Completed appointments missing a psych note */
     pendingNotesCount: number;
+    /** All appointments for today */
+    todayAppointments: Appointment[];
     /** True while next appointment is loading */
     isLoading: boolean;
+    /** True while today's appointments are loading */
+    isTodayLoading: boolean;
 }
 
 /* ── Hook ────────────────────────────────────────── */
@@ -84,6 +91,13 @@ export function useDashboardData(): DashboardData {
         staleTime: 1000 * 60 * 5,
     });
 
+    /* 5. Today's appointments (full list) */
+    const { data: todayAppointments = [], isLoading: isTodayLoading } = useQuery({
+        queryKey: QUERY_KEYS.todayAppointments,
+        queryFn: () => fetchAppointmentsByDate(getTodayDateString()),
+        staleTime: 1000 * 60 * 5,
+    });
+
     /* ── Derived / memoized transformations ── */
 
     const recentPatients = useMemo(
@@ -103,6 +117,8 @@ export function useDashboardData(): DashboardData {
         recentPatients,
         calendarDays,
         pendingNotesCount,
+        todayAppointments,
         isLoading,
+        isTodayLoading,
     };
 }

@@ -9,6 +9,8 @@ import type {
   CreateAppointmentPayload,
   ReschedulePayload,
   SessionContext,
+  PsychNote,
+  CreatePsychNoteDto,
 } from '../types/appointments.types';
 
 /**
@@ -155,4 +157,19 @@ export async function rescheduleAppointment(appointmentId: string, payload: Resc
  */
 export function getTodayDateString(): string {
   return new Date().toISOString().split('T')[0];
+}
+
+/* ── Clinical Notes ─────────────────────────── */
+
+export async function fetchPsychNote(appointmentId: string): Promise<PsychNote> {
+  const response = await api.get<PsychNote>(`/appointments/${appointmentId}/notes`);
+  return response.data;
+}
+
+export async function upsertPsychNote(
+  appointmentId: string,
+  payload: CreatePsychNoteDto,
+): Promise<PsychNote> {
+  const response = await api.post<PsychNote>(`/appointments/${appointmentId}/notes`, payload);
+  return response.data;
 }

@@ -1,6 +1,7 @@
-import type { FC, ReactNode } from 'react';
+import { type FC, type ReactNode, useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/auth.store';
+import { DiscreteModeToggle } from './common/DiscreteModeToggle';
 import {
   LayoutDashboard,
   Calendar,
@@ -10,6 +11,8 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  Menu,
+  X,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -44,6 +47,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthStore();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const clinicianType = user?.profile?.type;
   const navItems = clinicianType === 'NUTRITIONIST' ? NUTRITIONIST_NAV : PSYCHOLOGIST_NAV;
@@ -64,17 +68,38 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-bg flex">
-      {/* Fixed Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col fixed h-full z-10">
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-20 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`w-64 bg-white border-r border-gray-200 flex flex-col fixed h-full z-30 transition-transform duration-200 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0`}
+      >
         {/* Logo */}
-        <div className="h-16 flex items-center gap-3 px-5">
-          <div className="w-9 h-9 bg-gradient-to-br from-kio to-kanji rounded-xl flex items-center justify-center">
-            <span className="text-white font-bold text-sm">K</span>
+        <div className="h-16 flex items-center justify-between px-5">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-gradient-to-br from-kio to-kanji rounded-xl flex items-center justify-center">
+              <span className="text-white font-bold text-sm">K</span>
+            </div>
+            <div>
+              <span className="font-bold text-kanji text-lg">Kio</span>
+              <span className="text-gray-400 text-lg ml-0.5">Health</span>
+            </div>
           </div>
-          <div>
-            <span className="font-bold text-kanji text-lg">Kio</span>
-            <span className="text-gray-400 text-lg ml-0.5">Health</span>
-          </div>
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden text-gray-400 hover:text-kanji"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         {/* Navigation */}
@@ -87,6 +112,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
               <li key={item.to}>
                 <NavLink
                   to={item.to}
+                  onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
                     `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative ${
                       isActive
@@ -117,6 +143,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
         <div className="px-3 pb-4 border-t border-gray-100 pt-3 space-y-0.5">
           <NavLink
             to="/settings"
+            onClick={() => setSidebarOpen(false)}
             className={({ isActive }) =>
               `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative ${
                 isActive
@@ -147,11 +174,18 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col ml-64">
+      <div className="flex-1 flex flex-col lg:ml-64">
         {/* Top Header */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-5">
-          {/* Breadcrumb / Title */}
-          <div className="flex items-center gap-2 text-sm">
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-10">
+          {/* Hamburger + Breadcrumb */}
+          <div className="flex items-center gap-3 text-sm">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden text-gray-500 hover:text-kanji"
+            >
+              <Menu size={22} />
+            </button>
             <span className="text-gray-400 font-medium">Inicio</span>
             <ChevronRight size={14} className="text-gray-300" />
             <span className="text-kanji font-bold">{pageLabel}</span>
@@ -159,6 +193,8 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
 
           {/* User Avatar */}
           <div className="flex items-center gap-3">
+            <DiscreteModeToggle />
+            <div className="w-px h-6 bg-gray-200 mx-1" />
             <div className="text-right hidden sm:block">
               <p className="text-sm font-medium text-kanji">{userName}</p>
               <p className="text-xs text-gray-400">

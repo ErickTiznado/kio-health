@@ -1,3 +1,5 @@
+import type { Appointment, PsychNote } from './appointments.types';
+
 export interface EmergencyContact {
   name: string;
   phone: string;
@@ -36,7 +38,7 @@ export interface CreatePatientDto {
   emergencyContact?: EmergencyContact;
 }
 
-export interface UpdatePatientDto extends Partial<CreatePatientDto> { }
+export type UpdatePatientDto = Partial<CreatePatientDto>;
 
 export interface QueryPatientsDto {
   page?: number;
@@ -46,6 +48,19 @@ export interface QueryPatientsDto {
 
 export interface PatientsResponse {
   data: Patient[];
+  meta: {
+    total: number;
+    page: number;
+    lastPage: number;
+  };
+}
+
+export type TimelineItem = Appointment & {
+  psychNote?: PsychNote;
+};
+
+export interface TimelineResponse {
+  data: TimelineItem[];
   meta: {
     total: number;
     page: number;

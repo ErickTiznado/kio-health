@@ -10,10 +10,19 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { RescheduleAppointmentDto } from './dto/reschedule-appointment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { CompleteCheckoutDto } from './dto/complete-checkout.dto';
+import { CreatePsychNoteDto, NoteTemplateType } from './dto/create-psych-note.dto';
+import { EncryptionService } from '../lib/encryption';
+import { ExportService } from '../export/export.service';
+
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class AppointmentsService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly exportService: ExportService,
+    private readonly eventEmitter: EventEmitter2,
+  ) { }
 
   /**
    * Find appointments for a specific clinician.
@@ -111,18 +120,43 @@ export class AppointmentsService {
         startTime: { gte: startOfRange, lte: endOfRange },
         status: { not: 'CANCELLED' },
       },
-      select: { startTime: true },
+      select: { id: true, startTime: true, endTime: true },
       orderBy: { startTime: 'asc' },
     });
 
     // Group by date string
-    const countByDay: Record<string, number> = {};
+    const summary: Record<
+      string,
+      {
+        count: number;
+        appointments: Array<{
+          id: string;
+          startTime: string;
+          duration: number;
+        }>;
+      }
+    > = {};
+
     for (const apt of appointments) {
       const dayKey = apt.startTime.toISOString().split('T')[0];
-      countByDay[dayKey] = (countByDay[dayKey] || 0) + 1;
+
+      if (!summary[dayKey]) {
+        summary[dayKey] = { count: 0, appointments: [] };
+      }
+
+      summary[dayKey].count++;
+
+      const durationMs = apt.endTime.getTime() - apt.startTime.getTime();
+      const durationMinutes = Math.round(durationMs / 60000);
+
+      summary[dayKey].appointments.push({
+        id: apt.id,
+        startTime: apt.startTime.toISOString(),
+        duration: durationMinutes,
+      });
     }
 
-    return countByDay;
+    return summary;
   }
 
   /**
@@ -236,6 +270,15 @@ export class AppointmentsService {
       select: { startTime: true },
     });
 
+    const sessionNumber = await this.prisma.appointment.count({
+      where: {
+        patientId: appointment.patientId,
+        clinicianId: profile.id,
+        status: { in: ['COMPLETED', 'IN_PROGRESS', 'SCHEDULED'] },
+        startTime: { lte: appointment.startTime },
+      },
+    });
+
     // Remove the appointments array from patient object to keep response clean
     const { appointments: _appointments, ...patientData } = patient;
 
@@ -244,7 +287,180 @@ export class AppointmentsService {
       patient: patientData,
       totalBalance,
       lastVisit: lastVisit?.startTime || null,
+      sessionNumber,
     };
+  }
+
+  /* ── Psych Notes ─────────────────────────────── */
+
+  /**
+   * Get the clinical note for an appointment.
+   * Decrypts private notes before returning.
+   */
+  async getPsychNote(userId: string, appointmentId: string) {
+    const profile = await this.resolveClinicianProfile(userId);
+    const appointment = await this.findAppointmentOrFail(appointmentId);
+    this.assertOwnership(appointment.clinicianId, profile.id);
+
+    const note = await this.prisma.psychNote.findUnique({
+      where: { appointmentId },
+    });
+
+    if (!note) return null;
+
+    // Decrypt private notes if present
+    if (note.privateNotes) {
+      try {
+        // We need to handle cases where decryption might fail (e.g. old data or bad key)
+        // But here we assume it's valid if present.
+        // Actually, let's wrap in try-catch to be safe, though EncryptionService throws.
+        const decrypted = EncryptionService.decrypt(note.privateNotes);
+        return { ...note, privateNotes: decrypted };
+      } catch (error) {
+        console.error('Failed to decrypt private notes:', error);
+        // Return as is or empty? Let's return as is to show something is wrong or maybe undefined?
+        // Better to return empty string or error?
+        // Let's return generic error message in field
+        return { ...note, privateNotes: '[Error decrypting notes]' };
+      }
+    }
+
+    return note;
+  }
+
+  /**
+   * Create or update a clinical note for an appointment.
+   * Encrypts private notes before saving.
+   */
+  async upsertPsychNote(
+    userId: string,
+    appointmentId: string,
+    dto: CreatePsychNoteDto,
+  ) {
+    const profile = await this.resolveClinicianProfile(userId);
+    const appointment = await this.findAppointmentOrFail(appointmentId);
+    this.assertOwnership(appointment.clinicianId, profile.id);
+
+    // Check 24h edit rule (Integridad Clínica)
+    const now = new Date();
+    const deadline = new Date(appointment.endTime);
+    deadline.setHours(deadline.getHours() + 24);
+
+    if (now > deadline) {
+      // Allow creation if note doesn't exist? Usually "Edición de Historial" implies modification.
+      // If creating a note for an old appointment, maybe it's okay? "Backfilling".
+      // But modifying an *existing* note after 24h is disallowed.
+      // The prompt says: "Edición de Historial: Solo permitir editar notas de las últimas 24 horas".
+      
+      const existing = await this.prisma.psychNote.findUnique({ where: { appointmentId } });
+      if (existing) {
+        throw new ForbiddenException('Edición bloqueada: Han pasado más de 24 horas desde la sesión.');
+      }
+    }
+
+    // Validate content structure based on templateType
+    this.validateNoteContent(dto.templateType, dto.content);
+
+    // Encrypt private notes if present
+    let encryptedPrivateNotes: string | null = null;
+    if (dto.privateNotes) {
+      encryptedPrivateNotes = EncryptionService.encrypt(dto.privateNotes);
+    }
+
+    // Check if note exists
+    const existingNote = await this.prisma.psychNote.findUnique({
+      where: { appointmentId },
+    });
+
+    if (existingNote) {
+      // Update
+      return this.prisma.psychNote.update({
+        where: { id: existingNote.id },
+        data: {
+          templateType: dto.templateType,
+          content: dto.content,
+          moodRating: dto.moodRating,
+          privateNotes: encryptedPrivateNotes ?? existingNote.privateNotes,
+          tags: dto.tags,
+        },
+      });
+    } else {
+      // Create
+      return this.prisma.psychNote.create({
+        data: {
+          appointmentId,
+          patientId: appointment.patientId,
+          templateType: dto.templateType,
+          content: dto.content,
+          moodRating: dto.moodRating,
+          privateNotes: encryptedPrivateNotes,
+          tags: dto.tags,
+        },
+      });
+    }
+  }
+
+  private validateNoteContent(type: NoteTemplateType, content: any) {
+    // Simple validation logic
+    if (type === NoteTemplateType.SOAP) {
+      if (!content.s || !content.o || !content.a || !content.p) {
+        throw new BadRequestException('SOAP note must contain s, o, a, p fields');
+      }
+    } else if (type === NoteTemplateType.FREE) {
+      if (!content.body) {
+        throw new BadRequestException('Free note must contain body field');
+      }
+    }
+    // Add other types as needed
+  }
+
+  async togglePin(userId: string, appointmentId: string) {
+    const profile = await this.resolveClinicianProfile(userId);
+    const appointment = await this.findAppointmentOrFail(appointmentId);
+    this.assertOwnership(appointment.clinicianId, profile.id);
+
+    const note = await this.prisma.psychNote.findUnique({
+      where: { appointmentId },
+    });
+
+    if (!note) {
+      throw new NotFoundException('No existe nota clínica para esta cita.');
+    }
+
+    return this.prisma.psychNote.update({
+      where: { id: note.id },
+      data: { isPinned: !note.isPinned },
+    });
+  }
+
+  async exportPdf(userId: string, appointmentId: string, includePrivate: boolean) {
+    const profile = await this.resolveClinicianProfile(userId);
+    const appointment = await this.prisma.appointment.findUnique({
+      where: { id: appointmentId },
+      include: {
+        patient: true,
+        clinician: { include: { user: true } },
+        psychNote: true,
+      },
+    });
+
+    if (!appointment) throw new NotFoundException('Appointment not found');
+    this.assertOwnership(appointment.clinicianId, profile.id);
+
+    // Decrypt private notes if requested and present
+    if (includePrivate && appointment.psychNote?.privateNotes) {
+      try {
+        appointment.psychNote.privateNotes = EncryptionService.decrypt(appointment.psychNote.privateNotes);
+      } catch (e) {
+        console.error('Failed to decrypt for export', e);
+        appointment.psychNote.privateNotes = '[Error decrypting]';
+      }
+    } else if (appointment.psychNote) {
+      // Ensure strictly stripped if not requested (though service logic handles conditional rendering too)
+      appointment.psychNote.privateNotes = null;
+    }
+
+    return this.exportService.generateSessionPdf(appointment, includePrivate);
   }
 
   /* ── Status transition methods ─────────────────── */

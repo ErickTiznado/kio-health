@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SessionLayout } from '../components/session/SessionLayout';
 import { PatientContextPanel } from '../components/session/PatientContextPanel';
-import { PsychologistEditor } from '../components/session/PsychologistEditor';
+import { EditorContainer } from '../components/session/editor/EditorContainer';
 import { SessionCheckoutModal } from '../components/session/SessionCheckoutModal';
 import { useSessionSnapshot, useStartSession, useMarkNoShow } from '../hooks/use-session';
 import { toast } from 'sonner';
@@ -58,7 +58,7 @@ export function SessionPage() {
     );
   }
 
-  const { appointment, patient, totalBalance, lastVisit } = sessionContext;
+  const { appointment, patient, totalBalance, lastVisit, sessionNumber } = sessionContext;
 
   const handleStartSession = () => {
     if (appointmentId) {
@@ -103,6 +103,7 @@ export function SessionPage() {
         patientId={patient.id}
         patientName={patient.fullName}
         patientAge={age}
+        sessionNumber={sessionNumber}
         elapsedTime={elapsedTime}
         totalBalance={totalBalance}
         lastVisit={lastVisit}
@@ -114,6 +115,7 @@ export function SessionPage() {
         <div className="grid grid-cols-[30%_70%] h-full">
           {/* Left — Patient Context */}
           <PatientContextPanel
+            patientId={patient.id}
             patientName={patient.fullName}
             patientAge={age || 0}
             clinicianType="PSYCHOLOGIST" // Dynamic later
@@ -122,10 +124,9 @@ export function SessionPage() {
           />
 
           {/* Right — Role-specific panel */}
-          <PsychologistEditor 
-            appointmentId={appointment.id}
-            initialNotes={appointment.notes || ''}
-          />
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-full">
+            <EditorContainer appointmentId={appointment.id} patientId={patient.id} />
+          </div>
         </div>
       </SessionLayout>
 

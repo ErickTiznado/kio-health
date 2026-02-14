@@ -48,10 +48,21 @@ export interface SessionContext {
   patient: Patient & { appointments?: any[] };
   totalBalance: number;
   lastVisit: string | null;
+  sessionNumber: number;
 }
 
-/** Map of date string (YYYY-MM-DD) → appointment count */
-export type DaySummary = Record<string, number>;
+/** Map of date string (YYYY-MM-DD) -> detailed summary */
+export type DaySummary = Record<
+  string,
+  {
+    count: number;
+    appointments: Array<{
+      id: string;
+      startTime: string; // ISO
+      duration: number; // minutes
+    }>;
+  }
+>;
 
 /** Payload sent to PATCH /appointments/:id/checkout */
 export interface CheckoutPayload {
@@ -80,4 +91,35 @@ export interface CreateAppointmentPayload {
 /** Payload sent to PATCH /appointments/:id/reschedule */
 export interface ReschedulePayload {
   startTime: string; // ISO
+}
+
+export const NoteTemplateType = {
+  SOAP: 'SOAP',
+  FREE: 'FREE',
+  INITIAL: 'INITIAL',
+  CBT: 'CBT',
+} as const;
+
+export type NoteTemplateType = (typeof NoteTemplateType)[keyof typeof NoteTemplateType];
+
+export interface PsychNote {
+  id: string;
+  appointmentId: string;
+  patientId: string;
+  templateType: NoteTemplateType;
+  content: any; // JSON
+  moodRating: number | null;
+  privateNotes: string | null;
+  isPinned: boolean;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePsychNoteDto {
+  templateType: NoteTemplateType;
+  content: any;
+  moodRating?: number;
+  privateNotes?: string;
+  tags?: string[];
 }

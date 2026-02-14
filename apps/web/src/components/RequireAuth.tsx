@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/auth.store';
+import { SessionTimeout } from './auth/SessionTimeout';
 
 interface RequireAuthProps {
   children: React.ReactNode;
@@ -24,5 +25,10 @@ export function RequireAuth({ children }: RequireAuthProps) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <SessionTimeout />
+      {children}
+    </>
+  );
 }

@@ -56,6 +56,13 @@ enum TransactionType {
   EXPENSE
 }
 
+enum NoteTemplateType {
+  SOAP
+  FREE
+  INITIAL
+  CBT
+}
+
 // ============================================
 // MODELS
 // ============================================
@@ -68,6 +75,7 @@ model User {
   createdAt    DateTime          @default(now()) @map("created_at")
   updatedAt    DateTime          @updatedAt @map("updated_at")
   profile      ClinicianProfile?
+  accessLogs   AccessLog[]
 
   @@map("users")
 }
@@ -107,6 +115,8 @@ model Patient {
   clinician    ClinicianProfile @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
   appointments Appointment[]
   psychNotes   PsychNote[]
+  accessLogs   AccessLog[]
+  tasks        Task[]
 
   @@index([fullName])
   @@map("patients")
@@ -137,14 +147,17 @@ model Appointment {
 }
 
 model PsychNote {
-  id            String   @id @default(uuid()) @db.Uuid
-  appointmentId String   @unique @map("appointment_id") @db.Uuid
-  patientId     String   @map("patient_id") @db.Uuid
-  templateType  String   @map("template_type")
+  id            String           @id @default(uuid()) @db.Uuid
+  appointmentId String           @unique @map("appointment_id") @db.Uuid
+  patientId     String           @map("patient_id") @db.Uuid
+  templateType  NoteTemplateType @map("template_type")
   content       Json
-  moodRating    Int?     @map("mood_rating")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  moodRating    Int?             @map("mood_rating")
+  privateNotes  String?          @map("private_notes")
+  isPinned      Boolean          @default(false) @map("is_pinned")
+  tags          String[]         @default([])
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
 
   appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   patient     Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
@@ -152,11 +165,43 @@ model PsychNote {
   @@map("psych_notes")
 }
 
+model Task {
+  id          String    @id @default(uuid()) @db.Uuid
+  patientId   String    @map("patient_id") @db.Uuid
+  description String
+  isCompleted Boolean   @default(false) @map("is_completed")
+  dueDate     DateTime? @map("due_date")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("tasks")
+}
+
+model AccessLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  patientId   String?  @map("patient_id") @db.Uuid
+  action      String
+  resource    String
+  details     String?
+  ipAddress   String?  @map("ip_address")
+  userAgent   String?  @map("user_agent")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patient Patient? @relation(fields: [patientId], references: [id], onDelete: SetNull)
+
+  @@map("access_logs")
+}
+
 model FinanceTransaction {
   id            String          @id @default(uuid()) @db.Uuid
   clinicianId   String          @map("clinician_id") @db.Uuid
   appointmentId String?         @unique @map("appointment_id") @db.Uuid
   type          TransactionType
+  category      String          @default("General")
   amount        Decimal         @db.Decimal(10, 2)
   description   String?
   date          DateTime        @default(now())

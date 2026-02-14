@@ -1,6 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
-import type { CreatePatientDto, UpdatePatientDto, QueryPatientsDto, Patient, PatientsResponse } from '../types/patients.types';
+import type { CreatePatientDto, UpdatePatientDto, QueryPatientsDto, Patient, PatientsResponse, TimelineResponse } from '../types/patients.types';
 
 const fetchPatients = async (params: QueryPatientsDto): Promise<PatientsResponse> => {
   const { data } = await api.get<PatientsResponse>('/patients', { params });
@@ -71,6 +71,39 @@ export const useArchivePatient = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
       queryClient.invalidateQueries({ queryKey: ['patient', data.id] });
+    },
+  });
+};
+
+export const usePatientTimeline = (patientId: string, search: string = '') => {
+  return useInfiniteQuery({
+    queryKey: ['timeline', patientId, search],
+    queryFn: async ({ pageParam = 1 }) => {
+      const { data } = await api.get<TimelineResponse>(`/patients/${patientId}/timeline`, {
+        params: { page: pageParam, limit: 10, search },
+      });
+      return data;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.meta.page < lastPage.meta.lastPage) {
+        return lastPage.meta.page + 1;
+      }
+      return undefined;
+    },
+    enabled: !!patientId,
+  });
+};
+
+export const useTogglePin = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (appointmentId: string) => {
+      const { data } = await api.patch(`/appointments/${appointmentId}/notes/pin`);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['timeline'] });
     },
   });
 };

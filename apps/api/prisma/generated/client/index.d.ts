@@ -116,6 +116,16 @@ export const TransactionType: {
 
 export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType]
 
+
+export const NoteTemplateType: {
+  SOAP: 'SOAP',
+  FREE: 'FREE',
+  INITIAL: 'INITIAL',
+  CBT: 'CBT'
+};
+
+export type NoteTemplateType = (typeof NoteTemplateType)[keyof typeof NoteTemplateType]
+
 }
 
 export type UserRole = $Enums.UserRole
@@ -149,6 +159,10 @@ export const PaymentMethod: typeof $Enums.PaymentMethod
 export type TransactionType = $Enums.TransactionType
 
 export const TransactionType: typeof $Enums.TransactionType
+
+export type NoteTemplateType = $Enums.NoteTemplateType
+
+export const NoteTemplateType: typeof $Enums.NoteTemplateType
 
 /**
  * ##  Prisma Client ʲˢ
@@ -6298,8 +6312,9 @@ export namespace Prisma {
     id: string | null
     appointmentId: string | null
     patientId: string | null
-    templateType: string | null
+    templateType: $Enums.NoteTemplateType | null
     moodRating: number | null
+    privateNotes: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6308,8 +6323,9 @@ export namespace Prisma {
     id: string | null
     appointmentId: string | null
     patientId: string | null
-    templateType: string | null
+    templateType: $Enums.NoteTemplateType | null
     moodRating: number | null
+    privateNotes: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6321,6 +6337,7 @@ export namespace Prisma {
     templateType: number
     content: number
     moodRating: number
+    privateNotes: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -6341,6 +6358,7 @@ export namespace Prisma {
     patientId?: true
     templateType?: true
     moodRating?: true
+    privateNotes?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6351,6 +6369,7 @@ export namespace Prisma {
     patientId?: true
     templateType?: true
     moodRating?: true
+    privateNotes?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6362,6 +6381,7 @@ export namespace Prisma {
     templateType?: true
     content?: true
     moodRating?: true
+    privateNotes?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -6457,9 +6477,10 @@ export namespace Prisma {
     id: string
     appointmentId: string
     patientId: string
-    templateType: string
+    templateType: $Enums.NoteTemplateType
     content: JsonValue
     moodRating: number | null
+    privateNotes: string | null
     createdAt: Date
     updatedAt: Date
     _count: PsychNoteCountAggregateOutputType | null
@@ -6490,6 +6511,7 @@ export namespace Prisma {
     templateType?: boolean
     content?: boolean
     moodRating?: boolean
+    privateNotes?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
@@ -6503,6 +6525,7 @@ export namespace Prisma {
     templateType?: boolean
     content?: boolean
     moodRating?: boolean
+    privateNotes?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
@@ -6516,6 +6539,7 @@ export namespace Prisma {
     templateType?: boolean
     content?: boolean
     moodRating?: boolean
+    privateNotes?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
@@ -6529,11 +6553,12 @@ export namespace Prisma {
     templateType?: boolean
     content?: boolean
     moodRating?: boolean
+    privateNotes?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PsychNoteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "appointmentId" | "patientId" | "templateType" | "content" | "moodRating" | "createdAt" | "updatedAt", ExtArgs["result"]["psychNote"]>
+  export type PsychNoteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "appointmentId" | "patientId" | "templateType" | "content" | "moodRating" | "privateNotes" | "createdAt" | "updatedAt", ExtArgs["result"]["psychNote"]>
   export type PsychNoteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
     patient?: boolean | PatientDefaultArgs<ExtArgs>
@@ -6557,9 +6582,10 @@ export namespace Prisma {
       id: string
       appointmentId: string
       patientId: string
-      templateType: string
+      templateType: $Enums.NoteTemplateType
       content: Prisma.JsonValue
       moodRating: number | null
+      privateNotes: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["psychNote"]>
@@ -6990,9 +7016,10 @@ export namespace Prisma {
     readonly id: FieldRef<"PsychNote", 'String'>
     readonly appointmentId: FieldRef<"PsychNote", 'String'>
     readonly patientId: FieldRef<"PsychNote", 'String'>
-    readonly templateType: FieldRef<"PsychNote", 'String'>
+    readonly templateType: FieldRef<"PsychNote", 'NoteTemplateType'>
     readonly content: FieldRef<"PsychNote", 'Json'>
     readonly moodRating: FieldRef<"PsychNote", 'Int'>
+    readonly privateNotes: FieldRef<"PsychNote", 'String'>
     readonly createdAt: FieldRef<"PsychNote", 'DateTime'>
     readonly updatedAt: FieldRef<"PsychNote", 'DateTime'>
   }
@@ -8665,6 +8692,7 @@ export namespace Prisma {
     templateType: 'templateType',
     content: 'content',
     moodRating: 'moodRating',
+    privateNotes: 'privateNotes',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -8905,6 +8933,20 @@ export namespace Prisma {
    * Reference to a field of type 'PaymentMethod[]'
    */
   export type ListEnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'NoteTemplateType'
+   */
+  export type EnumNoteTemplateTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NoteTemplateType'>
+    
+
+
+  /**
+   * Reference to a field of type 'NoteTemplateType[]'
+   */
+  export type ListEnumNoteTemplateTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NoteTemplateType[]'>
     
 
 
@@ -9294,9 +9336,10 @@ export namespace Prisma {
     id?: UuidFilter<"PsychNote"> | string
     appointmentId?: UuidFilter<"PsychNote"> | string
     patientId?: UuidFilter<"PsychNote"> | string
-    templateType?: StringFilter<"PsychNote"> | string
+    templateType?: EnumNoteTemplateTypeFilter<"PsychNote"> | $Enums.NoteTemplateType
     content?: JsonFilter<"PsychNote">
     moodRating?: IntNullableFilter<"PsychNote"> | number | null
+    privateNotes?: StringNullableFilter<"PsychNote"> | string | null
     createdAt?: DateTimeFilter<"PsychNote"> | Date | string
     updatedAt?: DateTimeFilter<"PsychNote"> | Date | string
     appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
@@ -9310,6 +9353,7 @@ export namespace Prisma {
     templateType?: SortOrder
     content?: SortOrder
     moodRating?: SortOrderInput | SortOrder
+    privateNotes?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     appointment?: AppointmentOrderByWithRelationInput
@@ -9323,9 +9367,10 @@ export namespace Prisma {
     OR?: PsychNoteWhereInput[]
     NOT?: PsychNoteWhereInput | PsychNoteWhereInput[]
     patientId?: UuidFilter<"PsychNote"> | string
-    templateType?: StringFilter<"PsychNote"> | string
+    templateType?: EnumNoteTemplateTypeFilter<"PsychNote"> | $Enums.NoteTemplateType
     content?: JsonFilter<"PsychNote">
     moodRating?: IntNullableFilter<"PsychNote"> | number | null
+    privateNotes?: StringNullableFilter<"PsychNote"> | string | null
     createdAt?: DateTimeFilter<"PsychNote"> | Date | string
     updatedAt?: DateTimeFilter<"PsychNote"> | Date | string
     appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
@@ -9339,6 +9384,7 @@ export namespace Prisma {
     templateType?: SortOrder
     content?: SortOrder
     moodRating?: SortOrderInput | SortOrder
+    privateNotes?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: PsychNoteCountOrderByAggregateInput
@@ -9355,9 +9401,10 @@ export namespace Prisma {
     id?: UuidWithAggregatesFilter<"PsychNote"> | string
     appointmentId?: UuidWithAggregatesFilter<"PsychNote"> | string
     patientId?: UuidWithAggregatesFilter<"PsychNote"> | string
-    templateType?: StringWithAggregatesFilter<"PsychNote"> | string
+    templateType?: EnumNoteTemplateTypeWithAggregatesFilter<"PsychNote"> | $Enums.NoteTemplateType
     content?: JsonWithAggregatesFilter<"PsychNote">
     moodRating?: IntNullableWithAggregatesFilter<"PsychNote"> | number | null
+    privateNotes?: StringNullableWithAggregatesFilter<"PsychNote"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"PsychNote"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"PsychNote"> | Date | string
   }
@@ -9836,9 +9883,10 @@ export namespace Prisma {
 
   export type PsychNoteCreateInput = {
     id?: string
-    templateType: string
+    templateType: $Enums.NoteTemplateType
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
+    privateNotes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appointment: AppointmentCreateNestedOneWithoutPsychNoteInput
@@ -9849,18 +9897,20 @@ export namespace Prisma {
     id?: string
     appointmentId: string
     patientId: string
-    templateType: string
+    templateType: $Enums.NoteTemplateType
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
+    privateNotes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type PsychNoteUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    templateType?: StringFieldUpdateOperationsInput | string
+    templateType?: EnumNoteTemplateTypeFieldUpdateOperationsInput | $Enums.NoteTemplateType
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
+    privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointment?: AppointmentUpdateOneRequiredWithoutPsychNoteNestedInput
@@ -9871,9 +9921,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     appointmentId?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
-    templateType?: StringFieldUpdateOperationsInput | string
+    templateType?: EnumNoteTemplateTypeFieldUpdateOperationsInput | $Enums.NoteTemplateType
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
+    privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9882,18 +9933,20 @@ export namespace Prisma {
     id?: string
     appointmentId: string
     patientId: string
-    templateType: string
+    templateType: $Enums.NoteTemplateType
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
+    privateNotes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type PsychNoteUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    templateType?: StringFieldUpdateOperationsInput | string
+    templateType?: EnumNoteTemplateTypeFieldUpdateOperationsInput | $Enums.NoteTemplateType
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
+    privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9902,9 +9955,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     appointmentId?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
-    templateType?: StringFieldUpdateOperationsInput | string
+    templateType?: EnumNoteTemplateTypeFieldUpdateOperationsInput | $Enums.NoteTemplateType
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
+    privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10602,6 +10656,13 @@ export namespace Prisma {
     _min?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
     _max?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
   }
+
+  export type EnumNoteTemplateTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.NoteTemplateType | EnumNoteTemplateTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.NoteTemplateType[] | ListEnumNoteTemplateTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.NoteTemplateType[] | ListEnumNoteTemplateTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumNoteTemplateTypeFilter<$PrismaModel> | $Enums.NoteTemplateType
+  }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -10649,6 +10710,7 @@ export namespace Prisma {
     templateType?: SortOrder
     content?: SortOrder
     moodRating?: SortOrder
+    privateNotes?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10663,6 +10725,7 @@ export namespace Prisma {
     patientId?: SortOrder
     templateType?: SortOrder
     moodRating?: SortOrder
+    privateNotes?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10673,12 +10736,23 @@ export namespace Prisma {
     patientId?: SortOrder
     templateType?: SortOrder
     moodRating?: SortOrder
+    privateNotes?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type PsychNoteSumOrderByAggregateInput = {
     moodRating?: SortOrder
+  }
+
+  export type EnumNoteTemplateTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.NoteTemplateType | EnumNoteTemplateTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.NoteTemplateType[] | ListEnumNoteTemplateTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.NoteTemplateType[] | ListEnumNoteTemplateTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumNoteTemplateTypeWithAggregatesFilter<$PrismaModel> | $Enums.NoteTemplateType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumNoteTemplateTypeFilter<$PrismaModel>
+    _max?: NestedEnumNoteTemplateTypeFilter<$PrismaModel>
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -11250,6 +11324,10 @@ export namespace Prisma {
     connect?: PatientWhereUniqueInput
   }
 
+  export type EnumNoteTemplateTypeFieldUpdateOperationsInput = {
+    set?: $Enums.NoteTemplateType
+  }
+
   export type NullableIntFieldUpdateOperationsInput = {
     set?: number | null
     increment?: number
@@ -11661,6 +11739,23 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
     _max?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumNoteTemplateTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.NoteTemplateType | EnumNoteTemplateTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.NoteTemplateType[] | ListEnumNoteTemplateTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.NoteTemplateType[] | ListEnumNoteTemplateTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumNoteTemplateTypeFilter<$PrismaModel> | $Enums.NoteTemplateType
+  }
+
+  export type NestedEnumNoteTemplateTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.NoteTemplateType | EnumNoteTemplateTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.NoteTemplateType[] | ListEnumNoteTemplateTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.NoteTemplateType[] | ListEnumNoteTemplateTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumNoteTemplateTypeWithAggregatesFilter<$PrismaModel> | $Enums.NoteTemplateType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumNoteTemplateTypeFilter<$PrismaModel>
+    _max?: NestedEnumNoteTemplateTypeFilter<$PrismaModel>
   }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -12178,9 +12273,10 @@ export namespace Prisma {
 
   export type PsychNoteCreateWithoutPatientInput = {
     id?: string
-    templateType: string
+    templateType: $Enums.NoteTemplateType
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
+    privateNotes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appointment: AppointmentCreateNestedOneWithoutPsychNoteInput
@@ -12189,9 +12285,10 @@ export namespace Prisma {
   export type PsychNoteUncheckedCreateWithoutPatientInput = {
     id?: string
     appointmentId: string
-    templateType: string
+    templateType: $Enums.NoteTemplateType
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
+    privateNotes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -12284,9 +12381,10 @@ export namespace Prisma {
     id?: UuidFilter<"PsychNote"> | string
     appointmentId?: UuidFilter<"PsychNote"> | string
     patientId?: UuidFilter<"PsychNote"> | string
-    templateType?: StringFilter<"PsychNote"> | string
+    templateType?: EnumNoteTemplateTypeFilter<"PsychNote"> | $Enums.NoteTemplateType
     content?: JsonFilter<"PsychNote">
     moodRating?: IntNullableFilter<"PsychNote"> | number | null
+    privateNotes?: StringNullableFilter<"PsychNote"> | string | null
     createdAt?: DateTimeFilter<"PsychNote"> | Date | string
     updatedAt?: DateTimeFilter<"PsychNote"> | Date | string
   }
@@ -12361,9 +12459,10 @@ export namespace Prisma {
 
   export type PsychNoteCreateWithoutAppointmentInput = {
     id?: string
-    templateType: string
+    templateType: $Enums.NoteTemplateType
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
+    privateNotes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     patient: PatientCreateNestedOneWithoutPsychNotesInput
@@ -12372,9 +12471,10 @@ export namespace Prisma {
   export type PsychNoteUncheckedCreateWithoutAppointmentInput = {
     id?: string
     patientId: string
-    templateType: string
+    templateType: $Enums.NoteTemplateType
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
+    privateNotes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -12504,9 +12604,10 @@ export namespace Prisma {
 
   export type PsychNoteUpdateWithoutAppointmentInput = {
     id?: StringFieldUpdateOperationsInput | string
-    templateType?: StringFieldUpdateOperationsInput | string
+    templateType?: EnumNoteTemplateTypeFieldUpdateOperationsInput | $Enums.NoteTemplateType
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
+    privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patient?: PatientUpdateOneRequiredWithoutPsychNotesNestedInput
@@ -12515,9 +12616,10 @@ export namespace Prisma {
   export type PsychNoteUncheckedUpdateWithoutAppointmentInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
-    templateType?: StringFieldUpdateOperationsInput | string
+    templateType?: EnumNoteTemplateTypeFieldUpdateOperationsInput | $Enums.NoteTemplateType
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
+    privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13066,9 +13168,10 @@ export namespace Prisma {
   export type PsychNoteCreateManyPatientInput = {
     id?: string
     appointmentId: string
-    templateType: string
+    templateType: $Enums.NoteTemplateType
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
+    privateNotes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -13127,9 +13230,10 @@ export namespace Prisma {
 
   export type PsychNoteUpdateWithoutPatientInput = {
     id?: StringFieldUpdateOperationsInput | string
-    templateType?: StringFieldUpdateOperationsInput | string
+    templateType?: EnumNoteTemplateTypeFieldUpdateOperationsInput | $Enums.NoteTemplateType
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
+    privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointment?: AppointmentUpdateOneRequiredWithoutPsychNoteNestedInput
@@ -13138,9 +13242,10 @@ export namespace Prisma {
   export type PsychNoteUncheckedUpdateWithoutPatientInput = {
     id?: StringFieldUpdateOperationsInput | string
     appointmentId?: StringFieldUpdateOperationsInput | string
-    templateType?: StringFieldUpdateOperationsInput | string
+    templateType?: EnumNoteTemplateTypeFieldUpdateOperationsInput | $Enums.NoteTemplateType
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
+    privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13148,9 +13253,10 @@ export namespace Prisma {
   export type PsychNoteUncheckedUpdateManyWithoutPatientInput = {
     id?: StringFieldUpdateOperationsInput | string
     appointmentId?: StringFieldUpdateOperationsInput | string
-    templateType?: StringFieldUpdateOperationsInput | string
+    templateType?: EnumNoteTemplateTypeFieldUpdateOperationsInput | $Enums.NoteTemplateType
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
+    privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

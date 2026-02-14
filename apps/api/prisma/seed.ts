@@ -3,6 +3,7 @@ import { PrismaClient } from '../prisma/generated/client/index.js';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { faker } from '@faker-js/faker';
 import * as bcrypt from 'bcrypt';
+import { EncryptionService } from '../src/lib/encryption';
 
 // ============================================
 // PRISMA 7.x CONFIGURATION
@@ -27,13 +28,6 @@ const CLINICIANS_CONFIG = [
     type: 'PSYCHOLOGIST' as const,
     licenseNumber: 'PSY-2024-001',
     sessionDefaultPrice: 150.0,
-    currency: 'USD',
-  },
-  {
-    email: 'nutri@kio.com',
-    type: 'NUTRITIONIST' as const,
-    licenseNumber: 'NUT-2024-001',
-    sessionDefaultPrice: 100.0,
     currency: 'USD',
   },
 ];
@@ -90,7 +84,6 @@ async function clearDatabase(): Promise<void> {
   // Order matters due to foreign key constraints
   await prisma.financeTransaction.deleteMany();
   await prisma.psychNote.deleteMany();
-  await prisma.nutriRecord.deleteMany();
   await prisma.appointment.deleteMany();
   await prisma.patient.deleteMany();
   await prisma.clinicianProfile.deleteMany();
@@ -201,12 +194,12 @@ async function createAppointmentsForClinician(
       await prisma.psychNote.create({
         data: {
           appointmentId: appointment.id,
-          patientId,
+          patientId: patientId,
           templateType: faker.helpers.arrayElement([
             'SOAP',
-            'DAP',
-            'BIRP',
-            'NARRATIVE',
+            'FREE',
+            'INITIAL',
+            'CBT',
           ]),
           content: {
             subjective: faker.lorem.paragraph(),
@@ -216,40 +209,15 @@ async function createAppointmentsForClinician(
             notes: faker.lorem.sentences(2),
           },
           moodRating: faker.number.int({ min: 1, max: 10 }),
+          privateNotes: EncryptionService.encrypt(faker.lorem.sentence()),
         },
       });
     }
 
     // Create NutriRecord for nutritionist appointments
-    if (clinicianType === 'NUTRITIONIST') {
-      await prisma.nutriRecord.create({
-        data: {
-          patientId,
-          anthropometry: {
-            weight: faker.number.float({ min: 50, max: 120, fractionDigits: 1 }),
-            height: faker.number.float({
-              min: 1.5,
-              max: 2.0,
-              fractionDigits: 2,
-            }),
-            waist: faker.number.float({ min: 60, max: 120, fractionDigits: 1 }),
-            hip: faker.number.float({ min: 80, max: 130, fractionDigits: 1 }),
-            bodyFatPercentage: faker.number.float({
-              min: 10,
-              max: 40,
-              fractionDigits: 1,
-            }),
-          },
-          calculations: {
-            bmi: faker.number.float({ min: 18, max: 35, fractionDigits: 1 }),
-            bmr: faker.number.int({ min: 1200, max: 2500 }),
-            tdee: faker.number.int({ min: 1500, max: 3500 }),
-            recommendedCalories: faker.number.int({ min: 1400, max: 3000 }),
-          },
-          date: start,
-        },
-      });
-    }
+    // if (clinicianType === 'NUTRITIONIST') {
+    //   // NutriRecord removed from schema
+    // }
 
     // Create FinanceTransaction for completed appointments (ONLY IF PAID)
     if (!isUnpaid) {
@@ -358,13 +326,11 @@ async function main(): Promise<void> {
   console.log(`  • Patients: ${await prisma.patient.count()}`);
   console.log(`  • Appointments: ${await prisma.appointment.count()}`);
   console.log(`  • Psych Notes: ${await prisma.psychNote.count()}`);
-  console.log(`  • Nutri Records: ${await prisma.nutriRecord.count()}`);
   console.log(`  • Finance Transactions: ${await prisma.financeTransaction.count()}`);
 
   console.log('\n✅ Seed completed successfully!');
   console.log('\n📌 Test Credentials:');
   console.log('  • Psychologist: psych@kio.com / 123456');
-  console.log('  • Nutritionist: nutri@kio.com / 123456');
 }
 
 main()

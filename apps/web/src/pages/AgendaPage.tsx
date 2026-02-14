@@ -9,17 +9,20 @@ import { WeeklyCalendarGrid } from '../components/agenda/WeeklyCalendarGrid';
 import { DailyCalendarGrid } from '../components/agenda/DailyCalendarGrid';
 import { AppointmentDrawer } from '../components/agenda/AppointmentDrawer';
 import { ScheduleAppointmentModal } from '../components/agenda/ScheduleAppointmentModal';
-import { fetchAppointmentsByRange, rescheduleAppointment } from '../lib/appointments.api';
+import { fetchAppointmentsByRange, rescheduleAppointment, cancelAppointment } from '../lib/appointments.api';
 import type { Appointment } from '../types/appointments.types';
 import type { CalendarView } from '../types/agenda.types';
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useDocumentTitle } from '../hooks/use-document-title';
 
 /**
  * Agenda Page — Interactive weekly/daily calendar view.
  * Fetches real appointments from the backend API for the visible date range.
  */
 export function AgendaPage() {
+  useDocumentTitle('Agenda');
+
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
@@ -28,6 +31,7 @@ export function AgendaPage() {
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [scheduleSlot, setScheduleSlot] = useState<Date | null>(null);
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const queryClient = useQueryClient();
 
   /* ── Data fetching ── */
@@ -45,6 +49,28 @@ export function AgendaPage() {
     queryFn: () => fetchAppointmentsByRange(fromStr, toStr),
     staleTime: 1000 * 60 * 2,
   });
+
+  /* ── Filter Logic ── */
+
+  const toggleFilter = useCallback((filterKey: string) => {
+    setActiveFilters((prev) =>
+      prev.includes(filterKey)
+        ? prev.filter((k) => k !== filterKey)
+        : [...prev, filterKey]
+    );
+  }, []);
+
+  const filteredAppointments = useMemo(() => {
+    if (activeFilters.length === 0) return appointments;
+
+    return appointments.filter((apt) => {
+      // "OR" Logic: Match any selected filter
+      const matchesStatus = activeFilters.includes(apt.status);
+      const matchesUnpaid = activeFilters.includes('UNPAID') && apt.paymentStatus === 'PENDING';
+      
+      return matchesStatus || matchesUnpaid;
+    });
+  }, [appointments, activeFilters]);
 
   /* ── Mobile Logic ── */
   const isMobile = useIsMobile();
@@ -146,6 +172,23 @@ export function AgendaPage() {
     });
   }, [rescheduleMutation]);
 
+  const cancelMutation = useMutation({
+    mutationFn: (id: string) => cancelAppointment(id),
+    onSuccess: () => {
+      toast.success('Cita cancelada correctamente');
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      setIsDrawerOpen(false);
+    },
+    onError: (error: any) => {
+      const message = error.response?.data?.message || 'Error al cancelar cita';
+      toast.error(message);
+    },
+  });
+
+  const handleCancel = useCallback((appointmentId: string) => {
+    cancelMutation.mutate(appointmentId);
+  }, [cancelMutation]);
+
   /* ── Labels ── */
 
   const dateLabel = useMemo(() => {
@@ -172,20 +215,31 @@ export function AgendaPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Legend - Using Icons instead of Emojis/Dots */}
-            <div className="hidden xl:flex items-center gap-4 mr-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-r border-gray-200 pr-4">
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 size={12} className="text-emerald-500" /> Completada
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Calendar size={12} className="text-blue-500" /> Agendada
-              </div>
-              <div className="flex items-center gap-1.5">
-                <XCircle size={12} className="text-red-500" /> Cancelada
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Banknote size={12} className="text-amber-500" /> Deuda
-              </div>
+            {/* Legend - Using Interactive Filters */}
+            <div className="hidden xl:flex items-center gap-2 mr-4 text-[10px] font-bold text-[var(--color-kanji)]/60 uppercase tracking-widest border-r border-[var(--color-cruz)] pr-4">
+              {[
+                { key: 'COMPLETED', label: 'Completada', icon: CheckCircle2, color: 'text-emerald-500', activeBg: 'bg-emerald-50 text-emerald-700' },
+                { key: 'SCHEDULED', label: 'Agendada', icon: Calendar, color: 'text-blue-500', activeBg: 'bg-blue-50 text-blue-700' },
+                { key: 'CANCELLED', label: 'Cancelada', icon: XCircle, color: 'text-red-500', activeBg: 'bg-red-50 text-red-700' },
+                { key: 'UNPAID', label: 'Deuda', icon: Banknote, color: 'text-amber-500', activeBg: 'bg-amber-50 text-amber-700' },
+              ].map((filter) => {
+                const isActive = activeFilters.includes(filter.key);
+                const Icon = filter.icon;
+                return (
+                  <button
+                    key={filter.key}
+                    onClick={() => toggleFilter(filter.key)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all border border-transparent ${
+                      isActive 
+                        ? `${filter.activeBg} border-current/10 shadow-sm` 
+                        : 'hover:bg-gray-100 opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <Icon size={12} className={isActive ? 'text-current' : filter.color} /> 
+                    {filter.label}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Loading indicator */}
@@ -198,7 +252,7 @@ export function AgendaPage() {
               <button
                 type="button"
                 onClick={navigatePrevious}
-                className="p-2 rounded-xl hover:bg-[var(--color-bg)] text-[var(--color-text)] opacity-70 hover:opacity-100 hover:text-[var(--color-kanji)] transition-all"
+                className="p-2 rounded-xl hover:bg-[var(--color-kio-light)] text-[var(--color-kanji)] transition-all"
                 aria-label={previousAriaLabel}
               >
                 <ChevronLeft size={16} />
@@ -213,7 +267,7 @@ export function AgendaPage() {
               <button
                 type="button"
                 onClick={navigateNext}
-                className="p-2 rounded-xl hover:bg-[var(--color-bg)] text-[var(--color-text)] opacity-70 hover:opacity-100 hover:text-[var(--color-kanji)] transition-all"
+                className="p-2 rounded-xl hover:bg-[var(--color-kio-light)] text-[var(--color-kanji)] transition-all"
                 aria-label={nextAriaLabel}
               >
                 <ChevronRight size={16} />
@@ -228,7 +282,7 @@ export function AgendaPage() {
                   onClick={switchToWeekView}
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${activeView === 'week'
                     ? 'bg-[var(--color-kanji)] text-white shadow-sm'
-                    : 'text-[var(--color-text)] opacity-70 hover:text-[var(--color-kanji)] hover:opacity-100'
+                    : 'text-[var(--color-kanji)] hover:bg-[var(--color-kio-light)]'
                     }`}
                 >
                   <CalendarDays size={14} />
@@ -239,7 +293,7 @@ export function AgendaPage() {
                   onClick={switchToDayView}
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${activeView === 'day'
                     ? 'bg-[var(--color-kanji)] text-white shadow-sm'
-                    : 'text-[var(--color-text)] opacity-70 hover:text-[var(--color-kanji)] hover:opacity-100'
+                    : 'text-[var(--color-kanji)] hover:bg-[var(--color-kio-light)]'
                     }`}
                 >
                   <Calendar size={14} />
@@ -265,7 +319,7 @@ export function AgendaPage() {
           {activeView === 'week' ? (
             <WeeklyCalendarGrid
               weekStart={currentWeekStart}
-              appointments={appointments}
+              appointments={filteredAppointments}
               onSelectAppointment={handleSelectAppointment}
               onSlotClick={handleSlotClick}
               onReschedule={handleReschedule}
@@ -273,7 +327,7 @@ export function AgendaPage() {
           ) : (
             <DailyCalendarGrid
               selectedDay={selectedDay}
-              appointments={appointments}
+              appointments={filteredAppointments}
               onSelectAppointment={handleSelectAppointment}
               onSlotClick={handleSlotClick}
               onReschedule={handleReschedule}
@@ -287,6 +341,8 @@ export function AgendaPage() {
         appointment={selectedAppointment}
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}
+        onReschedule={handleReschedule}
+        onCancel={handleCancel}
       />
 
       {/* Schedule Appointment Modal */}

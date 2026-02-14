@@ -179,6 +179,7 @@ exports.Prisma.PsychNoteScalarFieldEnum = {
   templateType: 'templateType',
   content: 'content',
   moodRating: 'moodRating',
+  privateNotes: 'privateNotes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -262,6 +263,13 @@ exports.PaymentMethod = exports.$Enums.PaymentMethod = {
   CASH: 'CASH',
   CARD: 'CARD',
   TRANSFER: 'TRANSFER'
+};
+
+exports.NoteTemplateType = exports.$Enums.NoteTemplateType = {
+  SOAP: 'SOAP',
+  FREE: 'FREE',
+  INITIAL: 'INITIAL',
+  CBT: 'CBT'
 };
 
 exports.TransactionType = exports.$Enums.TransactionType = {
