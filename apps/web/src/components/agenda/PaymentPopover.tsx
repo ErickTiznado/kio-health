@@ -125,7 +125,7 @@ export function PaymentPopover({ status, amount, onStatusChange, onAmountChange 
                             </div>
 
                             <div className="space-y-1">
-                                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Monto (MXN)</label>
+                                <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Monto (USD)</label>
                                 <input
                                     ref={inputRef}
                                     type="number"
@@ -162,7 +162,7 @@ export function PaymentPopover({ status, amount, onStatusChange, onAmountChange 
                                 </div>
                                 <div>
                                     <h4 className="text-sm font-bold text-gray-800">Pagado</h4>
-                                    <p className="text-xs text-gray-500 font-medium">${amount} • Efectivo</p>
+                                    <p className="text-xs text-gray-500 font-medium">${amount} • USD</p>
                                 </div>
                             </div>
 

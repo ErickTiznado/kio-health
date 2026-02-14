@@ -78,4 +78,28 @@ export class AppointmentsController {
       dto,
     );
   }
+
+  @Patch(':id/start')
+  async startSession(
+    @CurrentUser() user: { userId: string; email: string; role: string },
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+  ) {
+    return this.appointmentsService.startSession(user.userId, appointmentId);
+  }
+
+  @Patch(':id/cancel')
+  async cancelAppointment(
+    @CurrentUser() user: { userId: string; email: string; role: string },
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+  ) {
+    return this.appointmentsService.cancelAppointment(user.userId, appointmentId);
+  }
+
+  @Patch(':id/no-show')
+  async markNoShow(
+    @CurrentUser() user: { userId: string; email: string; role: string },
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+  ) {
+    return this.appointmentsService.markNoShow(user.userId, appointmentId);
+  }
 }

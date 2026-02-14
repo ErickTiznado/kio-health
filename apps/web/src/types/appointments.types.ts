@@ -17,7 +17,7 @@ export interface Appointment {
   endTime: string;
   type: AppointmentType;
   reason: string | null;
-  status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
+  status: 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
   paymentStatus: 'PENDING' | 'PAID';
   paymentMethod: PaymentMethod | null;
   price: string;

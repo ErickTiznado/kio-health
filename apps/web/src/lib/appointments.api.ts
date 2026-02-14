@@ -94,6 +94,23 @@ export async function fetchPendingNotesCount(): Promise<PendingNotesCount> {
   return response.data;
 }
 
+/* ── Status transition calls ────────────────── */
+
+export async function startSession(appointmentId: string): Promise<Appointment> {
+  const response = await api.patch<Appointment>(`/appointments/${appointmentId}/start`);
+  return response.data;
+}
+
+export async function cancelAppointment(appointmentId: string): Promise<Appointment> {
+  const response = await api.patch<Appointment>(`/appointments/${appointmentId}/cancel`);
+  return response.data;
+}
+
+export async function markNoShow(appointmentId: string): Promise<Appointment> {
+  const response = await api.patch<Appointment>(`/appointments/${appointmentId}/no-show`);
+  return response.data;
+}
+
 /**
  * Get today's date in YYYY-MM-DD format
  */

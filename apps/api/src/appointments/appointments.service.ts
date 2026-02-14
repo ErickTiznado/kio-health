@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CompleteCheckoutDto } from './dto/complete-checkout.dto';
@@ -181,6 +182,71 @@ export class AppointmentsService {
     });
 
     return { count };
+  }
+
+  /* ── Status transition methods ─────────────────── */
+
+  /**
+   * Start a scheduled session → IN_PROGRESS.
+   */
+  async startSession(userId: string, appointmentId: string) {
+    const profile = await this.resolveClinicianProfile(userId);
+    const appointment = await this.findAppointmentOrFail(appointmentId);
+    this.assertOwnership(appointment.clinicianId, profile.id);
+
+    if (appointment.status !== 'SCHEDULED') {
+      throw new BadRequestException(
+        `Cannot start a session that is ${appointment.status}`,
+      );
+    }
+
+    return this.prisma.appointment.update({
+      where: { id: appointmentId },
+      data: { status: 'IN_PROGRESS' },
+      include: { patient: { select: { id: true, fullName: true } } },
+    });
+  }
+
+  /**
+   * Cancel a scheduled appointment → CANCELLED.
+   */
+  async cancelAppointment(userId: string, appointmentId: string) {
+    const profile = await this.resolveClinicianProfile(userId);
+    const appointment = await this.findAppointmentOrFail(appointmentId);
+    this.assertOwnership(appointment.clinicianId, profile.id);
+
+    if (appointment.status !== 'SCHEDULED') {
+      throw new BadRequestException(
+        `Cannot cancel an appointment that is ${appointment.status}`,
+      );
+    }
+
+    return this.prisma.appointment.update({
+      where: { id: appointmentId },
+      data: { status: 'CANCELLED' },
+      include: { patient: { select: { id: true, fullName: true } } },
+    });
+  }
+
+  /**
+   * Mark a scheduled appointment as NO_SHOW.
+   */
+  async markNoShow(userId: string, appointmentId: string) {
+    const profile = await this.resolveClinicianProfile(userId);
+    const appointment = await this.findAppointmentOrFail(appointmentId);
+    this.assertOwnership(appointment.clinicianId, profile.id);
+
+    if (appointment.status !== 'SCHEDULED') {
+      throw new BadRequestException(
+        `Cannot mark no-show for an appointment that is ${appointment.status}`,
+      );
+    }
+
+    return this.prisma.appointment.update({
+      where: { id: appointmentId },
+      data: { status: 'NO_SHOW' },
+      include: { patient: { select: { id: true, fullName: true } } },
+    });
   }
 
   /**
