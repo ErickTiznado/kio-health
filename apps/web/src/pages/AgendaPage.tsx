@@ -2,7 +2,8 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { startOfWeek, addWeeks, subWeeks, addDays, subDays, format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Calendar, CalendarDays, Loader2, Plus, CheckCircle2, XCircle, Banknote } from 'lucide-react';
+import { WaitlistPanel } from '../features/dashboard/components/WaitlistPanel';
+import { ChevronLeft, ChevronRight, Calendar, CalendarDays, Loader2, Plus, CheckCircle2, XCircle, Banknote, List } from 'lucide-react';
 import { useIsMobile } from '../hooks/use-is-mobile';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { WeeklyCalendarGrid } from '../components/agenda/WeeklyCalendarGrid';
@@ -32,6 +33,7 @@ export function AgendaPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [scheduleSlot, setScheduleSlot] = useState<Date | null>(null);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const queryClient = useQueryClient();
 
   /* ── Data fetching ── */
@@ -302,6 +304,23 @@ export function AgendaPage() {
               </div>
             )}
 
+            {/* Waitlist Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsWaitlistOpen(!isWaitlistOpen)}
+              className={`p-2.5 rounded-[24px] transition-all flex items-center gap-2 border shadow-sm ${
+                isWaitlistOpen 
+                  ? 'bg-amber-50 text-amber-600 border-amber-200' 
+                  : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50 hover:text-gray-700'
+              }`}
+              title="Lista de Espera"
+            >
+              <List size={18} />
+              <span className={`text-xs font-bold transition-all ${isWaitlistOpen ? 'max-w-20 opacity-100' : 'max-w-0 opacity-0 overflow-hidden'}`}>
+                Espera
+              </span>
+            </button>
+
             {/* Primary CTA */}
             <button
               type="button"
@@ -314,24 +333,33 @@ export function AgendaPage() {
           </div>
         </div>
 
-        {/* Calendar Grid */}
-        <div className="flex-1 min-h-0">
-          {activeView === 'week' ? (
-            <WeeklyCalendarGrid
-              weekStart={currentWeekStart}
-              appointments={filteredAppointments}
-              onSelectAppointment={handleSelectAppointment}
-              onSlotClick={handleSlotClick}
-              onReschedule={handleReschedule}
-            />
-          ) : (
-            <DailyCalendarGrid
-              selectedDay={selectedDay}
-              appointments={filteredAppointments}
-              onSelectAppointment={handleSelectAppointment}
-              onSlotClick={handleSlotClick}
-              onReschedule={handleReschedule}
-            />
+        {/* Calendar Grid & Sidebar */}
+        <div className="flex-1 min-h-0 flex gap-6 overflow-hidden">
+          <div className="flex-1 min-w-0 h-full flex flex-col">
+            {activeView === 'week' ? (
+              <WeeklyCalendarGrid
+                weekStart={currentWeekStart}
+                appointments={filteredAppointments}
+                onSelectAppointment={handleSelectAppointment}
+                onSlotClick={handleSlotClick}
+                onReschedule={handleReschedule}
+              />
+            ) : (
+              <DailyCalendarGrid
+                selectedDay={selectedDay}
+                appointments={filteredAppointments}
+                onSelectAppointment={handleSelectAppointment}
+                onSlotClick={handleSlotClick}
+                onReschedule={handleReschedule}
+              />
+            )}
+          </div>
+
+          {/* Waitlist Sidebar */}
+          {isWaitlistOpen && (
+            <div className="w-80 h-full shrink-0 animate-in slide-in-from-right-10 fade-in duration-300 border-l border-gray-100 pl-6">
+               <WaitlistPanel />
+            </div>
           )}
         </div>
       </div>

@@ -31,7 +31,7 @@ export function SessionTimeout() {
       setIsIdle(false);
       setPassword('');
       toast.success('Sesión desbloqueada');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Contraseña incorrecta');
     } finally {
       setIsLoading(false);

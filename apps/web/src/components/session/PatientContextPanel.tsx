@@ -35,6 +35,13 @@ export const PatientContextPanel: FC<PatientContextPanelProps> = ({
       </div>
 
       <div className="mb-6">
+        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Contexto Clínico</h3>
+        <p className="text-gray-700 text-sm leading-relaxed p-3 bg-gray-50 rounded-md border border-gray-100">
+          {psychContext.clinicalContext}
+        </p>
+      </div>
+
+      <div className="mb-6">
         <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Objetivos</h3>
         <ul className="list-disc pl-5 space-y-1 text-gray-700">
           {(psychContext.treatmentGoals || []).map((goal: string, idx: number) => (

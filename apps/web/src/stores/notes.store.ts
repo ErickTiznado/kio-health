@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { toast } from 'sonner';
 import { fetchPsychNote, upsertPsychNote } from '../lib/appointments.api';
 import type { PsychNote, CreatePsychNoteDto } from '../types/appointments.types';
 
@@ -26,6 +27,7 @@ export const useNoteStore = create<NoteState>((set) => ({
       set({ currentNote: note, status: 'idle' });
     } catch (error) {
       console.error('Failed to fetch note:', error);
+      toast.error('Error al cargar la nota');
       // Assume no note exists or error, reset currentNote
       set({ currentNote: null, status: 'idle' });
     }
@@ -36,8 +38,10 @@ export const useNoteStore = create<NoteState>((set) => ({
     try {
       const note = await upsertPsychNote(appointmentId, data);
       set({ currentNote: note, status: 'saved', lastSaved: new Date() });
+      toast.success('Nota guardada');
     } catch (error) {
       console.error('Failed to save note:', error);
+      toast.error('Error al guardar la nota');
       set({ status: 'error', error: 'Failed to save changes' });
     }
   },

@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect, useCallback } from 'react';
 import { format, addDays, isToday, parseISO, isSameDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import type { Appointment } from '../../types/appointments.types';
 import { AppointmentPill } from './AppointmentPill';
 import { CurrentTimeLine } from './CurrentTimeLine';
@@ -127,6 +128,7 @@ export function WeeklyCalendarGrid({ weekStart, appointments, onSelectAppointmen
       onReschedule(id, newTime);
     } catch (err) {
       console.error('Drop error', err);
+      toast.error('Error al mover la cita');
     }
   };
 

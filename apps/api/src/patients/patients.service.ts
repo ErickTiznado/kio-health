@@ -42,33 +42,41 @@ export class PatientsService {
   async findAll(
     clinicianId: string,
     query: QueryPatientsDto,
-  ): Promise<{ data: Patient[]; meta: { total: number; page: number; lastPage: number } }> {
-    const { page = 1, limit = 10, search } = query;
+  ): Promise<{ data: any[]; meta: { total: number; page: number; lastPage: number } }> {
+    const { page = 1, limit = 10, search, status } = query;
     const skip = (page - 1) * limit;
 
     const where: Prisma.PatientWhereInput = {
-      clinicianId, // Ensure only patients belonging to the clinician are returned
-      status: { not: 'ARCHIVED' }, // Default to active patients unless specified otherwise? Or should archived be filterable?
-      // For now, let's assume archived are hidden by default or we can add a filter later.
-      // The prompt says "No borramos datos clínicos, solo cambiamos status: ARCHIVED."
-      // It implies a soft delete behavior, so standard findAll should probably exclude them or allow filtering.
-      // Let's exclude ARCHIVED by default for the main list, but maybe allow an option later.
-      // For now, let's just stick to the search requirement.
+      clinicianId,
     };
+
+    // Apply Status Filter
+    if (status) {
+      where.status = status;
+    } else {
+      // Default: Exclude archived if no specific status requested
+      where.status = { not: 'ARCHIVED' };
+    }
 
     if (search) {
       where.OR = [
         { fullName: { contains: search, mode: 'insensitive' } },
-        // Could also search by phone number if needed
+        { contactPhone: { contains: search, mode: 'insensitive' } },
       ];
     }
+
+    // Determine sorting: FIFO for Waitlist, LIFO (created) for others
+    const orderBy: Prisma.PatientOrderByWithRelationInput = 
+      status === 'WAITLIST' 
+        ? { updatedAt: 'asc' } 
+        : { createdAt: 'desc' };
 
     const [data, total] = await Promise.all([
       this.prisma.patient.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
         include: {
           appointments: {
             where: {
@@ -82,15 +90,18 @@ export class PatientsService {
       this.prisma.patient.count({ where }),
     ]);
 
-    // Calculate totalDebt and clean up result
-    const patientsWithDebt = data.map(patient => {
-      const totalDebt = patient.appointments.reduce((sum, app) => sum + Number(app.price), 0);
-      const { appointments, ...rest } = patient; // Remove appointments from response to keep it clean
+    const patientsWithDebt = data.map((patient) => {
+      const totalDebt = patient.appointments.reduce(
+        (sum, app) => sum + Number(app.price),
+        0,
+      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { appointments, ...rest } = patient;
       return { ...rest, totalDebt };
     });
 
     return {
-      data: patientsWithDebt as any, // Cast to avoid strict type issues for now, or update return type
+      data: patientsWithDebt,
       meta: {
         total,
         page,

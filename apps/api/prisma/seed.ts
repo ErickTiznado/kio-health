@@ -141,6 +141,15 @@ async function createPatientsForClinician(
         status: randomStatus(),
         contactPhone: faker.phone.number(),
         emergencyContact: generateEmergencyContact(),
+        diagnosis: faker.helpers.arrayElement([
+          'Ansiedad Generalizada',
+          'Depresión Mayor',
+          'TDAH',
+          'Estrés Laboral',
+          'Trastorno de Adaptación',
+          null,
+        ]),
+        clinicalContext: faker.lorem.paragraph(),
       },
     });
     patientIds.push(patient.id);
@@ -220,12 +229,13 @@ async function createAppointmentsForClinician(
     // }
 
     // Create FinanceTransaction for completed appointments (ONLY IF PAID)
-    if (!isUnpaid) {
+    if (!isUnpaid && paymentStatus === 'PAID') {
       await prisma.financeTransaction.create({
         data: {
           clinicianId,
           appointmentId: appointment.id,
           type: 'INCOME',
+          category: 'Consultation',
           amount: defaultPrice,
           description: `Session payment - ${appointment.id.slice(0, 8)}`,
           date: start,
@@ -281,6 +291,29 @@ async function createAppointmentsForClinician(
   }
 }
 
+async function createExpensesForClinician(clinicianId: string): Promise<void> {
+  const expenseCategories = ['Rent', 'Services', 'Materials', 'Software'];
+  
+  for (let i = 0; i < 10; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() - faker.number.int({ min: 1, max: 30 }));
+    
+    const category = faker.helpers.arrayElement(expenseCategories);
+    const amount = faker.number.float({ min: 50, max: 500, fractionDigits: 2 });
+    
+    await prisma.financeTransaction.create({
+      data: {
+        clinicianId,
+        type: 'EXPENSE',
+        category,
+        amount,
+        description: `${category} payment`,
+        date,
+      },
+    });
+  }
+}
+
 // ============================================
 // MAIN SEED FUNCTION
 // ============================================
@@ -311,8 +344,10 @@ async function main(): Promise<void> {
       clinician.id,
       clinician.type,
       patientIds,
-      defaultPrice,
+      defaultPrice, // Pass defaultPrice properly
     );
+
+    await createExpensesForClinician(clinician.id);
 
     const totalAppointments =
       PAST_APPOINTMENTS + TODAY_APPOINTMENTS + FUTURE_APPOINTMENTS;

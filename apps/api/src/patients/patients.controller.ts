@@ -51,7 +51,7 @@ export class PatientsController {
     @CurrentUser() user: any,
     @Param('id') id: string,
     @Query() query: QueryTimelineDto,
-    @Req() req: Request,
+    @Req() req: any,
   ) {
     const clinicianId = await this.patientsService.getClinicianId(user.userId);
     
@@ -91,7 +91,7 @@ export class PatientsController {
   async findOne(
     @CurrentUser() user: any,
     @Param('id') id: string,
-    @Req() req: Request,
+    @Req() req: any,
   ) {
     const clinicianId = await this.patientsService.getClinicianId(user.userId);
     

@@ -93,6 +93,7 @@ export function SessionPage() {
   // Mock data for panels until we implement full history fetching
   const mockPsychContext = {
     diagnosis: patient.diagnosis || 'Sin diagnóstico',
+    clinicalContext: patient.clinicalContext || 'Sin contexto registrado',
     treatmentGoals: [],
     totalSessions: 0,
   };

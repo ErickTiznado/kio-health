@@ -39,6 +39,16 @@ export type Appointment = $Result.DefaultSelection<Prisma.$AppointmentPayload>
  */
 export type PsychNote = $Result.DefaultSelection<Prisma.$PsychNotePayload>
 /**
+ * Model Task
+ * 
+ */
+export type Task = $Result.DefaultSelection<Prisma.$TaskPayload>
+/**
+ * Model AccessLog
+ * 
+ */
+export type AccessLog = $Result.DefaultSelection<Prisma.$AccessLogPayload>
+/**
  * Model FinanceTransaction
  * 
  */
@@ -330,6 +340,26 @@ export class PrismaClient<
     * ```
     */
   get psychNote(): Prisma.PsychNoteDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.task`: Exposes CRUD operations for the **Task** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Tasks
+    * const tasks = await prisma.task.findMany()
+    * ```
+    */
+  get task(): Prisma.TaskDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.accessLog`: Exposes CRUD operations for the **AccessLog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AccessLogs
+    * const accessLogs = await prisma.accessLog.findMany()
+    * ```
+    */
+  get accessLog(): Prisma.AccessLogDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.financeTransaction`: Exposes CRUD operations for the **FinanceTransaction** model.
@@ -779,6 +809,8 @@ export namespace Prisma {
     Patient: 'Patient',
     Appointment: 'Appointment',
     PsychNote: 'PsychNote',
+    Task: 'Task',
+    AccessLog: 'AccessLog',
     FinanceTransaction: 'FinanceTransaction'
   };
 
@@ -795,7 +827,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "clinicianProfile" | "patient" | "appointment" | "psychNote" | "financeTransaction"
+      modelProps: "user" | "clinicianProfile" | "patient" | "appointment" | "psychNote" | "task" | "accessLog" | "financeTransaction"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1169,6 +1201,154 @@ export namespace Prisma {
           }
         }
       }
+      Task: {
+        payload: Prisma.$TaskPayload<ExtArgs>
+        fields: Prisma.TaskFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TaskFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TaskFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskPayload>
+          }
+          findFirst: {
+            args: Prisma.TaskFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TaskFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskPayload>
+          }
+          findMany: {
+            args: Prisma.TaskFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskPayload>[]
+          }
+          create: {
+            args: Prisma.TaskCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskPayload>
+          }
+          createMany: {
+            args: Prisma.TaskCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TaskCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskPayload>[]
+          }
+          delete: {
+            args: Prisma.TaskDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskPayload>
+          }
+          update: {
+            args: Prisma.TaskUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskPayload>
+          }
+          deleteMany: {
+            args: Prisma.TaskDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TaskUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TaskUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskPayload>[]
+          }
+          upsert: {
+            args: Prisma.TaskUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskPayload>
+          }
+          aggregate: {
+            args: Prisma.TaskAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTask>
+          }
+          groupBy: {
+            args: Prisma.TaskGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TaskGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TaskCountArgs<ExtArgs>
+            result: $Utils.Optional<TaskCountAggregateOutputType> | number
+          }
+        }
+      }
+      AccessLog: {
+        payload: Prisma.$AccessLogPayload<ExtArgs>
+        fields: Prisma.AccessLogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AccessLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AccessLogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AccessLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AccessLogPayload>
+          }
+          findFirst: {
+            args: Prisma.AccessLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AccessLogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AccessLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AccessLogPayload>
+          }
+          findMany: {
+            args: Prisma.AccessLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AccessLogPayload>[]
+          }
+          create: {
+            args: Prisma.AccessLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AccessLogPayload>
+          }
+          createMany: {
+            args: Prisma.AccessLogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AccessLogCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AccessLogPayload>[]
+          }
+          delete: {
+            args: Prisma.AccessLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AccessLogPayload>
+          }
+          update: {
+            args: Prisma.AccessLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AccessLogPayload>
+          }
+          deleteMany: {
+            args: Prisma.AccessLogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AccessLogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AccessLogUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AccessLogPayload>[]
+          }
+          upsert: {
+            args: Prisma.AccessLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AccessLogPayload>
+          }
+          aggregate: {
+            args: Prisma.AccessLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAccessLog>
+          }
+          groupBy: {
+            args: Prisma.AccessLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AccessLogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AccessLogCountArgs<ExtArgs>
+            result: $Utils.Optional<AccessLogCountAggregateOutputType> | number
+          }
+        }
+      }
       FinanceTransaction: {
         payload: Prisma.$FinanceTransactionPayload<ExtArgs>
         fields: Prisma.FinanceTransactionFieldRefs
@@ -1356,6 +1536,8 @@ export namespace Prisma {
     patient?: PatientOmit
     appointment?: AppointmentOmit
     psychNote?: PsychNoteOmit
+    task?: TaskOmit
+    accessLog?: AccessLogOmit
     financeTransaction?: FinanceTransactionOmit
   }
 
@@ -1433,6 +1615,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type UserCountOutputType
+   */
+
+  export type UserCountOutputType = {
+    accessLogs: number
+  }
+
+  export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    accessLogs?: boolean | UserCountOutputTypeCountAccessLogsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserCountOutputType
+     */
+    select?: UserCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountAccessLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AccessLogWhereInput
+  }
+
+
+  /**
    * Count Type ClinicianProfileCountOutputType
    */
 
@@ -1488,11 +1701,15 @@ export namespace Prisma {
   export type PatientCountOutputType = {
     appointments: number
     psychNotes: number
+    accessLogs: number
+    tasks: number
   }
 
   export type PatientCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appointments?: boolean | PatientCountOutputTypeCountAppointmentsArgs
     psychNotes?: boolean | PatientCountOutputTypeCountPsychNotesArgs
+    accessLogs?: boolean | PatientCountOutputTypeCountAccessLogsArgs
+    tasks?: boolean | PatientCountOutputTypeCountTasksArgs
   }
 
   // Custom InputTypes
@@ -1518,6 +1735,20 @@ export namespace Prisma {
    */
   export type PatientCountOutputTypeCountPsychNotesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PsychNoteWhereInput
+  }
+
+  /**
+   * PatientCountOutputType without action
+   */
+  export type PatientCountOutputTypeCountAccessLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AccessLogWhereInput
+  }
+
+  /**
+   * PatientCountOutputType without action
+   */
+  export type PatientCountOutputTypeCountTasksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TaskWhereInput
   }
 
 
@@ -1698,6 +1929,8 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     profile?: boolean | User$profileArgs<ExtArgs>
+    accessLogs?: boolean | User$accessLogsArgs<ExtArgs>
+    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1730,6 +1963,8 @@ export namespace Prisma {
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "role" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     profile?: boolean | User$profileArgs<ExtArgs>
+    accessLogs?: boolean | User$accessLogsArgs<ExtArgs>
+    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
   export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -1738,6 +1973,7 @@ export namespace Prisma {
     name: "User"
     objects: {
       profile: Prisma.$ClinicianProfilePayload<ExtArgs> | null
+      accessLogs: Prisma.$AccessLogPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2141,6 +2377,7 @@ export namespace Prisma {
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     profile<T extends User$profileArgs<ExtArgs> = {}>(args?: Subset<T, User$profileArgs<ExtArgs>>): Prisma__ClinicianProfileClient<$Result.GetResult<Prisma.$ClinicianProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    accessLogs<T extends User$accessLogsArgs<ExtArgs> = {}>(args?: Subset<T, User$accessLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2580,6 +2817,30 @@ export namespace Prisma {
      */
     include?: ClinicianProfileInclude<ExtArgs> | null
     where?: ClinicianProfileWhereInput
+  }
+
+  /**
+   * User.accessLogs
+   */
+  export type User$accessLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AccessLog
+     */
+    select?: AccessLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AccessLog
+     */
+    omit?: AccessLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AccessLogInclude<ExtArgs> | null
+    where?: AccessLogWhereInput
+    orderBy?: AccessLogOrderByWithRelationInput | AccessLogOrderByWithRelationInput[]
+    cursor?: AccessLogWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AccessLogScalarFieldEnum | AccessLogScalarFieldEnum[]
   }
 
   /**
@@ -4046,6 +4307,8 @@ export namespace Prisma {
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
     appointments?: boolean | Patient$appointmentsArgs<ExtArgs>
     psychNotes?: boolean | Patient$psychNotesArgs<ExtArgs>
+    accessLogs?: boolean | Patient$accessLogsArgs<ExtArgs>
+    tasks?: boolean | Patient$tasksArgs<ExtArgs>
     _count?: boolean | PatientCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["patient"]>
 
@@ -4098,6 +4361,8 @@ export namespace Prisma {
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
     appointments?: boolean | Patient$appointmentsArgs<ExtArgs>
     psychNotes?: boolean | Patient$psychNotesArgs<ExtArgs>
+    accessLogs?: boolean | Patient$accessLogsArgs<ExtArgs>
+    tasks?: boolean | Patient$tasksArgs<ExtArgs>
     _count?: boolean | PatientCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PatientIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4113,6 +4378,8 @@ export namespace Prisma {
       clinician: Prisma.$ClinicianProfilePayload<ExtArgs>
       appointments: Prisma.$AppointmentPayload<ExtArgs>[]
       psychNotes: Prisma.$PsychNotePayload<ExtArgs>[]
+      accessLogs: Prisma.$AccessLogPayload<ExtArgs>[]
+      tasks: Prisma.$TaskPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4523,6 +4790,8 @@ export namespace Prisma {
     clinician<T extends ClinicianProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClinicianProfileDefaultArgs<ExtArgs>>): Prisma__ClinicianProfileClient<$Result.GetResult<Prisma.$ClinicianProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     appointments<T extends Patient$appointmentsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     psychNotes<T extends Patient$psychNotesArgs<ExtArgs> = {}>(args?: Subset<T, Patient$psychNotesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PsychNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    accessLogs<T extends Patient$accessLogsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$accessLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    tasks<T extends Patient$tasksArgs<ExtArgs> = {}>(args?: Subset<T, Patient$tasksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5004,6 +5273,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PsychNoteScalarFieldEnum | PsychNoteScalarFieldEnum[]
+  }
+
+  /**
+   * Patient.accessLogs
+   */
+  export type Patient$accessLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AccessLog
+     */
+    select?: AccessLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AccessLog
+     */
+    omit?: AccessLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AccessLogInclude<ExtArgs> | null
+    where?: AccessLogWhereInput
+    orderBy?: AccessLogOrderByWithRelationInput | AccessLogOrderByWithRelationInput[]
+    cursor?: AccessLogWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AccessLogScalarFieldEnum | AccessLogScalarFieldEnum[]
+  }
+
+  /**
+   * Patient.tasks
+   */
+  export type Patient$tasksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Task
+     */
+    omit?: TaskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskInclude<ExtArgs> | null
+    where?: TaskWhereInput
+    orderBy?: TaskOrderByWithRelationInput | TaskOrderByWithRelationInput[]
+    cursor?: TaskWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TaskScalarFieldEnum | TaskScalarFieldEnum[]
   }
 
   /**
@@ -6315,6 +6632,7 @@ export namespace Prisma {
     templateType: $Enums.NoteTemplateType | null
     moodRating: number | null
     privateNotes: string | null
+    isPinned: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6326,6 +6644,7 @@ export namespace Prisma {
     templateType: $Enums.NoteTemplateType | null
     moodRating: number | null
     privateNotes: string | null
+    isPinned: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6338,6 +6657,8 @@ export namespace Prisma {
     content: number
     moodRating: number
     privateNotes: number
+    isPinned: number
+    tags: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -6359,6 +6680,7 @@ export namespace Prisma {
     templateType?: true
     moodRating?: true
     privateNotes?: true
+    isPinned?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6370,6 +6692,7 @@ export namespace Prisma {
     templateType?: true
     moodRating?: true
     privateNotes?: true
+    isPinned?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6382,6 +6705,8 @@ export namespace Prisma {
     content?: true
     moodRating?: true
     privateNotes?: true
+    isPinned?: true
+    tags?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -6481,6 +6806,8 @@ export namespace Prisma {
     content: JsonValue
     moodRating: number | null
     privateNotes: string | null
+    isPinned: boolean
+    tags: string[]
     createdAt: Date
     updatedAt: Date
     _count: PsychNoteCountAggregateOutputType | null
@@ -6512,6 +6839,8 @@ export namespace Prisma {
     content?: boolean
     moodRating?: boolean
     privateNotes?: boolean
+    isPinned?: boolean
+    tags?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
@@ -6526,6 +6855,8 @@ export namespace Prisma {
     content?: boolean
     moodRating?: boolean
     privateNotes?: boolean
+    isPinned?: boolean
+    tags?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
@@ -6540,6 +6871,8 @@ export namespace Prisma {
     content?: boolean
     moodRating?: boolean
     privateNotes?: boolean
+    isPinned?: boolean
+    tags?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
@@ -6554,11 +6887,13 @@ export namespace Prisma {
     content?: boolean
     moodRating?: boolean
     privateNotes?: boolean
+    isPinned?: boolean
+    tags?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PsychNoteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "appointmentId" | "patientId" | "templateType" | "content" | "moodRating" | "privateNotes" | "createdAt" | "updatedAt", ExtArgs["result"]["psychNote"]>
+  export type PsychNoteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "appointmentId" | "patientId" | "templateType" | "content" | "moodRating" | "privateNotes" | "isPinned" | "tags" | "createdAt" | "updatedAt", ExtArgs["result"]["psychNote"]>
   export type PsychNoteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
     patient?: boolean | PatientDefaultArgs<ExtArgs>
@@ -6586,6 +6921,8 @@ export namespace Prisma {
       content: Prisma.JsonValue
       moodRating: number | null
       privateNotes: string | null
+      isPinned: boolean
+      tags: string[]
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["psychNote"]>
@@ -7020,6 +7357,8 @@ export namespace Prisma {
     readonly content: FieldRef<"PsychNote", 'Json'>
     readonly moodRating: FieldRef<"PsychNote", 'Int'>
     readonly privateNotes: FieldRef<"PsychNote", 'String'>
+    readonly isPinned: FieldRef<"PsychNote", 'Boolean'>
+    readonly tags: FieldRef<"PsychNote", 'String[]'>
     readonly createdAt: FieldRef<"PsychNote", 'DateTime'>
     readonly updatedAt: FieldRef<"PsychNote", 'DateTime'>
   }
@@ -7437,6 +7776,2227 @@ export namespace Prisma {
 
 
   /**
+   * Model Task
+   */
+
+  export type AggregateTask = {
+    _count: TaskCountAggregateOutputType | null
+    _min: TaskMinAggregateOutputType | null
+    _max: TaskMaxAggregateOutputType | null
+  }
+
+  export type TaskMinAggregateOutputType = {
+    id: string | null
+    patientId: string | null
+    description: string | null
+    isCompleted: boolean | null
+    dueDate: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TaskMaxAggregateOutputType = {
+    id: string | null
+    patientId: string | null
+    description: string | null
+    isCompleted: boolean | null
+    dueDate: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TaskCountAggregateOutputType = {
+    id: number
+    patientId: number
+    description: number
+    isCompleted: number
+    dueDate: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type TaskMinAggregateInputType = {
+    id?: true
+    patientId?: true
+    description?: true
+    isCompleted?: true
+    dueDate?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TaskMaxAggregateInputType = {
+    id?: true
+    patientId?: true
+    description?: true
+    isCompleted?: true
+    dueDate?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TaskCountAggregateInputType = {
+    id?: true
+    patientId?: true
+    description?: true
+    isCompleted?: true
+    dueDate?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type TaskAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Task to aggregate.
+     */
+    where?: TaskWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Tasks to fetch.
+     */
+    orderBy?: TaskOrderByWithRelationInput | TaskOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TaskWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Tasks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Tasks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Tasks
+    **/
+    _count?: true | TaskCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TaskMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TaskMaxAggregateInputType
+  }
+
+  export type GetTaskAggregateType<T extends TaskAggregateArgs> = {
+        [P in keyof T & keyof AggregateTask]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTask[P]>
+      : GetScalarType<T[P], AggregateTask[P]>
+  }
+
+
+
+
+  export type TaskGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TaskWhereInput
+    orderBy?: TaskOrderByWithAggregationInput | TaskOrderByWithAggregationInput[]
+    by: TaskScalarFieldEnum[] | TaskScalarFieldEnum
+    having?: TaskScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TaskCountAggregateInputType | true
+    _min?: TaskMinAggregateInputType
+    _max?: TaskMaxAggregateInputType
+  }
+
+  export type TaskGroupByOutputType = {
+    id: string
+    patientId: string
+    description: string
+    isCompleted: boolean
+    dueDate: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: TaskCountAggregateOutputType | null
+    _min: TaskMinAggregateOutputType | null
+    _max: TaskMaxAggregateOutputType | null
+  }
+
+  type GetTaskGroupByPayload<T extends TaskGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TaskGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TaskGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TaskGroupByOutputType[P]>
+            : GetScalarType<T[P], TaskGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TaskSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    description?: boolean
+    isCompleted?: boolean
+    dueDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["task"]>
+
+  export type TaskSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    description?: boolean
+    isCompleted?: boolean
+    dueDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["task"]>
+
+  export type TaskSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    description?: boolean
+    isCompleted?: boolean
+    dueDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["task"]>
+
+  export type TaskSelectScalar = {
+    id?: boolean
+    patientId?: boolean
+    description?: boolean
+    isCompleted?: boolean
+    dueDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type TaskOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "description" | "isCompleted" | "dueDate" | "createdAt" | "updatedAt", ExtArgs["result"]["task"]>
+  export type TaskInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+  }
+  export type TaskIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+  }
+  export type TaskIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+  }
+
+  export type $TaskPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Task"
+    objects: {
+      patient: Prisma.$PatientPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      patientId: string
+      description: string
+      isCompleted: boolean
+      dueDate: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["task"]>
+    composites: {}
+  }
+
+  type TaskGetPayload<S extends boolean | null | undefined | TaskDefaultArgs> = $Result.GetResult<Prisma.$TaskPayload, S>
+
+  type TaskCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TaskFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TaskCountAggregateInputType | true
+    }
+
+  export interface TaskDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Task'], meta: { name: 'Task' } }
+    /**
+     * Find zero or one Task that matches the filter.
+     * @param {TaskFindUniqueArgs} args - Arguments to find a Task
+     * @example
+     * // Get one Task
+     * const task = await prisma.task.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TaskFindUniqueArgs>(args: SelectSubset<T, TaskFindUniqueArgs<ExtArgs>>): Prisma__TaskClient<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Task that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TaskFindUniqueOrThrowArgs} args - Arguments to find a Task
+     * @example
+     * // Get one Task
+     * const task = await prisma.task.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TaskFindUniqueOrThrowArgs>(args: SelectSubset<T, TaskFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TaskClient<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Task that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskFindFirstArgs} args - Arguments to find a Task
+     * @example
+     * // Get one Task
+     * const task = await prisma.task.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TaskFindFirstArgs>(args?: SelectSubset<T, TaskFindFirstArgs<ExtArgs>>): Prisma__TaskClient<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Task that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskFindFirstOrThrowArgs} args - Arguments to find a Task
+     * @example
+     * // Get one Task
+     * const task = await prisma.task.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TaskFindFirstOrThrowArgs>(args?: SelectSubset<T, TaskFindFirstOrThrowArgs<ExtArgs>>): Prisma__TaskClient<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Tasks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Tasks
+     * const tasks = await prisma.task.findMany()
+     * 
+     * // Get first 10 Tasks
+     * const tasks = await prisma.task.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const taskWithIdOnly = await prisma.task.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TaskFindManyArgs>(args?: SelectSubset<T, TaskFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Task.
+     * @param {TaskCreateArgs} args - Arguments to create a Task.
+     * @example
+     * // Create one Task
+     * const Task = await prisma.task.create({
+     *   data: {
+     *     // ... data to create a Task
+     *   }
+     * })
+     * 
+     */
+    create<T extends TaskCreateArgs>(args: SelectSubset<T, TaskCreateArgs<ExtArgs>>): Prisma__TaskClient<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Tasks.
+     * @param {TaskCreateManyArgs} args - Arguments to create many Tasks.
+     * @example
+     * // Create many Tasks
+     * const task = await prisma.task.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TaskCreateManyArgs>(args?: SelectSubset<T, TaskCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Tasks and returns the data saved in the database.
+     * @param {TaskCreateManyAndReturnArgs} args - Arguments to create many Tasks.
+     * @example
+     * // Create many Tasks
+     * const task = await prisma.task.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Tasks and only return the `id`
+     * const taskWithIdOnly = await prisma.task.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TaskCreateManyAndReturnArgs>(args?: SelectSubset<T, TaskCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Task.
+     * @param {TaskDeleteArgs} args - Arguments to delete one Task.
+     * @example
+     * // Delete one Task
+     * const Task = await prisma.task.delete({
+     *   where: {
+     *     // ... filter to delete one Task
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TaskDeleteArgs>(args: SelectSubset<T, TaskDeleteArgs<ExtArgs>>): Prisma__TaskClient<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Task.
+     * @param {TaskUpdateArgs} args - Arguments to update one Task.
+     * @example
+     * // Update one Task
+     * const task = await prisma.task.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TaskUpdateArgs>(args: SelectSubset<T, TaskUpdateArgs<ExtArgs>>): Prisma__TaskClient<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Tasks.
+     * @param {TaskDeleteManyArgs} args - Arguments to filter Tasks to delete.
+     * @example
+     * // Delete a few Tasks
+     * const { count } = await prisma.task.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TaskDeleteManyArgs>(args?: SelectSubset<T, TaskDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Tasks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Tasks
+     * const task = await prisma.task.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TaskUpdateManyArgs>(args: SelectSubset<T, TaskUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Tasks and returns the data updated in the database.
+     * @param {TaskUpdateManyAndReturnArgs} args - Arguments to update many Tasks.
+     * @example
+     * // Update many Tasks
+     * const task = await prisma.task.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Tasks and only return the `id`
+     * const taskWithIdOnly = await prisma.task.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TaskUpdateManyAndReturnArgs>(args: SelectSubset<T, TaskUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Task.
+     * @param {TaskUpsertArgs} args - Arguments to update or create a Task.
+     * @example
+     * // Update or create a Task
+     * const task = await prisma.task.upsert({
+     *   create: {
+     *     // ... data to create a Task
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Task we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TaskUpsertArgs>(args: SelectSubset<T, TaskUpsertArgs<ExtArgs>>): Prisma__TaskClient<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Tasks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskCountArgs} args - Arguments to filter Tasks to count.
+     * @example
+     * // Count the number of Tasks
+     * const count = await prisma.task.count({
+     *   where: {
+     *     // ... the filter for the Tasks we want to count
+     *   }
+     * })
+    **/
+    count<T extends TaskCountArgs>(
+      args?: Subset<T, TaskCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TaskCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Task.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TaskAggregateArgs>(args: Subset<T, TaskAggregateArgs>): Prisma.PrismaPromise<GetTaskAggregateType<T>>
+
+    /**
+     * Group by Task.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TaskGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TaskGroupByArgs['orderBy'] }
+        : { orderBy?: TaskGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TaskGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTaskGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Task model
+   */
+  readonly fields: TaskFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Task.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TaskClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    patient<T extends PatientDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PatientDefaultArgs<ExtArgs>>): Prisma__PatientClient<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Task model
+   */
+  interface TaskFieldRefs {
+    readonly id: FieldRef<"Task", 'String'>
+    readonly patientId: FieldRef<"Task", 'String'>
+    readonly description: FieldRef<"Task", 'String'>
+    readonly isCompleted: FieldRef<"Task", 'Boolean'>
+    readonly dueDate: FieldRef<"Task", 'DateTime'>
+    readonly createdAt: FieldRef<"Task", 'DateTime'>
+    readonly updatedAt: FieldRef<"Task", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Task findUnique
+   */
+  export type TaskFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Task
+     */
+    omit?: TaskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
+     * Filter, which Task to fetch.
+     */
+    where: TaskWhereUniqueInput
+  }
+
+  /**
+   * Task findUniqueOrThrow
+   */
+  export type TaskFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Task
+     */
+    omit?: TaskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
+     * Filter, which Task to fetch.
+     */
+    where: TaskWhereUniqueInput
+  }
+
+  /**
+   * Task findFirst
+   */
+  export type TaskFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Task
+     */
+    omit?: TaskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
+     * Filter, which Task to fetch.
+     */
+    where?: TaskWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Tasks to fetch.
+     */
+    orderBy?: TaskOrderByWithRelationInput | TaskOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Tasks.
+     */
+    cursor?: TaskWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Tasks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Tasks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Tasks.
+     */
+    distinct?: TaskScalarFieldEnum | TaskScalarFieldEnum[]
+  }
+
+  /**
+   * Task findFirstOrThrow
+   */
+  export type TaskFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Task
+     */
+    omit?: TaskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
+     * Filter, which Task to fetch.
+     */
+    where?: TaskWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Tasks to fetch.
+     */
+    orderBy?: TaskOrderByWithRelationInput | TaskOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Tasks.
+     */
+    cursor?: TaskWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Tasks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Tasks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Tasks.
+     */
+    distinct?: TaskScalarFieldEnum | TaskScalarFieldEnum[]
+  }
+
+  /**
+   * Task findMany
+   */
+  export type TaskFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Task
+     */
+    omit?: TaskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
+     * Filter, which Tasks to fetch.
+     */
+    where?: TaskWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Tasks to fetch.
+     */
+    orderBy?: TaskOrderByWithRelationInput | TaskOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Tasks.
+     */
+    cursor?: TaskWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Tasks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Tasks.
+     */
+    skip?: number
+    distinct?: TaskScalarFieldEnum | TaskScalarFieldEnum[]
+  }
+
+  /**
+   * Task create
+   */
+  export type TaskCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Task
+     */
+    omit?: TaskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Task.
+     */
+    data: XOR<TaskCreateInput, TaskUncheckedCreateInput>
+  }
+
+  /**
+   * Task createMany
+   */
+  export type TaskCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Tasks.
+     */
+    data: TaskCreateManyInput | TaskCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Task createManyAndReturn
+   */
+  export type TaskCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Task
+     */
+    omit?: TaskOmit<ExtArgs> | null
+    /**
+     * The data used to create many Tasks.
+     */
+    data: TaskCreateManyInput | TaskCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Task update
+   */
+  export type TaskUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Task
+     */
+    omit?: TaskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Task.
+     */
+    data: XOR<TaskUpdateInput, TaskUncheckedUpdateInput>
+    /**
+     * Choose, which Task to update.
+     */
+    where: TaskWhereUniqueInput
+  }
+
+  /**
+   * Task updateMany
+   */
+  export type TaskUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Tasks.
+     */
+    data: XOR<TaskUpdateManyMutationInput, TaskUncheckedUpdateManyInput>
+    /**
+     * Filter which Tasks to update
+     */
+    where?: TaskWhereInput
+    /**
+     * Limit how many Tasks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Task updateManyAndReturn
+   */
+  export type TaskUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Task
+     */
+    omit?: TaskOmit<ExtArgs> | null
+    /**
+     * The data used to update Tasks.
+     */
+    data: XOR<TaskUpdateManyMutationInput, TaskUncheckedUpdateManyInput>
+    /**
+     * Filter which Tasks to update
+     */
+    where?: TaskWhereInput
+    /**
+     * Limit how many Tasks to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Task upsert
+   */
+  export type TaskUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Task
+     */
+    omit?: TaskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Task to update in case it exists.
+     */
+    where: TaskWhereUniqueInput
+    /**
+     * In case the Task found by the `where` argument doesn't exist, create a new Task with this data.
+     */
+    create: XOR<TaskCreateInput, TaskUncheckedCreateInput>
+    /**
+     * In case the Task was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TaskUpdateInput, TaskUncheckedUpdateInput>
+  }
+
+  /**
+   * Task delete
+   */
+  export type TaskDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Task
+     */
+    omit?: TaskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
+     * Filter which Task to delete.
+     */
+    where: TaskWhereUniqueInput
+  }
+
+  /**
+   * Task deleteMany
+   */
+  export type TaskDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Tasks to delete
+     */
+    where?: TaskWhereInput
+    /**
+     * Limit how many Tasks to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Task without action
+   */
+  export type TaskDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Task
+     */
+    omit?: TaskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AccessLog
+   */
+
+  export type AggregateAccessLog = {
+    _count: AccessLogCountAggregateOutputType | null
+    _min: AccessLogMinAggregateOutputType | null
+    _max: AccessLogMaxAggregateOutputType | null
+  }
+
+  export type AccessLogMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    patientId: string | null
+    action: string | null
+    resource: string | null
+    details: string | null
+    ipAddress: string | null
+    userAgent: string | null
+    createdAt: Date | null
+  }
+
+  export type AccessLogMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    patientId: string | null
+    action: string | null
+    resource: string | null
+    details: string | null
+    ipAddress: string | null
+    userAgent: string | null
+    createdAt: Date | null
+  }
+
+  export type AccessLogCountAggregateOutputType = {
+    id: number
+    userId: number
+    patientId: number
+    action: number
+    resource: number
+    details: number
+    ipAddress: number
+    userAgent: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type AccessLogMinAggregateInputType = {
+    id?: true
+    userId?: true
+    patientId?: true
+    action?: true
+    resource?: true
+    details?: true
+    ipAddress?: true
+    userAgent?: true
+    createdAt?: true
+  }
+
+  export type AccessLogMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    patientId?: true
+    action?: true
+    resource?: true
+    details?: true
+    ipAddress?: true
+    userAgent?: true
+    createdAt?: true
+  }
+
+  export type AccessLogCountAggregateInputType = {
+    id?: true
+    userId?: true
+    patientId?: true
+    action?: true
+    resource?: true
+    details?: true
+    ipAddress?: true
+    userAgent?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type AccessLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AccessLog to aggregate.
+     */
+    where?: AccessLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AccessLogs to fetch.
+     */
+    orderBy?: AccessLogOrderByWithRelationInput | AccessLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AccessLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AccessLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AccessLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AccessLogs
+    **/
+    _count?: true | AccessLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AccessLogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AccessLogMaxAggregateInputType
+  }
+
+  export type GetAccessLogAggregateType<T extends AccessLogAggregateArgs> = {
+        [P in keyof T & keyof AggregateAccessLog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAccessLog[P]>
+      : GetScalarType<T[P], AggregateAccessLog[P]>
+  }
+
+
+
+
+  export type AccessLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AccessLogWhereInput
+    orderBy?: AccessLogOrderByWithAggregationInput | AccessLogOrderByWithAggregationInput[]
+    by: AccessLogScalarFieldEnum[] | AccessLogScalarFieldEnum
+    having?: AccessLogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AccessLogCountAggregateInputType | true
+    _min?: AccessLogMinAggregateInputType
+    _max?: AccessLogMaxAggregateInputType
+  }
+
+  export type AccessLogGroupByOutputType = {
+    id: string
+    userId: string
+    patientId: string | null
+    action: string
+    resource: string
+    details: string | null
+    ipAddress: string | null
+    userAgent: string | null
+    createdAt: Date
+    _count: AccessLogCountAggregateOutputType | null
+    _min: AccessLogMinAggregateOutputType | null
+    _max: AccessLogMaxAggregateOutputType | null
+  }
+
+  type GetAccessLogGroupByPayload<T extends AccessLogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AccessLogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AccessLogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AccessLogGroupByOutputType[P]>
+            : GetScalarType<T[P], AccessLogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AccessLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    patientId?: boolean
+    action?: boolean
+    resource?: boolean
+    details?: boolean
+    ipAddress?: boolean
+    userAgent?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    patient?: boolean | AccessLog$patientArgs<ExtArgs>
+  }, ExtArgs["result"]["accessLog"]>
+
+  export type AccessLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    patientId?: boolean
+    action?: boolean
+    resource?: boolean
+    details?: boolean
+    ipAddress?: boolean
+    userAgent?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    patient?: boolean | AccessLog$patientArgs<ExtArgs>
+  }, ExtArgs["result"]["accessLog"]>
+
+  export type AccessLogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    patientId?: boolean
+    action?: boolean
+    resource?: boolean
+    details?: boolean
+    ipAddress?: boolean
+    userAgent?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    patient?: boolean | AccessLog$patientArgs<ExtArgs>
+  }, ExtArgs["result"]["accessLog"]>
+
+  export type AccessLogSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    patientId?: boolean
+    action?: boolean
+    resource?: boolean
+    details?: boolean
+    ipAddress?: boolean
+    userAgent?: boolean
+    createdAt?: boolean
+  }
+
+  export type AccessLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "patientId" | "action" | "resource" | "details" | "ipAddress" | "userAgent" | "createdAt", ExtArgs["result"]["accessLog"]>
+  export type AccessLogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    patient?: boolean | AccessLog$patientArgs<ExtArgs>
+  }
+  export type AccessLogIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    patient?: boolean | AccessLog$patientArgs<ExtArgs>
+  }
+  export type AccessLogIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    patient?: boolean | AccessLog$patientArgs<ExtArgs>
+  }
+
+  export type $AccessLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AccessLog"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      patient: Prisma.$PatientPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      patientId: string | null
+      action: string
+      resource: string
+      details: string | null
+      ipAddress: string | null
+      userAgent: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["accessLog"]>
+    composites: {}
+  }
+
+  type AccessLogGetPayload<S extends boolean | null | undefined | AccessLogDefaultArgs> = $Result.GetResult<Prisma.$AccessLogPayload, S>
+
+  type AccessLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AccessLogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AccessLogCountAggregateInputType | true
+    }
+
+  export interface AccessLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AccessLog'], meta: { name: 'AccessLog' } }
+    /**
+     * Find zero or one AccessLog that matches the filter.
+     * @param {AccessLogFindUniqueArgs} args - Arguments to find a AccessLog
+     * @example
+     * // Get one AccessLog
+     * const accessLog = await prisma.accessLog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AccessLogFindUniqueArgs>(args: SelectSubset<T, AccessLogFindUniqueArgs<ExtArgs>>): Prisma__AccessLogClient<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AccessLog that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AccessLogFindUniqueOrThrowArgs} args - Arguments to find a AccessLog
+     * @example
+     * // Get one AccessLog
+     * const accessLog = await prisma.accessLog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AccessLogFindUniqueOrThrowArgs>(args: SelectSubset<T, AccessLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AccessLogClient<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AccessLog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AccessLogFindFirstArgs} args - Arguments to find a AccessLog
+     * @example
+     * // Get one AccessLog
+     * const accessLog = await prisma.accessLog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AccessLogFindFirstArgs>(args?: SelectSubset<T, AccessLogFindFirstArgs<ExtArgs>>): Prisma__AccessLogClient<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AccessLog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AccessLogFindFirstOrThrowArgs} args - Arguments to find a AccessLog
+     * @example
+     * // Get one AccessLog
+     * const accessLog = await prisma.accessLog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AccessLogFindFirstOrThrowArgs>(args?: SelectSubset<T, AccessLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__AccessLogClient<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AccessLogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AccessLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AccessLogs
+     * const accessLogs = await prisma.accessLog.findMany()
+     * 
+     * // Get first 10 AccessLogs
+     * const accessLogs = await prisma.accessLog.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const accessLogWithIdOnly = await prisma.accessLog.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AccessLogFindManyArgs>(args?: SelectSubset<T, AccessLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AccessLog.
+     * @param {AccessLogCreateArgs} args - Arguments to create a AccessLog.
+     * @example
+     * // Create one AccessLog
+     * const AccessLog = await prisma.accessLog.create({
+     *   data: {
+     *     // ... data to create a AccessLog
+     *   }
+     * })
+     * 
+     */
+    create<T extends AccessLogCreateArgs>(args: SelectSubset<T, AccessLogCreateArgs<ExtArgs>>): Prisma__AccessLogClient<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AccessLogs.
+     * @param {AccessLogCreateManyArgs} args - Arguments to create many AccessLogs.
+     * @example
+     * // Create many AccessLogs
+     * const accessLog = await prisma.accessLog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AccessLogCreateManyArgs>(args?: SelectSubset<T, AccessLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AccessLogs and returns the data saved in the database.
+     * @param {AccessLogCreateManyAndReturnArgs} args - Arguments to create many AccessLogs.
+     * @example
+     * // Create many AccessLogs
+     * const accessLog = await prisma.accessLog.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AccessLogs and only return the `id`
+     * const accessLogWithIdOnly = await prisma.accessLog.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AccessLogCreateManyAndReturnArgs>(args?: SelectSubset<T, AccessLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AccessLog.
+     * @param {AccessLogDeleteArgs} args - Arguments to delete one AccessLog.
+     * @example
+     * // Delete one AccessLog
+     * const AccessLog = await prisma.accessLog.delete({
+     *   where: {
+     *     // ... filter to delete one AccessLog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AccessLogDeleteArgs>(args: SelectSubset<T, AccessLogDeleteArgs<ExtArgs>>): Prisma__AccessLogClient<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AccessLog.
+     * @param {AccessLogUpdateArgs} args - Arguments to update one AccessLog.
+     * @example
+     * // Update one AccessLog
+     * const accessLog = await prisma.accessLog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AccessLogUpdateArgs>(args: SelectSubset<T, AccessLogUpdateArgs<ExtArgs>>): Prisma__AccessLogClient<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AccessLogs.
+     * @param {AccessLogDeleteManyArgs} args - Arguments to filter AccessLogs to delete.
+     * @example
+     * // Delete a few AccessLogs
+     * const { count } = await prisma.accessLog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AccessLogDeleteManyArgs>(args?: SelectSubset<T, AccessLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AccessLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AccessLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AccessLogs
+     * const accessLog = await prisma.accessLog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AccessLogUpdateManyArgs>(args: SelectSubset<T, AccessLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AccessLogs and returns the data updated in the database.
+     * @param {AccessLogUpdateManyAndReturnArgs} args - Arguments to update many AccessLogs.
+     * @example
+     * // Update many AccessLogs
+     * const accessLog = await prisma.accessLog.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AccessLogs and only return the `id`
+     * const accessLogWithIdOnly = await prisma.accessLog.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AccessLogUpdateManyAndReturnArgs>(args: SelectSubset<T, AccessLogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AccessLog.
+     * @param {AccessLogUpsertArgs} args - Arguments to update or create a AccessLog.
+     * @example
+     * // Update or create a AccessLog
+     * const accessLog = await prisma.accessLog.upsert({
+     *   create: {
+     *     // ... data to create a AccessLog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AccessLog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AccessLogUpsertArgs>(args: SelectSubset<T, AccessLogUpsertArgs<ExtArgs>>): Prisma__AccessLogClient<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AccessLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AccessLogCountArgs} args - Arguments to filter AccessLogs to count.
+     * @example
+     * // Count the number of AccessLogs
+     * const count = await prisma.accessLog.count({
+     *   where: {
+     *     // ... the filter for the AccessLogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends AccessLogCountArgs>(
+      args?: Subset<T, AccessLogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AccessLogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AccessLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AccessLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AccessLogAggregateArgs>(args: Subset<T, AccessLogAggregateArgs>): Prisma.PrismaPromise<GetAccessLogAggregateType<T>>
+
+    /**
+     * Group by AccessLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AccessLogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AccessLogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AccessLogGroupByArgs['orderBy'] }
+        : { orderBy?: AccessLogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AccessLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAccessLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AccessLog model
+   */
+  readonly fields: AccessLogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AccessLog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AccessLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    patient<T extends AccessLog$patientArgs<ExtArgs> = {}>(args?: Subset<T, AccessLog$patientArgs<ExtArgs>>): Prisma__PatientClient<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AccessLog model
+   */
+  interface AccessLogFieldRefs {
+    readonly id: FieldRef<"AccessLog", 'String'>
+    readonly userId: FieldRef<"AccessLog", 'String'>
+    readonly patientId: FieldRef<"AccessLog", 'String'>
+    readonly action: FieldRef<"AccessLog", 'String'>
+    readonly resource: FieldRef<"AccessLog", 'String'>
+    readonly details: FieldRef<"AccessLog", 'String'>
+    readonly ipAddress: FieldRef<"AccessLog", 'String'>
+    readonly userAgent: FieldRef<"AccessLog", 'String'>
+    readonly createdAt: FieldRef<"AccessLog", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AccessLog findUnique
+   */
+  export type AccessLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AccessLog
+     */
+    select?: AccessLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AccessLog
+     */
+    omit?: AccessLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AccessLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AccessLog to fetch.
+     */
+    where: AccessLogWhereUniqueInput
+  }
+
+  /**
+   * AccessLog findUniqueOrThrow
+   */
+  export type AccessLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AccessLog
+     */
+    select?: AccessLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AccessLog
+     */
+    omit?: AccessLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AccessLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AccessLog to fetch.
+     */
+    where: AccessLogWhereUniqueInput
+  }
+
+  /**
+   * AccessLog findFirst
+   */
+  export type AccessLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AccessLog
+     */
+    select?: AccessLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AccessLog
+     */
+    omit?: AccessLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AccessLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AccessLog to fetch.
+     */
+    where?: AccessLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AccessLogs to fetch.
+     */
+    orderBy?: AccessLogOrderByWithRelationInput | AccessLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AccessLogs.
+     */
+    cursor?: AccessLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AccessLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AccessLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AccessLogs.
+     */
+    distinct?: AccessLogScalarFieldEnum | AccessLogScalarFieldEnum[]
+  }
+
+  /**
+   * AccessLog findFirstOrThrow
+   */
+  export type AccessLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AccessLog
+     */
+    select?: AccessLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AccessLog
+     */
+    omit?: AccessLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AccessLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AccessLog to fetch.
+     */
+    where?: AccessLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AccessLogs to fetch.
+     */
+    orderBy?: AccessLogOrderByWithRelationInput | AccessLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AccessLogs.
+     */
+    cursor?: AccessLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AccessLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AccessLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AccessLogs.
+     */
+    distinct?: AccessLogScalarFieldEnum | AccessLogScalarFieldEnum[]
+  }
+
+  /**
+   * AccessLog findMany
+   */
+  export type AccessLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AccessLog
+     */
+    select?: AccessLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AccessLog
+     */
+    omit?: AccessLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AccessLogInclude<ExtArgs> | null
+    /**
+     * Filter, which AccessLogs to fetch.
+     */
+    where?: AccessLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AccessLogs to fetch.
+     */
+    orderBy?: AccessLogOrderByWithRelationInput | AccessLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AccessLogs.
+     */
+    cursor?: AccessLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AccessLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AccessLogs.
+     */
+    skip?: number
+    distinct?: AccessLogScalarFieldEnum | AccessLogScalarFieldEnum[]
+  }
+
+  /**
+   * AccessLog create
+   */
+  export type AccessLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AccessLog
+     */
+    select?: AccessLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AccessLog
+     */
+    omit?: AccessLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AccessLogInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AccessLog.
+     */
+    data: XOR<AccessLogCreateInput, AccessLogUncheckedCreateInput>
+  }
+
+  /**
+   * AccessLog createMany
+   */
+  export type AccessLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AccessLogs.
+     */
+    data: AccessLogCreateManyInput | AccessLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AccessLog createManyAndReturn
+   */
+  export type AccessLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AccessLog
+     */
+    select?: AccessLogSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AccessLog
+     */
+    omit?: AccessLogOmit<ExtArgs> | null
+    /**
+     * The data used to create many AccessLogs.
+     */
+    data: AccessLogCreateManyInput | AccessLogCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AccessLogIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AccessLog update
+   */
+  export type AccessLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AccessLog
+     */
+    select?: AccessLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AccessLog
+     */
+    omit?: AccessLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AccessLogInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AccessLog.
+     */
+    data: XOR<AccessLogUpdateInput, AccessLogUncheckedUpdateInput>
+    /**
+     * Choose, which AccessLog to update.
+     */
+    where: AccessLogWhereUniqueInput
+  }
+
+  /**
+   * AccessLog updateMany
+   */
+  export type AccessLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AccessLogs.
+     */
+    data: XOR<AccessLogUpdateManyMutationInput, AccessLogUncheckedUpdateManyInput>
+    /**
+     * Filter which AccessLogs to update
+     */
+    where?: AccessLogWhereInput
+    /**
+     * Limit how many AccessLogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AccessLog updateManyAndReturn
+   */
+  export type AccessLogUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AccessLog
+     */
+    select?: AccessLogSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AccessLog
+     */
+    omit?: AccessLogOmit<ExtArgs> | null
+    /**
+     * The data used to update AccessLogs.
+     */
+    data: XOR<AccessLogUpdateManyMutationInput, AccessLogUncheckedUpdateManyInput>
+    /**
+     * Filter which AccessLogs to update
+     */
+    where?: AccessLogWhereInput
+    /**
+     * Limit how many AccessLogs to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AccessLogIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AccessLog upsert
+   */
+  export type AccessLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AccessLog
+     */
+    select?: AccessLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AccessLog
+     */
+    omit?: AccessLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AccessLogInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AccessLog to update in case it exists.
+     */
+    where: AccessLogWhereUniqueInput
+    /**
+     * In case the AccessLog found by the `where` argument doesn't exist, create a new AccessLog with this data.
+     */
+    create: XOR<AccessLogCreateInput, AccessLogUncheckedCreateInput>
+    /**
+     * In case the AccessLog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AccessLogUpdateInput, AccessLogUncheckedUpdateInput>
+  }
+
+  /**
+   * AccessLog delete
+   */
+  export type AccessLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AccessLog
+     */
+    select?: AccessLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AccessLog
+     */
+    omit?: AccessLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AccessLogInclude<ExtArgs> | null
+    /**
+     * Filter which AccessLog to delete.
+     */
+    where: AccessLogWhereUniqueInput
+  }
+
+  /**
+   * AccessLog deleteMany
+   */
+  export type AccessLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AccessLogs to delete
+     */
+    where?: AccessLogWhereInput
+    /**
+     * Limit how many AccessLogs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AccessLog.patient
+   */
+  export type AccessLog$patientArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Patient
+     */
+    select?: PatientSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Patient
+     */
+    omit?: PatientOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PatientInclude<ExtArgs> | null
+    where?: PatientWhereInput
+  }
+
+  /**
+   * AccessLog without action
+   */
+  export type AccessLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AccessLog
+     */
+    select?: AccessLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AccessLog
+     */
+    omit?: AccessLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AccessLogInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model FinanceTransaction
    */
 
@@ -7461,6 +10021,7 @@ export namespace Prisma {
     clinicianId: string | null
     appointmentId: string | null
     type: $Enums.TransactionType | null
+    category: string | null
     amount: Decimal | null
     description: string | null
     date: Date | null
@@ -7473,6 +10034,7 @@ export namespace Prisma {
     clinicianId: string | null
     appointmentId: string | null
     type: $Enums.TransactionType | null
+    category: string | null
     amount: Decimal | null
     description: string | null
     date: Date | null
@@ -7485,6 +10047,7 @@ export namespace Prisma {
     clinicianId: number
     appointmentId: number
     type: number
+    category: number
     amount: number
     description: number
     date: number
@@ -7507,6 +10070,7 @@ export namespace Prisma {
     clinicianId?: true
     appointmentId?: true
     type?: true
+    category?: true
     amount?: true
     description?: true
     date?: true
@@ -7519,6 +10083,7 @@ export namespace Prisma {
     clinicianId?: true
     appointmentId?: true
     type?: true
+    category?: true
     amount?: true
     description?: true
     date?: true
@@ -7531,6 +10096,7 @@ export namespace Prisma {
     clinicianId?: true
     appointmentId?: true
     type?: true
+    category?: true
     amount?: true
     description?: true
     date?: true
@@ -7630,6 +10196,7 @@ export namespace Prisma {
     clinicianId: string
     appointmentId: string | null
     type: $Enums.TransactionType
+    category: string
     amount: Decimal
     description: string | null
     date: Date
@@ -7661,6 +10228,7 @@ export namespace Prisma {
     clinicianId?: boolean
     appointmentId?: boolean
     type?: boolean
+    category?: boolean
     amount?: boolean
     description?: boolean
     date?: boolean
@@ -7675,6 +10243,7 @@ export namespace Prisma {
     clinicianId?: boolean
     appointmentId?: boolean
     type?: boolean
+    category?: boolean
     amount?: boolean
     description?: boolean
     date?: boolean
@@ -7689,6 +10258,7 @@ export namespace Prisma {
     clinicianId?: boolean
     appointmentId?: boolean
     type?: boolean
+    category?: boolean
     amount?: boolean
     description?: boolean
     date?: boolean
@@ -7703,6 +10273,7 @@ export namespace Prisma {
     clinicianId?: boolean
     appointmentId?: boolean
     type?: boolean
+    category?: boolean
     amount?: boolean
     description?: boolean
     date?: boolean
@@ -7710,7 +10281,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type FinanceTransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clinicianId" | "appointmentId" | "type" | "amount" | "description" | "date" | "createdAt" | "updatedAt", ExtArgs["result"]["financeTransaction"]>
+  export type FinanceTransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clinicianId" | "appointmentId" | "type" | "category" | "amount" | "description" | "date" | "createdAt" | "updatedAt", ExtArgs["result"]["financeTransaction"]>
   export type FinanceTransactionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
     appointment?: boolean | FinanceTransaction$appointmentArgs<ExtArgs>
@@ -7735,6 +10306,7 @@ export namespace Prisma {
       clinicianId: string
       appointmentId: string | null
       type: $Enums.TransactionType
+      category: string
       amount: Prisma.Decimal
       description: string | null
       date: Date
@@ -8169,6 +10741,7 @@ export namespace Prisma {
     readonly clinicianId: FieldRef<"FinanceTransaction", 'String'>
     readonly appointmentId: FieldRef<"FinanceTransaction", 'String'>
     readonly type: FieldRef<"FinanceTransaction", 'TransactionType'>
+    readonly category: FieldRef<"FinanceTransaction", 'String'>
     readonly amount: FieldRef<"FinanceTransaction", 'Decimal'>
     readonly description: FieldRef<"FinanceTransaction", 'String'>
     readonly date: FieldRef<"FinanceTransaction", 'DateTime'>
@@ -8693,6 +11266,8 @@ export namespace Prisma {
     content: 'content',
     moodRating: 'moodRating',
     privateNotes: 'privateNotes',
+    isPinned: 'isPinned',
+    tags: 'tags',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -8700,11 +11275,40 @@ export namespace Prisma {
   export type PsychNoteScalarFieldEnum = (typeof PsychNoteScalarFieldEnum)[keyof typeof PsychNoteScalarFieldEnum]
 
 
+  export const TaskScalarFieldEnum: {
+    id: 'id',
+    patientId: 'patientId',
+    description: 'description',
+    isCompleted: 'isCompleted',
+    dueDate: 'dueDate',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
+
+
+  export const AccessLogScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    patientId: 'patientId',
+    action: 'action',
+    resource: 'resource',
+    details: 'details',
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent',
+    createdAt: 'createdAt'
+  };
+
+  export type AccessLogScalarFieldEnum = (typeof AccessLogScalarFieldEnum)[keyof typeof AccessLogScalarFieldEnum]
+
+
   export const FinanceTransactionScalarFieldEnum: {
     id: 'id',
     clinicianId: 'clinicianId',
     appointmentId: 'appointmentId',
     type: 'type',
+    category: 'category',
     amount: 'amount',
     description: 'description',
     date: 'date',
@@ -8951,6 +11555,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'TransactionType'
    */
   export type EnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionType'>
@@ -8992,6 +11603,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     profile?: XOR<ClinicianProfileNullableScalarRelationFilter, ClinicianProfileWhereInput> | null
+    accessLogs?: AccessLogListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -9002,6 +11614,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     profile?: ClinicianProfileOrderByWithRelationInput
+    accessLogs?: AccessLogOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -9015,6 +11628,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     profile?: XOR<ClinicianProfileNullableScalarRelationFilter, ClinicianProfileWhereInput> | null
+    accessLogs?: AccessLogListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -9145,6 +11759,8 @@ export namespace Prisma {
     clinician?: XOR<ClinicianProfileScalarRelationFilter, ClinicianProfileWhereInput>
     appointments?: AppointmentListRelationFilter
     psychNotes?: PsychNoteListRelationFilter
+    accessLogs?: AccessLogListRelationFilter
+    tasks?: TaskListRelationFilter
   }
 
   export type PatientOrderByWithRelationInput = {
@@ -9162,6 +11778,8 @@ export namespace Prisma {
     clinician?: ClinicianProfileOrderByWithRelationInput
     appointments?: AppointmentOrderByRelationAggregateInput
     psychNotes?: PsychNoteOrderByRelationAggregateInput
+    accessLogs?: AccessLogOrderByRelationAggregateInput
+    tasks?: TaskOrderByRelationAggregateInput
   }
 
   export type PatientWhereUniqueInput = Prisma.AtLeast<{
@@ -9182,6 +11800,8 @@ export namespace Prisma {
     clinician?: XOR<ClinicianProfileScalarRelationFilter, ClinicianProfileWhereInput>
     appointments?: AppointmentListRelationFilter
     psychNotes?: PsychNoteListRelationFilter
+    accessLogs?: AccessLogListRelationFilter
+    tasks?: TaskListRelationFilter
   }, "id">
 
   export type PatientOrderByWithAggregationInput = {
@@ -9340,6 +11960,8 @@ export namespace Prisma {
     content?: JsonFilter<"PsychNote">
     moodRating?: IntNullableFilter<"PsychNote"> | number | null
     privateNotes?: StringNullableFilter<"PsychNote"> | string | null
+    isPinned?: BoolFilter<"PsychNote"> | boolean
+    tags?: StringNullableListFilter<"PsychNote">
     createdAt?: DateTimeFilter<"PsychNote"> | Date | string
     updatedAt?: DateTimeFilter<"PsychNote"> | Date | string
     appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
@@ -9354,6 +11976,8 @@ export namespace Prisma {
     content?: SortOrder
     moodRating?: SortOrderInput | SortOrder
     privateNotes?: SortOrderInput | SortOrder
+    isPinned?: SortOrder
+    tags?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     appointment?: AppointmentOrderByWithRelationInput
@@ -9371,6 +11995,8 @@ export namespace Prisma {
     content?: JsonFilter<"PsychNote">
     moodRating?: IntNullableFilter<"PsychNote"> | number | null
     privateNotes?: StringNullableFilter<"PsychNote"> | string | null
+    isPinned?: BoolFilter<"PsychNote"> | boolean
+    tags?: StringNullableListFilter<"PsychNote">
     createdAt?: DateTimeFilter<"PsychNote"> | Date | string
     updatedAt?: DateTimeFilter<"PsychNote"> | Date | string
     appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
@@ -9385,6 +12011,8 @@ export namespace Prisma {
     content?: SortOrder
     moodRating?: SortOrderInput | SortOrder
     privateNotes?: SortOrderInput | SortOrder
+    isPinned?: SortOrder
+    tags?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: PsychNoteCountOrderByAggregateInput
@@ -9405,8 +12033,153 @@ export namespace Prisma {
     content?: JsonWithAggregatesFilter<"PsychNote">
     moodRating?: IntNullableWithAggregatesFilter<"PsychNote"> | number | null
     privateNotes?: StringNullableWithAggregatesFilter<"PsychNote"> | string | null
+    isPinned?: BoolWithAggregatesFilter<"PsychNote"> | boolean
+    tags?: StringNullableListFilter<"PsychNote">
     createdAt?: DateTimeWithAggregatesFilter<"PsychNote"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"PsychNote"> | Date | string
+  }
+
+  export type TaskWhereInput = {
+    AND?: TaskWhereInput | TaskWhereInput[]
+    OR?: TaskWhereInput[]
+    NOT?: TaskWhereInput | TaskWhereInput[]
+    id?: UuidFilter<"Task"> | string
+    patientId?: UuidFilter<"Task"> | string
+    description?: StringFilter<"Task"> | string
+    isCompleted?: BoolFilter<"Task"> | boolean
+    dueDate?: DateTimeNullableFilter<"Task"> | Date | string | null
+    createdAt?: DateTimeFilter<"Task"> | Date | string
+    updatedAt?: DateTimeFilter<"Task"> | Date | string
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+  }
+
+  export type TaskOrderByWithRelationInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    description?: SortOrder
+    isCompleted?: SortOrder
+    dueDate?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    patient?: PatientOrderByWithRelationInput
+  }
+
+  export type TaskWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: TaskWhereInput | TaskWhereInput[]
+    OR?: TaskWhereInput[]
+    NOT?: TaskWhereInput | TaskWhereInput[]
+    patientId?: UuidFilter<"Task"> | string
+    description?: StringFilter<"Task"> | string
+    isCompleted?: BoolFilter<"Task"> | boolean
+    dueDate?: DateTimeNullableFilter<"Task"> | Date | string | null
+    createdAt?: DateTimeFilter<"Task"> | Date | string
+    updatedAt?: DateTimeFilter<"Task"> | Date | string
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+  }, "id">
+
+  export type TaskOrderByWithAggregationInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    description?: SortOrder
+    isCompleted?: SortOrder
+    dueDate?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: TaskCountOrderByAggregateInput
+    _max?: TaskMaxOrderByAggregateInput
+    _min?: TaskMinOrderByAggregateInput
+  }
+
+  export type TaskScalarWhereWithAggregatesInput = {
+    AND?: TaskScalarWhereWithAggregatesInput | TaskScalarWhereWithAggregatesInput[]
+    OR?: TaskScalarWhereWithAggregatesInput[]
+    NOT?: TaskScalarWhereWithAggregatesInput | TaskScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"Task"> | string
+    patientId?: UuidWithAggregatesFilter<"Task"> | string
+    description?: StringWithAggregatesFilter<"Task"> | string
+    isCompleted?: BoolWithAggregatesFilter<"Task"> | boolean
+    dueDate?: DateTimeNullableWithAggregatesFilter<"Task"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Task"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Task"> | Date | string
+  }
+
+  export type AccessLogWhereInput = {
+    AND?: AccessLogWhereInput | AccessLogWhereInput[]
+    OR?: AccessLogWhereInput[]
+    NOT?: AccessLogWhereInput | AccessLogWhereInput[]
+    id?: UuidFilter<"AccessLog"> | string
+    userId?: UuidFilter<"AccessLog"> | string
+    patientId?: UuidNullableFilter<"AccessLog"> | string | null
+    action?: StringFilter<"AccessLog"> | string
+    resource?: StringFilter<"AccessLog"> | string
+    details?: StringNullableFilter<"AccessLog"> | string | null
+    ipAddress?: StringNullableFilter<"AccessLog"> | string | null
+    userAgent?: StringNullableFilter<"AccessLog"> | string | null
+    createdAt?: DateTimeFilter<"AccessLog"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    patient?: XOR<PatientNullableScalarRelationFilter, PatientWhereInput> | null
+  }
+
+  export type AccessLogOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    patientId?: SortOrderInput | SortOrder
+    action?: SortOrder
+    resource?: SortOrder
+    details?: SortOrderInput | SortOrder
+    ipAddress?: SortOrderInput | SortOrder
+    userAgent?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    patient?: PatientOrderByWithRelationInput
+  }
+
+  export type AccessLogWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AccessLogWhereInput | AccessLogWhereInput[]
+    OR?: AccessLogWhereInput[]
+    NOT?: AccessLogWhereInput | AccessLogWhereInput[]
+    userId?: UuidFilter<"AccessLog"> | string
+    patientId?: UuidNullableFilter<"AccessLog"> | string | null
+    action?: StringFilter<"AccessLog"> | string
+    resource?: StringFilter<"AccessLog"> | string
+    details?: StringNullableFilter<"AccessLog"> | string | null
+    ipAddress?: StringNullableFilter<"AccessLog"> | string | null
+    userAgent?: StringNullableFilter<"AccessLog"> | string | null
+    createdAt?: DateTimeFilter<"AccessLog"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    patient?: XOR<PatientNullableScalarRelationFilter, PatientWhereInput> | null
+  }, "id">
+
+  export type AccessLogOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    patientId?: SortOrderInput | SortOrder
+    action?: SortOrder
+    resource?: SortOrder
+    details?: SortOrderInput | SortOrder
+    ipAddress?: SortOrderInput | SortOrder
+    userAgent?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: AccessLogCountOrderByAggregateInput
+    _max?: AccessLogMaxOrderByAggregateInput
+    _min?: AccessLogMinOrderByAggregateInput
+  }
+
+  export type AccessLogScalarWhereWithAggregatesInput = {
+    AND?: AccessLogScalarWhereWithAggregatesInput | AccessLogScalarWhereWithAggregatesInput[]
+    OR?: AccessLogScalarWhereWithAggregatesInput[]
+    NOT?: AccessLogScalarWhereWithAggregatesInput | AccessLogScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"AccessLog"> | string
+    userId?: UuidWithAggregatesFilter<"AccessLog"> | string
+    patientId?: UuidNullableWithAggregatesFilter<"AccessLog"> | string | null
+    action?: StringWithAggregatesFilter<"AccessLog"> | string
+    resource?: StringWithAggregatesFilter<"AccessLog"> | string
+    details?: StringNullableWithAggregatesFilter<"AccessLog"> | string | null
+    ipAddress?: StringNullableWithAggregatesFilter<"AccessLog"> | string | null
+    userAgent?: StringNullableWithAggregatesFilter<"AccessLog"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"AccessLog"> | Date | string
   }
 
   export type FinanceTransactionWhereInput = {
@@ -9417,6 +12190,7 @@ export namespace Prisma {
     clinicianId?: UuidFilter<"FinanceTransaction"> | string
     appointmentId?: UuidNullableFilter<"FinanceTransaction"> | string | null
     type?: EnumTransactionTypeFilter<"FinanceTransaction"> | $Enums.TransactionType
+    category?: StringFilter<"FinanceTransaction"> | string
     amount?: DecimalFilter<"FinanceTransaction"> | Decimal | DecimalJsLike | number | string
     description?: StringNullableFilter<"FinanceTransaction"> | string | null
     date?: DateTimeFilter<"FinanceTransaction"> | Date | string
@@ -9431,6 +12205,7 @@ export namespace Prisma {
     clinicianId?: SortOrder
     appointmentId?: SortOrderInput | SortOrder
     type?: SortOrder
+    category?: SortOrder
     amount?: SortOrder
     description?: SortOrderInput | SortOrder
     date?: SortOrder
@@ -9448,6 +12223,7 @@ export namespace Prisma {
     NOT?: FinanceTransactionWhereInput | FinanceTransactionWhereInput[]
     clinicianId?: UuidFilter<"FinanceTransaction"> | string
     type?: EnumTransactionTypeFilter<"FinanceTransaction"> | $Enums.TransactionType
+    category?: StringFilter<"FinanceTransaction"> | string
     amount?: DecimalFilter<"FinanceTransaction"> | Decimal | DecimalJsLike | number | string
     description?: StringNullableFilter<"FinanceTransaction"> | string | null
     date?: DateTimeFilter<"FinanceTransaction"> | Date | string
@@ -9462,6 +12238,7 @@ export namespace Prisma {
     clinicianId?: SortOrder
     appointmentId?: SortOrderInput | SortOrder
     type?: SortOrder
+    category?: SortOrder
     amount?: SortOrder
     description?: SortOrderInput | SortOrder
     date?: SortOrder
@@ -9482,6 +12259,7 @@ export namespace Prisma {
     clinicianId?: UuidWithAggregatesFilter<"FinanceTransaction"> | string
     appointmentId?: UuidNullableWithAggregatesFilter<"FinanceTransaction"> | string | null
     type?: EnumTransactionTypeWithAggregatesFilter<"FinanceTransaction"> | $Enums.TransactionType
+    category?: StringWithAggregatesFilter<"FinanceTransaction"> | string
     amount?: DecimalWithAggregatesFilter<"FinanceTransaction"> | Decimal | DecimalJsLike | number | string
     description?: StringNullableWithAggregatesFilter<"FinanceTransaction"> | string | null
     date?: DateTimeWithAggregatesFilter<"FinanceTransaction"> | Date | string
@@ -9497,6 +12275,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     profile?: ClinicianProfileCreateNestedOneWithoutUserInput
+    accessLogs?: AccessLogCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -9507,6 +12286,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     profile?: ClinicianProfileUncheckedCreateNestedOneWithoutUserInput
+    accessLogs?: AccessLogUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -9517,6 +12297,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     profile?: ClinicianProfileUpdateOneWithoutUserNestedInput
+    accessLogs?: AccessLogUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -9527,6 +12308,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     profile?: ClinicianProfileUncheckedUpdateOneWithoutUserNestedInput
+    accessLogs?: AccessLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -9665,6 +12447,8 @@ export namespace Prisma {
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
+    tasks?: TaskCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateInput = {
@@ -9681,6 +12465,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
+    tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUpdateInput = {
@@ -9697,6 +12483,8 @@ export namespace Prisma {
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateInput = {
@@ -9713,6 +12501,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientCreateManyInput = {
@@ -9887,6 +12677,8 @@ export namespace Prisma {
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
     privateNotes?: string | null
+    isPinned?: boolean
+    tags?: PsychNoteCreatetagsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     appointment: AppointmentCreateNestedOneWithoutPsychNoteInput
@@ -9901,6 +12693,8 @@ export namespace Prisma {
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
     privateNotes?: string | null
+    isPinned?: boolean
+    tags?: PsychNoteCreatetagsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9911,6 +12705,8 @@ export namespace Prisma {
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
     privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    tags?: PsychNoteUpdatetagsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointment?: AppointmentUpdateOneRequiredWithoutPsychNoteNestedInput
@@ -9925,6 +12721,8 @@ export namespace Prisma {
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
     privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    tags?: PsychNoteUpdatetagsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9937,6 +12735,8 @@ export namespace Prisma {
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
     privateNotes?: string | null
+    isPinned?: boolean
+    tags?: PsychNoteCreatetagsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9947,6 +12747,8 @@ export namespace Prisma {
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
     privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    tags?: PsychNoteUpdatetagsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9959,13 +12761,167 @@ export namespace Prisma {
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
     privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    tags?: PsychNoteUpdatetagsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskCreateInput = {
+    id?: string
+    description: string
+    isCompleted?: boolean
+    dueDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutTasksInput
+  }
+
+  export type TaskUncheckedCreateInput = {
+    id?: string
+    patientId: string
+    description: string
+    isCompleted?: boolean
+    dueDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    isCompleted?: BoolFieldUpdateOperationsInput | boolean
+    dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutTasksNestedInput
+  }
+
+  export type TaskUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    isCompleted?: BoolFieldUpdateOperationsInput | boolean
+    dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskCreateManyInput = {
+    id?: string
+    patientId: string
+    description: string
+    isCompleted?: boolean
+    dueDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    isCompleted?: BoolFieldUpdateOperationsInput | boolean
+    dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    isCompleted?: BoolFieldUpdateOperationsInput | boolean
+    dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AccessLogCreateInput = {
+    id?: string
+    action: string
+    resource: string
+    details?: string | null
+    ipAddress?: string | null
+    userAgent?: string | null
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutAccessLogsInput
+    patient?: PatientCreateNestedOneWithoutAccessLogsInput
+  }
+
+  export type AccessLogUncheckedCreateInput = {
+    id?: string
+    userId: string
+    patientId?: string | null
+    action: string
+    resource: string
+    details?: string | null
+    ipAddress?: string | null
+    userAgent?: string | null
+    createdAt?: Date | string
+  }
+
+  export type AccessLogUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutAccessLogsNestedInput
+    patient?: PatientUpdateOneWithoutAccessLogsNestedInput
+  }
+
+  export type AccessLogUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    patientId?: NullableStringFieldUpdateOperationsInput | string | null
+    action?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AccessLogCreateManyInput = {
+    id?: string
+    userId: string
+    patientId?: string | null
+    action: string
+    resource: string
+    details?: string | null
+    ipAddress?: string | null
+    userAgent?: string | null
+    createdAt?: Date | string
+  }
+
+  export type AccessLogUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AccessLogUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    patientId?: NullableStringFieldUpdateOperationsInput | string | null
+    action?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type FinanceTransactionCreateInput = {
     id?: string
     type: $Enums.TransactionType
+    category?: string
     amount: Decimal | DecimalJsLike | number | string
     description?: string | null
     date?: Date | string
@@ -9980,6 +12936,7 @@ export namespace Prisma {
     clinicianId: string
     appointmentId?: string | null
     type: $Enums.TransactionType
+    category?: string
     amount: Decimal | DecimalJsLike | number | string
     description?: string | null
     date?: Date | string
@@ -9990,6 +12947,7 @@ export namespace Prisma {
   export type FinanceTransactionUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    category?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10004,6 +12962,7 @@ export namespace Prisma {
     clinicianId?: StringFieldUpdateOperationsInput | string
     appointmentId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    category?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10016,6 +12975,7 @@ export namespace Prisma {
     clinicianId: string
     appointmentId?: string | null
     type: $Enums.TransactionType
+    category?: string
     amount: Decimal | DecimalJsLike | number | string
     description?: string | null
     date?: Date | string
@@ -10026,6 +12986,7 @@ export namespace Prisma {
   export type FinanceTransactionUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    category?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10038,6 +12999,7 @@ export namespace Prisma {
     clinicianId?: StringFieldUpdateOperationsInput | string
     appointmentId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    category?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10093,6 +13055,16 @@ export namespace Prisma {
   export type ClinicianProfileNullableScalarRelationFilter = {
     is?: ClinicianProfileWhereInput | null
     isNot?: ClinicianProfileWhereInput | null
+  }
+
+  export type AccessLogListRelationFilter = {
+    every?: AccessLogWhereInput
+    some?: AccessLogWhereInput
+    none?: AccessLogWhereInput
+  }
+
+  export type AccessLogOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type UserCountOrderByAggregateInput = {
@@ -10421,7 +13393,17 @@ export namespace Prisma {
     none?: PsychNoteWhereInput
   }
 
+  export type TaskListRelationFilter = {
+    every?: TaskWhereInput
+    some?: TaskWhereInput
+    none?: TaskWhereInput
+  }
+
   export type PsychNoteOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TaskOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -10698,6 +13680,19 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
   export type AppointmentScalarRelationFilter = {
     is?: AppointmentWhereInput
     isNot?: AppointmentWhereInput
@@ -10711,6 +13706,8 @@ export namespace Prisma {
     content?: SortOrder
     moodRating?: SortOrder
     privateNotes?: SortOrder
+    isPinned?: SortOrder
+    tags?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10726,6 +13723,7 @@ export namespace Prisma {
     templateType?: SortOrder
     moodRating?: SortOrder
     privateNotes?: SortOrder
+    isPinned?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10737,6 +13735,7 @@ export namespace Prisma {
     templateType?: SortOrder
     moodRating?: SortOrder
     privateNotes?: SortOrder
+    isPinned?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10797,6 +13796,44 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type TaskCountOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    description?: SortOrder
+    isCompleted?: SortOrder
+    dueDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TaskMaxOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    description?: SortOrder
+    isCompleted?: SortOrder
+    dueDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TaskMinOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    description?: SortOrder
+    isCompleted?: SortOrder
+    dueDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
   export type UuidNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -10807,6 +13844,62 @@ export namespace Prisma {
     gte?: string | StringFieldRefInput<$PrismaModel>
     mode?: QueryMode
     not?: NestedUuidNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type PatientNullableScalarRelationFilter = {
+    is?: PatientWhereInput | null
+    isNot?: PatientWhereInput | null
+  }
+
+  export type AccessLogCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    patientId?: SortOrder
+    action?: SortOrder
+    resource?: SortOrder
+    details?: SortOrder
+    ipAddress?: SortOrder
+    userAgent?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AccessLogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    patientId?: SortOrder
+    action?: SortOrder
+    resource?: SortOrder
+    details?: SortOrder
+    ipAddress?: SortOrder
+    userAgent?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AccessLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    patientId?: SortOrder
+    action?: SortOrder
+    resource?: SortOrder
+    details?: SortOrder
+    ipAddress?: SortOrder
+    userAgent?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type UuidNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type EnumTransactionTypeFilter<$PrismaModel = never> = {
@@ -10826,6 +13919,7 @@ export namespace Prisma {
     clinicianId?: SortOrder
     appointmentId?: SortOrder
     type?: SortOrder
+    category?: SortOrder
     amount?: SortOrder
     description?: SortOrder
     date?: SortOrder
@@ -10842,6 +13936,7 @@ export namespace Prisma {
     clinicianId?: SortOrder
     appointmentId?: SortOrder
     type?: SortOrder
+    category?: SortOrder
     amount?: SortOrder
     description?: SortOrder
     date?: SortOrder
@@ -10854,6 +13949,7 @@ export namespace Prisma {
     clinicianId?: SortOrder
     appointmentId?: SortOrder
     type?: SortOrder
+    category?: SortOrder
     amount?: SortOrder
     description?: SortOrder
     date?: SortOrder
@@ -10863,21 +13959,6 @@ export namespace Prisma {
 
   export type FinanceTransactionSumOrderByAggregateInput = {
     amount?: SortOrder
-  }
-
-  export type UuidNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedUuidNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type EnumTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -10896,10 +13977,24 @@ export namespace Prisma {
     connect?: ClinicianProfileWhereUniqueInput
   }
 
+  export type AccessLogCreateNestedManyWithoutUserInput = {
+    create?: XOR<AccessLogCreateWithoutUserInput, AccessLogUncheckedCreateWithoutUserInput> | AccessLogCreateWithoutUserInput[] | AccessLogUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AccessLogCreateOrConnectWithoutUserInput | AccessLogCreateOrConnectWithoutUserInput[]
+    createMany?: AccessLogCreateManyUserInputEnvelope
+    connect?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+  }
+
   export type ClinicianProfileUncheckedCreateNestedOneWithoutUserInput = {
     create?: XOR<ClinicianProfileCreateWithoutUserInput, ClinicianProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: ClinicianProfileCreateOrConnectWithoutUserInput
     connect?: ClinicianProfileWhereUniqueInput
+  }
+
+  export type AccessLogUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<AccessLogCreateWithoutUserInput, AccessLogUncheckedCreateWithoutUserInput> | AccessLogCreateWithoutUserInput[] | AccessLogUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AccessLogCreateOrConnectWithoutUserInput | AccessLogCreateOrConnectWithoutUserInput[]
+    createMany?: AccessLogCreateManyUserInputEnvelope
+    connect?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -10924,6 +14019,20 @@ export namespace Prisma {
     update?: XOR<XOR<ClinicianProfileUpdateToOneWithWhereWithoutUserInput, ClinicianProfileUpdateWithoutUserInput>, ClinicianProfileUncheckedUpdateWithoutUserInput>
   }
 
+  export type AccessLogUpdateManyWithoutUserNestedInput = {
+    create?: XOR<AccessLogCreateWithoutUserInput, AccessLogUncheckedCreateWithoutUserInput> | AccessLogCreateWithoutUserInput[] | AccessLogUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AccessLogCreateOrConnectWithoutUserInput | AccessLogCreateOrConnectWithoutUserInput[]
+    upsert?: AccessLogUpsertWithWhereUniqueWithoutUserInput | AccessLogUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: AccessLogCreateManyUserInputEnvelope
+    set?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    disconnect?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    delete?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    connect?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    update?: AccessLogUpdateWithWhereUniqueWithoutUserInput | AccessLogUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: AccessLogUpdateManyWithWhereWithoutUserInput | AccessLogUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AccessLogScalarWhereInput | AccessLogScalarWhereInput[]
+  }
+
   export type ClinicianProfileUncheckedUpdateOneWithoutUserNestedInput = {
     create?: XOR<ClinicianProfileCreateWithoutUserInput, ClinicianProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: ClinicianProfileCreateOrConnectWithoutUserInput
@@ -10932,6 +14041,20 @@ export namespace Prisma {
     delete?: ClinicianProfileWhereInput | boolean
     connect?: ClinicianProfileWhereUniqueInput
     update?: XOR<XOR<ClinicianProfileUpdateToOneWithWhereWithoutUserInput, ClinicianProfileUpdateWithoutUserInput>, ClinicianProfileUncheckedUpdateWithoutUserInput>
+  }
+
+  export type AccessLogUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<AccessLogCreateWithoutUserInput, AccessLogUncheckedCreateWithoutUserInput> | AccessLogCreateWithoutUserInput[] | AccessLogUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AccessLogCreateOrConnectWithoutUserInput | AccessLogCreateOrConnectWithoutUserInput[]
+    upsert?: AccessLogUpsertWithWhereUniqueWithoutUserInput | AccessLogUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: AccessLogCreateManyUserInputEnvelope
+    set?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    disconnect?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    delete?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    connect?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    update?: AccessLogUpdateWithWhereUniqueWithoutUserInput | AccessLogUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: AccessLogUpdateManyWithWhereWithoutUserInput | AccessLogUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AccessLogScalarWhereInput | AccessLogScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutProfileInput = {
@@ -11118,6 +14241,20 @@ export namespace Prisma {
     connect?: PsychNoteWhereUniqueInput | PsychNoteWhereUniqueInput[]
   }
 
+  export type AccessLogCreateNestedManyWithoutPatientInput = {
+    create?: XOR<AccessLogCreateWithoutPatientInput, AccessLogUncheckedCreateWithoutPatientInput> | AccessLogCreateWithoutPatientInput[] | AccessLogUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: AccessLogCreateOrConnectWithoutPatientInput | AccessLogCreateOrConnectWithoutPatientInput[]
+    createMany?: AccessLogCreateManyPatientInputEnvelope
+    connect?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+  }
+
+  export type TaskCreateNestedManyWithoutPatientInput = {
+    create?: XOR<TaskCreateWithoutPatientInput, TaskUncheckedCreateWithoutPatientInput> | TaskCreateWithoutPatientInput[] | TaskUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutPatientInput | TaskCreateOrConnectWithoutPatientInput[]
+    createMany?: TaskCreateManyPatientInputEnvelope
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+  }
+
   export type AppointmentUncheckedCreateNestedManyWithoutPatientInput = {
     create?: XOR<AppointmentCreateWithoutPatientInput, AppointmentUncheckedCreateWithoutPatientInput> | AppointmentCreateWithoutPatientInput[] | AppointmentUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: AppointmentCreateOrConnectWithoutPatientInput | AppointmentCreateOrConnectWithoutPatientInput[]
@@ -11130,6 +14267,20 @@ export namespace Prisma {
     connectOrCreate?: PsychNoteCreateOrConnectWithoutPatientInput | PsychNoteCreateOrConnectWithoutPatientInput[]
     createMany?: PsychNoteCreateManyPatientInputEnvelope
     connect?: PsychNoteWhereUniqueInput | PsychNoteWhereUniqueInput[]
+  }
+
+  export type AccessLogUncheckedCreateNestedManyWithoutPatientInput = {
+    create?: XOR<AccessLogCreateWithoutPatientInput, AccessLogUncheckedCreateWithoutPatientInput> | AccessLogCreateWithoutPatientInput[] | AccessLogUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: AccessLogCreateOrConnectWithoutPatientInput | AccessLogCreateOrConnectWithoutPatientInput[]
+    createMany?: AccessLogCreateManyPatientInputEnvelope
+    connect?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+  }
+
+  export type TaskUncheckedCreateNestedManyWithoutPatientInput = {
+    create?: XOR<TaskCreateWithoutPatientInput, TaskUncheckedCreateWithoutPatientInput> | TaskCreateWithoutPatientInput[] | TaskUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutPatientInput | TaskCreateOrConnectWithoutPatientInput[]
+    createMany?: TaskCreateManyPatientInputEnvelope
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -11176,6 +14327,34 @@ export namespace Prisma {
     deleteMany?: PsychNoteScalarWhereInput | PsychNoteScalarWhereInput[]
   }
 
+  export type AccessLogUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<AccessLogCreateWithoutPatientInput, AccessLogUncheckedCreateWithoutPatientInput> | AccessLogCreateWithoutPatientInput[] | AccessLogUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: AccessLogCreateOrConnectWithoutPatientInput | AccessLogCreateOrConnectWithoutPatientInput[]
+    upsert?: AccessLogUpsertWithWhereUniqueWithoutPatientInput | AccessLogUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: AccessLogCreateManyPatientInputEnvelope
+    set?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    disconnect?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    delete?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    connect?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    update?: AccessLogUpdateWithWhereUniqueWithoutPatientInput | AccessLogUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: AccessLogUpdateManyWithWhereWithoutPatientInput | AccessLogUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: AccessLogScalarWhereInput | AccessLogScalarWhereInput[]
+  }
+
+  export type TaskUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<TaskCreateWithoutPatientInput, TaskUncheckedCreateWithoutPatientInput> | TaskCreateWithoutPatientInput[] | TaskUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutPatientInput | TaskCreateOrConnectWithoutPatientInput[]
+    upsert?: TaskUpsertWithWhereUniqueWithoutPatientInput | TaskUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: TaskCreateManyPatientInputEnvelope
+    set?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    disconnect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    delete?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    update?: TaskUpdateWithWhereUniqueWithoutPatientInput | TaskUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: TaskUpdateManyWithWhereWithoutPatientInput | TaskUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: TaskScalarWhereInput | TaskScalarWhereInput[]
+  }
+
   export type AppointmentUncheckedUpdateManyWithoutPatientNestedInput = {
     create?: XOR<AppointmentCreateWithoutPatientInput, AppointmentUncheckedCreateWithoutPatientInput> | AppointmentCreateWithoutPatientInput[] | AppointmentUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: AppointmentCreateOrConnectWithoutPatientInput | AppointmentCreateOrConnectWithoutPatientInput[]
@@ -11202,6 +14381,34 @@ export namespace Prisma {
     update?: PsychNoteUpdateWithWhereUniqueWithoutPatientInput | PsychNoteUpdateWithWhereUniqueWithoutPatientInput[]
     updateMany?: PsychNoteUpdateManyWithWhereWithoutPatientInput | PsychNoteUpdateManyWithWhereWithoutPatientInput[]
     deleteMany?: PsychNoteScalarWhereInput | PsychNoteScalarWhereInput[]
+  }
+
+  export type AccessLogUncheckedUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<AccessLogCreateWithoutPatientInput, AccessLogUncheckedCreateWithoutPatientInput> | AccessLogCreateWithoutPatientInput[] | AccessLogUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: AccessLogCreateOrConnectWithoutPatientInput | AccessLogCreateOrConnectWithoutPatientInput[]
+    upsert?: AccessLogUpsertWithWhereUniqueWithoutPatientInput | AccessLogUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: AccessLogCreateManyPatientInputEnvelope
+    set?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    disconnect?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    delete?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    connect?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+    update?: AccessLogUpdateWithWhereUniqueWithoutPatientInput | AccessLogUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: AccessLogUpdateManyWithWhereWithoutPatientInput | AccessLogUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: AccessLogScalarWhereInput | AccessLogScalarWhereInput[]
+  }
+
+  export type TaskUncheckedUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<TaskCreateWithoutPatientInput, TaskUncheckedCreateWithoutPatientInput> | TaskCreateWithoutPatientInput[] | TaskUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutPatientInput | TaskCreateOrConnectWithoutPatientInput[]
+    upsert?: TaskUpsertWithWhereUniqueWithoutPatientInput | TaskUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: TaskCreateManyPatientInputEnvelope
+    set?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    disconnect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    delete?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    update?: TaskUpdateWithWhereUniqueWithoutPatientInput | TaskUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: TaskUpdateManyWithWhereWithoutPatientInput | TaskUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: TaskScalarWhereInput | TaskScalarWhereInput[]
   }
 
   export type PatientCreateNestedOneWithoutAppointmentsInput = {
@@ -11312,6 +14519,10 @@ export namespace Prisma {
     update?: XOR<XOR<FinanceTransactionUpdateToOneWithWhereWithoutAppointmentInput, FinanceTransactionUpdateWithoutAppointmentInput>, FinanceTransactionUncheckedUpdateWithoutAppointmentInput>
   }
 
+  export type PsychNoteCreatetagsInput = {
+    set: string[]
+  }
+
   export type AppointmentCreateNestedOneWithoutPsychNoteInput = {
     create?: XOR<AppointmentCreateWithoutPsychNoteInput, AppointmentUncheckedCreateWithoutPsychNoteInput>
     connectOrCreate?: AppointmentCreateOrConnectWithoutPsychNoteInput
@@ -11336,6 +14547,15 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
+  export type PsychNoteUpdatetagsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
   export type AppointmentUpdateOneRequiredWithoutPsychNoteNestedInput = {
     create?: XOR<AppointmentCreateWithoutPsychNoteInput, AppointmentUncheckedCreateWithoutPsychNoteInput>
     connectOrCreate?: AppointmentCreateOrConnectWithoutPsychNoteInput
@@ -11350,6 +14570,50 @@ export namespace Prisma {
     upsert?: PatientUpsertWithoutPsychNotesInput
     connect?: PatientWhereUniqueInput
     update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutPsychNotesInput, PatientUpdateWithoutPsychNotesInput>, PatientUncheckedUpdateWithoutPsychNotesInput>
+  }
+
+  export type PatientCreateNestedOneWithoutTasksInput = {
+    create?: XOR<PatientCreateWithoutTasksInput, PatientUncheckedCreateWithoutTasksInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutTasksInput
+    connect?: PatientWhereUniqueInput
+  }
+
+  export type PatientUpdateOneRequiredWithoutTasksNestedInput = {
+    create?: XOR<PatientCreateWithoutTasksInput, PatientUncheckedCreateWithoutTasksInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutTasksInput
+    upsert?: PatientUpsertWithoutTasksInput
+    connect?: PatientWhereUniqueInput
+    update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutTasksInput, PatientUpdateWithoutTasksInput>, PatientUncheckedUpdateWithoutTasksInput>
+  }
+
+  export type UserCreateNestedOneWithoutAccessLogsInput = {
+    create?: XOR<UserCreateWithoutAccessLogsInput, UserUncheckedCreateWithoutAccessLogsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAccessLogsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type PatientCreateNestedOneWithoutAccessLogsInput = {
+    create?: XOR<PatientCreateWithoutAccessLogsInput, PatientUncheckedCreateWithoutAccessLogsInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutAccessLogsInput
+    connect?: PatientWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutAccessLogsNestedInput = {
+    create?: XOR<UserCreateWithoutAccessLogsInput, UserUncheckedCreateWithoutAccessLogsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAccessLogsInput
+    upsert?: UserUpsertWithoutAccessLogsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAccessLogsInput, UserUpdateWithoutAccessLogsInput>, UserUncheckedUpdateWithoutAccessLogsInput>
+  }
+
+  export type PatientUpdateOneWithoutAccessLogsNestedInput = {
+    create?: XOR<PatientCreateWithoutAccessLogsInput, PatientUncheckedCreateWithoutAccessLogsInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutAccessLogsInput
+    upsert?: PatientUpsertWithoutAccessLogsInput
+    disconnect?: PatientWhereInput | boolean
+    delete?: PatientWhereInput | boolean
+    connect?: PatientWhereUniqueInput
+    update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutAccessLogsInput, PatientUpdateWithoutAccessLogsInput>, PatientUncheckedUpdateWithoutAccessLogsInput>
   }
 
   export type ClinicianProfileCreateNestedOneWithoutTransactionsInput = {
@@ -11748,6 +15012,11 @@ export namespace Prisma {
     not?: NestedEnumNoteTemplateTypeFilter<$PrismaModel> | $Enums.NoteTemplateType
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type NestedEnumNoteTemplateTypeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.NoteTemplateType | EnumNoteTemplateTypeFieldRefInput<$PrismaModel>
     in?: $Enums.NoteTemplateType[] | ListEnumNoteTemplateTypeFieldRefInput<$PrismaModel>
@@ -11808,6 +15077,14 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type NestedUuidNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -11817,13 +15094,6 @@ export namespace Prisma {
     gt?: string | StringFieldRefInput<$PrismaModel>
     gte?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedUuidNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type NestedEnumTransactionTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumTransactionTypeFilter<$PrismaModel> | $Enums.TransactionType
   }
 
   export type NestedUuidNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -11838,6 +15108,13 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTransactionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TransactionType[] | ListEnumTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumTransactionTypeFilter<$PrismaModel> | $Enums.TransactionType
   }
 
   export type NestedEnumTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -11883,6 +15160,38 @@ export namespace Prisma {
     create: XOR<ClinicianProfileCreateWithoutUserInput, ClinicianProfileUncheckedCreateWithoutUserInput>
   }
 
+  export type AccessLogCreateWithoutUserInput = {
+    id?: string
+    action: string
+    resource: string
+    details?: string | null
+    ipAddress?: string | null
+    userAgent?: string | null
+    createdAt?: Date | string
+    patient?: PatientCreateNestedOneWithoutAccessLogsInput
+  }
+
+  export type AccessLogUncheckedCreateWithoutUserInput = {
+    id?: string
+    patientId?: string | null
+    action: string
+    resource: string
+    details?: string | null
+    ipAddress?: string | null
+    userAgent?: string | null
+    createdAt?: Date | string
+  }
+
+  export type AccessLogCreateOrConnectWithoutUserInput = {
+    where: AccessLogWhereUniqueInput
+    create: XOR<AccessLogCreateWithoutUserInput, AccessLogUncheckedCreateWithoutUserInput>
+  }
+
+  export type AccessLogCreateManyUserInputEnvelope = {
+    data: AccessLogCreateManyUserInput | AccessLogCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ClinicianProfileUpsertWithoutUserInput = {
     update: XOR<ClinicianProfileUpdateWithoutUserInput, ClinicianProfileUncheckedUpdateWithoutUserInput>
     create: XOR<ClinicianProfileCreateWithoutUserInput, ClinicianProfileUncheckedCreateWithoutUserInput>
@@ -11922,6 +15231,37 @@ export namespace Prisma {
     transactions?: FinanceTransactionUncheckedUpdateManyWithoutClinicianNestedInput
   }
 
+  export type AccessLogUpsertWithWhereUniqueWithoutUserInput = {
+    where: AccessLogWhereUniqueInput
+    update: XOR<AccessLogUpdateWithoutUserInput, AccessLogUncheckedUpdateWithoutUserInput>
+    create: XOR<AccessLogCreateWithoutUserInput, AccessLogUncheckedCreateWithoutUserInput>
+  }
+
+  export type AccessLogUpdateWithWhereUniqueWithoutUserInput = {
+    where: AccessLogWhereUniqueInput
+    data: XOR<AccessLogUpdateWithoutUserInput, AccessLogUncheckedUpdateWithoutUserInput>
+  }
+
+  export type AccessLogUpdateManyWithWhereWithoutUserInput = {
+    where: AccessLogScalarWhereInput
+    data: XOR<AccessLogUpdateManyMutationInput, AccessLogUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type AccessLogScalarWhereInput = {
+    AND?: AccessLogScalarWhereInput | AccessLogScalarWhereInput[]
+    OR?: AccessLogScalarWhereInput[]
+    NOT?: AccessLogScalarWhereInput | AccessLogScalarWhereInput[]
+    id?: UuidFilter<"AccessLog"> | string
+    userId?: UuidFilter<"AccessLog"> | string
+    patientId?: UuidNullableFilter<"AccessLog"> | string | null
+    action?: StringFilter<"AccessLog"> | string
+    resource?: StringFilter<"AccessLog"> | string
+    details?: StringNullableFilter<"AccessLog"> | string | null
+    ipAddress?: StringNullableFilter<"AccessLog"> | string | null
+    userAgent?: StringNullableFilter<"AccessLog"> | string | null
+    createdAt?: DateTimeFilter<"AccessLog"> | Date | string
+  }
+
   export type UserCreateWithoutProfileInput = {
     id?: string
     email: string
@@ -11929,6 +15269,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     createdAt?: Date | string
     updatedAt?: Date | string
+    accessLogs?: AccessLogCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutProfileInput = {
@@ -11938,6 +15279,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     createdAt?: Date | string
     updatedAt?: Date | string
+    accessLogs?: AccessLogUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutProfileInput = {
@@ -11958,6 +15300,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
+    tasks?: TaskCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutClinicianInput = {
@@ -11973,6 +15317,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
+    tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutClinicianInput = {
@@ -12034,6 +15380,7 @@ export namespace Prisma {
   export type FinanceTransactionCreateWithoutClinicianInput = {
     id?: string
     type: $Enums.TransactionType
+    category?: string
     amount: Decimal | DecimalJsLike | number | string
     description?: string | null
     date?: Date | string
@@ -12046,6 +15393,7 @@ export namespace Prisma {
     id?: string
     appointmentId?: string | null
     type: $Enums.TransactionType
+    category?: string
     amount: Decimal | DecimalJsLike | number | string
     description?: string | null
     date?: Date | string
@@ -12081,6 +15429,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accessLogs?: AccessLogUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProfileInput = {
@@ -12090,6 +15439,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accessLogs?: AccessLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type PatientUpsertWithWhereUniqueWithoutClinicianInput = {
@@ -12185,6 +15535,7 @@ export namespace Prisma {
     clinicianId?: UuidFilter<"FinanceTransaction"> | string
     appointmentId?: UuidNullableFilter<"FinanceTransaction"> | string | null
     type?: EnumTransactionTypeFilter<"FinanceTransaction"> | $Enums.TransactionType
+    category?: StringFilter<"FinanceTransaction"> | string
     amount?: DecimalFilter<"FinanceTransaction"> | Decimal | DecimalJsLike | number | string
     description?: StringNullableFilter<"FinanceTransaction"> | string | null
     date?: DateTimeFilter<"FinanceTransaction"> | Date | string
@@ -12277,6 +15628,8 @@ export namespace Prisma {
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
     privateNotes?: string | null
+    isPinned?: boolean
+    tags?: PsychNoteCreatetagsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     appointment: AppointmentCreateNestedOneWithoutPsychNoteInput
@@ -12289,6 +15642,8 @@ export namespace Prisma {
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
     privateNotes?: string | null
+    isPinned?: boolean
+    tags?: PsychNoteCreatetagsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -12300,6 +15655,66 @@ export namespace Prisma {
 
   export type PsychNoteCreateManyPatientInputEnvelope = {
     data: PsychNoteCreateManyPatientInput | PsychNoteCreateManyPatientInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AccessLogCreateWithoutPatientInput = {
+    id?: string
+    action: string
+    resource: string
+    details?: string | null
+    ipAddress?: string | null
+    userAgent?: string | null
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutAccessLogsInput
+  }
+
+  export type AccessLogUncheckedCreateWithoutPatientInput = {
+    id?: string
+    userId: string
+    action: string
+    resource: string
+    details?: string | null
+    ipAddress?: string | null
+    userAgent?: string | null
+    createdAt?: Date | string
+  }
+
+  export type AccessLogCreateOrConnectWithoutPatientInput = {
+    where: AccessLogWhereUniqueInput
+    create: XOR<AccessLogCreateWithoutPatientInput, AccessLogUncheckedCreateWithoutPatientInput>
+  }
+
+  export type AccessLogCreateManyPatientInputEnvelope = {
+    data: AccessLogCreateManyPatientInput | AccessLogCreateManyPatientInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TaskCreateWithoutPatientInput = {
+    id?: string
+    description: string
+    isCompleted?: boolean
+    dueDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskUncheckedCreateWithoutPatientInput = {
+    id?: string
+    description: string
+    isCompleted?: boolean
+    dueDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskCreateOrConnectWithoutPatientInput = {
+    where: TaskWhereUniqueInput
+    create: XOR<TaskCreateWithoutPatientInput, TaskUncheckedCreateWithoutPatientInput>
+  }
+
+  export type TaskCreateManyPatientInputEnvelope = {
+    data: TaskCreateManyPatientInput | TaskCreateManyPatientInput[]
     skipDuplicates?: boolean
   }
 
@@ -12385,8 +15800,55 @@ export namespace Prisma {
     content?: JsonFilter<"PsychNote">
     moodRating?: IntNullableFilter<"PsychNote"> | number | null
     privateNotes?: StringNullableFilter<"PsychNote"> | string | null
+    isPinned?: BoolFilter<"PsychNote"> | boolean
+    tags?: StringNullableListFilter<"PsychNote">
     createdAt?: DateTimeFilter<"PsychNote"> | Date | string
     updatedAt?: DateTimeFilter<"PsychNote"> | Date | string
+  }
+
+  export type AccessLogUpsertWithWhereUniqueWithoutPatientInput = {
+    where: AccessLogWhereUniqueInput
+    update: XOR<AccessLogUpdateWithoutPatientInput, AccessLogUncheckedUpdateWithoutPatientInput>
+    create: XOR<AccessLogCreateWithoutPatientInput, AccessLogUncheckedCreateWithoutPatientInput>
+  }
+
+  export type AccessLogUpdateWithWhereUniqueWithoutPatientInput = {
+    where: AccessLogWhereUniqueInput
+    data: XOR<AccessLogUpdateWithoutPatientInput, AccessLogUncheckedUpdateWithoutPatientInput>
+  }
+
+  export type AccessLogUpdateManyWithWhereWithoutPatientInput = {
+    where: AccessLogScalarWhereInput
+    data: XOR<AccessLogUpdateManyMutationInput, AccessLogUncheckedUpdateManyWithoutPatientInput>
+  }
+
+  export type TaskUpsertWithWhereUniqueWithoutPatientInput = {
+    where: TaskWhereUniqueInput
+    update: XOR<TaskUpdateWithoutPatientInput, TaskUncheckedUpdateWithoutPatientInput>
+    create: XOR<TaskCreateWithoutPatientInput, TaskUncheckedCreateWithoutPatientInput>
+  }
+
+  export type TaskUpdateWithWhereUniqueWithoutPatientInput = {
+    where: TaskWhereUniqueInput
+    data: XOR<TaskUpdateWithoutPatientInput, TaskUncheckedUpdateWithoutPatientInput>
+  }
+
+  export type TaskUpdateManyWithWhereWithoutPatientInput = {
+    where: TaskScalarWhereInput
+    data: XOR<TaskUpdateManyMutationInput, TaskUncheckedUpdateManyWithoutPatientInput>
+  }
+
+  export type TaskScalarWhereInput = {
+    AND?: TaskScalarWhereInput | TaskScalarWhereInput[]
+    OR?: TaskScalarWhereInput[]
+    NOT?: TaskScalarWhereInput | TaskScalarWhereInput[]
+    id?: UuidFilter<"Task"> | string
+    patientId?: UuidFilter<"Task"> | string
+    description?: StringFilter<"Task"> | string
+    isCompleted?: BoolFilter<"Task"> | boolean
+    dueDate?: DateTimeNullableFilter<"Task"> | Date | string | null
+    createdAt?: DateTimeFilter<"Task"> | Date | string
+    updatedAt?: DateTimeFilter<"Task"> | Date | string
   }
 
   export type PatientCreateWithoutAppointmentsInput = {
@@ -12402,6 +15864,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
+    tasks?: TaskCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutAppointmentsInput = {
@@ -12417,6 +15881,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
+    tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutAppointmentsInput = {
@@ -12463,6 +15929,8 @@ export namespace Prisma {
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
     privateNotes?: string | null
+    isPinned?: boolean
+    tags?: PsychNoteCreatetagsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     patient: PatientCreateNestedOneWithoutPsychNotesInput
@@ -12475,6 +15943,8 @@ export namespace Prisma {
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
     privateNotes?: string | null
+    isPinned?: boolean
+    tags?: PsychNoteCreatetagsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -12487,6 +15957,7 @@ export namespace Prisma {
   export type FinanceTransactionCreateWithoutAppointmentInput = {
     id?: string
     type: $Enums.TransactionType
+    category?: string
     amount: Decimal | DecimalJsLike | number | string
     description?: string | null
     date?: Date | string
@@ -12499,6 +15970,7 @@ export namespace Prisma {
     id?: string
     clinicianId: string
     type: $Enums.TransactionType
+    category?: string
     amount: Decimal | DecimalJsLike | number | string
     description?: string | null
     date?: Date | string
@@ -12535,6 +16007,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutAppointmentsInput = {
@@ -12550,6 +16024,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type ClinicianProfileUpsertWithoutAppointmentsInput = {
@@ -12608,6 +16084,8 @@ export namespace Prisma {
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
     privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    tags?: PsychNoteUpdatetagsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patient?: PatientUpdateOneRequiredWithoutPsychNotesNestedInput
@@ -12620,6 +16098,8 @@ export namespace Prisma {
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
     privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    tags?: PsychNoteUpdatetagsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12638,6 +16118,7 @@ export namespace Prisma {
   export type FinanceTransactionUpdateWithoutAppointmentInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    category?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12650,6 +16131,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     clinicianId?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    category?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12711,6 +16193,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
+    tasks?: TaskCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutPsychNotesInput = {
@@ -12726,6 +16210,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
+    tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutPsychNotesInput = {
@@ -12804,6 +16290,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutPsychNotesInput = {
@@ -12819,6 +16307,232 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientCreateWithoutTasksInput = {
+    id?: string
+    fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
+    status?: $Enums.PatientStatus
+    contactPhone?: string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
+    appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientUncheckedCreateWithoutTasksInput = {
+    id?: string
+    clinicianId: string
+    fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
+    status?: $Enums.PatientStatus
+    contactPhone?: string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientCreateOrConnectWithoutTasksInput = {
+    where: PatientWhereUniqueInput
+    create: XOR<PatientCreateWithoutTasksInput, PatientUncheckedCreateWithoutTasksInput>
+  }
+
+  export type PatientUpsertWithoutTasksInput = {
+    update: XOR<PatientUpdateWithoutTasksInput, PatientUncheckedUpdateWithoutTasksInput>
+    create: XOR<PatientCreateWithoutTasksInput, PatientUncheckedCreateWithoutTasksInput>
+    where?: PatientWhereInput
+  }
+
+  export type PatientUpdateToOneWithWhereWithoutTasksInput = {
+    where?: PatientWhereInput
+    data: XOR<PatientUpdateWithoutTasksInput, PatientUncheckedUpdateWithoutTasksInput>
+  }
+
+  export type PatientUpdateWithoutTasksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
+    appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateWithoutTasksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clinicianId?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
+  }
+
+  export type UserCreateWithoutAccessLogsInput = {
+    id?: string
+    email: string
+    passwordHash: string
+    role: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    profile?: ClinicianProfileCreateNestedOneWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutAccessLogsInput = {
+    id?: string
+    email: string
+    passwordHash: string
+    role: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    profile?: ClinicianProfileUncheckedCreateNestedOneWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutAccessLogsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutAccessLogsInput, UserUncheckedCreateWithoutAccessLogsInput>
+  }
+
+  export type PatientCreateWithoutAccessLogsInput = {
+    id?: string
+    fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
+    status?: $Enums.PatientStatus
+    contactPhone?: string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
+    appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
+    tasks?: TaskCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientUncheckedCreateWithoutAccessLogsInput = {
+    id?: string
+    clinicianId: string
+    fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
+    status?: $Enums.PatientStatus
+    contactPhone?: string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
+    tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientCreateOrConnectWithoutAccessLogsInput = {
+    where: PatientWhereUniqueInput
+    create: XOR<PatientCreateWithoutAccessLogsInput, PatientUncheckedCreateWithoutAccessLogsInput>
+  }
+
+  export type UserUpsertWithoutAccessLogsInput = {
+    update: XOR<UserUpdateWithoutAccessLogsInput, UserUncheckedUpdateWithoutAccessLogsInput>
+    create: XOR<UserCreateWithoutAccessLogsInput, UserUncheckedCreateWithoutAccessLogsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutAccessLogsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutAccessLogsInput, UserUncheckedUpdateWithoutAccessLogsInput>
+  }
+
+  export type UserUpdateWithoutAccessLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: ClinicianProfileUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutAccessLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: ClinicianProfileUncheckedUpdateOneWithoutUserNestedInput
+  }
+
+  export type PatientUpsertWithoutAccessLogsInput = {
+    update: XOR<PatientUpdateWithoutAccessLogsInput, PatientUncheckedUpdateWithoutAccessLogsInput>
+    create: XOR<PatientCreateWithoutAccessLogsInput, PatientUncheckedCreateWithoutAccessLogsInput>
+    where?: PatientWhereInput
+  }
+
+  export type PatientUpdateToOneWithWhereWithoutAccessLogsInput = {
+    where?: PatientWhereInput
+    data: XOR<PatientUpdateWithoutAccessLogsInput, PatientUncheckedUpdateWithoutAccessLogsInput>
+  }
+
+  export type PatientUpdateWithoutAccessLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
+    appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateWithoutAccessLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clinicianId?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type ClinicianProfileCreateWithoutTransactionsInput = {
@@ -12981,6 +16695,50 @@ export namespace Prisma {
     psychNote?: PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput
   }
 
+  export type AccessLogCreateManyUserInput = {
+    id?: string
+    patientId?: string | null
+    action: string
+    resource: string
+    details?: string | null
+    ipAddress?: string | null
+    userAgent?: string | null
+    createdAt?: Date | string
+  }
+
+  export type AccessLogUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneWithoutAccessLogsNestedInput
+  }
+
+  export type AccessLogUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: NullableStringFieldUpdateOperationsInput | string | null
+    action?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AccessLogUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: NullableStringFieldUpdateOperationsInput | string | null
+    action?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type PatientCreateManyClinicianInput = {
     id?: string
     fullName: string
@@ -13014,6 +16772,7 @@ export namespace Prisma {
     id?: string
     appointmentId?: string | null
     type: $Enums.TransactionType
+    category?: string
     amount: Decimal | DecimalJsLike | number | string
     description?: string | null
     date?: Date | string
@@ -13034,6 +16793,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutClinicianInput = {
@@ -13049,6 +16810,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateManyWithoutClinicianInput = {
@@ -13119,6 +16882,7 @@ export namespace Prisma {
   export type FinanceTransactionUpdateWithoutClinicianInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    category?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13131,6 +16895,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     appointmentId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    category?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13142,6 +16907,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     appointmentId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    category?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13172,6 +16938,28 @@ export namespace Prisma {
     content: JsonNullValueInput | InputJsonValue
     moodRating?: number | null
     privateNotes?: string | null
+    isPinned?: boolean
+    tags?: PsychNoteCreatetagsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AccessLogCreateManyPatientInput = {
+    id?: string
+    userId: string
+    action: string
+    resource: string
+    details?: string | null
+    ipAddress?: string | null
+    userAgent?: string | null
+    createdAt?: Date | string
+  }
+
+  export type TaskCreateManyPatientInput = {
+    id?: string
+    description: string
+    isCompleted?: boolean
+    dueDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -13234,6 +17022,8 @@ export namespace Prisma {
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
     privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    tags?: PsychNoteUpdatetagsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointment?: AppointmentUpdateOneRequiredWithoutPsychNoteNestedInput
@@ -13246,6 +17036,8 @@ export namespace Prisma {
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
     privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    tags?: PsychNoteUpdatetagsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13257,6 +17049,68 @@ export namespace Prisma {
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
     privateNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    tags?: PsychNoteUpdatetagsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AccessLogUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutAccessLogsNestedInput
+  }
+
+  export type AccessLogUncheckedUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AccessLogUncheckedUpdateManyWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    isCompleted?: BoolFieldUpdateOperationsInput | boolean
+    dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskUncheckedUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    isCompleted?: BoolFieldUpdateOperationsInput | boolean
+    dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskUncheckedUpdateManyWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    isCompleted?: BoolFieldUpdateOperationsInput | boolean
+    dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

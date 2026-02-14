@@ -71,7 +71,7 @@ export function MoodChart({ patientId }: MoodChartProps) {
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                 labelStyle={{ fontSize: '12px', color: '#6B7280', marginBottom: '4px' }}
                 itemStyle={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--color-kanji)' }}
-                formatter={(value: number) => [`${value}/10`, 'Ánimo']}
+                formatter={(value: any) => [`${value}/10`, 'Ánimo']}
             />
             <Area 
                 type="monotone" 

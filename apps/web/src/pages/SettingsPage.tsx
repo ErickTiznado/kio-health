@@ -5,7 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { useAuthStore } from '../stores/auth.store';
 import { settingsSchema, type SettingsFormData } from '../schemas/settings.schema';
-import api from '../lib/api';
+import { api } from '../lib/api';
 
 export function SettingsPage() {
   const { user, fetchCurrentUser } = useAuthStore();

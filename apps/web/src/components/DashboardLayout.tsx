@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Menu,
   X,
+  DollarSign,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -30,6 +31,7 @@ const PSYCHOLOGIST_NAV: NavItem[] = [
   { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} /> },
   { to: '/patients', label: 'Pacientes', icon: <Users size={20} /> },
   { to: '/bitacora', label: 'Bitácora', icon: <BookOpen size={20} /> },
+  { to: '/finance', label: 'Finanzas', icon: <DollarSign size={20} /> },
 ];
 
 const NUTRITIONIST_NAV: NavItem[] = [
@@ -37,6 +39,7 @@ const NUTRITIONIST_NAV: NavItem[] = [
   { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} /> },
   { to: '/patients', label: 'Pacientes', icon: <Users size={20} /> },
   { to: '/measurements', label: 'Mediciones', icon: <Ruler size={20} /> },
+  { to: '/finance', label: 'Finanzas', icon: <DollarSign size={20} /> },
 ];
 
 /**
@@ -53,6 +56,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
   const navItems = clinicianType === 'NUTRITIONIST' ? NUTRITIONIST_NAV : PSYCHOLOGIST_NAV;
 
   const handleLogout = () => {
+    setSidebarOpen(false);
     logout();
     navigate('/login', { replace: true });
   };

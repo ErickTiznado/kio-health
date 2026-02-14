@@ -16,6 +16,8 @@ import { ExportService } from '../export/export.service';
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
+import { startOfMonth, endOfMonth } from 'date-fns';
+
 @Injectable()
 export class AppointmentsService {
   constructor(
@@ -23,6 +25,31 @@ export class AppointmentsService {
     private readonly exportService: ExportService,
     private readonly eventEmitter: EventEmitter2,
   ) { }
+
+  async getMonthDensity(userId: string, date: Date | string) {
+    const profile = await this.resolveClinicianProfile(userId);
+    const targetDate = new Date(date);
+    const start = startOfMonth(targetDate);
+    const end = endOfMonth(targetDate);
+
+    const appointments = await this.prisma.appointment.findMany({
+      where: {
+        clinicianId: profile.id,
+        startTime: { gte: start, lte: end },
+        status: { not: 'CANCELLED' },
+      },
+      select: { startTime: true },
+    });
+
+    const density: Record<string, number> = {};
+
+    appointments.forEach((apt) => {
+      const day = apt.startTime.toISOString().split('T')[0];
+      density[day] = (density[day] || 0) + 1;
+    });
+
+    return Object.entries(density).map(([date, count]) => ({ date, count }));
+  }
 
   /**
    * Find appointments for a specific clinician.
@@ -640,14 +667,14 @@ export class AppointmentsService {
 
   /**
    * Update payment status for an appointment.
-   * If status is PAID, create a transaction.
+   * If status is PAID, emit appointment.paid event.
    */
   async updatePayment(userId: string, appointmentId: string, dto: UpdatePaymentDto) {
     const profile = await this.resolveClinicianProfile(userId);
     const appointment = await this.findAppointmentOrFail(appointmentId);
     this.assertOwnership(appointment.clinicianId, profile.id);
 
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       // 1. Update Appointment
       const updatedAppointment = await tx.appointment.update({
         where: { id: appointmentId },
@@ -662,41 +689,9 @@ export class AppointmentsService {
         },
       });
 
-      // 2. Handle Transaction Creation/Deletion
-      if (dto.status === 'PAID') {
-        // Create INCOME transaction if not exists (or update?)
-        // Requirement says "create FinanceTransaction".
-        // Let's check if one already exists to avoid duplicates or update it.
-        const existingTx = await tx.financeTransaction.findUnique({
-          where: { appointmentId },
-        });
-
-        if (existingTx) {
-          // Update existing transaction
-          await tx.financeTransaction.update({
-            where: { id: existingTx.id },
-            data: {
-              amount: updatedAppointment.price,
-              type: 'INCOME',
-              date: new Date(),
-            }
-          });
-        } else {
-          // Create new transaction
-          await tx.financeTransaction.create({
-            data: {
-              clinicianId: profile.id,
-              appointmentId: appointment.id,
-              type: 'INCOME',
-              amount: updatedAppointment.price,
-              description: `Pago de cita: ${updatedAppointment.patient.fullName}`,
-              date: new Date(),
-            },
-          });
-        }
-      } else if (dto.status === 'PENDING') {
-        // If switched back to PENDING, delete the transaction if it exists
-        // This keeps financial records consistent with "Paid" appointments.
+      if (dto.status === 'PENDING') {
+        // If switched back to PENDING, delete the transaction if it exists.
+        // Keeping this logic for consistency, but relying on event for creation.
         await tx.financeTransaction.deleteMany({
           where: { appointmentId },
         });
@@ -704,6 +699,12 @@ export class AppointmentsService {
 
       return updatedAppointment;
     });
+
+    if (dto.status === 'PAID') {
+      this.eventEmitter.emit('appointment.paid', { appointment: result });
+    }
+
+    return result;
   }
 
   /**

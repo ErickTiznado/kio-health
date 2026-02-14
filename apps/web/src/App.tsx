@@ -12,6 +12,9 @@ import { AgendaPage } from './pages/AgendaPage';
 import { SessionPage } from './pages/SessionPage';
 import PatientsPage from './pages/PatientsPage';
 import PatientDetailsPage from './pages/PatientDetailsPage';
+import FinancePage from './pages/finance/FinancePage';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import NotFoundPage from './pages/NotFoundPage';
 
 function RootRedirect() {
   const { isAuthenticated, user } = useAuthStore();
@@ -28,12 +31,15 @@ function RootRedirect() {
   return <Navigate to="/onboarding" replace />;
 }
 
+import { Omnibox } from './components/ui/Omnibox';
+
 function App() {
   const location = useLocation();
 
   return (
-    <>
+    <ErrorBoundary>
       <Toaster position="bottom-right" richColors />
+      <Omnibox />
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           {/* Public Routes */}
@@ -63,6 +69,16 @@ function App() {
               <PageTransition>
                 <RequireAuth>
                   <AgendaPage />
+                </RequireAuth>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/finance"
+            element={
+              <PageTransition>
+                <RequireAuth>
+                  <FinancePage />
                 </RequireAuth>
               </PageTransition>
             }
@@ -121,11 +137,11 @@ function App() {
           {/* Root Redirect */}
           <Route path="/" element={<RootRedirect />} />
 
-          {/* Catch-all - redirect to root for Switch logic */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Catch-all - 404 */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </AnimatePresence>
-    </>
+    </ErrorBoundary>
   );
 }
 

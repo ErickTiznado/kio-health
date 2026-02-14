@@ -12,6 +12,7 @@ import { ExportModule } from './export/export.module';
 import { TasksModule } from './tasks/tasks.module';
 import { FinanceModule } from './modules/finance/finance.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     ExportModule,
     TasksModule,
     FinanceModule,
+    SearchModule,
     EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],

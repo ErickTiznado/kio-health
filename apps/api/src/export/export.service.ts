@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as PDFDocument from 'pdfkit';
+import PDFDocument from 'pdfkit';
 import { Appointment, Patient, PsychNote, ClinicianProfile, User } from '../../prisma/generated/client';
 
 @Injectable()

@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { FinanceService } from './finance.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { GetUser } from '../../auth/decorators/get-user.decorator';
+import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import { User } from '@prisma/client';
 
 @Controller('finance')
@@ -11,18 +11,18 @@ export class FinanceController {
   constructor(private readonly financeService: FinanceService) {}
 
   @Post()
-  async create(@GetUser() user: User, @Body() dto: CreateTransactionDto) {
-    return this.financeService.create(user.id, dto);
+  async create(@CurrentUser() user: any, @Body() dto: CreateTransactionDto) {
+    return this.financeService.create(user.userId, dto);
   }
 
   @Get('summary')
   async getSummary(
-    @GetUser() user: User,
+    @CurrentUser() user: any,
     @Query('month') month: string,
     @Query('year') year: string,
   ) {
     return this.financeService.getSummary(
-      user.id,
+      user.userId,
       parseInt(month),
       parseInt(year),
     );

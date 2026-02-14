@@ -13,13 +13,7 @@ export function MoodTracker({ value, onChange }: MoodTrackerProps) {
     return 'text-red-500';
   };
 
-  const getIcon = (val: number) => {
-    if (val >= 8) return Smile;
-    if (val >= 5) return Meh;
-    return Frown;
-  };
-
-  const Icon = getIcon(value);
+  const Icon = value >= 8 ? Smile : value >= 5 ? Meh : Frown;
 
   return (
     <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-full px-4 py-1.5 shadow-sm">

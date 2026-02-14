@@ -1,49 +1,58 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { RefreshCcw, AlertTriangle } from 'lucide-react';
 
 interface Props {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 interface State {
   hasError: boolean;
+  error: Error | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-  state: State = { hasError: false };
+  public state: State = {
+    hasError: false,
+    error: null,
+  };
 
-  static getDerivedStateFromError(): State {
-    return { hasError: true };
+  public static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error('ErrorBoundary caught:', error, info);
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Uncaught error:', error, errorInfo);
   }
 
-  render() {
+  public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-bg">
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto">
-              <span className="text-red-500 text-2xl">!</span>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <div className="bg-white p-8 rounded-[32px] shadow-xl text-center max-w-md w-full border border-red-50">
+            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500">
+              <AlertTriangle size={40} />
             </div>
-            <h2 className="text-2xl font-bold text-kanji">
-              Algo salió mal
-            </h2>
-            <p className="text-gray-500 text-sm max-w-sm">
-              Ocurrió un error inesperado. Intenta recargar la página.
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Algo salió mal</h1>
+            <p className="text-gray-500 mb-8 text-sm leading-relaxed">
+              Ha ocurrido un error inesperado. Por favor, intenta recargar la página.
             </p>
+            {this.state.error && (
+                <pre className="bg-gray-50 p-4 rounded-xl text-[10px] text-left text-gray-600 overflow-auto max-h-32 mb-6 border border-gray-100">
+                    {this.state.error.message}
+                </pre>
+            )}
             <button
-              type="button"
               onClick={() => window.location.reload()}
-              className="bg-kio text-white px-6 py-3 rounded-2xl font-bold text-sm hover:opacity-90 transition-opacity"
+              className="w-full bg-kanji text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
             >
-              Recargar
+              <RefreshCcw size={20} />
+              Recargar Página
             </button>
           </div>
         </div>
       );
     }
+
     return this.props.children;
   }
 }

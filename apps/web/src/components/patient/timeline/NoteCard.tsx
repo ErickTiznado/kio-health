@@ -85,6 +85,17 @@ export function NoteCard({ item }: NoteCardProps) {
           </div>
         )}
       </div>
+
+      {/* Tags */}
+      {note.tags && note.tags.length > 0 && (
+        <div className="px-4 pb-3 flex flex-wrap gap-1.5">
+          {note.tags.map(tag => (
+            <span key={tag} className="text-[10px] font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

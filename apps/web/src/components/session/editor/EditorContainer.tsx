@@ -102,7 +102,7 @@ P: ${content.p || ''}`;
       link.click();
       link.remove();
       toast.success('PDF descargado');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Error al generar PDF');
     }
   };
@@ -128,7 +128,7 @@ P: ${content.p || ''}`;
         if (lastNote.tags) setTags(lastNote.tags);
         
         toast.success('Nota duplicada');
-    } catch (e) {
+    } catch (_e) {
         toast.error('Error al duplicar nota');
     }
   };
@@ -212,6 +212,7 @@ P: ${content.p || ''}`;
             />
           )}
         </div>
+      </div>
       </div>
 
       {/* Private Notes Sidebar */}

@@ -103,7 +103,7 @@ export class AppointmentsController {
     @CurrentUser() user: { userId: string; email: string; role: string },
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Query('includePrivate') includePrivate: string,
-    @Res() res: Response,
+    @Res() res: any,
   ) {
     const buffer = await this.appointmentsService.exportPdf(
       user.userId,

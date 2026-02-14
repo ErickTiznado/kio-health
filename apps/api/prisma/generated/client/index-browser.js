@@ -180,8 +180,32 @@ exports.Prisma.PsychNoteScalarFieldEnum = {
   content: 'content',
   moodRating: 'moodRating',
   privateNotes: 'privateNotes',
+  isPinned: 'isPinned',
+  tags: 'tags',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TaskScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  description: 'description',
+  isCompleted: 'isCompleted',
+  dueDate: 'dueDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AccessLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  patientId: 'patientId',
+  action: 'action',
+  resource: 'resource',
+  details: 'details',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.FinanceTransactionScalarFieldEnum = {
@@ -189,6 +213,7 @@ exports.Prisma.FinanceTransactionScalarFieldEnum = {
   clinicianId: 'clinicianId',
   appointmentId: 'appointmentId',
   type: 'type',
+  category: 'category',
   amount: 'amount',
   description: 'description',
   date: 'date',
@@ -283,6 +308,8 @@ exports.Prisma.ModelName = {
   Patient: 'Patient',
   Appointment: 'Appointment',
   PsychNote: 'PsychNote',
+  Task: 'Task',
+  AccessLog: 'AccessLog',
   FinanceTransaction: 'FinanceTransaction'
 };
 
