@@ -39,11 +39,6 @@ export type Appointment = $Result.DefaultSelection<Prisma.$AppointmentPayload>
  */
 export type PsychNote = $Result.DefaultSelection<Prisma.$PsychNotePayload>
 /**
- * Model NutriRecord
- * 
- */
-export type NutriRecord = $Result.DefaultSelection<Prisma.$NutriRecordPayload>
-/**
  * Model FinanceTransaction
  * 
  */
@@ -62,8 +57,7 @@ export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
 export const ClinicianType: {
-  PSYCHOLOGIST: 'PSYCHOLOGIST',
-  NUTRITIONIST: 'NUTRITIONIST'
+  PSYCHOLOGIST: 'PSYCHOLOGIST'
 };
 
 export type ClinicianType = (typeof ClinicianType)[keyof typeof ClinicianType]
@@ -80,6 +74,7 @@ export type PatientStatus = (typeof PatientStatus)[keyof typeof PatientStatus]
 
 export const AppointmentStatus: {
   SCHEDULED: 'SCHEDULED',
+  IN_PROGRESS: 'IN_PROGRESS',
   COMPLETED: 'COMPLETED',
   CANCELLED: 'CANCELLED',
   NO_SHOW: 'NO_SHOW'
@@ -94,6 +89,15 @@ export const PaymentStatus: {
 };
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const AppointmentType: {
+  CONSULTATION: 'CONSULTATION',
+  EVALUATION: 'EVALUATION',
+  FOLLOW_UP: 'FOLLOW_UP'
+};
+
+export type AppointmentType = (typeof AppointmentType)[keyof typeof AppointmentType]
 
 
 export const PaymentMethod: {
@@ -133,6 +137,10 @@ export const AppointmentStatus: typeof $Enums.AppointmentStatus
 export type PaymentStatus = $Enums.PaymentStatus
 
 export const PaymentStatus: typeof $Enums.PaymentStatus
+
+export type AppointmentType = $Enums.AppointmentType
+
+export const AppointmentType: typeof $Enums.AppointmentType
 
 export type PaymentMethod = $Enums.PaymentMethod
 
@@ -308,16 +316,6 @@ export class PrismaClient<
     * ```
     */
   get psychNote(): Prisma.PsychNoteDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.nutriRecord`: Exposes CRUD operations for the **NutriRecord** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more NutriRecords
-    * const nutriRecords = await prisma.nutriRecord.findMany()
-    * ```
-    */
-  get nutriRecord(): Prisma.NutriRecordDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.financeTransaction`: Exposes CRUD operations for the **FinanceTransaction** model.
@@ -767,7 +765,6 @@ export namespace Prisma {
     Patient: 'Patient',
     Appointment: 'Appointment',
     PsychNote: 'PsychNote',
-    NutriRecord: 'NutriRecord',
     FinanceTransaction: 'FinanceTransaction'
   };
 
@@ -784,7 +781,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "clinicianProfile" | "patient" | "appointment" | "psychNote" | "nutriRecord" | "financeTransaction"
+      modelProps: "user" | "clinicianProfile" | "patient" | "appointment" | "psychNote" | "financeTransaction"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1158,80 +1155,6 @@ export namespace Prisma {
           }
         }
       }
-      NutriRecord: {
-        payload: Prisma.$NutriRecordPayload<ExtArgs>
-        fields: Prisma.NutriRecordFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.NutriRecordFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NutriRecordPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.NutriRecordFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NutriRecordPayload>
-          }
-          findFirst: {
-            args: Prisma.NutriRecordFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NutriRecordPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.NutriRecordFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NutriRecordPayload>
-          }
-          findMany: {
-            args: Prisma.NutriRecordFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NutriRecordPayload>[]
-          }
-          create: {
-            args: Prisma.NutriRecordCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NutriRecordPayload>
-          }
-          createMany: {
-            args: Prisma.NutriRecordCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.NutriRecordCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NutriRecordPayload>[]
-          }
-          delete: {
-            args: Prisma.NutriRecordDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NutriRecordPayload>
-          }
-          update: {
-            args: Prisma.NutriRecordUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NutriRecordPayload>
-          }
-          deleteMany: {
-            args: Prisma.NutriRecordDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.NutriRecordUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.NutriRecordUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NutriRecordPayload>[]
-          }
-          upsert: {
-            args: Prisma.NutriRecordUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NutriRecordPayload>
-          }
-          aggregate: {
-            args: Prisma.NutriRecordAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateNutriRecord>
-          }
-          groupBy: {
-            args: Prisma.NutriRecordGroupByArgs<ExtArgs>
-            result: $Utils.Optional<NutriRecordGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.NutriRecordCountArgs<ExtArgs>
-            result: $Utils.Optional<NutriRecordCountAggregateOutputType> | number
-          }
-        }
-      }
       FinanceTransaction: {
         payload: Prisma.$FinanceTransactionPayload<ExtArgs>
         fields: Prisma.FinanceTransactionFieldRefs
@@ -1419,7 +1342,6 @@ export namespace Prisma {
     patient?: PatientOmit
     appointment?: AppointmentOmit
     psychNote?: PsychNoteOmit
-    nutriRecord?: NutriRecordOmit
     financeTransaction?: FinanceTransactionOmit
   }
 
@@ -1551,13 +1473,11 @@ export namespace Prisma {
 
   export type PatientCountOutputType = {
     appointments: number
-    nutriRecords: number
     psychNotes: number
   }
 
   export type PatientCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appointments?: boolean | PatientCountOutputTypeCountAppointmentsArgs
-    nutriRecords?: boolean | PatientCountOutputTypeCountNutriRecordsArgs
     psychNotes?: boolean | PatientCountOutputTypeCountPsychNotesArgs
   }
 
@@ -1577,13 +1497,6 @@ export namespace Prisma {
    */
   export type PatientCountOutputTypeCountAppointmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AppointmentWhereInput
-  }
-
-  /**
-   * PatientCountOutputType without action
-   */
-  export type PatientCountOutputTypeCountNutriRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: NutriRecordWhereInput
   }
 
   /**
@@ -3922,6 +3835,9 @@ export namespace Prisma {
     id: string | null
     clinicianId: string | null
     fullName: string | null
+    dateOfBirth: Date | null
+    diagnosis: string | null
+    clinicalContext: string | null
     status: $Enums.PatientStatus | null
     contactPhone: string | null
     createdAt: Date | null
@@ -3932,6 +3848,9 @@ export namespace Prisma {
     id: string | null
     clinicianId: string | null
     fullName: string | null
+    dateOfBirth: Date | null
+    diagnosis: string | null
+    clinicalContext: string | null
     status: $Enums.PatientStatus | null
     contactPhone: string | null
     createdAt: Date | null
@@ -3942,6 +3861,9 @@ export namespace Prisma {
     id: number
     clinicianId: number
     fullName: number
+    dateOfBirth: number
+    diagnosis: number
+    clinicalContext: number
     status: number
     contactPhone: number
     emergencyContact: number
@@ -3955,6 +3877,9 @@ export namespace Prisma {
     id?: true
     clinicianId?: true
     fullName?: true
+    dateOfBirth?: true
+    diagnosis?: true
+    clinicalContext?: true
     status?: true
     contactPhone?: true
     createdAt?: true
@@ -3965,6 +3890,9 @@ export namespace Prisma {
     id?: true
     clinicianId?: true
     fullName?: true
+    dateOfBirth?: true
+    diagnosis?: true
+    clinicalContext?: true
     status?: true
     contactPhone?: true
     createdAt?: true
@@ -3975,6 +3903,9 @@ export namespace Prisma {
     id?: true
     clinicianId?: true
     fullName?: true
+    dateOfBirth?: true
+    diagnosis?: true
+    clinicalContext?: true
     status?: true
     contactPhone?: true
     emergencyContact?: true
@@ -4059,6 +3990,9 @@ export namespace Prisma {
     id: string
     clinicianId: string
     fullName: string
+    dateOfBirth: Date | null
+    diagnosis: string | null
+    clinicalContext: string | null
     status: $Enums.PatientStatus
     contactPhone: string | null
     emergencyContact: JsonValue | null
@@ -4087,6 +4021,9 @@ export namespace Prisma {
     id?: boolean
     clinicianId?: boolean
     fullName?: boolean
+    dateOfBirth?: boolean
+    diagnosis?: boolean
+    clinicalContext?: boolean
     status?: boolean
     contactPhone?: boolean
     emergencyContact?: boolean
@@ -4094,7 +4031,6 @@ export namespace Prisma {
     updatedAt?: boolean
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
     appointments?: boolean | Patient$appointmentsArgs<ExtArgs>
-    nutriRecords?: boolean | Patient$nutriRecordsArgs<ExtArgs>
     psychNotes?: boolean | Patient$psychNotesArgs<ExtArgs>
     _count?: boolean | PatientCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["patient"]>
@@ -4103,6 +4039,9 @@ export namespace Prisma {
     id?: boolean
     clinicianId?: boolean
     fullName?: boolean
+    dateOfBirth?: boolean
+    diagnosis?: boolean
+    clinicalContext?: boolean
     status?: boolean
     contactPhone?: boolean
     emergencyContact?: boolean
@@ -4115,6 +4054,9 @@ export namespace Prisma {
     id?: boolean
     clinicianId?: boolean
     fullName?: boolean
+    dateOfBirth?: boolean
+    diagnosis?: boolean
+    clinicalContext?: boolean
     status?: boolean
     contactPhone?: boolean
     emergencyContact?: boolean
@@ -4127,6 +4069,9 @@ export namespace Prisma {
     id?: boolean
     clinicianId?: boolean
     fullName?: boolean
+    dateOfBirth?: boolean
+    diagnosis?: boolean
+    clinicalContext?: boolean
     status?: boolean
     contactPhone?: boolean
     emergencyContact?: boolean
@@ -4134,11 +4079,10 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type PatientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clinicianId" | "fullName" | "status" | "contactPhone" | "emergencyContact" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
+  export type PatientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clinicianId" | "fullName" | "dateOfBirth" | "diagnosis" | "clinicalContext" | "status" | "contactPhone" | "emergencyContact" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
   export type PatientInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
     appointments?: boolean | Patient$appointmentsArgs<ExtArgs>
-    nutriRecords?: boolean | Patient$nutriRecordsArgs<ExtArgs>
     psychNotes?: boolean | Patient$psychNotesArgs<ExtArgs>
     _count?: boolean | PatientCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -4154,13 +4098,15 @@ export namespace Prisma {
     objects: {
       clinician: Prisma.$ClinicianProfilePayload<ExtArgs>
       appointments: Prisma.$AppointmentPayload<ExtArgs>[]
-      nutriRecords: Prisma.$NutriRecordPayload<ExtArgs>[]
       psychNotes: Prisma.$PsychNotePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       clinicianId: string
       fullName: string
+      dateOfBirth: Date | null
+      diagnosis: string | null
+      clinicalContext: string | null
       status: $Enums.PatientStatus
       contactPhone: string | null
       emergencyContact: Prisma.JsonValue | null
@@ -4562,7 +4508,6 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     clinician<T extends ClinicianProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClinicianProfileDefaultArgs<ExtArgs>>): Prisma__ClinicianProfileClient<$Result.GetResult<Prisma.$ClinicianProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     appointments<T extends Patient$appointmentsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    nutriRecords<T extends Patient$nutriRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$nutriRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NutriRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     psychNotes<T extends Patient$psychNotesArgs<ExtArgs> = {}>(args?: Subset<T, Patient$psychNotesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PsychNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -4596,6 +4541,9 @@ export namespace Prisma {
     readonly id: FieldRef<"Patient", 'String'>
     readonly clinicianId: FieldRef<"Patient", 'String'>
     readonly fullName: FieldRef<"Patient", 'String'>
+    readonly dateOfBirth: FieldRef<"Patient", 'DateTime'>
+    readonly diagnosis: FieldRef<"Patient", 'String'>
+    readonly clinicalContext: FieldRef<"Patient", 'String'>
     readonly status: FieldRef<"Patient", 'PatientStatus'>
     readonly contactPhone: FieldRef<"Patient", 'String'>
     readonly emergencyContact: FieldRef<"Patient", 'Json'>
@@ -5021,30 +4969,6 @@ export namespace Prisma {
   }
 
   /**
-   * Patient.nutriRecords
-   */
-  export type Patient$nutriRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NutriRecord
-     */
-    select?: NutriRecordSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NutriRecord
-     */
-    omit?: NutriRecordOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NutriRecordInclude<ExtArgs> | null
-    where?: NutriRecordWhereInput
-    orderBy?: NutriRecordOrderByWithRelationInput | NutriRecordOrderByWithRelationInput[]
-    cursor?: NutriRecordWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: NutriRecordScalarFieldEnum | NutriRecordScalarFieldEnum[]
-  }
-
-  /**
    * Patient.psychNotes
    */
   export type Patient$psychNotesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5113,6 +5037,8 @@ export namespace Prisma {
     clinicianId: string | null
     startTime: Date | null
     endTime: Date | null
+    type: $Enums.AppointmentType | null
+    reason: string | null
     status: $Enums.AppointmentStatus | null
     paymentStatus: $Enums.PaymentStatus | null
     paymentMethod: $Enums.PaymentMethod | null
@@ -5128,6 +5054,8 @@ export namespace Prisma {
     clinicianId: string | null
     startTime: Date | null
     endTime: Date | null
+    type: $Enums.AppointmentType | null
+    reason: string | null
     status: $Enums.AppointmentStatus | null
     paymentStatus: $Enums.PaymentStatus | null
     paymentMethod: $Enums.PaymentMethod | null
@@ -5143,6 +5071,8 @@ export namespace Prisma {
     clinicianId: number
     startTime: number
     endTime: number
+    type: number
+    reason: number
     status: number
     paymentStatus: number
     paymentMethod: number
@@ -5168,6 +5098,8 @@ export namespace Prisma {
     clinicianId?: true
     startTime?: true
     endTime?: true
+    type?: true
+    reason?: true
     status?: true
     paymentStatus?: true
     paymentMethod?: true
@@ -5183,6 +5115,8 @@ export namespace Prisma {
     clinicianId?: true
     startTime?: true
     endTime?: true
+    type?: true
+    reason?: true
     status?: true
     paymentStatus?: true
     paymentMethod?: true
@@ -5198,6 +5132,8 @@ export namespace Prisma {
     clinicianId?: true
     startTime?: true
     endTime?: true
+    type?: true
+    reason?: true
     status?: true
     paymentStatus?: true
     paymentMethod?: true
@@ -5300,6 +5236,8 @@ export namespace Prisma {
     clinicianId: string
     startTime: Date
     endTime: Date
+    type: $Enums.AppointmentType
+    reason: string | null
     status: $Enums.AppointmentStatus
     paymentStatus: $Enums.PaymentStatus
     paymentMethod: $Enums.PaymentMethod | null
@@ -5334,6 +5272,8 @@ export namespace Prisma {
     clinicianId?: boolean
     startTime?: boolean
     endTime?: boolean
+    type?: boolean
+    reason?: boolean
     status?: boolean
     paymentStatus?: boolean
     paymentMethod?: boolean
@@ -5353,6 +5293,8 @@ export namespace Prisma {
     clinicianId?: boolean
     startTime?: boolean
     endTime?: boolean
+    type?: boolean
+    reason?: boolean
     status?: boolean
     paymentStatus?: boolean
     paymentMethod?: boolean
@@ -5370,6 +5312,8 @@ export namespace Prisma {
     clinicianId?: boolean
     startTime?: boolean
     endTime?: boolean
+    type?: boolean
+    reason?: boolean
     status?: boolean
     paymentStatus?: boolean
     paymentMethod?: boolean
@@ -5387,6 +5331,8 @@ export namespace Prisma {
     clinicianId?: boolean
     startTime?: boolean
     endTime?: boolean
+    type?: boolean
+    reason?: boolean
     status?: boolean
     paymentStatus?: boolean
     paymentMethod?: boolean
@@ -5396,7 +5342,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type AppointmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "clinicianId" | "startTime" | "endTime" | "status" | "paymentStatus" | "paymentMethod" | "price" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["appointment"]>
+  export type AppointmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "clinicianId" | "startTime" | "endTime" | "type" | "reason" | "status" | "paymentStatus" | "paymentMethod" | "price" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["appointment"]>
   export type AppointmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     patient?: boolean | PatientDefaultArgs<ExtArgs>
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
@@ -5426,6 +5372,8 @@ export namespace Prisma {
       clinicianId: string
       startTime: Date
       endTime: Date
+      type: $Enums.AppointmentType
+      reason: string | null
       status: $Enums.AppointmentStatus
       paymentStatus: $Enums.PaymentStatus
       paymentMethod: $Enums.PaymentMethod | null
@@ -5865,6 +5813,8 @@ export namespace Prisma {
     readonly clinicianId: FieldRef<"Appointment", 'String'>
     readonly startTime: FieldRef<"Appointment", 'DateTime'>
     readonly endTime: FieldRef<"Appointment", 'DateTime'>
+    readonly type: FieldRef<"Appointment", 'AppointmentType'>
+    readonly reason: FieldRef<"Appointment", 'String'>
     readonly status: FieldRef<"Appointment", 'AppointmentStatus'>
     readonly paymentStatus: FieldRef<"Appointment", 'PaymentStatus'>
     readonly paymentMethod: FieldRef<"Appointment", 'PaymentMethod'>
@@ -7460,1082 +7410,6 @@ export namespace Prisma {
 
 
   /**
-   * Model NutriRecord
-   */
-
-  export type AggregateNutriRecord = {
-    _count: NutriRecordCountAggregateOutputType | null
-    _min: NutriRecordMinAggregateOutputType | null
-    _max: NutriRecordMaxAggregateOutputType | null
-  }
-
-  export type NutriRecordMinAggregateOutputType = {
-    id: string | null
-    patientId: string | null
-    date: Date | null
-    createdAt: Date | null
-    updatedAt: Date | null
-  }
-
-  export type NutriRecordMaxAggregateOutputType = {
-    id: string | null
-    patientId: string | null
-    date: Date | null
-    createdAt: Date | null
-    updatedAt: Date | null
-  }
-
-  export type NutriRecordCountAggregateOutputType = {
-    id: number
-    patientId: number
-    anthropometry: number
-    calculations: number
-    date: number
-    createdAt: number
-    updatedAt: number
-    _all: number
-  }
-
-
-  export type NutriRecordMinAggregateInputType = {
-    id?: true
-    patientId?: true
-    date?: true
-    createdAt?: true
-    updatedAt?: true
-  }
-
-  export type NutriRecordMaxAggregateInputType = {
-    id?: true
-    patientId?: true
-    date?: true
-    createdAt?: true
-    updatedAt?: true
-  }
-
-  export type NutriRecordCountAggregateInputType = {
-    id?: true
-    patientId?: true
-    anthropometry?: true
-    calculations?: true
-    date?: true
-    createdAt?: true
-    updatedAt?: true
-    _all?: true
-  }
-
-  export type NutriRecordAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which NutriRecord to aggregate.
-     */
-    where?: NutriRecordWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of NutriRecords to fetch.
-     */
-    orderBy?: NutriRecordOrderByWithRelationInput | NutriRecordOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: NutriRecordWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` NutriRecords from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` NutriRecords.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned NutriRecords
-    **/
-    _count?: true | NutriRecordCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: NutriRecordMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: NutriRecordMaxAggregateInputType
-  }
-
-  export type GetNutriRecordAggregateType<T extends NutriRecordAggregateArgs> = {
-        [P in keyof T & keyof AggregateNutriRecord]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateNutriRecord[P]>
-      : GetScalarType<T[P], AggregateNutriRecord[P]>
-  }
-
-
-
-
-  export type NutriRecordGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: NutriRecordWhereInput
-    orderBy?: NutriRecordOrderByWithAggregationInput | NutriRecordOrderByWithAggregationInput[]
-    by: NutriRecordScalarFieldEnum[] | NutriRecordScalarFieldEnum
-    having?: NutriRecordScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: NutriRecordCountAggregateInputType | true
-    _min?: NutriRecordMinAggregateInputType
-    _max?: NutriRecordMaxAggregateInputType
-  }
-
-  export type NutriRecordGroupByOutputType = {
-    id: string
-    patientId: string
-    anthropometry: JsonValue
-    calculations: JsonValue
-    date: Date
-    createdAt: Date
-    updatedAt: Date
-    _count: NutriRecordCountAggregateOutputType | null
-    _min: NutriRecordMinAggregateOutputType | null
-    _max: NutriRecordMaxAggregateOutputType | null
-  }
-
-  type GetNutriRecordGroupByPayload<T extends NutriRecordGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<NutriRecordGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof NutriRecordGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], NutriRecordGroupByOutputType[P]>
-            : GetScalarType<T[P], NutriRecordGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type NutriRecordSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    patientId?: boolean
-    anthropometry?: boolean
-    calculations?: boolean
-    date?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    patient?: boolean | PatientDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["nutriRecord"]>
-
-  export type NutriRecordSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    patientId?: boolean
-    anthropometry?: boolean
-    calculations?: boolean
-    date?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    patient?: boolean | PatientDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["nutriRecord"]>
-
-  export type NutriRecordSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    patientId?: boolean
-    anthropometry?: boolean
-    calculations?: boolean
-    date?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    patient?: boolean | PatientDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["nutriRecord"]>
-
-  export type NutriRecordSelectScalar = {
-    id?: boolean
-    patientId?: boolean
-    anthropometry?: boolean
-    calculations?: boolean
-    date?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-  }
-
-  export type NutriRecordOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "anthropometry" | "calculations" | "date" | "createdAt" | "updatedAt", ExtArgs["result"]["nutriRecord"]>
-  export type NutriRecordInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    patient?: boolean | PatientDefaultArgs<ExtArgs>
-  }
-  export type NutriRecordIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    patient?: boolean | PatientDefaultArgs<ExtArgs>
-  }
-  export type NutriRecordIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    patient?: boolean | PatientDefaultArgs<ExtArgs>
-  }
-
-  export type $NutriRecordPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "NutriRecord"
-    objects: {
-      patient: Prisma.$PatientPayload<ExtArgs>
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      patientId: string
-      anthropometry: Prisma.JsonValue
-      calculations: Prisma.JsonValue
-      date: Date
-      createdAt: Date
-      updatedAt: Date
-    }, ExtArgs["result"]["nutriRecord"]>
-    composites: {}
-  }
-
-  type NutriRecordGetPayload<S extends boolean | null | undefined | NutriRecordDefaultArgs> = $Result.GetResult<Prisma.$NutriRecordPayload, S>
-
-  type NutriRecordCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<NutriRecordFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: NutriRecordCountAggregateInputType | true
-    }
-
-  export interface NutriRecordDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['NutriRecord'], meta: { name: 'NutriRecord' } }
-    /**
-     * Find zero or one NutriRecord that matches the filter.
-     * @param {NutriRecordFindUniqueArgs} args - Arguments to find a NutriRecord
-     * @example
-     * // Get one NutriRecord
-     * const nutriRecord = await prisma.nutriRecord.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends NutriRecordFindUniqueArgs>(args: SelectSubset<T, NutriRecordFindUniqueArgs<ExtArgs>>): Prisma__NutriRecordClient<$Result.GetResult<Prisma.$NutriRecordPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one NutriRecord that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {NutriRecordFindUniqueOrThrowArgs} args - Arguments to find a NutriRecord
-     * @example
-     * // Get one NutriRecord
-     * const nutriRecord = await prisma.nutriRecord.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends NutriRecordFindUniqueOrThrowArgs>(args: SelectSubset<T, NutriRecordFindUniqueOrThrowArgs<ExtArgs>>): Prisma__NutriRecordClient<$Result.GetResult<Prisma.$NutriRecordPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first NutriRecord that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {NutriRecordFindFirstArgs} args - Arguments to find a NutriRecord
-     * @example
-     * // Get one NutriRecord
-     * const nutriRecord = await prisma.nutriRecord.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends NutriRecordFindFirstArgs>(args?: SelectSubset<T, NutriRecordFindFirstArgs<ExtArgs>>): Prisma__NutriRecordClient<$Result.GetResult<Prisma.$NutriRecordPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first NutriRecord that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {NutriRecordFindFirstOrThrowArgs} args - Arguments to find a NutriRecord
-     * @example
-     * // Get one NutriRecord
-     * const nutriRecord = await prisma.nutriRecord.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends NutriRecordFindFirstOrThrowArgs>(args?: SelectSubset<T, NutriRecordFindFirstOrThrowArgs<ExtArgs>>): Prisma__NutriRecordClient<$Result.GetResult<Prisma.$NutriRecordPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more NutriRecords that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {NutriRecordFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all NutriRecords
-     * const nutriRecords = await prisma.nutriRecord.findMany()
-     * 
-     * // Get first 10 NutriRecords
-     * const nutriRecords = await prisma.nutriRecord.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const nutriRecordWithIdOnly = await prisma.nutriRecord.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends NutriRecordFindManyArgs>(args?: SelectSubset<T, NutriRecordFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NutriRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a NutriRecord.
-     * @param {NutriRecordCreateArgs} args - Arguments to create a NutriRecord.
-     * @example
-     * // Create one NutriRecord
-     * const NutriRecord = await prisma.nutriRecord.create({
-     *   data: {
-     *     // ... data to create a NutriRecord
-     *   }
-     * })
-     * 
-     */
-    create<T extends NutriRecordCreateArgs>(args: SelectSubset<T, NutriRecordCreateArgs<ExtArgs>>): Prisma__NutriRecordClient<$Result.GetResult<Prisma.$NutriRecordPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many NutriRecords.
-     * @param {NutriRecordCreateManyArgs} args - Arguments to create many NutriRecords.
-     * @example
-     * // Create many NutriRecords
-     * const nutriRecord = await prisma.nutriRecord.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends NutriRecordCreateManyArgs>(args?: SelectSubset<T, NutriRecordCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many NutriRecords and returns the data saved in the database.
-     * @param {NutriRecordCreateManyAndReturnArgs} args - Arguments to create many NutriRecords.
-     * @example
-     * // Create many NutriRecords
-     * const nutriRecord = await prisma.nutriRecord.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many NutriRecords and only return the `id`
-     * const nutriRecordWithIdOnly = await prisma.nutriRecord.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends NutriRecordCreateManyAndReturnArgs>(args?: SelectSubset<T, NutriRecordCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NutriRecordPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a NutriRecord.
-     * @param {NutriRecordDeleteArgs} args - Arguments to delete one NutriRecord.
-     * @example
-     * // Delete one NutriRecord
-     * const NutriRecord = await prisma.nutriRecord.delete({
-     *   where: {
-     *     // ... filter to delete one NutriRecord
-     *   }
-     * })
-     * 
-     */
-    delete<T extends NutriRecordDeleteArgs>(args: SelectSubset<T, NutriRecordDeleteArgs<ExtArgs>>): Prisma__NutriRecordClient<$Result.GetResult<Prisma.$NutriRecordPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one NutriRecord.
-     * @param {NutriRecordUpdateArgs} args - Arguments to update one NutriRecord.
-     * @example
-     * // Update one NutriRecord
-     * const nutriRecord = await prisma.nutriRecord.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends NutriRecordUpdateArgs>(args: SelectSubset<T, NutriRecordUpdateArgs<ExtArgs>>): Prisma__NutriRecordClient<$Result.GetResult<Prisma.$NutriRecordPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more NutriRecords.
-     * @param {NutriRecordDeleteManyArgs} args - Arguments to filter NutriRecords to delete.
-     * @example
-     * // Delete a few NutriRecords
-     * const { count } = await prisma.nutriRecord.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends NutriRecordDeleteManyArgs>(args?: SelectSubset<T, NutriRecordDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more NutriRecords.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {NutriRecordUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many NutriRecords
-     * const nutriRecord = await prisma.nutriRecord.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends NutriRecordUpdateManyArgs>(args: SelectSubset<T, NutriRecordUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more NutriRecords and returns the data updated in the database.
-     * @param {NutriRecordUpdateManyAndReturnArgs} args - Arguments to update many NutriRecords.
-     * @example
-     * // Update many NutriRecords
-     * const nutriRecord = await prisma.nutriRecord.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more NutriRecords and only return the `id`
-     * const nutriRecordWithIdOnly = await prisma.nutriRecord.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends NutriRecordUpdateManyAndReturnArgs>(args: SelectSubset<T, NutriRecordUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NutriRecordPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one NutriRecord.
-     * @param {NutriRecordUpsertArgs} args - Arguments to update or create a NutriRecord.
-     * @example
-     * // Update or create a NutriRecord
-     * const nutriRecord = await prisma.nutriRecord.upsert({
-     *   create: {
-     *     // ... data to create a NutriRecord
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the NutriRecord we want to update
-     *   }
-     * })
-     */
-    upsert<T extends NutriRecordUpsertArgs>(args: SelectSubset<T, NutriRecordUpsertArgs<ExtArgs>>): Prisma__NutriRecordClient<$Result.GetResult<Prisma.$NutriRecordPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of NutriRecords.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {NutriRecordCountArgs} args - Arguments to filter NutriRecords to count.
-     * @example
-     * // Count the number of NutriRecords
-     * const count = await prisma.nutriRecord.count({
-     *   where: {
-     *     // ... the filter for the NutriRecords we want to count
-     *   }
-     * })
-    **/
-    count<T extends NutriRecordCountArgs>(
-      args?: Subset<T, NutriRecordCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], NutriRecordCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a NutriRecord.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {NutriRecordAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends NutriRecordAggregateArgs>(args: Subset<T, NutriRecordAggregateArgs>): Prisma.PrismaPromise<GetNutriRecordAggregateType<T>>
-
-    /**
-     * Group by NutriRecord.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {NutriRecordGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends NutriRecordGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: NutriRecordGroupByArgs['orderBy'] }
-        : { orderBy?: NutriRecordGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, NutriRecordGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetNutriRecordGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the NutriRecord model
-   */
-  readonly fields: NutriRecordFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for NutriRecord.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__NutriRecordClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    patient<T extends PatientDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PatientDefaultArgs<ExtArgs>>): Prisma__PatientClient<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the NutriRecord model
-   */
-  interface NutriRecordFieldRefs {
-    readonly id: FieldRef<"NutriRecord", 'String'>
-    readonly patientId: FieldRef<"NutriRecord", 'String'>
-    readonly anthropometry: FieldRef<"NutriRecord", 'Json'>
-    readonly calculations: FieldRef<"NutriRecord", 'Json'>
-    readonly date: FieldRef<"NutriRecord", 'DateTime'>
-    readonly createdAt: FieldRef<"NutriRecord", 'DateTime'>
-    readonly updatedAt: FieldRef<"NutriRecord", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * NutriRecord findUnique
-   */
-  export type NutriRecordFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NutriRecord
-     */
-    select?: NutriRecordSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NutriRecord
-     */
-    omit?: NutriRecordOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NutriRecordInclude<ExtArgs> | null
-    /**
-     * Filter, which NutriRecord to fetch.
-     */
-    where: NutriRecordWhereUniqueInput
-  }
-
-  /**
-   * NutriRecord findUniqueOrThrow
-   */
-  export type NutriRecordFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NutriRecord
-     */
-    select?: NutriRecordSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NutriRecord
-     */
-    omit?: NutriRecordOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NutriRecordInclude<ExtArgs> | null
-    /**
-     * Filter, which NutriRecord to fetch.
-     */
-    where: NutriRecordWhereUniqueInput
-  }
-
-  /**
-   * NutriRecord findFirst
-   */
-  export type NutriRecordFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NutriRecord
-     */
-    select?: NutriRecordSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NutriRecord
-     */
-    omit?: NutriRecordOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NutriRecordInclude<ExtArgs> | null
-    /**
-     * Filter, which NutriRecord to fetch.
-     */
-    where?: NutriRecordWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of NutriRecords to fetch.
-     */
-    orderBy?: NutriRecordOrderByWithRelationInput | NutriRecordOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for NutriRecords.
-     */
-    cursor?: NutriRecordWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` NutriRecords from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` NutriRecords.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of NutriRecords.
-     */
-    distinct?: NutriRecordScalarFieldEnum | NutriRecordScalarFieldEnum[]
-  }
-
-  /**
-   * NutriRecord findFirstOrThrow
-   */
-  export type NutriRecordFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NutriRecord
-     */
-    select?: NutriRecordSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NutriRecord
-     */
-    omit?: NutriRecordOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NutriRecordInclude<ExtArgs> | null
-    /**
-     * Filter, which NutriRecord to fetch.
-     */
-    where?: NutriRecordWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of NutriRecords to fetch.
-     */
-    orderBy?: NutriRecordOrderByWithRelationInput | NutriRecordOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for NutriRecords.
-     */
-    cursor?: NutriRecordWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` NutriRecords from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` NutriRecords.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of NutriRecords.
-     */
-    distinct?: NutriRecordScalarFieldEnum | NutriRecordScalarFieldEnum[]
-  }
-
-  /**
-   * NutriRecord findMany
-   */
-  export type NutriRecordFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NutriRecord
-     */
-    select?: NutriRecordSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NutriRecord
-     */
-    omit?: NutriRecordOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NutriRecordInclude<ExtArgs> | null
-    /**
-     * Filter, which NutriRecords to fetch.
-     */
-    where?: NutriRecordWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of NutriRecords to fetch.
-     */
-    orderBy?: NutriRecordOrderByWithRelationInput | NutriRecordOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing NutriRecords.
-     */
-    cursor?: NutriRecordWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` NutriRecords from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` NutriRecords.
-     */
-    skip?: number
-    distinct?: NutriRecordScalarFieldEnum | NutriRecordScalarFieldEnum[]
-  }
-
-  /**
-   * NutriRecord create
-   */
-  export type NutriRecordCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NutriRecord
-     */
-    select?: NutriRecordSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NutriRecord
-     */
-    omit?: NutriRecordOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NutriRecordInclude<ExtArgs> | null
-    /**
-     * The data needed to create a NutriRecord.
-     */
-    data: XOR<NutriRecordCreateInput, NutriRecordUncheckedCreateInput>
-  }
-
-  /**
-   * NutriRecord createMany
-   */
-  export type NutriRecordCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many NutriRecords.
-     */
-    data: NutriRecordCreateManyInput | NutriRecordCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * NutriRecord createManyAndReturn
-   */
-  export type NutriRecordCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NutriRecord
-     */
-    select?: NutriRecordSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the NutriRecord
-     */
-    omit?: NutriRecordOmit<ExtArgs> | null
-    /**
-     * The data used to create many NutriRecords.
-     */
-    data: NutriRecordCreateManyInput | NutriRecordCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NutriRecordIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * NutriRecord update
-   */
-  export type NutriRecordUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NutriRecord
-     */
-    select?: NutriRecordSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NutriRecord
-     */
-    omit?: NutriRecordOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NutriRecordInclude<ExtArgs> | null
-    /**
-     * The data needed to update a NutriRecord.
-     */
-    data: XOR<NutriRecordUpdateInput, NutriRecordUncheckedUpdateInput>
-    /**
-     * Choose, which NutriRecord to update.
-     */
-    where: NutriRecordWhereUniqueInput
-  }
-
-  /**
-   * NutriRecord updateMany
-   */
-  export type NutriRecordUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update NutriRecords.
-     */
-    data: XOR<NutriRecordUpdateManyMutationInput, NutriRecordUncheckedUpdateManyInput>
-    /**
-     * Filter which NutriRecords to update
-     */
-    where?: NutriRecordWhereInput
-    /**
-     * Limit how many NutriRecords to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * NutriRecord updateManyAndReturn
-   */
-  export type NutriRecordUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NutriRecord
-     */
-    select?: NutriRecordSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the NutriRecord
-     */
-    omit?: NutriRecordOmit<ExtArgs> | null
-    /**
-     * The data used to update NutriRecords.
-     */
-    data: XOR<NutriRecordUpdateManyMutationInput, NutriRecordUncheckedUpdateManyInput>
-    /**
-     * Filter which NutriRecords to update
-     */
-    where?: NutriRecordWhereInput
-    /**
-     * Limit how many NutriRecords to update.
-     */
-    limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NutriRecordIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * NutriRecord upsert
-   */
-  export type NutriRecordUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NutriRecord
-     */
-    select?: NutriRecordSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NutriRecord
-     */
-    omit?: NutriRecordOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NutriRecordInclude<ExtArgs> | null
-    /**
-     * The filter to search for the NutriRecord to update in case it exists.
-     */
-    where: NutriRecordWhereUniqueInput
-    /**
-     * In case the NutriRecord found by the `where` argument doesn't exist, create a new NutriRecord with this data.
-     */
-    create: XOR<NutriRecordCreateInput, NutriRecordUncheckedCreateInput>
-    /**
-     * In case the NutriRecord was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<NutriRecordUpdateInput, NutriRecordUncheckedUpdateInput>
-  }
-
-  /**
-   * NutriRecord delete
-   */
-  export type NutriRecordDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NutriRecord
-     */
-    select?: NutriRecordSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NutriRecord
-     */
-    omit?: NutriRecordOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NutriRecordInclude<ExtArgs> | null
-    /**
-     * Filter which NutriRecord to delete.
-     */
-    where: NutriRecordWhereUniqueInput
-  }
-
-  /**
-   * NutriRecord deleteMany
-   */
-  export type NutriRecordDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which NutriRecords to delete
-     */
-    where?: NutriRecordWhereInput
-    /**
-     * Limit how many NutriRecords to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * NutriRecord without action
-   */
-  export type NutriRecordDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NutriRecord
-     */
-    select?: NutriRecordSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NutriRecord
-     */
-    omit?: NutriRecordOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NutriRecordInclude<ExtArgs> | null
-  }
-
-
-  /**
    * Model FinanceTransaction
    */
 
@@ -9751,6 +8625,9 @@ export namespace Prisma {
     id: 'id',
     clinicianId: 'clinicianId',
     fullName: 'fullName',
+    dateOfBirth: 'dateOfBirth',
+    diagnosis: 'diagnosis',
+    clinicalContext: 'clinicalContext',
     status: 'status',
     contactPhone: 'contactPhone',
     emergencyContact: 'emergencyContact',
@@ -9767,6 +8644,8 @@ export namespace Prisma {
     clinicianId: 'clinicianId',
     startTime: 'startTime',
     endTime: 'endTime',
+    type: 'type',
+    reason: 'reason',
     status: 'status',
     paymentStatus: 'paymentStatus',
     paymentMethod: 'paymentMethod',
@@ -9791,19 +8670,6 @@ export namespace Prisma {
   };
 
   export type PsychNoteScalarFieldEnum = (typeof PsychNoteScalarFieldEnum)[keyof typeof PsychNoteScalarFieldEnum]
-
-
-  export const NutriRecordScalarFieldEnum: {
-    id: 'id',
-    patientId: 'patientId',
-    anthropometry: 'anthropometry',
-    calculations: 'calculations',
-    date: 'date',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
-  };
-
-  export type NutriRecordScalarFieldEnum = (typeof NutriRecordScalarFieldEnum)[keyof typeof NutriRecordScalarFieldEnum]
 
 
   export const FinanceTransactionScalarFieldEnum: {
@@ -9983,6 +8849,20 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'AppointmentType'
+   */
+  export type EnumAppointmentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppointmentType'>
+    
+
+
+  /**
+   * Reference to a field of type 'AppointmentType[]'
+   */
+  export type ListEnumAppointmentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppointmentType[]'>
     
 
 
@@ -10212,6 +9092,9 @@ export namespace Prisma {
     id?: UuidFilter<"Patient"> | string
     clinicianId?: UuidFilter<"Patient"> | string
     fullName?: StringFilter<"Patient"> | string
+    dateOfBirth?: DateTimeNullableFilter<"Patient"> | Date | string | null
+    diagnosis?: StringNullableFilter<"Patient"> | string | null
+    clinicalContext?: StringNullableFilter<"Patient"> | string | null
     status?: EnumPatientStatusFilter<"Patient"> | $Enums.PatientStatus
     contactPhone?: StringNullableFilter<"Patient"> | string | null
     emergencyContact?: JsonNullableFilter<"Patient">
@@ -10219,7 +9102,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Patient"> | Date | string
     clinician?: XOR<ClinicianProfileScalarRelationFilter, ClinicianProfileWhereInput>
     appointments?: AppointmentListRelationFilter
-    nutriRecords?: NutriRecordListRelationFilter
     psychNotes?: PsychNoteListRelationFilter
   }
 
@@ -10227,6 +9109,9 @@ export namespace Prisma {
     id?: SortOrder
     clinicianId?: SortOrder
     fullName?: SortOrder
+    dateOfBirth?: SortOrderInput | SortOrder
+    diagnosis?: SortOrderInput | SortOrder
+    clinicalContext?: SortOrderInput | SortOrder
     status?: SortOrder
     contactPhone?: SortOrderInput | SortOrder
     emergencyContact?: SortOrderInput | SortOrder
@@ -10234,7 +9119,6 @@ export namespace Prisma {
     updatedAt?: SortOrder
     clinician?: ClinicianProfileOrderByWithRelationInput
     appointments?: AppointmentOrderByRelationAggregateInput
-    nutriRecords?: NutriRecordOrderByRelationAggregateInput
     psychNotes?: PsychNoteOrderByRelationAggregateInput
   }
 
@@ -10245,6 +9129,9 @@ export namespace Prisma {
     NOT?: PatientWhereInput | PatientWhereInput[]
     clinicianId?: UuidFilter<"Patient"> | string
     fullName?: StringFilter<"Patient"> | string
+    dateOfBirth?: DateTimeNullableFilter<"Patient"> | Date | string | null
+    diagnosis?: StringNullableFilter<"Patient"> | string | null
+    clinicalContext?: StringNullableFilter<"Patient"> | string | null
     status?: EnumPatientStatusFilter<"Patient"> | $Enums.PatientStatus
     contactPhone?: StringNullableFilter<"Patient"> | string | null
     emergencyContact?: JsonNullableFilter<"Patient">
@@ -10252,7 +9139,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Patient"> | Date | string
     clinician?: XOR<ClinicianProfileScalarRelationFilter, ClinicianProfileWhereInput>
     appointments?: AppointmentListRelationFilter
-    nutriRecords?: NutriRecordListRelationFilter
     psychNotes?: PsychNoteListRelationFilter
   }, "id">
 
@@ -10260,6 +9146,9 @@ export namespace Prisma {
     id?: SortOrder
     clinicianId?: SortOrder
     fullName?: SortOrder
+    dateOfBirth?: SortOrderInput | SortOrder
+    diagnosis?: SortOrderInput | SortOrder
+    clinicalContext?: SortOrderInput | SortOrder
     status?: SortOrder
     contactPhone?: SortOrderInput | SortOrder
     emergencyContact?: SortOrderInput | SortOrder
@@ -10277,6 +9166,9 @@ export namespace Prisma {
     id?: UuidWithAggregatesFilter<"Patient"> | string
     clinicianId?: UuidWithAggregatesFilter<"Patient"> | string
     fullName?: StringWithAggregatesFilter<"Patient"> | string
+    dateOfBirth?: DateTimeNullableWithAggregatesFilter<"Patient"> | Date | string | null
+    diagnosis?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    clinicalContext?: StringNullableWithAggregatesFilter<"Patient"> | string | null
     status?: EnumPatientStatusWithAggregatesFilter<"Patient"> | $Enums.PatientStatus
     contactPhone?: StringNullableWithAggregatesFilter<"Patient"> | string | null
     emergencyContact?: JsonNullableWithAggregatesFilter<"Patient">
@@ -10293,6 +9185,8 @@ export namespace Prisma {
     clinicianId?: UuidFilter<"Appointment"> | string
     startTime?: DateTimeFilter<"Appointment"> | Date | string
     endTime?: DateTimeFilter<"Appointment"> | Date | string
+    type?: EnumAppointmentTypeFilter<"Appointment"> | $Enums.AppointmentType
+    reason?: StringNullableFilter<"Appointment"> | string | null
     status?: EnumAppointmentStatusFilter<"Appointment"> | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFilter<"Appointment"> | $Enums.PaymentStatus
     paymentMethod?: EnumPaymentMethodNullableFilter<"Appointment"> | $Enums.PaymentMethod | null
@@ -10312,6 +9206,8 @@ export namespace Prisma {
     clinicianId?: SortOrder
     startTime?: SortOrder
     endTime?: SortOrder
+    type?: SortOrder
+    reason?: SortOrderInput | SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
     paymentMethod?: SortOrderInput | SortOrder
@@ -10334,6 +9230,8 @@ export namespace Prisma {
     clinicianId?: UuidFilter<"Appointment"> | string
     startTime?: DateTimeFilter<"Appointment"> | Date | string
     endTime?: DateTimeFilter<"Appointment"> | Date | string
+    type?: EnumAppointmentTypeFilter<"Appointment"> | $Enums.AppointmentType
+    reason?: StringNullableFilter<"Appointment"> | string | null
     status?: EnumAppointmentStatusFilter<"Appointment"> | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFilter<"Appointment"> | $Enums.PaymentStatus
     paymentMethod?: EnumPaymentMethodNullableFilter<"Appointment"> | $Enums.PaymentMethod | null
@@ -10353,6 +9251,8 @@ export namespace Prisma {
     clinicianId?: SortOrder
     startTime?: SortOrder
     endTime?: SortOrder
+    type?: SortOrder
+    reason?: SortOrderInput | SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
     paymentMethod?: SortOrderInput | SortOrder
@@ -10376,6 +9276,8 @@ export namespace Prisma {
     clinicianId?: UuidWithAggregatesFilter<"Appointment"> | string
     startTime?: DateTimeWithAggregatesFilter<"Appointment"> | Date | string
     endTime?: DateTimeWithAggregatesFilter<"Appointment"> | Date | string
+    type?: EnumAppointmentTypeWithAggregatesFilter<"Appointment"> | $Enums.AppointmentType
+    reason?: StringNullableWithAggregatesFilter<"Appointment"> | string | null
     status?: EnumAppointmentStatusWithAggregatesFilter<"Appointment"> | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusWithAggregatesFilter<"Appointment"> | $Enums.PaymentStatus
     paymentMethod?: EnumPaymentMethodNullableWithAggregatesFilter<"Appointment"> | $Enums.PaymentMethod | null
@@ -10458,71 +9360,6 @@ export namespace Prisma {
     moodRating?: IntNullableWithAggregatesFilter<"PsychNote"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"PsychNote"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"PsychNote"> | Date | string
-  }
-
-  export type NutriRecordWhereInput = {
-    AND?: NutriRecordWhereInput | NutriRecordWhereInput[]
-    OR?: NutriRecordWhereInput[]
-    NOT?: NutriRecordWhereInput | NutriRecordWhereInput[]
-    id?: UuidFilter<"NutriRecord"> | string
-    patientId?: UuidFilter<"NutriRecord"> | string
-    anthropometry?: JsonFilter<"NutriRecord">
-    calculations?: JsonFilter<"NutriRecord">
-    date?: DateTimeFilter<"NutriRecord"> | Date | string
-    createdAt?: DateTimeFilter<"NutriRecord"> | Date | string
-    updatedAt?: DateTimeFilter<"NutriRecord"> | Date | string
-    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
-  }
-
-  export type NutriRecordOrderByWithRelationInput = {
-    id?: SortOrder
-    patientId?: SortOrder
-    anthropometry?: SortOrder
-    calculations?: SortOrder
-    date?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    patient?: PatientOrderByWithRelationInput
-  }
-
-  export type NutriRecordWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    AND?: NutriRecordWhereInput | NutriRecordWhereInput[]
-    OR?: NutriRecordWhereInput[]
-    NOT?: NutriRecordWhereInput | NutriRecordWhereInput[]
-    patientId?: UuidFilter<"NutriRecord"> | string
-    anthropometry?: JsonFilter<"NutriRecord">
-    calculations?: JsonFilter<"NutriRecord">
-    date?: DateTimeFilter<"NutriRecord"> | Date | string
-    createdAt?: DateTimeFilter<"NutriRecord"> | Date | string
-    updatedAt?: DateTimeFilter<"NutriRecord"> | Date | string
-    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
-  }, "id">
-
-  export type NutriRecordOrderByWithAggregationInput = {
-    id?: SortOrder
-    patientId?: SortOrder
-    anthropometry?: SortOrder
-    calculations?: SortOrder
-    date?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    _count?: NutriRecordCountOrderByAggregateInput
-    _max?: NutriRecordMaxOrderByAggregateInput
-    _min?: NutriRecordMinOrderByAggregateInput
-  }
-
-  export type NutriRecordScalarWhereWithAggregatesInput = {
-    AND?: NutriRecordScalarWhereWithAggregatesInput | NutriRecordScalarWhereWithAggregatesInput[]
-    OR?: NutriRecordScalarWhereWithAggregatesInput[]
-    NOT?: NutriRecordScalarWhereWithAggregatesInput | NutriRecordScalarWhereWithAggregatesInput[]
-    id?: UuidWithAggregatesFilter<"NutriRecord"> | string
-    patientId?: UuidWithAggregatesFilter<"NutriRecord"> | string
-    anthropometry?: JsonWithAggregatesFilter<"NutriRecord">
-    calculations?: JsonWithAggregatesFilter<"NutriRecord">
-    date?: DateTimeWithAggregatesFilter<"NutriRecord"> | Date | string
-    createdAt?: DateTimeWithAggregatesFilter<"NutriRecord"> | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter<"NutriRecord"> | Date | string
   }
 
   export type FinanceTransactionWhereInput = {
@@ -10770,6 +9607,9 @@ export namespace Prisma {
   export type PatientCreateInput = {
     id?: string
     fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
@@ -10777,7 +9617,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
-    nutriRecords?: NutriRecordCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
   }
 
@@ -10785,19 +9624,24 @@ export namespace Prisma {
     id?: string
     clinicianId: string
     fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
-    nutriRecords?: NutriRecordUncheckedCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
@@ -10805,7 +9649,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
-    nutriRecords?: NutriRecordUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
   }
 
@@ -10813,13 +9656,15 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     clinicianId?: StringFieldUpdateOperationsInput | string
     fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
-    nutriRecords?: NutriRecordUncheckedUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
   }
 
@@ -10827,6 +9672,9 @@ export namespace Prisma {
     id?: string
     clinicianId: string
     fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
@@ -10837,6 +9685,9 @@ export namespace Prisma {
   export type PatientUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
@@ -10848,6 +9699,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     clinicianId?: StringFieldUpdateOperationsInput | string
     fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
@@ -10859,6 +9713,8 @@ export namespace Prisma {
     id?: string
     startTime: Date | string
     endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
     paymentMethod?: $Enums.PaymentMethod | null
@@ -10878,6 +9734,8 @@ export namespace Prisma {
     clinicianId: string
     startTime: Date | string
     endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
     paymentMethod?: $Enums.PaymentMethod | null
@@ -10893,6 +9751,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
@@ -10912,6 +9772,8 @@ export namespace Prisma {
     clinicianId?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
@@ -10929,6 +9791,8 @@ export namespace Prisma {
     clinicianId: string
     startTime: Date | string
     endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
     paymentMethod?: $Enums.PaymentMethod | null
@@ -10942,6 +9806,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
@@ -10957,6 +9823,8 @@ export namespace Prisma {
     clinicianId?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
@@ -11037,75 +9905,6 @@ export namespace Prisma {
     templateType?: StringFieldUpdateOperationsInput | string
     content?: JsonNullValueInput | InputJsonValue
     moodRating?: NullableIntFieldUpdateOperationsInput | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type NutriRecordCreateInput = {
-    id?: string
-    anthropometry: JsonNullValueInput | InputJsonValue
-    calculations: JsonNullValueInput | InputJsonValue
-    date?: Date | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    patient: PatientCreateNestedOneWithoutNutriRecordsInput
-  }
-
-  export type NutriRecordUncheckedCreateInput = {
-    id?: string
-    patientId: string
-    anthropometry: JsonNullValueInput | InputJsonValue
-    calculations: JsonNullValueInput | InputJsonValue
-    date?: Date | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type NutriRecordUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    anthropometry?: JsonNullValueInput | InputJsonValue
-    calculations?: JsonNullValueInput | InputJsonValue
-    date?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    patient?: PatientUpdateOneRequiredWithoutNutriRecordsNestedInput
-  }
-
-  export type NutriRecordUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    patientId?: StringFieldUpdateOperationsInput | string
-    anthropometry?: JsonNullValueInput | InputJsonValue
-    calculations?: JsonNullValueInput | InputJsonValue
-    date?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type NutriRecordCreateManyInput = {
-    id?: string
-    patientId: string
-    anthropometry: JsonNullValueInput | InputJsonValue
-    calculations: JsonNullValueInput | InputJsonValue
-    date?: Date | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type NutriRecordUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    anthropometry?: JsonNullValueInput | InputJsonValue
-    calculations?: JsonNullValueInput | InputJsonValue
-    date?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type NutriRecordUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    patientId?: StringFieldUpdateOperationsInput | string
-    anthropometry?: JsonNullValueInput | InputJsonValue
-    calculations?: JsonNullValueInput | InputJsonValue
-    date?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -11516,6 +10315,17 @@ export namespace Prisma {
     _max?: NestedDecimalFilter<$PrismaModel>
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type EnumPatientStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.PatientStatus | EnumPatientStatusFieldRefInput<$PrismaModel>
     in?: $Enums.PatientStatus[] | ListEnumPatientStatusFieldRefInput<$PrismaModel>
@@ -11551,20 +10361,10 @@ export namespace Prisma {
     isNot?: ClinicianProfileWhereInput
   }
 
-  export type NutriRecordListRelationFilter = {
-    every?: NutriRecordWhereInput
-    some?: NutriRecordWhereInput
-    none?: NutriRecordWhereInput
-  }
-
   export type PsychNoteListRelationFilter = {
     every?: PsychNoteWhereInput
     some?: PsychNoteWhereInput
     none?: PsychNoteWhereInput
-  }
-
-  export type NutriRecordOrderByRelationAggregateInput = {
-    _count?: SortOrder
   }
 
   export type PsychNoteOrderByRelationAggregateInput = {
@@ -11575,6 +10375,9 @@ export namespace Prisma {
     id?: SortOrder
     clinicianId?: SortOrder
     fullName?: SortOrder
+    dateOfBirth?: SortOrder
+    diagnosis?: SortOrder
+    clinicalContext?: SortOrder
     status?: SortOrder
     contactPhone?: SortOrder
     emergencyContact?: SortOrder
@@ -11586,6 +10389,9 @@ export namespace Prisma {
     id?: SortOrder
     clinicianId?: SortOrder
     fullName?: SortOrder
+    dateOfBirth?: SortOrder
+    diagnosis?: SortOrder
+    clinicalContext?: SortOrder
     status?: SortOrder
     contactPhone?: SortOrder
     createdAt?: SortOrder
@@ -11596,10 +10402,27 @@ export namespace Prisma {
     id?: SortOrder
     clinicianId?: SortOrder
     fullName?: SortOrder
+    dateOfBirth?: SortOrder
+    diagnosis?: SortOrder
+    clinicalContext?: SortOrder
     status?: SortOrder
     contactPhone?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type EnumPatientStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -11636,6 +10459,13 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedJsonNullableFilter<$PrismaModel>
     _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type EnumAppointmentTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.AppointmentType | EnumAppointmentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AppointmentType[] | ListEnumAppointmentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AppointmentType[] | ListEnumAppointmentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAppointmentTypeFilter<$PrismaModel> | $Enums.AppointmentType
   }
 
   export type EnumAppointmentStatusFilter<$PrismaModel = never> = {
@@ -11680,6 +10510,8 @@ export namespace Prisma {
     clinicianId?: SortOrder
     startTime?: SortOrder
     endTime?: SortOrder
+    type?: SortOrder
+    reason?: SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
     paymentMethod?: SortOrder
@@ -11699,6 +10531,8 @@ export namespace Prisma {
     clinicianId?: SortOrder
     startTime?: SortOrder
     endTime?: SortOrder
+    type?: SortOrder
+    reason?: SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
     paymentMethod?: SortOrder
@@ -11714,6 +10548,8 @@ export namespace Prisma {
     clinicianId?: SortOrder
     startTime?: SortOrder
     endTime?: SortOrder
+    type?: SortOrder
+    reason?: SortOrder
     status?: SortOrder
     paymentStatus?: SortOrder
     paymentMethod?: SortOrder
@@ -11725,6 +10561,16 @@ export namespace Prisma {
 
   export type AppointmentSumOrderByAggregateInput = {
     price?: SortOrder
+  }
+
+  export type EnumAppointmentTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AppointmentType | EnumAppointmentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AppointmentType[] | ListEnumAppointmentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AppointmentType[] | ListEnumAppointmentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAppointmentTypeWithAggregatesFilter<$PrismaModel> | $Enums.AppointmentType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAppointmentTypeFilter<$PrismaModel>
+    _max?: NestedEnumAppointmentTypeFilter<$PrismaModel>
   }
 
   export type EnumAppointmentStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -11875,32 +10721,6 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type NutriRecordCountOrderByAggregateInput = {
-    id?: SortOrder
-    patientId?: SortOrder
-    anthropometry?: SortOrder
-    calculations?: SortOrder
-    date?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type NutriRecordMaxOrderByAggregateInput = {
-    id?: SortOrder
-    patientId?: SortOrder
-    date?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type NutriRecordMinOrderByAggregateInput = {
-    id?: SortOrder
-    patientId?: SortOrder
-    date?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
   }
 
   export type UuidNullableFilter<$PrismaModel = never> = {
@@ -12217,13 +11037,6 @@ export namespace Prisma {
     connect?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
   }
 
-  export type NutriRecordCreateNestedManyWithoutPatientInput = {
-    create?: XOR<NutriRecordCreateWithoutPatientInput, NutriRecordUncheckedCreateWithoutPatientInput> | NutriRecordCreateWithoutPatientInput[] | NutriRecordUncheckedCreateWithoutPatientInput[]
-    connectOrCreate?: NutriRecordCreateOrConnectWithoutPatientInput | NutriRecordCreateOrConnectWithoutPatientInput[]
-    createMany?: NutriRecordCreateManyPatientInputEnvelope
-    connect?: NutriRecordWhereUniqueInput | NutriRecordWhereUniqueInput[]
-  }
-
   export type PsychNoteCreateNestedManyWithoutPatientInput = {
     create?: XOR<PsychNoteCreateWithoutPatientInput, PsychNoteUncheckedCreateWithoutPatientInput> | PsychNoteCreateWithoutPatientInput[] | PsychNoteUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: PsychNoteCreateOrConnectWithoutPatientInput | PsychNoteCreateOrConnectWithoutPatientInput[]
@@ -12238,18 +11051,15 @@ export namespace Prisma {
     connect?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
   }
 
-  export type NutriRecordUncheckedCreateNestedManyWithoutPatientInput = {
-    create?: XOR<NutriRecordCreateWithoutPatientInput, NutriRecordUncheckedCreateWithoutPatientInput> | NutriRecordCreateWithoutPatientInput[] | NutriRecordUncheckedCreateWithoutPatientInput[]
-    connectOrCreate?: NutriRecordCreateOrConnectWithoutPatientInput | NutriRecordCreateOrConnectWithoutPatientInput[]
-    createMany?: NutriRecordCreateManyPatientInputEnvelope
-    connect?: NutriRecordWhereUniqueInput | NutriRecordWhereUniqueInput[]
-  }
-
   export type PsychNoteUncheckedCreateNestedManyWithoutPatientInput = {
     create?: XOR<PsychNoteCreateWithoutPatientInput, PsychNoteUncheckedCreateWithoutPatientInput> | PsychNoteCreateWithoutPatientInput[] | PsychNoteUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: PsychNoteCreateOrConnectWithoutPatientInput | PsychNoteCreateOrConnectWithoutPatientInput[]
     createMany?: PsychNoteCreateManyPatientInputEnvelope
     connect?: PsychNoteWhereUniqueInput | PsychNoteWhereUniqueInput[]
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type EnumPatientStatusFieldUpdateOperationsInput = {
@@ -12278,20 +11088,6 @@ export namespace Prisma {
     deleteMany?: AppointmentScalarWhereInput | AppointmentScalarWhereInput[]
   }
 
-  export type NutriRecordUpdateManyWithoutPatientNestedInput = {
-    create?: XOR<NutriRecordCreateWithoutPatientInput, NutriRecordUncheckedCreateWithoutPatientInput> | NutriRecordCreateWithoutPatientInput[] | NutriRecordUncheckedCreateWithoutPatientInput[]
-    connectOrCreate?: NutriRecordCreateOrConnectWithoutPatientInput | NutriRecordCreateOrConnectWithoutPatientInput[]
-    upsert?: NutriRecordUpsertWithWhereUniqueWithoutPatientInput | NutriRecordUpsertWithWhereUniqueWithoutPatientInput[]
-    createMany?: NutriRecordCreateManyPatientInputEnvelope
-    set?: NutriRecordWhereUniqueInput | NutriRecordWhereUniqueInput[]
-    disconnect?: NutriRecordWhereUniqueInput | NutriRecordWhereUniqueInput[]
-    delete?: NutriRecordWhereUniqueInput | NutriRecordWhereUniqueInput[]
-    connect?: NutriRecordWhereUniqueInput | NutriRecordWhereUniqueInput[]
-    update?: NutriRecordUpdateWithWhereUniqueWithoutPatientInput | NutriRecordUpdateWithWhereUniqueWithoutPatientInput[]
-    updateMany?: NutriRecordUpdateManyWithWhereWithoutPatientInput | NutriRecordUpdateManyWithWhereWithoutPatientInput[]
-    deleteMany?: NutriRecordScalarWhereInput | NutriRecordScalarWhereInput[]
-  }
-
   export type PsychNoteUpdateManyWithoutPatientNestedInput = {
     create?: XOR<PsychNoteCreateWithoutPatientInput, PsychNoteUncheckedCreateWithoutPatientInput> | PsychNoteCreateWithoutPatientInput[] | PsychNoteUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: PsychNoteCreateOrConnectWithoutPatientInput | PsychNoteCreateOrConnectWithoutPatientInput[]
@@ -12318,20 +11114,6 @@ export namespace Prisma {
     update?: AppointmentUpdateWithWhereUniqueWithoutPatientInput | AppointmentUpdateWithWhereUniqueWithoutPatientInput[]
     updateMany?: AppointmentUpdateManyWithWhereWithoutPatientInput | AppointmentUpdateManyWithWhereWithoutPatientInput[]
     deleteMany?: AppointmentScalarWhereInput | AppointmentScalarWhereInput[]
-  }
-
-  export type NutriRecordUncheckedUpdateManyWithoutPatientNestedInput = {
-    create?: XOR<NutriRecordCreateWithoutPatientInput, NutriRecordUncheckedCreateWithoutPatientInput> | NutriRecordCreateWithoutPatientInput[] | NutriRecordUncheckedCreateWithoutPatientInput[]
-    connectOrCreate?: NutriRecordCreateOrConnectWithoutPatientInput | NutriRecordCreateOrConnectWithoutPatientInput[]
-    upsert?: NutriRecordUpsertWithWhereUniqueWithoutPatientInput | NutriRecordUpsertWithWhereUniqueWithoutPatientInput[]
-    createMany?: NutriRecordCreateManyPatientInputEnvelope
-    set?: NutriRecordWhereUniqueInput | NutriRecordWhereUniqueInput[]
-    disconnect?: NutriRecordWhereUniqueInput | NutriRecordWhereUniqueInput[]
-    delete?: NutriRecordWhereUniqueInput | NutriRecordWhereUniqueInput[]
-    connect?: NutriRecordWhereUniqueInput | NutriRecordWhereUniqueInput[]
-    update?: NutriRecordUpdateWithWhereUniqueWithoutPatientInput | NutriRecordUpdateWithWhereUniqueWithoutPatientInput[]
-    updateMany?: NutriRecordUpdateManyWithWhereWithoutPatientInput | NutriRecordUpdateManyWithWhereWithoutPatientInput[]
-    deleteMany?: NutriRecordScalarWhereInput | NutriRecordScalarWhereInput[]
   }
 
   export type PsychNoteUncheckedUpdateManyWithoutPatientNestedInput = {
@@ -12382,6 +11164,10 @@ export namespace Prisma {
     create?: XOR<FinanceTransactionCreateWithoutAppointmentInput, FinanceTransactionUncheckedCreateWithoutAppointmentInput>
     connectOrCreate?: FinanceTransactionCreateOrConnectWithoutAppointmentInput
     connect?: FinanceTransactionWhereUniqueInput
+  }
+
+  export type EnumAppointmentTypeFieldUpdateOperationsInput = {
+    set?: $Enums.AppointmentType
   }
 
   export type EnumAppointmentStatusFieldUpdateOperationsInput = {
@@ -12486,20 +11272,6 @@ export namespace Prisma {
     upsert?: PatientUpsertWithoutPsychNotesInput
     connect?: PatientWhereUniqueInput
     update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutPsychNotesInput, PatientUpdateWithoutPsychNotesInput>, PatientUncheckedUpdateWithoutPsychNotesInput>
-  }
-
-  export type PatientCreateNestedOneWithoutNutriRecordsInput = {
-    create?: XOR<PatientCreateWithoutNutriRecordsInput, PatientUncheckedCreateWithoutNutriRecordsInput>
-    connectOrCreate?: PatientCreateOrConnectWithoutNutriRecordsInput
-    connect?: PatientWhereUniqueInput
-  }
-
-  export type PatientUpdateOneRequiredWithoutNutriRecordsNestedInput = {
-    create?: XOR<PatientCreateWithoutNutriRecordsInput, PatientUncheckedCreateWithoutNutriRecordsInput>
-    connectOrCreate?: PatientCreateOrConnectWithoutNutriRecordsInput
-    upsert?: PatientUpsertWithoutNutriRecordsInput
-    connect?: PatientWhereUniqueInput
-    update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutNutriRecordsInput, PatientUpdateWithoutNutriRecordsInput>, PatientUncheckedUpdateWithoutNutriRecordsInput>
   }
 
   export type ClinicianProfileCreateNestedOneWithoutTransactionsInput = {
@@ -12758,11 +11530,36 @@ export namespace Prisma {
     _max?: NestedDecimalFilter<$PrismaModel>
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedEnumPatientStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.PatientStatus | EnumPatientStatusFieldRefInput<$PrismaModel>
     in?: $Enums.PatientStatus[] | ListEnumPatientStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.PatientStatus[] | ListEnumPatientStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumPatientStatusFilter<$PrismaModel> | $Enums.PatientStatus
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumPatientStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -12798,6 +11595,13 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type NestedEnumAppointmentTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.AppointmentType | EnumAppointmentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AppointmentType[] | ListEnumAppointmentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AppointmentType[] | ListEnumAppointmentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAppointmentTypeFilter<$PrismaModel> | $Enums.AppointmentType
+  }
+
   export type NestedEnumAppointmentStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.AppointmentStatus | EnumAppointmentStatusFieldRefInput<$PrismaModel>
     in?: $Enums.AppointmentStatus[] | ListEnumAppointmentStatusFieldRefInput<$PrismaModel>
@@ -12817,6 +11621,16 @@ export namespace Prisma {
     in?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null
     notIn?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel> | null
     not?: NestedEnumPaymentMethodNullableFilter<$PrismaModel> | $Enums.PaymentMethod | null
+  }
+
+  export type NestedEnumAppointmentTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AppointmentType | EnumAppointmentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AppointmentType[] | ListEnumAppointmentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AppointmentType[] | ListEnumAppointmentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAppointmentTypeWithAggregatesFilter<$PrismaModel> | $Enums.AppointmentType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAppointmentTypeFilter<$PrismaModel>
+    _max?: NestedEnumAppointmentTypeFilter<$PrismaModel>
   }
 
   export type NestedEnumAppointmentStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -13039,26 +11853,30 @@ export namespace Prisma {
   export type PatientCreateWithoutClinicianInput = {
     id?: string
     fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
-    nutriRecords?: NutriRecordCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutClinicianInput = {
     id?: string
     fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
-    nutriRecords?: NutriRecordUncheckedCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
   }
 
@@ -13076,6 +11894,8 @@ export namespace Prisma {
     id?: string
     startTime: Date | string
     endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
     paymentMethod?: $Enums.PaymentMethod | null
@@ -13093,6 +11913,8 @@ export namespace Prisma {
     patientId: string
     startTime: Date | string
     endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
     paymentMethod?: $Enums.PaymentMethod | null
@@ -13198,6 +12020,9 @@ export namespace Prisma {
     id?: UuidFilter<"Patient"> | string
     clinicianId?: UuidFilter<"Patient"> | string
     fullName?: StringFilter<"Patient"> | string
+    dateOfBirth?: DateTimeNullableFilter<"Patient"> | Date | string | null
+    diagnosis?: StringNullableFilter<"Patient"> | string | null
+    clinicalContext?: StringNullableFilter<"Patient"> | string | null
     status?: EnumPatientStatusFilter<"Patient"> | $Enums.PatientStatus
     contactPhone?: StringNullableFilter<"Patient"> | string | null
     emergencyContact?: JsonNullableFilter<"Patient">
@@ -13230,6 +12055,8 @@ export namespace Prisma {
     clinicianId?: UuidFilter<"Appointment"> | string
     startTime?: DateTimeFilter<"Appointment"> | Date | string
     endTime?: DateTimeFilter<"Appointment"> | Date | string
+    type?: EnumAppointmentTypeFilter<"Appointment"> | $Enums.AppointmentType
+    reason?: StringNullableFilter<"Appointment"> | string | null
     status?: EnumAppointmentStatusFilter<"Appointment"> | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFilter<"Appointment"> | $Enums.PaymentStatus
     paymentMethod?: EnumPaymentMethodNullableFilter<"Appointment"> | $Enums.PaymentMethod | null
@@ -13307,6 +12134,8 @@ export namespace Prisma {
     id?: string
     startTime: Date | string
     endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
     paymentMethod?: $Enums.PaymentMethod | null
@@ -13324,6 +12153,8 @@ export namespace Prisma {
     clinicianId: string
     startTime: Date | string
     endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
     paymentMethod?: $Enums.PaymentMethod | null
@@ -13342,34 +12173,6 @@ export namespace Prisma {
 
   export type AppointmentCreateManyPatientInputEnvelope = {
     data: AppointmentCreateManyPatientInput | AppointmentCreateManyPatientInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type NutriRecordCreateWithoutPatientInput = {
-    id?: string
-    anthropometry: JsonNullValueInput | InputJsonValue
-    calculations: JsonNullValueInput | InputJsonValue
-    date?: Date | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type NutriRecordUncheckedCreateWithoutPatientInput = {
-    id?: string
-    anthropometry: JsonNullValueInput | InputJsonValue
-    calculations: JsonNullValueInput | InputJsonValue
-    date?: Date | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type NutriRecordCreateOrConnectWithoutPatientInput = {
-    where: NutriRecordWhereUniqueInput
-    create: XOR<NutriRecordCreateWithoutPatientInput, NutriRecordUncheckedCreateWithoutPatientInput>
-  }
-
-  export type NutriRecordCreateManyPatientInputEnvelope = {
-    data: NutriRecordCreateManyPatientInput | NutriRecordCreateManyPatientInput[]
     skipDuplicates?: boolean
   }
 
@@ -13458,35 +12261,6 @@ export namespace Prisma {
     data: XOR<AppointmentUpdateManyMutationInput, AppointmentUncheckedUpdateManyWithoutPatientInput>
   }
 
-  export type NutriRecordUpsertWithWhereUniqueWithoutPatientInput = {
-    where: NutriRecordWhereUniqueInput
-    update: XOR<NutriRecordUpdateWithoutPatientInput, NutriRecordUncheckedUpdateWithoutPatientInput>
-    create: XOR<NutriRecordCreateWithoutPatientInput, NutriRecordUncheckedCreateWithoutPatientInput>
-  }
-
-  export type NutriRecordUpdateWithWhereUniqueWithoutPatientInput = {
-    where: NutriRecordWhereUniqueInput
-    data: XOR<NutriRecordUpdateWithoutPatientInput, NutriRecordUncheckedUpdateWithoutPatientInput>
-  }
-
-  export type NutriRecordUpdateManyWithWhereWithoutPatientInput = {
-    where: NutriRecordScalarWhereInput
-    data: XOR<NutriRecordUpdateManyMutationInput, NutriRecordUncheckedUpdateManyWithoutPatientInput>
-  }
-
-  export type NutriRecordScalarWhereInput = {
-    AND?: NutriRecordScalarWhereInput | NutriRecordScalarWhereInput[]
-    OR?: NutriRecordScalarWhereInput[]
-    NOT?: NutriRecordScalarWhereInput | NutriRecordScalarWhereInput[]
-    id?: UuidFilter<"NutriRecord"> | string
-    patientId?: UuidFilter<"NutriRecord"> | string
-    anthropometry?: JsonFilter<"NutriRecord">
-    calculations?: JsonFilter<"NutriRecord">
-    date?: DateTimeFilter<"NutriRecord"> | Date | string
-    createdAt?: DateTimeFilter<"NutriRecord"> | Date | string
-    updatedAt?: DateTimeFilter<"NutriRecord"> | Date | string
-  }
-
   export type PsychNoteUpsertWithWhereUniqueWithoutPatientInput = {
     where: PsychNoteWhereUniqueInput
     update: XOR<PsychNoteUpdateWithoutPatientInput, PsychNoteUncheckedUpdateWithoutPatientInput>
@@ -13520,13 +12294,15 @@ export namespace Prisma {
   export type PatientCreateWithoutAppointmentsInput = {
     id?: string
     fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
-    nutriRecords?: NutriRecordCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
   }
 
@@ -13534,12 +12310,14 @@ export namespace Prisma {
     id?: string
     clinicianId: string
     fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    nutriRecords?: NutriRecordUncheckedCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
   }
 
@@ -13647,13 +12425,15 @@ export namespace Prisma {
   export type PatientUpdateWithoutAppointmentsInput = {
     id?: StringFieldUpdateOperationsInput | string
     fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
-    nutriRecords?: NutriRecordUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
   }
 
@@ -13661,12 +12441,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     clinicianId?: StringFieldUpdateOperationsInput | string
     fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    nutriRecords?: NutriRecordUncheckedUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
   }
 
@@ -13777,6 +12559,8 @@ export namespace Prisma {
     id?: string
     startTime: Date | string
     endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
     paymentMethod?: $Enums.PaymentMethod | null
@@ -13795,6 +12579,8 @@ export namespace Prisma {
     clinicianId: string
     startTime: Date | string
     endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
     paymentMethod?: $Enums.PaymentMethod | null
@@ -13813,6 +12599,9 @@ export namespace Prisma {
   export type PatientCreateWithoutPsychNotesInput = {
     id?: string
     fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
@@ -13820,20 +12609,21 @@ export namespace Prisma {
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
-    nutriRecords?: NutriRecordCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutPsychNotesInput = {
     id?: string
     clinicianId: string
     fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
-    nutriRecords?: NutriRecordUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutPsychNotesInput = {
@@ -13856,6 +12646,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
@@ -13874,6 +12666,8 @@ export namespace Prisma {
     clinicianId?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
@@ -13898,6 +12692,9 @@ export namespace Prisma {
   export type PatientUpdateWithoutPsychNotesInput = {
     id?: StringFieldUpdateOperationsInput | string
     fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
@@ -13905,88 +12702,21 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
-    nutriRecords?: NutriRecordUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutPsychNotesInput = {
     id?: StringFieldUpdateOperationsInput | string
     clinicianId?: StringFieldUpdateOperationsInput | string
     fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
-    nutriRecords?: NutriRecordUncheckedUpdateManyWithoutPatientNestedInput
-  }
-
-  export type PatientCreateWithoutNutriRecordsInput = {
-    id?: string
-    fullName: string
-    status?: $Enums.PatientStatus
-    contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
-    appointments?: AppointmentCreateNestedManyWithoutPatientInput
-    psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
-  }
-
-  export type PatientUncheckedCreateWithoutNutriRecordsInput = {
-    id?: string
-    clinicianId: string
-    fullName: string
-    status?: $Enums.PatientStatus
-    contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
-    psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
-  }
-
-  export type PatientCreateOrConnectWithoutNutriRecordsInput = {
-    where: PatientWhereUniqueInput
-    create: XOR<PatientCreateWithoutNutriRecordsInput, PatientUncheckedCreateWithoutNutriRecordsInput>
-  }
-
-  export type PatientUpsertWithoutNutriRecordsInput = {
-    update: XOR<PatientUpdateWithoutNutriRecordsInput, PatientUncheckedUpdateWithoutNutriRecordsInput>
-    create: XOR<PatientCreateWithoutNutriRecordsInput, PatientUncheckedCreateWithoutNutriRecordsInput>
-    where?: PatientWhereInput
-  }
-
-  export type PatientUpdateToOneWithWhereWithoutNutriRecordsInput = {
-    where?: PatientWhereInput
-    data: XOR<PatientUpdateWithoutNutriRecordsInput, PatientUncheckedUpdateWithoutNutriRecordsInput>
-  }
-
-  export type PatientUpdateWithoutNutriRecordsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    fullName?: StringFieldUpdateOperationsInput | string
-    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
-    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
-    appointments?: AppointmentUpdateManyWithoutPatientNestedInput
-    psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
-  }
-
-  export type PatientUncheckedUpdateWithoutNutriRecordsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clinicianId?: StringFieldUpdateOperationsInput | string
-    fullName?: StringFieldUpdateOperationsInput | string
-    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
-    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
-    psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type ClinicianProfileCreateWithoutTransactionsInput = {
@@ -14026,6 +12756,8 @@ export namespace Prisma {
     id?: string
     startTime: Date | string
     endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
     paymentMethod?: $Enums.PaymentMethod | null
@@ -14044,6 +12776,8 @@ export namespace Prisma {
     clinicianId: string
     startTime: Date | string
     endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
     paymentMethod?: $Enums.PaymentMethod | null
@@ -14113,6 +12847,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
@@ -14131,6 +12867,8 @@ export namespace Prisma {
     clinicianId?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
@@ -14144,6 +12882,9 @@ export namespace Prisma {
   export type PatientCreateManyClinicianInput = {
     id?: string
     fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
@@ -14156,6 +12897,8 @@ export namespace Prisma {
     patientId: string
     startTime: Date | string
     endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
     paymentMethod?: $Enums.PaymentMethod | null
@@ -14179,32 +12922,39 @@ export namespace Prisma {
   export type PatientUpdateWithoutClinicianInput = {
     id?: StringFieldUpdateOperationsInput | string
     fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
-    nutriRecords?: NutriRecordUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutClinicianInput = {
     id?: StringFieldUpdateOperationsInput | string
     fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
-    nutriRecords?: NutriRecordUncheckedUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateManyWithoutClinicianInput = {
     id?: StringFieldUpdateOperationsInput | string
     fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
@@ -14216,6 +12966,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
@@ -14233,6 +12985,8 @@ export namespace Prisma {
     patientId?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
@@ -14249,6 +13003,8 @@ export namespace Prisma {
     patientId?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
@@ -14296,20 +13052,13 @@ export namespace Prisma {
     clinicianId: string
     startTime: Date | string
     endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
     status?: $Enums.AppointmentStatus
     paymentStatus?: $Enums.PaymentStatus
     paymentMethod?: $Enums.PaymentMethod | null
     price: Decimal | DecimalJsLike | number | string
     notes?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type NutriRecordCreateManyPatientInput = {
-    id?: string
-    anthropometry: JsonNullValueInput | InputJsonValue
-    calculations: JsonNullValueInput | InputJsonValue
-    date?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -14328,6 +13077,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
@@ -14345,6 +13096,8 @@ export namespace Prisma {
     clinicianId?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
@@ -14361,38 +13114,13 @@ export namespace Prisma {
     clinicianId?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type NutriRecordUpdateWithoutPatientInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    anthropometry?: JsonNullValueInput | InputJsonValue
-    calculations?: JsonNullValueInput | InputJsonValue
-    date?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type NutriRecordUncheckedUpdateWithoutPatientInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    anthropometry?: JsonNullValueInput | InputJsonValue
-    calculations?: JsonNullValueInput | InputJsonValue
-    date?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type NutriRecordUncheckedUpdateManyWithoutPatientInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    anthropometry?: JsonNullValueInput | InputJsonValue
-    calculations?: JsonNullValueInput | InputJsonValue
-    date?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

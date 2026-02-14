@@ -8,33 +8,179 @@ import { CompleteCheckoutDto } from './dto/complete-checkout.dto';
 
 @Injectable()
 export class AppointmentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   /**
-   * Find appointments for a specific clinician on a given date.
-   * Converts date string to Start of Day → End of Day range.
+   * Find appointments for a specific clinician.
+   * Supports single date (date) or range (from/to).
    */
-  async findByDate(userId: string, dateString?: string) {
+  async findByDate(userId: string, dateString?: string, from?: string, to?: string) {
     const profile = await this.resolveClinicianProfile(userId);
 
-    const targetDate = dateString ? new Date(dateString) : new Date();
+    let startOfRange: Date;
+    let endOfRange: Date;
 
-    const startOfDay = new Date(targetDate);
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = new Date(targetDate);
-    endOfDay.setHours(23, 59, 59, 999);
+    if (from && to) {
+      startOfRange = new Date(from);
+      startOfRange.setHours(0, 0, 0, 0);
+      endOfRange = new Date(to);
+      endOfRange.setHours(23, 59, 59, 999);
+    } else {
+      const targetDate = dateString ? new Date(dateString) : new Date();
+      startOfRange = new Date(targetDate);
+      startOfRange.setHours(0, 0, 0, 0);
+      endOfRange = new Date(targetDate);
+      endOfRange.setHours(23, 59, 59, 999);
+    }
 
     return this.prisma.appointment.findMany({
       where: {
         clinicianId: profile.id,
-        startTime: { gte: startOfDay, lte: endOfDay },
+        startTime: { gte: startOfRange, lte: endOfRange },
       },
       include: {
         patient: { select: { id: true, fullName: true } },
       },
       orderBy: { startTime: 'asc' },
     });
+  }
+
+  /**
+   * Get recent unique patients from the clinician's completed appointments.
+   * Returns the last 6 unique patients with their most recent appointment info.
+   */
+  async getRecentPatients(userId: string) {
+    const profile = await this.resolveClinicianProfile(userId);
+
+    const recentAppointments = await this.prisma.appointment.findMany({
+      where: {
+        clinicianId: profile.id,
+        status: { in: ['COMPLETED', 'SCHEDULED'] },
+      },
+      include: {
+        patient: { select: { id: true, fullName: true } },
+      },
+      orderBy: { startTime: 'desc' },
+      take: 30,
+    });
+
+    // Deduplicate by patient, keeping the most recent appointment
+    const seen = new Set<string>();
+    const uniquePatients: Array<{
+      id: string;
+      name: string;
+      reason: string | null;
+      lastAppointmentTime: Date;
+    }> = [];
+
+    for (const apt of recentAppointments) {
+      if (seen.has(apt.patientId)) continue;
+      seen.add(apt.patientId);
+      uniquePatients.push({
+        id: apt.patient.id,
+        name: apt.patient.fullName,
+        reason: apt.reason,
+        lastAppointmentTime: apt.startTime,
+      });
+      if (uniquePatients.length >= 6) break;
+    }
+
+    return uniquePatients;
+  }
+
+  /**
+   * Get a count of appointments per day for a given date range.
+   * Used for the availability calendar widget.
+   */
+  async getDaySummary(userId: string, from: string, to: string) {
+    const profile = await this.resolveClinicianProfile(userId);
+
+    const startOfRange = new Date(from);
+    startOfRange.setHours(0, 0, 0, 0);
+    const endOfRange = new Date(to);
+    endOfRange.setHours(23, 59, 59, 999);
+
+    const appointments = await this.prisma.appointment.findMany({
+      where: {
+        clinicianId: profile.id,
+        startTime: { gte: startOfRange, lte: endOfRange },
+        status: { not: 'CANCELLED' },
+      },
+      select: { startTime: true },
+      orderBy: { startTime: 'asc' },
+    });
+
+    // Group by date string
+    const countByDay: Record<string, number> = {};
+    for (const apt of appointments) {
+      const dayKey = apt.startTime.toISOString().split('T')[0];
+      countByDay[dayKey] = (countByDay[dayKey] || 0) + 1;
+    }
+
+    return countByDay;
+  }
+
+  /**
+   * Get the next upcoming scheduled appointment (from now onwards).
+   * Includes expanded patient clinical data and the count of previous sessions.
+   * Returns null if there are no future appointments.
+   */
+  async getNextUpcoming(userId: string) {
+    const profile = await this.resolveClinicianProfile(userId);
+
+    const appointment = await this.prisma.appointment.findFirst({
+      where: {
+        clinicianId: profile.id,
+        status: 'SCHEDULED',
+        endTime: { gt: new Date() },
+      },
+      include: {
+        patient: {
+          select: {
+            id: true,
+            fullName: true,
+            dateOfBirth: true,
+            diagnosis: true,
+            clinicalContext: true,
+          },
+        },
+      },
+      orderBy: { startTime: 'asc' },
+    });
+
+    if (!appointment) return null;
+
+    // Count previously completed sessions for context ("Sesión #N")
+    const completedSessions = await this.prisma.appointment.count({
+      where: {
+        patientId: appointment.patientId,
+        clinicianId: profile.id,
+        status: 'COMPLETED',
+      },
+    });
+
+    return {
+      ...appointment,
+      sessionNumber: completedSessions + 1,
+    };
+  }
+
+  /**
+   * Count completed appointments that don't have an associated psych note yet.
+   * Used by the PendingNotesWidget on the dashboard.
+   */
+  async getPendingNotesCount(userId: string): Promise<{ count: number }> {
+    const profile = await this.resolveClinicianProfile(userId);
+
+    const count = await this.prisma.appointment.count({
+      where: {
+        clinicianId: profile.id,
+        status: 'COMPLETED',
+        psychNote: null,
+      },
+    });
+
+    return { count };
   }
 
   /**

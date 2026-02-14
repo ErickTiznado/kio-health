@@ -1,5 +1,5 @@
 import type { FC, ReactNode } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/auth.store';
 import {
   LayoutDashboard,
@@ -42,6 +42,7 @@ const NUTRITIONIST_NAV: NavItem[] = [
  */
 export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuthStore();
 
   const clinicianType = user?.profile?.type;
@@ -54,6 +55,12 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
 
   const userName = user?.email?.split('@')[0] || 'Doctor';
   const initials = userName.slice(0, 2).toUpperCase();
+
+  // Determine current page label for breadcrumb
+  const currentNavItem = [...navItems, { to: '/settings', label: 'Configuración' }].find(
+    (item) => item.to === location.pathname
+  );
+  const pageLabel = currentNavItem?.label || 'Dashboard';
 
   return (
     <div className="min-h-screen bg-bg flex">
@@ -145,9 +152,9 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-5">
           {/* Breadcrumb / Title */}
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-gray-400">Inicio</span>
+            <span className="text-gray-400 font-medium">Inicio</span>
             <ChevronRight size={14} className="text-gray-300" />
-            <span className="text-kanji font-medium">Dashboard</span>
+            <span className="text-kanji font-bold">{pageLabel}</span>
           </div>
 
           {/* User Avatar */}
@@ -170,3 +177,4 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
     </div>
   );
 };
+

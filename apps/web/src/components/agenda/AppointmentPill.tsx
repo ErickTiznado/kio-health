@@ -1,37 +1,47 @@
-import { Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { MoreVertical, MapPin, Banknote } from 'lucide-react';
 import { format, parseISO, differenceInMinutes } from 'date-fns';
-import type { AgendaAppointment } from '../../types/agenda.types';
+import type { Appointment } from '../../types/appointments.types';
 
 interface AppointmentPillProps {
-  appointment: AgendaAppointment;
-  onSelect: (appointment: AgendaAppointment) => void;
+  appointment: Appointment;
+  onSelect: (appointment: Appointment) => void;
 }
 
 const GRID_START_HOUR = 8;
 const HOUR_HEIGHT_PX = 80;
 
-const STATUS_STYLES: Record<string, string> = {
-  SCHEDULED: 'bg-purple-50 hover:bg-purple-100',
-  COMPLETED: 'bg-emerald-50 hover:bg-emerald-100',
-  CANCELLED: 'bg-gray-50 hover:bg-gray-100 opacity-60',
-  NO_SHOW: 'bg-amber-50 hover:bg-amber-100',
+const STATUS_BORDER_COLORS: Record<string, string> = {
+  COMPLETED: 'border-l-emerald-500', // Green #10B981
+  CANCELLED: 'border-l-red-500', // Red #EF4444
+  NO_SHOW: 'border-l-red-500', // Red #EF4444
+  SCHEDULED: 'border-l-blue-500', // Blue #3B82F6
+  PENDING: 'border-l-amber-500', // Amber #F59E0B
 };
 
-const TYPE_BORDER: Record<string, string> = {
-  CONSULTATION: 'border-l-kanji',
-  EVALUATION: 'border-l-blue-500',
-  FOLLOW_UP: 'border-l-emerald-500',
+const STATUS_HOVER_BG: Record<string, string> = {
+  COMPLETED: 'hover:bg-emerald-50/50',
+  CANCELLED: 'hover:bg-red-50/50',
+  NO_SHOW: 'hover:bg-red-50/50',
+  SCHEDULED: 'hover:bg-blue-50/50',
+  PENDING: 'hover:bg-amber-50/50',
 };
 
-function StatusIcon({ status }: { status: string }) {
-  if (status === 'COMPLETED') return <CheckCircle2 size={12} className="text-emerald-500" />;
-  if (status === 'CANCELLED') return <AlertCircle size={12} className="text-gray-400" />;
-  return <Clock size={12} className="text-kanji" />;
+function getStatusBorder(status: string, paymentStatus?: string | null) {
+  if (paymentStatus === 'PENDING' && status === 'SCHEDULED') {
+    return STATUS_BORDER_COLORS.PENDING;
+  }
+  return STATUS_BORDER_COLORS[status] || STATUS_BORDER_COLORS.SCHEDULED;
+}
+
+function getStatusHoverBg(status: string, paymentStatus?: string | null) {
+  if (paymentStatus === 'PENDING' && status === 'SCHEDULED') {
+    return STATUS_HOVER_BG.PENDING;
+  }
+  return STATUS_HOVER_BG[status] || STATUS_HOVER_BG.SCHEDULED;
 }
 
 /**
- * Renders a single appointment positioned absolutely within its day column.
- * Position and height derived from start/end times vs the 08:00 grid origin.
+ * Appointment Card component with semantic border and clean layout.
  */
 export function AppointmentPill({ appointment, onSelect }: AppointmentPillProps) {
   const startDate = parseISO(appointment.startTime);
@@ -43,32 +53,77 @@ export function AppointmentPill({ appointment, onSelect }: AppointmentPillProps)
   const topPx = (startOffsetMinutes / 60) * HOUR_HEIGHT_PX;
   const heightPx = (durationMinutes / 60) * HOUR_HEIGHT_PX;
 
-  const statusClass = STATUS_STYLES[appointment.status] ?? STATUS_STYLES.SCHEDULED;
-  const borderClass = TYPE_BORDER[appointment.type] ?? TYPE_BORDER.CONSULTATION;
+  const isShort = heightPx < 60;
+  
+  // Determine border color based on status
+  const paymentStatus = appointment.paymentStatus;
+  const borderClass = getStatusBorder(appointment.status, paymentStatus);
+  const hoverBgClass = getStatusHoverBg(appointment.status, paymentStatus);
 
-  const firstName = appointment.patient.fullName.split(' ')[0];
+  const firstName = appointment.patient.fullName;
+  
+  // Show Money icon if payment is pending
+  const showMoneyIcon = paymentStatus === 'PENDING';
 
   return (
-    <button
-      type="button"
+    <div
+      className={`absolute left-1.5 right-1.5 rounded-md border-l-4 ${borderClass} bg-white ${hoverBgClass} px-2 py-1.5 text-left cursor-pointer shadow-[0_2px_4px_rgba(0,0,0,0.05)] transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 group overflow-hidden flex flex-col z-20 hover:z-30 pointer-events-auto`}
+      style={{ top: `${topPx}px`, height: `${heightPx}px`, minHeight: '32px' }}
       onClick={() => onSelect(appointment)}
-      className={`absolute left-1.5 right-1.5 rounded-xl border-l-4 ${borderClass} ${statusClass} px-2 py-1 text-left cursor-pointer shadow-md transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 overflow-hidden group`}
-      style={{ top: `${topPx}px`, height: `${heightPx}px`, minHeight: '28px' }}
     >
-      <div className="flex items-center gap-1 mb-0.5">
-        <span className="text-xs text-gray-400 font-medium">
-          {format(startDate, 'hh:mm a')}
-        </span>
-        <StatusIcon status={appointment.status} />
-      </div>
-      <p className="text-sm font-bold text-gray-800 truncate leading-tight">
-        {firstName}
-      </p>
-      {heightPx > 50 && (
-        <p className="text-xs text-gray-500 truncate mt-0.5">
-          {appointment.reason}
-        </p>
+      {isShort ? (
+        // Short Appointment Layout (Single Line)
+        <div className="flex items-center gap-2 h-full">
+          <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
+            {format(startDate, 'HH:mm')}
+          </span>
+          <span className="text-sm font-bold text-gray-900 truncate flex-1">
+            {firstName}
+          </span>
+          {showMoneyIcon && (
+            <Banknote size={12} className="text-amber-500 shrink-0" />
+          )}
+        </div>
+      ) : (
+        // Standard Appointment Layout
+        <>
+          {/* Header: Time and Context Icon */}
+          <div className="flex justify-between items-start mb-0.5">
+             <div className="flex items-center gap-1.5 text-gray-500">
+               {/* Always show MapPin as all appointments are in-person */}
+               <MapPin size={14} strokeWidth={2} />
+               <span className="text-xs font-medium">
+                 {format(startDate, 'HH:mm')}
+               </span>
+               {showMoneyIcon && (
+                 <Banknote size={14} className="text-amber-500 ml-1" />
+               )}
+             </div>
+
+             {/* Hover Menu Icon */}
+             <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+               <MoreVertical size={16} className="text-gray-400 hover:text-gray-600" />
+             </div>
+          </div>
+
+          {/* Patient Name */}
+          <p className="text-sm font-bold text-gray-900 truncate leading-tight">
+            {firstName}
+          </p>
+
+          {/* Reason / Treatment */}
+          {appointment.reason ? (
+            <p className="text-xs text-gray-700 truncate mt-0.5 font-normal">
+              {appointment.reason}
+            </p>
+          ) : (
+            <p className="text-xs text-gray-400 truncate mt-0.5 italic">
+              Consulta General
+            </p>
+          )}
+        </>
       )}
-    </button>
+    </div>
   );
 }
+

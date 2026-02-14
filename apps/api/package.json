@@ -83,6 +83,9 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   },
+  "imports": {
+    "#generated/prisma": "./prisma/generated/client/index.js"
+  },
   "prisma": {
     "seed": "ts-node --transpile-only prisma/seed.ts"
   }

@@ -35,19 +35,27 @@ export function CurrentTimeLine() {
 
   return (
     <div
-      className="absolute left-0 right-0 z-20 pointer-events-none flex items-center"
+      className="absolute left-0 right-0 z-10 pointer-events-none flex items-center"
       style={{ top: `${topPosition}px` }}
     >
+      {/* Time Label */}
+      <div className="absolute -left-12 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-sm shadow-sm flex items-center justify-center">
+        AHORA
+      </div>
+
       {/* Circle indicator */}
       <div
-        className="w-3.5 h-3.5 rounded-full bg-red-400 -ml-[7px] shrink-0 z-10"
+        className="w-4 h-4 rounded-full bg-red-500 -ml-[8px] shrink-0 z-10 border-2 border-white"
         style={{ boxShadow: '0 0 10px rgba(239, 68, 68, 0.7), 0 0 20px rgba(239, 68, 68, 0.3)' }}
       />
+      
       {/* Line */}
       <div
-        className="flex-1 h-[2px] bg-red-400"
-        style={{ boxShadow: '0 0 10px rgba(239, 68, 68, 0.4)' }}
+        className="flex-1 h-[2px] bg-red-500/80"
+        style={{ boxShadow: '0 0 8px rgba(239, 68, 68, 0.4)' }}
       />
     </div>
   );
 }
+
+

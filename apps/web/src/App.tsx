@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/auth.store';
+import { Toaster } from 'sonner';
 import { RequireAuth } from './components/RequireAuth';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -25,58 +26,61 @@ function RootRedirect() {
 
 function App() {
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/login" element={<LoginPage />} />
+    <>
+      <Toaster position="bottom-right" richColors />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<LoginPage />} />
 
-      {/* Protected Routes */}
-      <Route
-        path="/dashboard"
-        element={
-          <RequireAuth>
-            <DashboardPage />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/agenda"
-        element={
-          <RequireAuth>
-            <AgendaPage />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/session/:appointmentId"
-        element={
-          <RequireAuth>
-            <SessionPage />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/onboarding"
-        element={
-          <RequireAuth>
-            <OnboardingPage />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/settings"
-        element={
-          <RequireAuth>
-            <SettingsPage />
-          </RequireAuth>
-        }
-      />
+        {/* Protected Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <DashboardPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/agenda"
+          element={
+            <RequireAuth>
+              <AgendaPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/session/:appointmentId"
+          element={
+            <RequireAuth>
+              <SessionPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/onboarding"
+          element={
+            <RequireAuth>
+              <OnboardingPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <RequireAuth>
+              <SettingsPage />
+            </RequireAuth>
+          }
+        />
 
-      {/* Root Redirect */}
-      <Route path="/" element={<RootRedirect />} />
+        {/* Root Redirect */}
+        <Route path="/" element={<RootRedirect />} />
 
-      {/* Catch-all - redirect to root for Switch logic */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Catch-all - redirect to root for Switch logic */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }
 

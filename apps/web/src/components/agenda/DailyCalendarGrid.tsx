@@ -1,14 +1,14 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { format, isToday, parseISO, isSameDay } from 'date-fns';
 import { es } from 'date-fns/locale';
-import type { AgendaAppointment } from '../../types/agenda.types';
+import type { Appointment } from '../../types/appointments.types';
 import { AppointmentPill } from './AppointmentPill';
 import { CurrentTimeLine } from './CurrentTimeLine';
 
 interface DailyCalendarGridProps {
   selectedDay: Date;
-  appointments: AgendaAppointment[];
-  onSelectAppointment: (appointment: AgendaAppointment) => void;
+  appointments: Appointment[];
+  onSelectAppointment: (appointment: Appointment) => void;
 }
 
 const GRID_START_HOUR = 8;
@@ -28,6 +28,22 @@ function formatHourLabel(hour: number): string {
  * Reuses AppointmentPill and CurrentTimeLine from the weekly view.
  */
 export function DailyCalendarGrid({ selectedDay, appointments, onSelectAppointment }: DailyCalendarGridProps) {
+  const [pastTimeHeight, setPastTimeHeight] = useState(0);
+
+  useEffect(() => {
+    const updateHeight = () => {
+      const now = new Date();
+      const currentHour = now.getHours();
+      const currentMinute = now.getMinutes();
+      const offsetHours = currentHour - GRID_START_HOUR + currentMinute / 60;
+      setPastTimeHeight(Math.max(0, offsetHours * HOUR_HEIGHT_PX));
+    };
+
+    updateHeight();
+    const interval = setInterval(updateHeight, 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
   const hourSlots = useMemo(() => {
     return Array.from({ length: TOTAL_HOURS }, (_, index) => GRID_START_HOUR + index);
   }, []);
@@ -50,11 +66,10 @@ export function DailyCalendarGrid({ selectedDay, appointments, onSelectAppointme
         <div className="p-3 border-r border-gray-100" />
         <div className="py-3 px-4 flex items-center gap-3">
           <div
-            className={`inline-flex items-center justify-center w-12 h-12 rounded-full text-lg font-bold transition-colors ${
-              isDayToday
+            className={`inline-flex items-center justify-center w-12 h-12 rounded-full text-lg font-bold transition-colors ${isDayToday
                 ? 'bg-kanji text-white shadow-md'
                 : 'text-gray-700 bg-gray-50'
-            }`}
+              }`}
           >
             {format(selectedDay, 'd')}
           </div>
@@ -89,14 +104,22 @@ export function DailyCalendarGrid({ selectedDay, appointments, onSelectAppointme
 
               {/* Day Column for this hour */}
               <div
-                className="border-b border-dashed border-gray-100/60 relative"
+                className="border-b border-dashed border-gray-100/60 relative group hover:bg-gray-50/50 transition-colors cursor-pointer"
                 style={{ height: `${HOUR_HEIGHT_PX}px` }}
-              />
+                title={`Agendar cita a las ${formatHourLabel(hour)}`}
+              >
+                {/* Ghost Slot UI */}
+                <div className="absolute inset-1 border-2 border-dashed border-gray-300 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wide bg-white/50 px-3 py-1.5 rounded-md backdrop-blur-sm">
+                    + Agendar aquí
+                  </span>
+                </div>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Appointment Pills Layer */}
+        {/* Shading and Pills Layer */}
         <div
           className="absolute top-0 grid pointer-events-none"
           style={{
@@ -107,7 +130,15 @@ export function DailyCalendarGrid({ selectedDay, appointments, onSelectAppointme
           }}
         >
           <div />
-          <div className="relative pointer-events-auto">
+          <div className="relative pointer-events-none">
+            {/* Past Time Shading */}
+            {isDayToday && (
+              <div
+                className="absolute top-0 left-0 right-0 bg-gray-50/40 border-b border-gray-100/50 pointer-events-none z-0"
+                style={{ height: `${pastTimeHeight}px` }}
+              />
+            )}
+
             {dayAppointments.map((appointment) => (
               <AppointmentPill
                 key={appointment.id}
@@ -135,3 +166,4 @@ export function DailyCalendarGrid({ selectedDay, appointments, onSelectAppointme
     </div>
   );
 }
+

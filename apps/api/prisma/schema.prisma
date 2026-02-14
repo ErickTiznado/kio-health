@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "./generated/client"
 }
 
 datasource db {
@@ -27,6 +28,7 @@ enum PatientStatus {
 
 enum AppointmentStatus {
   SCHEDULED
+  IN_PROGRESS
   COMPLETED
   CANCELLED
   NO_SHOW
@@ -35,6 +37,12 @@ enum AppointmentStatus {
 enum PaymentStatus {
   PENDING
   PAID
+}
+
+enum AppointmentType {
+  CONSULTATION
+  EVALUATION
+  FOLLOW_UP
 }
 
 enum PaymentMethod {
@@ -87,6 +95,9 @@ model Patient {
   id               String        @id @default(uuid()) @db.Uuid
   clinicianId      String        @map("clinician_id") @db.Uuid
   fullName         String        @map("full_name")
+  dateOfBirth      DateTime?     @map("date_of_birth") @db.Date
+  diagnosis        String?
+  clinicalContext  String?       @map("clinical_context")
   status           PatientStatus @default(ACTIVE)
   contactPhone     String?       @map("contact_phone")
   emergencyContact Json?         @map("emergency_contact")
@@ -106,6 +117,8 @@ model Appointment {
   clinicianId   String            @map("clinician_id") @db.Uuid
   startTime     DateTime          @map("start_time")
   endTime       DateTime          @map("end_time")
+  type          AppointmentType   @default(CONSULTATION)
+  reason        String?
   status        AppointmentStatus @default(SCHEDULED)
   paymentStatus PaymentStatus     @default(PENDING) @map("payment_status")
   paymentMethod PaymentMethod?    @map("payment_method")

@@ -145,6 +145,9 @@ exports.Prisma.PatientScalarFieldEnum = {
   id: 'id',
   clinicianId: 'clinicianId',
   fullName: 'fullName',
+  dateOfBirth: 'dateOfBirth',
+  diagnosis: 'diagnosis',
+  clinicalContext: 'clinicalContext',
   status: 'status',
   contactPhone: 'contactPhone',
   emergencyContact: 'emergencyContact',
@@ -158,6 +161,8 @@ exports.Prisma.AppointmentScalarFieldEnum = {
   clinicianId: 'clinicianId',
   startTime: 'startTime',
   endTime: 'endTime',
+  type: 'type',
+  reason: 'reason',
   status: 'status',
   paymentStatus: 'paymentStatus',
   paymentMethod: 'paymentMethod',
@@ -174,16 +179,6 @@ exports.Prisma.PsychNoteScalarFieldEnum = {
   templateType: 'templateType',
   content: 'content',
   moodRating: 'moodRating',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.NutriRecordScalarFieldEnum = {
-  id: 'id',
-  patientId: 'patientId',
-  anthropometry: 'anthropometry',
-  calculations: 'calculations',
-  date: 'date',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -235,8 +230,7 @@ exports.UserRole = exports.$Enums.UserRole = {
 };
 
 exports.ClinicianType = exports.$Enums.ClinicianType = {
-  PSYCHOLOGIST: 'PSYCHOLOGIST',
-  NUTRITIONIST: 'NUTRITIONIST'
+  PSYCHOLOGIST: 'PSYCHOLOGIST'
 };
 
 exports.PatientStatus = exports.$Enums.PatientStatus = {
@@ -245,8 +239,15 @@ exports.PatientStatus = exports.$Enums.PatientStatus = {
   WAITLIST: 'WAITLIST'
 };
 
+exports.AppointmentType = exports.$Enums.AppointmentType = {
+  CONSULTATION: 'CONSULTATION',
+  EVALUATION: 'EVALUATION',
+  FOLLOW_UP: 'FOLLOW_UP'
+};
+
 exports.AppointmentStatus = exports.$Enums.AppointmentStatus = {
   SCHEDULED: 'SCHEDULED',
+  IN_PROGRESS: 'IN_PROGRESS',
   COMPLETED: 'COMPLETED',
   CANCELLED: 'CANCELLED',
   NO_SHOW: 'NO_SHOW'
@@ -274,7 +275,6 @@ exports.Prisma.ModelName = {
   Patient: 'Patient',
   Appointment: 'Appointment',
   PsychNote: 'PsychNote',
-  NutriRecord: 'NutriRecord',
   FinanceTransaction: 'FinanceTransaction'
 };
 

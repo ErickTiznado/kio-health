@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { PrismaClient as BasePrismaClient } from '@prisma/client';
+import { PrismaClient as BasePrismaClient } from '#generated/prisma';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 // Create a custom PrismaClient with the PostgreSQL adapter
