@@ -3,8 +3,12 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateAppointmentDto } from './dto/create-appointment.dto';
+import { RescheduleAppointmentDto } from './dto/reschedule-appointment.dto';
+import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { CompleteCheckoutDto } from './dto/complete-checkout.dto';
 
 @Injectable()
@@ -184,7 +188,162 @@ export class AppointmentsService {
     return { count };
   }
 
+  /**
+   * Get the full context for an active session.
+   * Includes:
+   * - Appointment details
+   * - Patient basic info & clinical data
+   * - Patient's total outstanding balance
+   * - Last completed appointment date
+   */
+  async getSessionContext(userId: string, appointmentId: string) {
+    const profile = await this.resolveClinicianProfile(userId);
+    const appointment = await this.findAppointmentOrFail(appointmentId);
+    this.assertOwnership(appointment.clinicianId, profile.id);
+
+    // Get patient with extended details
+    const patient = await this.prisma.patient.findUnique({
+      where: { id: appointment.patientId },
+      include: {
+        appointments: {
+          where: {
+            status: 'COMPLETED',
+            paymentStatus: 'PENDING',
+          },
+          select: { price: true },
+        },
+      },
+    });
+
+    if (!patient) {
+      throw new NotFoundException('Patient not found');
+    }
+
+    // Calculate total pending balance
+    const totalBalance = patient.appointments.reduce(
+      (sum, apt) => sum + Number(apt.price),
+      0,
+    );
+
+    // Get last completed appointment (visit)
+    const lastVisit = await this.prisma.appointment.findFirst({
+      where: {
+        patientId: patient.id,
+        status: 'COMPLETED',
+        startTime: { lt: appointment.startTime }, // strictly before this one
+      },
+      orderBy: { startTime: 'desc' },
+      select: { startTime: true },
+    });
+
+    // Remove the appointments array from patient object to keep response clean
+    const { appointments: _appointments, ...patientData } = patient;
+
+    return {
+      appointment,
+      patient: patientData,
+      totalBalance,
+      lastVisit: lastVisit?.startTime || null,
+    };
+  }
+
   /* ── Status transition methods ─────────────────── */
+
+  /* ── Creation & Rescheduling ──────────────────── */
+
+  /**
+   * Create a new appointment.
+   * - Resolves default duration/price from profile.
+   * - Validates time slot overlap.
+   */
+  async create(userId: string, dto: CreateAppointmentDto) {
+    const profile = await this.resolveClinicianProfile(userId);
+
+    // Calculate end time based on profile duration if not provided (though DTO doesn't have endTime yet, we assume fixed duration logic)
+    // Wait, the DTO I created earlier doesn't have duration. Let's use the profile default.
+    const startTime = new Date(dto.startTime);
+    const durationMs = profile.sessionDefaultDuration * 60 * 1000;
+    const endTime = new Date(startTime.getTime() + durationMs);
+
+    // Validate overlap
+    await this.validateOverlap(profile.id, startTime, endTime);
+
+    return this.prisma.appointment.create({
+      data: {
+        clinicianId: profile.id,
+        patientId: dto.patientId,
+        startTime,
+        endTime,
+        type: dto.type || 'CONSULTATION',
+        reason: dto.reason,
+        price: dto.price ?? profile.sessionDefaultPrice,
+        status: 'SCHEDULED',
+        paymentStatus: 'PENDING',
+      },
+      include: {
+        patient: { select: { id: true, fullName: true } },
+      },
+    });
+  }
+
+  /**
+   * Reschedule an existing appointment.
+   * - Keeps the same duration.
+   * - Validates time slot overlap (excluding itself).
+   */
+  async reschedule(userId: string, appointmentId: string, dto: RescheduleAppointmentDto) {
+    const profile = await this.resolveClinicianProfile(userId);
+    const appointment = await this.findAppointmentOrFail(appointmentId);
+    this.assertOwnership(appointment.clinicianId, profile.id);
+
+    // Calculate new end time maintaining original duration
+    const originalDurationMs = appointment.endTime.getTime() - appointment.startTime.getTime();
+    const newStartTime = new Date(dto.startTime);
+    const newEndTime = new Date(newStartTime.getTime() + originalDurationMs);
+
+    // Validate overlap excluding this appointment
+    await this.validateOverlap(profile.id, newStartTime, newEndTime, appointmentId);
+
+    return this.prisma.appointment.update({
+      where: { id: appointmentId },
+      data: {
+        startTime: newStartTime,
+        endTime: newEndTime,
+      },
+      include: {
+        patient: { select: { id: true, fullName: true } },
+      },
+    });
+  }
+
+  /**
+   * Check if a time range overlaps with any existing appointment for the clinician.
+   * Excludes CANCELLED and NO_SHOW statuses.
+   */
+  private async validateOverlap(
+    clinicianId: string,
+    start: Date,
+    end: Date,
+    excludeAppointmentId?: string,
+  ) {
+    const overlapping = await this.prisma.appointment.findFirst({
+      where: {
+        clinicianId,
+        status: { notIn: ['CANCELLED', 'NO_SHOW'] },
+        id: excludeAppointmentId ? { not: excludeAppointmentId } : undefined,
+        AND: [
+          { startTime: { lt: end } },
+          { endTime: { gt: start } },
+        ],
+      },
+    });
+
+    if (overlapping) {
+      throw new ConflictException(
+        'El horario seleccionado entra en conflicto con otra cita existente.',
+      );
+    }
+  }
 
   /**
    * Start a scheduled session → IN_PROGRESS.
@@ -246,6 +405,88 @@ export class AppointmentsService {
       where: { id: appointmentId },
       data: { status: 'NO_SHOW' },
       include: { patient: { select: { id: true, fullName: true } } },
+    });
+  }
+
+  /**
+   * Update administrative/simple notes for an appointment.
+   */
+  async updateNotes(userId: string, appointmentId: string, notes: string) {
+    const profile = await this.resolveClinicianProfile(userId);
+    const appointment = await this.findAppointmentOrFail(appointmentId);
+    this.assertOwnership(appointment.clinicianId, profile.id);
+
+    return this.prisma.appointment.update({
+      where: { id: appointmentId },
+      data: { notes },
+    });
+  }
+
+  /**
+   * Update payment status for an appointment.
+   * If status is PAID, create a transaction.
+   */
+  async updatePayment(userId: string, appointmentId: string, dto: UpdatePaymentDto) {
+    const profile = await this.resolveClinicianProfile(userId);
+    const appointment = await this.findAppointmentOrFail(appointmentId);
+    this.assertOwnership(appointment.clinicianId, profile.id);
+
+    return this.prisma.$transaction(async (tx) => {
+      // 1. Update Appointment
+      const updatedAppointment = await tx.appointment.update({
+        where: { id: appointmentId },
+        data: {
+          paymentStatus: dto.status,
+          paymentMethod: dto.method,
+          // Only update price if provided
+          price: dto.amount !== undefined ? dto.amount : undefined,
+        },
+        include: {
+          patient: { select: { id: true, fullName: true } },
+        },
+      });
+
+      // 2. Handle Transaction Creation/Deletion
+      if (dto.status === 'PAID') {
+        // Create INCOME transaction if not exists (or update?)
+        // Requirement says "create FinanceTransaction".
+        // Let's check if one already exists to avoid duplicates or update it.
+        const existingTx = await tx.financeTransaction.findUnique({
+          where: { appointmentId },
+        });
+
+        if (existingTx) {
+          // Update existing transaction
+          await tx.financeTransaction.update({
+            where: { id: existingTx.id },
+            data: {
+              amount: updatedAppointment.price,
+              type: 'INCOME',
+              date: new Date(),
+            }
+          });
+        } else {
+          // Create new transaction
+          await tx.financeTransaction.create({
+            data: {
+              clinicianId: profile.id,
+              appointmentId: appointment.id,
+              type: 'INCOME',
+              amount: updatedAppointment.price,
+              description: `Pago de cita: ${updatedAppointment.patient.fullName}`,
+              date: new Date(),
+            },
+          });
+        }
+      } else if (dto.status === 'PENDING') {
+        // If switched back to PENDING, delete the transaction if it exists
+        // This keeps financial records consistent with "Paid" appointments.
+        await tx.financeTransaction.deleteMany({
+          where: { appointmentId },
+        });
+      }
+
+      return updatedAppointment;
     });
   }
 

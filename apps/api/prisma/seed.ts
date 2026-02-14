@@ -178,6 +178,10 @@ async function createAppointmentsForClinician(
     );
     const patientId = faker.helpers.arrayElement(patientIds);
 
+    // 20% chance of being UNPAID (Past Pending) to test Debt logic
+    const isUnpaid = Math.random() < 0.2;
+    const paymentStatus = isUnpaid ? 'PENDING' : 'PAID';
+
     const appointment = await prisma.appointment.create({
       data: {
         patientId,
@@ -185,13 +189,14 @@ async function createAppointmentsForClinician(
         startTime: start,
         endTime: end,
         status: 'COMPLETED',
-        paymentStatus: 'PAID',
+        paymentStatus,
         price: defaultPrice,
         notes: faker.lorem.sentence(),
       },
     });
 
     // Create PsychNote for psychologist appointments
+
     if (clinicianType === 'PSYCHOLOGIST') {
       await prisma.psychNote.create({
         data: {
@@ -246,17 +251,19 @@ async function createAppointmentsForClinician(
       });
     }
 
-    // Create FinanceTransaction for completed appointments
-    await prisma.financeTransaction.create({
-      data: {
-        clinicianId,
-        appointmentId: appointment.id,
-        type: 'INCOME',
-        amount: defaultPrice,
-        description: `Session payment - ${appointment.id.slice(0, 8)}`,
-        date: start,
-      },
-    });
+    // Create FinanceTransaction for completed appointments (ONLY IF PAID)
+    if (!isUnpaid) {
+      await prisma.financeTransaction.create({
+        data: {
+          clinicianId,
+          appointmentId: appointment.id,
+          type: 'INCOME',
+          amount: defaultPrice,
+          description: `Session payment - ${appointment.id.slice(0, 8)}`,
+          date: start,
+        },
+      });
+    }
   }
 
   // Today's appointments (SCHEDULED/PENDING) - CRITICAL for Dashboard testing

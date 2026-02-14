@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { useAuthStore } from '../stores/auth.store';
 import { useDashboardData } from '../hooks/use-dashboard-data';
@@ -45,10 +46,22 @@ export function DashboardPage() {
 
         {/* LIQUID COMMAND DECK (Hero + Calendar + Attention) */}
         <div className="px-4 relative z-0">
-          <div className="bg-gradient-to-br from-[#8a72d1] to-[#ae93fe] rounded-[40px] rounded-br-none relative">
-            <div className="absolute inset-0 overflow-hidden rounded-[40px] rounded-br-none" />
+          <div className="bg-white rounded-[40px] rounded-br-none relative overflow-hidden shadow-sm border border-gray-100/50">
+            {/* Liquid Fill Animation */}
+            <motion.div
+              initial={{ height: "0%" }}
+              animate={{ height: "100%" }}
+              transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }} // Fluid "Quart out"
+              className="absolute bottom-0 left-0 right-0 bg-gradient-to-br from-[#8a72d1] to-[#ae93fe] z-0"
+            />
 
-            <div className="grid grid-cols-12 relative z-10">
+            {/* Content Layer - Delayed Fade In */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="grid grid-cols-12 relative z-10"
+            >
               {/* HERO (8/12) */}
               <NextAppointmentWidget
                 appointment={nextAppointment}
@@ -60,7 +73,7 @@ export function DashboardPage() {
                 <AvailabilityWidget days={calendarDays} />
                 <PendingNotesWidget count={pendingNotesCount} />
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
 

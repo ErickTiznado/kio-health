@@ -4,6 +4,8 @@ export interface Patient {
   dateOfBirth: string | null;
   diagnosis: string | null;
   clinicalContext: string | null;
+  contactPhone?: string;
+  emergencyContact?: any;
 }
 
 export type PaymentMethod = 'CASH' | 'CARD' | 'TRANSFER';
@@ -41,6 +43,13 @@ export interface PendingNotesCount {
   count: number;
 }
 
+export interface SessionContext {
+  appointment: Appointment;
+  patient: Patient & { appointments?: any[] };
+  totalBalance: number;
+  lastVisit: string | null;
+}
+
 /** Map of date string (YYYY-MM-DD) → appointment count */
 export type DaySummary = Record<string, number>;
 
@@ -57,4 +66,18 @@ export interface CheckoutPayload {
 export interface CheckoutResponse {
   updatedAppointment: Appointment;
   nextAppointment: Appointment | null;
+}
+
+/** Payload sent to POST /appointments */
+export interface CreateAppointmentPayload {
+  patientId: string;
+  startTime: string; // ISO
+  type?: AppointmentType;
+  reason?: string;
+  price?: number;
+}
+
+/** Payload sent to PATCH /appointments/:id/reschedule */
+export interface ReschedulePayload {
+  startTime: string; // ISO
 }

@@ -29,6 +29,9 @@ const STATUS_HOVER_BG: Record<string, string> = {
 };
 
 function getStatusBorder(status: string, paymentStatus?: string | null) {
+  if (paymentStatus === 'PAID') {
+    return 'border-l-emerald-500';
+  }
   if (paymentStatus === 'PENDING' && status === 'SCHEDULED') {
     return STATUS_BORDER_COLORS.PENDING;
   }
@@ -67,12 +70,31 @@ export function AppointmentPill({ appointment, onSelect }: AppointmentPillProps)
   const showMoneyIcon = paymentStatus === 'PENDING';
   const isInactive = appointment.status === 'CANCELLED' || appointment.status === 'NO_SHOW';
   const isInProgress = appointment.status === 'IN_PROGRESS';
+  const isDraggable = appointment.status === 'SCHEDULED';
+
+  const handleDragStart = (e: React.DragEvent) => {
+    if (!isDraggable) {
+      e.preventDefault();
+      return;
+    }
+    e.dataTransfer.setData('text/plain', JSON.stringify({
+      id: appointment.id,
+      durationMinutes
+    }));
+    e.dataTransfer.effectAllowed = 'move';
+  };
 
   return (
     <div
-      className={`absolute left-1.5 right-1.5 rounded-md border-l-4 ${borderClass} ${isInactive ? 'bg-gray-50 opacity-60' : 'bg-white'} ${hoverBgClass} px-2 py-1.5 text-left cursor-pointer shadow-[0_2px_4px_rgba(0,0,0,0.05)] transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 group overflow-hidden flex flex-col z-20 hover:z-30 pointer-events-auto`}
+      draggable={isDraggable}
+      onDragStart={handleDragStart}
+      className={`absolute left-1.5 right-1.5 rounded-md border-l-4 ${borderClass} ${isInactive ? 'bg-gray-50 opacity-60' : 'bg-white'} ${hoverBgClass} px-2 py-1.5 text-left shadow-[0_2px_4px_rgba(0,0,0,0.05)] transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 group overflow-hidden flex flex-col z-20 hover:z-30 pointer-events-auto ${isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'}`}
       style={{ top: `${topPx}px`, height: `${heightPx}px`, minHeight: '32px' }}
-      onClick={() => onSelect(appointment)}
+      onClick={(e) => {
+        // Prevent click when dragging
+        if (e.defaultPrevented) return;
+        onSelect(appointment);
+      }}
     >
       {isShort ? (
         // Short Appointment Layout (Single Line)

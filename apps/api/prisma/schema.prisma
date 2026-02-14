@@ -108,6 +108,7 @@ model Patient {
   appointments Appointment[]
   psychNotes   PsychNote[]
 
+  @@index([fullName])
   @@map("patients")
 }
 

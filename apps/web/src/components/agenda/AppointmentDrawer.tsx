@@ -6,7 +6,7 @@ import type { Appointment } from '../../types/appointments.types';
 
 import { useState } from 'react';
 
-import { PaymentPopover } from './PaymentPopover';
+import { PaymentModal } from './PaymentModal';
 
 interface AppointmentDrawerProps {
   appointment: Appointment | null;
@@ -34,15 +34,12 @@ const STATUS_CONFIG: Record<string, { label: string; className: string; dotColor
  */
 export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentDrawerProps) {
   const navigate = useNavigate();
-  // Local state for payment status to demonstrate immediate feedback
-  const [paymentStatus, setPaymentStatus] = useState<'PENDING' | 'PAID'>(appointment?.paymentStatus || 'PENDING');
-  const [amount, setAmount] = useState(Number(appointment?.price) || 0);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
-  // Sync state if appointment changes
-  if (appointment && (appointment.paymentStatus !== paymentStatus || Number(appointment.price) !== amount)) {
-    // In a real app, this would be handled by effects or react-query,
-    // but for this UI demo we'll let the user toggle freely until reset.
-  }
+  // Derived state for display
+  const amount = Number(appointment?.price) || 0;
+
+
 
   if (!appointment) return null;
 
@@ -271,13 +268,28 @@ export function AppointmentDrawer({ appointment, isOpen, onClose }: AppointmentD
               <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Estado del Pago</p>
             </div>
             <div className="flex items-center justify-between bg-white rounded-xl p-3 border border-gray-200 shadow-sm">
-              <p className="text-sm font-bold text-gray-800">${amount} MXN</p>
+              <div className="flex flex-col">
+                <p className="text-sm font-bold text-gray-800">${amount} MXN</p>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md w-fit mt-1 ${appointment.paymentStatus === 'PAID'
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : 'bg-amber-100 text-amber-700'
+                  }`}>
+                  {appointment.paymentStatus === 'PAID' ? 'PAGADO' : 'PENDIENTE'}
+                </span>
+              </div>
 
-              <PaymentPopover
-                status={paymentStatus}
-                amount={amount}
-                onStatusChange={setPaymentStatus}
-                onAmountChange={setAmount}
+              <button
+                onClick={() => setIsPaymentModalOpen(true)}
+                className="px-4 py-2 bg-gray-900 text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1.5"
+              >
+                <CreditCard size={14} />
+                Gestionar
+              </button>
+
+              <PaymentModal
+                isOpen={isPaymentModalOpen}
+                onClose={() => setIsPaymentModalOpen(false)}
+                appointment={appointment}
               />
             </div>
           </div>

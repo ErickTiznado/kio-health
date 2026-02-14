@@ -1,80 +1,127 @@
 # Project Overview
 
-This is a monorepo for a web application called "kio-health". It consists of a React frontend and a NestJS backend. The project is built using Turborepo.
+"kio-health" is a modern healthcare management platform built as a monorepo. It features a robust backend for managing clinical data and a responsive frontend for clinicians to manage their practice, patients, and appointments.
 
-## Frontend (`apps/web`)
+## Tech Stack
 
-The frontend is a React application built with Vite. It uses:
-
-*   **UI:** Tailwind CSS
-*   **Routing:** React Router
+### Frontend (`apps/web`)
+*   **Framework:** React 19 (via Vite)
+*   **Styling:** Tailwind CSS v4
 *   **State Management:** Zustand
-*   **Data Fetching:** Axios and TanStack Query
-*   **Forms:** React Hook Form
-*   **Validation:** Zod
+*   **Data Fetching:** TanStack Query (React Query) v5
+*   **Routing:** React Router v7
+*   **Forms:** React Hook Form + Zod validation
+*   **Icons:** Lucide React
+*   **HTTP Client:** Axios
 
-## Backend (`apps/api`)
+### Backend (`apps/api`)
+*   **Framework:** NestJS 11
+*   **Database:** PostgreSQL
+*   **ORM:** Prisma 6
+*   **Authentication:** Passport + JWT (Bcrypt for hashing)
+*   **Validation:** class-validator + class-transformer
 
-The backend is a NestJS application. It uses:
+### Shared & Tooling
+*   **Monorepo Manager:** Turborepo
+*   **Package Manager:** npm
+*   **Linting/Formatting:** ESLint, Prettier
 
-*   **Database:** PostgreSQL (inferred from `adapter-pg`)
-*   **ORM:** Prisma
-*   **Authentication:** JWT with Passport
+---
 
-## Shared Packages (`packages`)
+# Architecture & Domain
 
-The monorepo contains the following shared packages:
+## Database Schema (Prisma)
+The core domain revolves around **Clinicians** managing **Patients**.
+*   **User:** Base account entity (Admin/Clinician).
+*   **ClinicianProfile:** Extended profile with practice details (currency, defaults).
+*   **Patient:** Health records, contact info, linked to a clinician.
+*   **Appointment:** Scheduled sessions with status, payment tracking, and types (Consultation, Evaluation, etc.).
+*   **PsychNote:** Clinical notes linked to appointments.
+*   **FinanceTransaction:** Income/Expense tracking for the practice.
 
-*   **`@repo/ui`:** A React component library.
-*   **`@repo/schema`:** Zod schemas for validation.
-*   **`@repo/types`:** TypeScript types.
-*   **`@repo/eslint-config`:** ESLint configurations.
-*   **`@repo/typescript-config`:** TypeScript configurations.
+## Project Structure
+```text
+/
+├── apps/
+│   ├── api/          # NestJS Backend
+│   │   ├── src/
+│   │   │   ├── appointments/  # Appointment logic
+│   │   │   ├── auth/          # Auth logic (JWT, Guards)
+│   │   │   ├── prisma/        # DB Connection
+│   │   │   └── users/         # User management
+│   │   └── prisma/            # Schema & Migrations
+│   └── web/          # React Frontend
+│       ├── src/
+│       │   ├── components/    # UI Components
+│       │   ├── hooks/         # Custom Hooks
+│       │   ├── lib/           # API clients & helpers
+│       │   ├── pages/         # Route pages
+│       │   ├── schemas/       # Zod schemas
+│       │   ├── stores/        # Zustand stores
+│       │   └── types/         # TS Types
+└── packages/         # Shared internal packages
+    ├── eslint-config/
+    ├── schema/       # Shared Zod schemas
+    ├── types/        # Shared TS types
+    ├── typescript-config/
+    └── ui/           # Shared UI components
+```
 
-# Building and Running
+---
+
+# Getting Started
+
+## Prerequisites
+*   Node.js >= 18
+*   PostgreSQL running locally (or configured via `.env`)
 
 ## Installation
-
 ```sh
 npm install
 ```
 
-## Development
-
-To run the frontend and backend in development mode, run the following command from the root of the project:
-
+## Running Development
+Start both frontend and backend in development mode:
 ```sh
 npm run dev
 ```
+*   **Web:** http://localhost:5173 (default Vite port)
+*   **API:** http://localhost:3000 (default NestJS port)
 
-You can also run a specific app:
-
+Run individual apps:
 ```sh
-# Run the web app
-npm run dev -- --filter=web
-
-# Run the api app
-npm run dev -- --filter=api
+npm run dev -- --filter=web  # Frontend only
+npm run dev -- --filter=api  # Backend only
 ```
 
-## Build
-
-To build all apps and packages, run the following command from the root of the project:
-
+## Building
+Build all applications and packages:
 ```sh
 npm run build
 ```
 
-## Other Commands
+## Database Management
+Run migrations (from `apps/api`):
+```sh
+cd apps/api
+npx prisma migrate dev
+```
 
-*   **Lint:** `npm run lint`
-*   **Format:** `npm run format`
-*   **Type Check:** `npm run check-types`
+---
 
 # Development Conventions
 
-*   The project uses TypeScript for static type checking.
-*   ESLint is used for code linting.
-*   Prettier is used for code formatting.
-*   The project follows the conventions of a Turborepo monorepo.
-*   The project uses a shared UI library, schemas, and types to ensure consistency across the applications.
+## Frontend
+*   **Components:** Functional components with hooks.
+*   **Styling:** Utility-first with Tailwind CSS. Avoid custom CSS files where possible.
+*   **State:** Use Zustand for global client state (auth, session), React Query for server state.
+*   **Forms:** Use React Hook Form controlled by Zod schemas.
+
+## Backend
+*   **Architecture:** Modular structure (Module, Controller, Service).
+*   **DTOs:** Use classes with `class-validator` decorators for request validation.
+*   **Auth:** Protect routes using `JwtAuthGuard`.
+
+## General
+*   **Type Safety:** Strict TypeScript usage across the stack. Share types via `@repo/types` where applicable.
+*   **Commits:** Follow conventional commits (implied by standardized workflows).

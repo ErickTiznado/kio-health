@@ -1,15 +1,19 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { startOfWeek, addWeeks, subWeeks, addDays, subDays, format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, Calendar, CalendarDays, Loader2, Plus, CheckCircle2, XCircle, Banknote } from 'lucide-react';
+import { useIsMobile } from '../hooks/use-is-mobile';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { WeeklyCalendarGrid } from '../components/agenda/WeeklyCalendarGrid';
 import { DailyCalendarGrid } from '../components/agenda/DailyCalendarGrid';
 import { AppointmentDrawer } from '../components/agenda/AppointmentDrawer';
-import { fetchAppointmentsByRange } from '../lib/appointments.api';
+import { ScheduleAppointmentModal } from '../components/agenda/ScheduleAppointmentModal';
+import { fetchAppointmentsByRange, rescheduleAppointment } from '../lib/appointments.api';
 import type { Appointment } from '../types/appointments.types';
 import type { CalendarView } from '../types/agenda.types';
+import { toast } from 'sonner';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 /**
  * Agenda Page — Interactive weekly/daily calendar view.
@@ -23,6 +27,8 @@ export function AgendaPage() {
   const [activeView, setActiveView] = useState<CalendarView>('week');
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [scheduleSlot, setScheduleSlot] = useState<Date | null>(null);
+  const queryClient = useQueryClient();
 
   /* ── Data fetching ── */
 
@@ -39,6 +45,16 @@ export function AgendaPage() {
     queryFn: () => fetchAppointmentsByRange(fromStr, toStr),
     staleTime: 1000 * 60 * 2,
   });
+
+  /* ── Mobile Logic ── */
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    if (isMobile) {
+      setActiveView('day');
+      setSelectedDay(new Date());
+    }
+  }, [isMobile]);
 
   /* ── Navigation handlers ── */
 
@@ -86,6 +102,49 @@ export function AgendaPage() {
   const handleCloseDrawer = useCallback(() => {
     setIsDrawerOpen(false);
   }, []);
+
+  /* ── Scheduling handlers ── */
+
+  const handleSlotClick = useCallback((date: Date) => {
+    setScheduleSlot(date);
+  }, []);
+
+  const handleCloseSchedule = useCallback(() => {
+    setScheduleSlot(null);
+  }, []);
+
+  const handleNewAppointmentClick = useCallback(() => {
+    // Open modal with current time rounded to next 30 min
+    const now = new Date();
+    const minutes = now.getMinutes();
+    const rounded = new Date(now);
+    if (minutes < 30) {
+      rounded.setMinutes(30, 0, 0);
+    } else {
+      rounded.setHours(rounded.getHours() + 1, 0, 0, 0);
+    }
+    setScheduleSlot(rounded);
+  }, []);
+
+  const rescheduleMutation = useMutation({
+    mutationFn: ({ id, startTime }: { id: string; startTime: string }) =>
+      rescheduleAppointment(id, { startTime }),
+    onSuccess: () => {
+      toast.success('Cita reagendada correctamente');
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+    },
+    onError: (error: any) => {
+      const message = error.response?.data?.message || 'Error al reagendar cita';
+      toast.error(message);
+    },
+  });
+
+  const handleReschedule = useCallback((appointmentId: string, newStartTime: Date) => {
+    rescheduleMutation.mutate({
+      id: appointmentId,
+      startTime: newStartTime.toISOString(),
+    });
+  }, [rescheduleMutation]);
 
   /* ── Labels ── */
 
@@ -162,34 +221,37 @@ export function AgendaPage() {
             </div>
 
             {/* View Toggle */}
-            <div className="flex items-center bg-white rounded-[24px] border border-[var(--color-cruz)] shadow-sm p-1">
-              <button
-                type="button"
-                onClick={switchToWeekView}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${activeView === 'week'
-                  ? 'bg-[var(--color-kanji)] text-white shadow-sm'
-                  : 'text-[var(--color-text)] opacity-70 hover:text-[var(--color-kanji)] hover:opacity-100'
-                  }`}
-              >
-                <CalendarDays size={14} />
-                Semana
-              </button>
-              <button
-                type="button"
-                onClick={switchToDayView}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${activeView === 'day'
-                  ? 'bg-[var(--color-kanji)] text-white shadow-sm'
-                  : 'text-[var(--color-text)] opacity-70 hover:text-[var(--color-kanji)] hover:opacity-100'
-                  }`}
-              >
-                <Calendar size={14} />
-                Día
-              </button>
-            </div>
+            {!isMobile && (
+              <div className="flex items-center bg-white rounded-[24px] border border-[var(--color-cruz)] shadow-sm p-1">
+                <button
+                  type="button"
+                  onClick={switchToWeekView}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${activeView === 'week'
+                    ? 'bg-[var(--color-kanji)] text-white shadow-sm'
+                    : 'text-[var(--color-text)] opacity-70 hover:text-[var(--color-kanji)] hover:opacity-100'
+                    }`}
+                >
+                  <CalendarDays size={14} />
+                  Semana
+                </button>
+                <button
+                  type="button"
+                  onClick={switchToDayView}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${activeView === 'day'
+                    ? 'bg-[var(--color-kanji)] text-white shadow-sm'
+                    : 'text-[var(--color-text)] opacity-70 hover:text-[var(--color-kanji)] hover:opacity-100'
+                    }`}
+                >
+                  <Calendar size={14} />
+                  Día
+                </button>
+              </div>
+            )}
 
             {/* Primary CTA */}
             <button
               type="button"
+              onClick={handleNewAppointmentClick}
               className="bg-kio hover:bg-kanji text-white px-5 py-2.5 rounded-[24px] text-sm font-bold shadow-lg shadow-kio/20 transition-all active:scale-95 flex items-center gap-2 ml-1"
             >
               <Plus size={18} />
@@ -205,12 +267,16 @@ export function AgendaPage() {
               weekStart={currentWeekStart}
               appointments={appointments}
               onSelectAppointment={handleSelectAppointment}
+              onSlotClick={handleSlotClick}
+              onReschedule={handleReschedule}
             />
           ) : (
             <DailyCalendarGrid
               selectedDay={selectedDay}
               appointments={appointments}
               onSelectAppointment={handleSelectAppointment}
+              onSlotClick={handleSlotClick}
+              onReschedule={handleReschedule}
             />
           )}
         </div>
@@ -221,6 +287,13 @@ export function AgendaPage() {
         appointment={selectedAppointment}
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}
+      />
+
+      {/* Schedule Appointment Modal */}
+      <ScheduleAppointmentModal
+        isOpen={!!scheduleSlot}
+        onClose={handleCloseSchedule}
+        initialDate={scheduleSlot}
       />
     </DashboardLayout>
   );

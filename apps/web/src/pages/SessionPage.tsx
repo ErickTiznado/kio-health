@@ -1,118 +1,140 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { SessionLayout } from '../components/session/SessionLayout';
 import { PatientContextPanel } from '../components/session/PatientContextPanel';
 import { PsychologistEditor } from '../components/session/PsychologistEditor';
 import { SessionCheckoutModal } from '../components/session/SessionCheckoutModal';
-// import { useAuthStore } from '../stores/auth.store';
-
-/* ── Mock data — replace with real API calls when backend is ready ── */
-
-const MOCK_PATIENT = {
-  name: 'María García López',
-  age: 28,
-};
-
-/** Psychologist-specific patient context. */
-const MOCK_PSYCH_CONTEXT = {
-  diagnosis: 'Trastorno de Ansiedad Generalizada (F41.1)',
-  treatmentGoals: [
-    'Reducir episodios de ansiedad a ≤2 por semana',
-    'Implementar rutina de mindfulness diaria',
-    'Mejorar calidad de sueño (≥7h)',
-  ],
-  totalSessions: 8,
-};
-
-const MOCK_SESSION_HISTORY = [
-  {
-    id: 'h1',
-    date: '2026-02-03',
-    type: 'Consulta de seguimiento',
-    summary:
-      'Paciente reporta mejoría significativa en niveles de ansiedad. Escala GAD-7 bajó de 14 a 9 puntos. Se continúa con plan terapéutico actual y se añaden ejercicios de respiración diafragmática.',
-  },
-  {
-    id: 'h2',
-    date: '2026-01-27',
-    type: 'Consulta de seguimiento',
-    summary:
-      'Se revisaron objetivos terapéuticos. Paciente implementó técnicas de mindfulness con adherencia parcial. Se ajusta frecuencia de sesiones a quincenal.',
-  },
-  {
-    id: 'h3',
-    date: '2026-01-13',
-    type: 'Evaluación inicial',
-    summary:
-      'Primera sesión. Se establece línea base: ansiedad moderada (GAD-7: 14), síntomas de estrés laboral. Se definen objetivos terapéuticos y plan de intervención CBT.',
-  },
-];
-
-/**
- * Formats total elapsed seconds into HH:MM:SS.
- */
-function formatElapsedTime(totalSeconds: number): string {
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  return [hours, minutes, seconds].map((unit) => String(unit).padStart(2, '0')).join(':');
-}
+import { useSessionSnapshot, useStartSession, useMarkNoShow } from '../hooks/use-session';
+import { toast } from 'sonner';
 
 /**
  * Clinical Session Page — Deep Work environment.
- * Reads the logged-in user's clinician type from the auth store and
- * renders role-specific UI for both the left context panel and right editor.
  */
 export function SessionPage() {
   const { appointmentId } = useParams<{ appointmentId: string }>();
-  // const user = useAuthStore((state) => state.user); // Unused for now as we enforce Psychologist
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const navigate = useNavigate();
+  const { data: sessionContext, isLoading } = useSessionSnapshot(appointmentId || '');
+  const { mutate: startSession } = useStartSession();
+  const { mutate: markNoShow } = useMarkNoShow();
+
+  const [elapsedTime, setElapsedTime] = useState('00:00:00');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
-  // Auto-incrementing session timer
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setElapsedSeconds((prev) => prev + 1);
-    }, 1000);
+    let intervalId: ReturnType<typeof setInterval>;
+
+    if (sessionContext?.appointment.status === 'IN_PROGRESS') {
+      const startTime = new Date(sessionContext.appointment.startTime).getTime();
+      
+      const updateTimer = () => {
+        const now = Date.now();
+        const diff = Math.max(0, Math.floor((now - startTime) / 1000));
+        
+        const hours = Math.floor(diff / 3600);
+        const minutes = Math.floor((diff % 3600) / 60);
+        const seconds = diff % 60;
+        
+        setElapsedTime(
+          [hours, minutes, seconds]
+            .map((unit) => String(unit).padStart(2, '0'))
+            .join(':')
+        );
+      };
+
+      updateTimer();
+      intervalId = setInterval(updateTimer, 1000);
+    } else {
+      setElapsedTime('00:00:00');
+    }
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [sessionContext?.appointment.status, sessionContext?.appointment.startTime]);
 
-  const elapsedTime = formatElapsedTime(elapsedSeconds);
+  if (isLoading || !sessionContext) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
 
-  // Derive clinician type from the authenticated user's profile
-  const clinicianType = 'PSYCHOLOGIST';
-  // const isPsychologist = true; // Unused
+  const { appointment, patient, totalBalance, lastVisit } = sessionContext;
+
+  const handleStartSession = () => {
+    if (appointmentId) {
+      startSession(appointmentId);
+    }
+  };
+
+
+  const handleFinishSession = () => {
+    setIsCheckoutOpen(true);
+  };
+
+  const handleNoShow = () => {
+    if (confirm('¿Marcar cita como No Asistió?')) {
+        markNoShow(appointmentId!, {
+            onSuccess: () => {
+                toast.success('Cita marcada como No Asistió');
+                navigate('/agenda');
+            },
+            onError: () => {
+                toast.error('Error al marcar como No Asistió');
+            }
+        });
+    }
+  };
+
+  // Calculate age from DOB
+  const age = patient.dateOfBirth
+    ? new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()
+    : undefined;
+
+  // Mock data for panels until we implement full history fetching
+  const mockPsychContext = {
+    diagnosis: patient.diagnosis || 'Sin diagnóstico',
+    treatmentGoals: [],
+    totalSessions: 0,
+  };
 
   return (
     <>
       <SessionLayout
-        patientName={MOCK_PATIENT.name}
-        patientAge={MOCK_PATIENT.age}
+        patientId={patient.id}
+        patientName={patient.fullName}
+        patientAge={age}
         elapsedTime={elapsedTime}
-        onFinishSession={() => setIsCheckoutOpen(true)}
+        totalBalance={totalBalance}
+        lastVisit={lastVisit}
+        status={appointment.status}
+        onStartSession={handleStartSession}
+        onFinishSession={handleFinishSession}
+        onNoShow={handleNoShow} 
       >
         <div className="grid grid-cols-[30%_70%] h-full">
-          {/* Left — Patient Context (role-aware) */}
+          {/* Left — Patient Context */}
           <PatientContextPanel
-            patientName={MOCK_PATIENT.name}
-            patientAge={MOCK_PATIENT.age}
-            clinicianType={clinicianType}
-            psychContext={MOCK_PSYCH_CONTEXT}
-            sessionHistory={MOCK_SESSION_HISTORY}
+            patientName={patient.fullName}
+            patientAge={age || 0}
+            clinicianType="PSYCHOLOGIST" // Dynamic later
+            psychContext={mockPsychContext}
+            sessionHistory={[]} // Fetch real history later
           />
 
           {/* Right — Role-specific panel */}
-          <PsychologistEditor />
+          <PsychologistEditor 
+            appointmentId={appointment.id}
+            initialNotes={appointment.notes || ''}
+          />
         </div>
       </SessionLayout>
 
-      {/* ── Checkout Modal (opens on "Finalizar Consulta") ── */}
       <SessionCheckoutModal
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
         appointmentId={appointmentId ?? ''}
+        price={appointment.price}
+        patientName={patient.fullName}
       />
     </>
   );

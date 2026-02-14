@@ -1,13 +1,17 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { useAuthStore } from './stores/auth.store';
 import { Toaster } from 'sonner';
 import { RequireAuth } from './components/RequireAuth';
+import { PageTransition } from './components/ui/PageTransition';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { AgendaPage } from './pages/AgendaPage';
 import { SessionPage } from './pages/SessionPage';
+import PatientsPage from './pages/PatientsPage';
+import PatientDetailsPage from './pages/PatientDetailsPage';
 
 function RootRedirect() {
   const { isAuthenticated, user } = useAuthStore();
@@ -25,64 +29,104 @@ function RootRedirect() {
 }
 
 function App() {
+  const location = useLocation();
+
   return (
     <>
       <Toaster position="bottom-right" richColors />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<LoginPage />} />
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          {/* Public Routes */}
+          <Route
+            path="/login"
+            element={
+              <PageTransition>
+                <LoginPage />
+              </PageTransition>
+            }
+          />
 
-        {/* Protected Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <RequireAuth>
-              <DashboardPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/agenda"
-          element={
-            <RequireAuth>
-              <AgendaPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/session/:appointmentId"
-          element={
-            <RequireAuth>
-              <SessionPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/onboarding"
-          element={
-            <RequireAuth>
-              <OnboardingPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <RequireAuth>
-              <SettingsPage />
-            </RequireAuth>
-          }
-        />
+          {/* Protected Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <PageTransition>
+                <RequireAuth>
+                  <DashboardPage />
+                </RequireAuth>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/agenda"
+            element={
+              <PageTransition>
+                <RequireAuth>
+                  <AgendaPage />
+                </RequireAuth>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/session/:appointmentId"
+            element={
+              <PageTransition>
+                <RequireAuth>
+                  <SessionPage />
+                </RequireAuth>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/patients"
+            element={
+              <PageTransition>
+                <RequireAuth>
+                  <PatientsPage />
+                </RequireAuth>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/patients/:id"
+            element={
+              <PageTransition>
+                <RequireAuth>
+                  <PatientDetailsPage />
+                </RequireAuth>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/onboarding"
+            element={
+              <PageTransition>
+                <RequireAuth>
+                  <OnboardingPage />
+                </RequireAuth>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <PageTransition>
+                <RequireAuth>
+                  <SettingsPage />
+                </RequireAuth>
+              </PageTransition>
+            }
+          />
 
-        {/* Root Redirect */}
-        <Route path="/" element={<RootRedirect />} />
+          {/* Root Redirect */}
+          <Route path="/" element={<RootRedirect />} />
 
-        {/* Catch-all - redirect to root for Switch logic */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* Catch-all - redirect to root for Switch logic */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AnimatePresence>
     </>
   );
 }
 
 export default App;
-

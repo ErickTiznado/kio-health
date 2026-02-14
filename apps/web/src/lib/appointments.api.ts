@@ -6,7 +6,18 @@ import type {
   RecentPatient,
   DaySummary,
   PendingNotesCount,
+  CreateAppointmentPayload,
+  ReschedulePayload,
+  SessionContext,
 } from '../types/appointments.types';
+
+/**
+ * Get the full context for an active session.
+ */
+export async function fetchSessionContext(appointmentId: string): Promise<SessionContext> {
+  const response = await api.get<SessionContext>(`/appointments/${appointmentId}/context`);
+  return response.data;
+}
 
 /**
  * Fetch appointments for a specific date.
@@ -108,6 +119,34 @@ export async function cancelAppointment(appointmentId: string): Promise<Appointm
 
 export async function markNoShow(appointmentId: string): Promise<Appointment> {
   const response = await api.patch<Appointment>(`/appointments/${appointmentId}/no-show`);
+  return response.data;
+}
+
+export async function updateNotes(appointmentId: string, notes: string): Promise<Appointment> {
+  const response = await api.patch<Appointment>(`/appointments/${appointmentId}/notes`, { notes });
+  return response.data;
+}
+
+export interface UpdatePaymentPayload {
+  status: 'PENDING' | 'PAID';
+  amount?: number;
+  method?: 'CASH' | 'CARD' | 'TRANSFER';
+}
+
+export async function updatePayment(appointmentId: string, payload: UpdatePaymentPayload): Promise<Appointment> {
+  const response = await api.patch<Appointment>(`/appointments/${appointmentId}/payment`, payload);
+  return response.data;
+}
+
+/* ── Scheduling ─────────────────────────────── */
+
+export async function createAppointment(payload: CreateAppointmentPayload): Promise<Appointment> {
+  const response = await api.post<Appointment>('/appointments', payload);
+  return response.data;
+}
+
+export async function rescheduleAppointment(appointmentId: string, payload: ReschedulePayload): Promise<Appointment> {
+  const response = await api.patch<Appointment>(`/appointments/${appointmentId}/reschedule`, payload);
   return response.data;
 }
 

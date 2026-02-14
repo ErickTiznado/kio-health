@@ -1,22 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-kanji: #8a72d1;
-  --color-cruz: #ddd3fa;
-  --color-kio: #ae93fe;
-  --color-kio-light: rgba(174, 147, 254, 0.28);
-  --color-text: #213547;
-  --color-bg: #f8f7fc;
-  --color-white: #ffffff;
+  --color-bg: #f8fafc;
+  --color-text: #334155;
+  --color-kio: #8b5cf6;
+  --color-kio-light: #ddd6fe;
+  --color-kanji: #1e293b;
+  --color-cruz: #e2e8f0;
 }
 
-:root {
-  font-family: 'Roboto', sans-serif;
-  color: var(--color-text);
-  background-color: var(--color-bg);
+@layer base {
+  /* ... existing styles ... */
+  
+  /* Force native calendar accent color */
+  [type="date"] {
+    accent-color: var(--color-kio);
+  }
 }
-
-body {
-  margin: 0;
-}
-
