@@ -36,11 +36,11 @@ const translateStatus = (status: string) => {
 const translateStatusColor = (status: string) => {
   switch (status) {
     case 'ACTIVE':
-      return 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-600/30';
+      return 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-600/20 dark:ring-emerald-500/20';
     case 'WAITLIST':
-      return 'bg-amber-50 text-amber-800 ring-1 ring-amber-600/30';
+      return 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 ring-1 ring-amber-600/20 dark:ring-amber-500/20';
     default:
-      return 'bg-[var(--color-bg)] text-[var(--color-text)] ring-1 ring-[var(--color-cruz)]';
+      return 'bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-400 ring-1 ring-gray-200 dark:ring-slate-700';
   }
 };
 
@@ -71,13 +71,13 @@ function ActionMenu({ patient, onEdit, onArchive, onView }: {
   return (
     <div className="relative" ref={menuRef}>
       <motion.button
-        whileHover={{ scale: 1.1, backgroundColor: "#F3F4F6" }}
+        whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={(e) => {
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="p-2 text-gray-400 hover:text-[var(--color-kanji)] rounded-full transition-colors opacity-0 group-hover:opacity-100 duration-200"
+        className="p-2 text-gray-400 hover:text-kanji dark:hover:text-kio rounded-full transition-colors opacity-0 group-hover:opacity-100 duration-200 hover:bg-gray-100 dark:hover:bg-slate-800"
       >
         <MoreVertical size={18} />
       </motion.button>
@@ -89,7 +89,7 @@ function ActionMenu({ patient, onEdit, onArchive, onView }: {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -5 }}
             transition={{ duration: 0.1, ease: "easeOut" }}
-            className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-[var(--color-cruz)] z-50 py-2 overflow-hidden"
+            className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-gray-100 dark:border-slate-800 z-50 py-2 overflow-hidden ring-1 ring-black/5"
           >
             <button
               onClick={(e) => {
@@ -97,9 +97,9 @@ function ActionMenu({ patient, onEdit, onArchive, onView }: {
                 onEdit(patient);
                 setIsOpen(false);
               }}
-              className="w-full text-left px-4 py-2.5 text-sm text-[var(--color-text)] hover:bg-[var(--color-bg)] flex items-center gap-3 transition-colors font-medium"
+              className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 flex items-center gap-3 transition-colors font-medium"
             >
-              <Edit size={16} className="text-gray-400" />
+              <Edit size={16} className="text-gray-400 dark:text-slate-500" />
               Editar
             </button>
             <button
@@ -108,19 +108,19 @@ function ActionMenu({ patient, onEdit, onArchive, onView }: {
                 onView(patient);
                 setIsOpen(false);
               }}
-              className="w-full text-left px-4 py-2.5 text-sm text-[var(--color-text)] hover:bg-[var(--color-bg)] flex items-center gap-3 transition-colors font-medium"
+              className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 flex items-center gap-3 transition-colors font-medium"
             >
-              <FileText size={16} className="text-gray-400" />
+              <FileText size={16} className="text-gray-400 dark:text-slate-500" />
               Ver Expediente
             </button>
-            <div className="h-px bg-[var(--color-cruz)] my-1 mx-4"></div>
+            <div className="h-px bg-gray-100 dark:bg-slate-800 my-1 mx-4"></div>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onArchive(patient);
                 setIsOpen(false);
               }}
-              className="w-full text-left px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 flex items-center gap-3 transition-colors font-medium"
+              className="w-full text-left px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 flex items-center gap-3 transition-colors font-medium"
             >
               <Trash2 size={16} className="text-rose-400" />
               Archivar
@@ -137,7 +137,7 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
     return (
       <div className="space-y-4">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-20 bg-white animate-pulse rounded-2xl border border-[var(--color-cruz)]"></div>
+          <div key={i} className="h-20 bg-white dark:bg-slate-900 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-800"></div>
         ))}
       </div>
     );
@@ -150,11 +150,11 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
         animate={{ opacity: 1 }}
         className="flex flex-col items-center justify-center py-20 text-center"
       >
-        <div className="w-16 h-16 bg-[var(--color-bg)] rounded-full flex items-center justify-center mb-4">
-          <FileText size={32} className="text-gray-300" />
+        <div className="w-16 h-16 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4 text-gray-300 dark:text-slate-600">
+          <FileText size={32} />
         </div>
-        <h3 className="text-lg font-bold text-[var(--color-kanji)]">Sin pacientes</h3>
-        <p className="text-[var(--color-text)] opacity-60 mt-1 max-w-sm">
+        <h3 className="text-lg font-bold text-kanji dark:text-kio">Sin pacientes</h3>
+        <p className="text-gray-500 dark:text-slate-400 opacity-60 mt-1 max-w-sm">
           No hay expedientes en esta categoría. Comienza añadiendo un nuevo paciente.
         </p>
       </motion.div>
@@ -164,7 +164,7 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
   return (
     <div className="space-y-3">
       {/* Table Header - Sutil y Minimalista */}
-      <div className="grid grid-cols-[2fr_1fr_1fr_48px] px-6 py-2 text-xs font-bold text-[var(--color-text)] opacity-50 uppercase tracking-widest">
+      <div className="grid grid-cols-[2fr_1fr_1fr_48px] px-6 py-2 text-xs font-bold text-gray-500 dark:text-slate-500 opacity-50 uppercase tracking-widest">
         <div>Paciente</div>
         <div>Estado</div>
         <div>Próxima Cita</div>
@@ -180,7 +180,7 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.4, delay: index * 0.05, ease: "easeOut" }}
-            className="group bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all border border-transparent hover:border-kio/40 cursor-pointer flex items-center justify-between"
+            className="group bg-white dark:bg-slate-900 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all border border-transparent dark:border-slate-800 hover:border-kio/40 dark:hover:border-kio/40 cursor-pointer flex items-center justify-between"
             onClick={() => onView(patient)}
           >
             {/* Columns Grid */}
@@ -190,18 +190,18 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
               <div className="flex items-center gap-4">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
-                  className="w-12 h-12 rounded-full bg-kio flex items-center justify-center text-white font-bold text-sm shadow-md shadow-kio/20"
+                  className="w-12 h-12 rounded-full bg-kanji dark:bg-kio flex items-center justify-center text-white dark:text-slate-900 font-bold text-sm shadow-md shadow-kio/20"
                 >
                   {getInitials(patient.fullName)}
                 </motion.div>
                 <div className="flex flex-col">
-                  <span className="font-bold text-[var(--color-kanji)] text-base leading-tight">{patient.fullName}</span>
+                  <span className="font-bold text-kanji dark:text-kio text-base leading-tight">{patient.fullName}</span>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-sm text-[var(--color-text)] opacity-50 font-medium">
+                    <span className="text-sm text-gray-500 dark:text-slate-400 font-medium">
                       {patient.contactPhone || 'Sin contacto'}
                     </span>
                     {Number(patient.totalDebt) > 0 && (
-                      <span className="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded-md border border-red-100 flex items-center gap-1">
+                      <span className="text-[10px] font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-1.5 py-0.5 rounded-md border border-red-100 dark:border-red-900/30 flex items-center gap-1">
                         Deuda: ${Number(patient.totalDebt)}
                       </span>
                     )}
@@ -221,18 +221,18 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
               </div>
 
               {/* Next Appointment */}
-              <div className="flex items-center gap-2 text-sm text-[var(--color-text)] opacity-80 font-medium">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400 font-medium">
                 {patient.appointments && patient.appointments.length > 0 ? (
                   <>
-                    <Calendar size={14} className="text-[var(--color-kanji)] opacity-60" />
-                    <span className="text-[var(--color-kanji)]">
+                    <Calendar size={14} className="text-kanji dark:text-kio opacity-60" />
+                    <span className="text-kanji dark:text-kio">
                       {new Date(patient.appointments[0].startTime).toLocaleDateString('es-MX', {
                         day: 'numeric',
                         month: 'short',
                       })}
                     </span>
-                    <span className="text-[var(--color-text)] opacity-40 mx-1">|</span>
-                    <span className="text-[var(--color-text)] opacity-60">
+                    <span className="text-gray-300 dark:text-slate-600 mx-1">|</span>
+                    <span className="text-gray-500 dark:text-slate-500">
                       {new Date(patient.appointments[0].startTime).toLocaleTimeString('es-MX', {
                         hour: '2-digit',
                         minute: '2-digit',
@@ -240,7 +240,7 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
                     </span>
                   </>
                 ) : (
-                  <span className="text-[var(--color-text)] opacity-30 italic font-normal text-xs">Sin agendar</span>
+                  <span className="text-gray-400 dark:text-slate-600 italic font-normal text-xs">Sin agendar</span>
                 )}
               </div>
 

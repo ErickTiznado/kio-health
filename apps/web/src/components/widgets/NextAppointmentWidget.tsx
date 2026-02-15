@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Clock, Play, UserPlus, Brain, Calendar, Hash, Radio, FileText } from 'lucide-react';
 import { Skeleton } from '../ui/Skeleton';
 import type { Appointment } from '../../types/appointments.types';
@@ -24,6 +25,15 @@ function formatTime(iso: string): string {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
+  });
+}
+
+function formatScheduledDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('es-MX', {
+    weekday: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
   });
 }
 
@@ -60,12 +70,12 @@ function formatCountdown(startIso: string): string {
 function PatientHeader({ appointment }: { appointment: Appointment }) {
   return (
     <div>
-      <h2 className="text-5xl font-black tracking-tighter leading-none">
+      <h2 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tighter leading-none">
         {appointment.patient.fullName.split(' ')[0]}
-        <span className="block text-2xl font-light opacity-60 mt-1">
+        <span className="block text-xl md:text-2xl font-light opacity-60 mt-1">
           {appointment.patient.fullName.split(' ').slice(1).join(' ')}
           {appointment.patient.dateOfBirth && (
-            <span className="ml-2 text-lg opacity-80">
+            <span className="ml-2 text-base md:text-lg opacity-80">
               · {computeAge(appointment.patient.dateOfBirth)} años
             </span>
           )}
@@ -79,13 +89,13 @@ function DiagnosisTags({ appointment }: { appointment: Appointment }) {
   return (
     <div className="flex items-center gap-2 flex-wrap">
       {appointment.patient.diagnosis && (
-        <span className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white/90 px-3 py-1.5 rounded-xl text-xs font-bold border border-white/10">
+        <span className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white/90 px-3 py-1.5 rounded-xl text-xs font-bold">
           <Brain size={12} className="opacity-70" />
           {appointment.patient.diagnosis}
         </span>
       )}
       {appointment.reason && (
-        <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-sm text-white/70 px-3 py-1.5 rounded-xl text-xs font-medium border border-white/10">
+        <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-sm text-white/70 px-3 py-1.5 rounded-xl text-xs font-medium">
           <Calendar size={12} className="opacity-60" />
           {appointment.reason}
         </span>
@@ -98,6 +108,7 @@ function DiagnosisTags({ appointment }: { appointment: Appointment }) {
 
 function InProgressView({ appointment }: { appointment: Appointment }) {
   const [elapsed, setElapsed] = useState(() => formatElapsed(appointment.startTime));
+  const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -110,14 +121,14 @@ function InProgressView({ appointment }: { appointment: Appointment }) {
     <div className="space-y-5 relative z-10">
       {/* Status badges */}
       <div className="flex items-center gap-3 flex-wrap">
-        <span className="inline-flex items-center gap-2 bg-emerald-400/20 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest border border-emerald-400/30 text-emerald-100">
+        <span className="inline-flex items-center gap-2 bg-emerald-400/20 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest text-emerald-100">
           <Radio size={10} className="animate-pulse" /> EN CURSO
         </span>
-        <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black tracking-widest border border-white/10">
+        <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black tracking-widest">
           <Clock size={10} /> {elapsed}
         </span>
         {appointment.sessionNumber && (
-          <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black tracking-widest border border-white/10">
+          <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black tracking-widest">
             <Hash size={10} /> SESIÓN {appointment.sessionNumber}
           </span>
         )}
@@ -135,10 +146,13 @@ function InProgressView({ appointment }: { appointment: Appointment }) {
 
       {/* Actions — contextual for in-progress */}
       <div className="flex items-center gap-3 mt-2">
-        <button className="bg-white text-kio px-6 py-3.5 rounded-2xl font-bold flex items-center gap-3 shadow-xl hover:scale-105 transition-transform text-sm">
-          <FileText size={16} /> Escribir Nota
+        <button 
+          onClick={() => navigate(`/session/${appointment.id}`)}
+          className="bg-white text-kio px-6 py-3.5 rounded-2xl font-bold flex items-center gap-3 hover:scale-105 transition-transform text-sm cursor-pointer"
+        >
+          <FileText size={16} /> Ir a Sesión
         </button>
-        <button className="bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-3.5 rounded-2xl font-bold flex items-center gap-2 hover:bg-white/20 transition-all text-sm">
+        <button className="bg-white/10 backdrop-blur-sm text-white px-6 py-3.5 rounded-2xl font-bold flex items-center gap-2 hover:bg-white/20 transition-all text-sm cursor-pointer">
           <Clock size={14} /> Finalizar Sesión
         </button>
       </div>
@@ -149,25 +163,33 @@ function InProgressView({ appointment }: { appointment: Appointment }) {
 /* ── Upcoming State ───────────────────────────── */
 
 function UpcomingView({ appointment }: { appointment: Appointment }) {
+  const navigate = useNavigate();
+  const [now, setNow] = useState(Date.now());
   const [countdown, setCountdown] = useState(() => formatCountdown(appointment.startTime));
 
   useEffect(() => {
     const interval = setInterval(() => {
+      const currentTime = Date.now();
+      setNow(currentTime);
       setCountdown(formatCountdown(appointment.startTime));
     }, 30_000);
     return () => clearInterval(interval);
   }, [appointment.startTime]);
+
+  // Logic: Allow start if within 15 mins
+  const timeUntilStart = new Date(appointment.startTime).getTime() - now;
+  const isWithinWindow = timeUntilStart <= 15 * 60 * 1000; // 15 minutes
 
   return (
     <div className="space-y-5 relative z-10">
       {/* Status badges */}
       <div className="flex items-center gap-3 flex-wrap">
         {appointment.sessionNumber && (
-          <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black tracking-widest border border-white/10">
+          <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black tracking-widest">
             <Hash size={10} /> SESIÓN {appointment.sessionNumber}
           </span>
         )}
-        <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black tracking-widest border border-white/10">
+        <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black tracking-widest">
           <Clock size={10} /> {formatTime(appointment.startTime)} · {countdown}
         </span>
       </div>
@@ -183,9 +205,24 @@ function UpcomingView({ appointment }: { appointment: Appointment }) {
       )}
 
       {/* Action */}
-      <button className="bg-white text-kio px-8 py-4 rounded-2xl font-bold flex items-center gap-3 shadow-xl hover:scale-105 transition-transform mt-2">
-        <Play fill="currentColor" size={16} /> Iniciar Consulta
-      </button>
+      {isWithinWindow ? (
+        <button
+          onClick={() => navigate(`/session/${appointment.id}`)}
+          className="bg-white text-kio px-8 py-4 rounded-2xl font-bold flex items-center gap-3 hover:scale-105 transition-transform mt-2 cursor-pointer"
+        >
+          <Play fill="currentColor" size={16} /> Iniciar Consulta
+        </button>
+      ) : (
+        <button
+          onClick={() => navigate('/agenda')}
+          className="bg-white/10 backdrop-blur-sm text-white/90 px-8 py-4 rounded-2xl font-bold flex items-center gap-3 hover:bg-white/20 transition-all mt-2 cursor-pointer"
+        >
+          <Calendar size={18} className="text-white/70" />
+          <span className="opacity-90">
+            Programada: <span className="text-white">{formatScheduledDate(appointment.startTime)}</span>
+          </span>
+        </button>
+      )}
     </div>
   );
 }
@@ -195,14 +232,14 @@ function UpcomingView({ appointment }: { appointment: Appointment }) {
 function EmptyView() {
   return (
     <div className="relative z-10 h-full flex flex-col justify-center">
-      <div className="absolute -right-20 -top-20 w-96 h-96 border border-white/5 rounded-full pointer-events-none" />
-      <div className="absolute -right-10 -top-10 w-64 h-64 border border-white/5 rounded-full pointer-events-none" />
+      <div className="absolute -right-20 -top-20 w-96 h-96 bg-white/5 rounded-full pointer-events-none" />
+      <div className="absolute -right-10 -top-10 w-64 h-64 bg-white/5 rounded-full pointer-events-none" />
 
       <h2 className="text-6xl font-black tracking-tighter mb-4">Agenda despejada.</h2>
       <p className="text-purple-100/80 text-lg max-w-md mb-8 leading-relaxed">
         No tienes citas digitales programadas por ahora. Tienes disponibilidad total para atender pacientes presenciales o urgencias.
       </p>
-      <button className="bg-white text-kanji px-8 py-4 rounded-2xl font-bold flex items-center gap-3 shadow-xl hover:scale-105 transition-transform w-fit">
+      <button className="bg-white text-kanji px-8 py-4 rounded-2xl font-bold flex items-center gap-3 hover:scale-105 transition-transform w-fit">
         <UserPlus size={20} /> Registrar Visita
       </button>
     </div>
@@ -215,7 +252,7 @@ export function NextAppointmentWidget({ appointment, isLoading }: NextAppointmen
   const inProgress = appointment ? isInProgress(appointment) : false;
 
   return (
-    <div className="col-span-12 lg:col-span-8 p-10 lg:p-14 text-white relative overflow-hidden">
+    <div className="col-span-12 lg:col-span-8 p-6 md:p-8 lg:p-10 xl:p-14 text-white relative overflow-hidden">
       {isLoading ? (
         <Skeleton className="w-64 h-12 bg-white/20" />
       ) : appointment ? (

@@ -56,7 +56,7 @@ export function DashboardPage() {
 
         {/* LIQUID COMMAND DECK (Hero + Calendar + Attention) */}
         <div className="px-4 relative z-0">
-          <div className="bg-white rounded-[40px] rounded-br-none relative overflow-hidden shadow-sm border border-gray-100/50">
+          <div className="bg-white dark:bg-slate-900 rounded-[40px] rounded-br-none relative overflow-hidden transition-colors duration-200">
             {/* Liquid Fill Animation */}
             <motion.div
               initial={{ height: "0%" }}
@@ -88,10 +88,10 @@ export function DashboardPage() {
         </div>
 
         {/* MAIN CONTENT AREA */}
-        <div className="grid grid-cols-12 gap-6 px-4 mt-6 pb-10">
+        <div className="grid grid-cols-12 gap-4 xl:gap-6 px-4 mt-6 pb-10">
           <RecentPatientsWidget patients={recentPatients} />
           
-          <div className="col-span-12 lg:col-span-5 flex flex-col gap-6 h-full">
+          <div className="col-span-12 lg:col-span-5 flex flex-col gap-4 xl:gap-6 h-full">
             <div className="flex-1 min-h-0">
               <TodayAgendaWidget appointments={todayAppointments} isLoading={isTodayLoading} />
             </div>

@@ -210,20 +210,20 @@ export function AgendaPage() {
     <DashboardLayout>
       <div className="flex flex-col h-[calc(100vh-64px)] -m-6">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 pt-4 pb-3 border-b border-[var(--color-cruz)] bg-white/50 backdrop-blur-sm sticky  z-30">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 pt-4 pb-3 border-b border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky  z-30">
           <div>
-            <h1 className="text-2xl font-bold text-[var(--color-kanji)] tracking-tight">Mi Agenda</h1>
-            <p className="text-sm text-[var(--color-text)] opacity-60 mt-0.5 capitalize">{dateLabel}</p>
+            <h1 className="text-2xl font-bold text-kanji dark:text-kio tracking-tight">Mi Agenda</h1>
+            <p className="text-sm text-gray-500 dark:text-slate-400 opacity-60 mt-0.5 capitalize">{dateLabel}</p>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Legend - Using Interactive Filters */}
-            <div className="hidden xl:flex items-center gap-2 mr-4 text-[10px] font-bold text-[var(--color-kanji)]/60 uppercase tracking-widest border-r border-[var(--color-cruz)] pr-4">
+            <div className="hidden xl:flex items-center gap-2 mr-4 text-[10px] font-bold text-kanji/60 dark:text-kio/60 uppercase tracking-widest border-r border-gray-200 dark:border-slate-800 pr-4">
               {[
-                { key: 'COMPLETED', label: 'Completada', icon: CheckCircle2, color: 'text-emerald-500', activeBg: 'bg-emerald-50 text-emerald-700' },
-                { key: 'SCHEDULED', label: 'Agendada', icon: Calendar, color: 'text-blue-500', activeBg: 'bg-blue-50 text-blue-700' },
-                { key: 'CANCELLED', label: 'Cancelada', icon: XCircle, color: 'text-red-500', activeBg: 'bg-red-50 text-red-700' },
-                { key: 'UNPAID', label: 'Deuda', icon: Banknote, color: 'text-amber-500', activeBg: 'bg-amber-50 text-amber-700' },
+                { key: 'COMPLETED', label: 'Completada', icon: CheckCircle2, color: 'text-emerald-500', activeBg: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-200' },
+                { key: 'SCHEDULED', label: 'Agendada', icon: Calendar, color: 'text-blue-500', activeBg: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-200' },
+                { key: 'CANCELLED', label: 'Cancelada', icon: XCircle, color: 'text-red-500', activeBg: 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-200' },
+                { key: 'UNPAID', label: 'Deuda', icon: Banknote, color: 'text-amber-500', activeBg: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-200' },
               ].map((filter) => {
                 const isActive = activeFilters.includes(filter.key);
                 const Icon = filter.icon;
@@ -234,7 +234,7 @@ export function AgendaPage() {
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all border border-transparent ${
                       isActive 
                         ? `${filter.activeBg} border-current/10 shadow-sm` 
-                        : 'hover:bg-gray-100 opacity-60 hover:opacity-100'
+                        : 'hover:bg-gray-100 dark:hover:bg-slate-800 opacity-60 hover:opacity-100'
                     }`}
                   >
                     <Icon size={12} className={isActive ? 'text-current' : filter.color} /> 
@@ -246,15 +246,15 @@ export function AgendaPage() {
 
             {/* Loading indicator */}
             {isLoading && (
-              <Loader2 size={16} className="animate-spin text-[var(--color-kanji)] opacity-60" />
+              <Loader2 size={16} className="animate-spin text-kanji dark:text-kio opacity-60" />
             )}
 
             {/* Navigation */}
-            <div className="flex items-center gap-1 bg-white rounded-[24px] border border-[var(--color-cruz)] shadow-sm p-1">
+            <div className="flex items-center gap-1 bg-white dark:bg-slate-800 rounded-[24px] border border-gray-200 dark:border-slate-700 shadow-sm p-1">
               <button
                 type="button"
                 onClick={navigatePrevious}
-                className="p-2 rounded-xl hover:bg-[var(--color-kio-light)] text-[var(--color-kanji)] transition-all"
+                className="p-2 rounded-xl hover:bg-kio-light dark:hover:bg-slate-700 text-kanji dark:text-kio transition-all"
                 aria-label={previousAriaLabel}
               >
                 <ChevronLeft size={16} />
@@ -262,14 +262,14 @@ export function AgendaPage() {
               <button
                 type="button"
                 onClick={navigateToToday}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-[var(--color-kanji)] hover:bg-[var(--color-kio-light)] transition-colors"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-kanji dark:text-kio hover:bg-kio-light dark:hover:bg-slate-700 transition-colors"
               >
                 Hoy
               </button>
               <button
                 type="button"
                 onClick={navigateNext}
-                className="p-2 rounded-xl hover:bg-[var(--color-kio-light)] text-[var(--color-kanji)] transition-all"
+                className="p-2 rounded-xl hover:bg-kio-light dark:hover:bg-slate-700 text-kanji dark:text-kio transition-all"
                 aria-label={nextAriaLabel}
               >
                 <ChevronRight size={16} />
@@ -278,13 +278,13 @@ export function AgendaPage() {
 
             {/* View Toggle */}
             {!isMobile && (
-              <div className="flex items-center bg-white rounded-[24px] border border-[var(--color-cruz)] shadow-sm p-1">
+              <div className="flex items-center bg-white dark:bg-slate-800 rounded-[24px] border border-gray-200 dark:border-slate-700 shadow-sm p-1">
                 <button
                   type="button"
                   onClick={switchToWeekView}
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${activeView === 'week'
-                    ? 'bg-[var(--color-kanji)] text-white shadow-sm'
-                    : 'text-[var(--color-kanji)] hover:bg-[var(--color-kio-light)]'
+                    ? 'bg-kanji dark:bg-kio text-white dark:text-slate-900 shadow-sm'
+                    : 'text-kanji dark:text-kio hover:bg-kio-light dark:hover:bg-slate-700'
                     }`}
                 >
                   <CalendarDays size={14} />
@@ -294,8 +294,8 @@ export function AgendaPage() {
                   type="button"
                   onClick={switchToDayView}
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${activeView === 'day'
-                    ? 'bg-[var(--color-kanji)] text-white shadow-sm'
-                    : 'text-[var(--color-kanji)] hover:bg-[var(--color-kio-light)]'
+                    ? 'bg-kanji dark:bg-kio text-white dark:text-slate-900 shadow-sm'
+                    : 'text-kanji dark:text-kio hover:bg-kio-light dark:hover:bg-slate-700'
                     }`}
                 >
                   <Calendar size={14} />
@@ -310,8 +310,8 @@ export function AgendaPage() {
               onClick={() => setIsWaitlistOpen(!isWaitlistOpen)}
               className={`p-2.5 rounded-[24px] transition-all flex items-center gap-2 border shadow-sm ${
                 isWaitlistOpen 
-                  ? 'bg-amber-50 text-amber-600 border-amber-200' 
-                  : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50 hover:text-gray-700'
+                  ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-200 border-amber-200 dark:border-amber-800' 
+                  : 'bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-slate-200'
               }`}
               title="Lista de Espera"
             >
@@ -325,7 +325,7 @@ export function AgendaPage() {
             <button
               type="button"
               onClick={handleNewAppointmentClick}
-              className="bg-kio hover:bg-kanji text-white px-5 py-2.5 rounded-[24px] text-sm font-bold shadow-lg shadow-kio/20 transition-all active:scale-95 flex items-center gap-2 ml-1"
+              className="bg-kio hover:bg-kanji text-white px-5 py-2.5 rounded-[24px] text-sm font-bold shadow-sm transition-all active:scale-95 flex items-center gap-2 ml-1"
             >
               <Plus size={18} />
               <span className="hidden sm:inline">Nueva Cita</span>
@@ -357,7 +357,7 @@ export function AgendaPage() {
 
           {/* Waitlist Sidebar */}
           {isWaitlistOpen && (
-            <div className="w-80 h-full shrink-0 animate-in slide-in-from-right-10 fade-in duration-300 border-l border-gray-100 pl-6">
+            <div className="w-80 h-full shrink-0 animate-in slide-in-from-right-10 fade-in duration-300 border-l border-gray-100 dark:border-slate-800 pl-6">
                <WaitlistPanel />
             </div>
           )}

@@ -1,23 +1,43 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { usePatient } from '../hooks/use-patients';
-import { AlertTriangle, Phone, MessageCircle, FileClock, User } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Phone, 
+  MessageCircle, 
+  FileClock, 
+  User, 
+  AlertTriangle, 
+  CreditCard,
+  Calendar,
+  Edit,
+} from 'lucide-react';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { TimelineContainer } from '../components/patient/timeline/TimelineContainer';
 import { MoodChart } from '../components/patient/insights/MoodChart';
 import { TasksWidget } from '../components/patient/tasks/TasksWidget';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const TABS = [
+  { id: 'history', label: 'Historia Clínica', icon: FileClock },
+  { id: 'info', label: 'Información General', icon: User },
+];
 
 export default function PatientDetailsPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { data: patient, isLoading, error } = usePatient(id || '');
-  const [activeTab, setActiveTab] = useState<'info' | 'history'>('history');
+  const [activeTab, setActiveTab] = useState('history');
 
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="p-6 max-w-7xl mx-auto animate-pulse">
-          <div className="h-32 bg-gray-200 rounded-lg mb-6"></div>
-          <div className="h-64 bg-gray-200 rounded-lg"></div>
+        <div className="flex flex-col h-[calc(100vh-64px)] -m-6 bg-bg p-8">
+            <div className="h-32 bg-gray-100 rounded-2xl animate-pulse mb-8"></div>
+            <div className="grid grid-cols-3 gap-6">
+                <div className="col-span-2 h-96 bg-gray-100 rounded-2xl animate-pulse"></div>
+                <div className="h-96 bg-gray-100 rounded-2xl animate-pulse"></div>
+            </div>
         </div>
       </DashboardLayout>
     );
@@ -26,193 +46,277 @@ export default function PatientDetailsPage() {
   if (error || !patient) {
     return (
       <DashboardLayout>
-        <div className="p-6 text-center text-red-600">
-          Error loading patient details.
+        <div className="flex flex-col items-center justify-center h-full text-center">
+            <div className="bg-red-50 p-4 rounded-full mb-4">
+                <AlertTriangle size={32} className="text-red-500" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">Error al cargar paciente</h2>
+            <p className="text-gray-500 mb-6">No se pudo encontrar la información solicitada.</p>
+            <button onClick={() => navigate('/patients')} className="text-[var(--color-kanji)] hover:underline font-medium">
+                Volver a la lista
+            </button>
         </div>
       </DashboardLayout>
     );
   }
 
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+  };
+
   return (
     <DashboardLayout>
-      <div className="p-6 max-w-7xl mx-auto space-y-6">
-        {/* Tabs */}
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-            <button
-              onClick={() => setActiveTab('history')}
-              className={`${
-                activeTab === 'history'
-                  ? 'border-[var(--color-kanji)] text-[var(--color-kanji)]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
-            >
-              <FileClock size={16} />
-              Historia Clínica
-            </button>
-            <button
-              onClick={() => setActiveTab('info')}
-              className={`${
-                activeTab === 'info'
-                  ? 'border-[var(--color-kanji)] text-[var(--color-kanji)]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
-            >
-              <User size={16} />
-              Información General
-            </button>
-          </nav>
-        </div>
-
-        {/* Tab Content */}
-        {activeTab === 'history' ? (
-          <div className="bg-white rounded-lg shadow p-6">
-            <TimelineContainer patientId={patient.id} />
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Insights Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <MoodChart patientId={patient.id} />
-                <div className="h-full">
-                    <TasksWidget patientId={patient.id} />
-                </div>
-            </div>
-
-            {/* Header Profile */}
-            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-              <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-                <div>
-                  <h3 className="text-2xl leading-6 font-bold text-gray-900">{patient.fullName}</h3>
-                  <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                    Status: <span className={`font-semibold ${patient.status === 'ACTIVE' ? 'text-green-600' : 'text-gray-500'}`}>{patient.status}</span>
-                  </p>
-                </div>
-                <div className="flex space-x-3">
-                  {patient.contactPhone && (
-                    <>
-                      <a
-                        href={`tel:${patient.contactPhone}`}
-                        className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      >
-                        <Phone className="h-4 w-4 mr-2 text-gray-500" />
-                        Call
-                      </a>
-                      <a
-                        href={`https://wa.me/${patient.contactPhone.replace(/\D/g, '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                      >
-                        <MessageCircle className="h-4 w-4 mr-2" />
-                        WhatsApp
-                      </a>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
-                <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Date of Birth</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{patient.dateOfBirth ? new Date(patient.dateOfBirth).toLocaleDateString() : '-'}</dd>
-                  </div>
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Phone</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{patient.contactPhone || '-'}</dd>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">Diagnosis</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{patient.diagnosis || 'No diagnosis recorded'}</dd>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">Clinical Context</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{patient.clinicalContext || 'No context recorded'}</dd>
-                  </div>
-                </dl>
-              </div>
-            </div>
-
-            {/* Emergency Contact Widget */}
-            {patient.emergencyContact && (
-              <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-md shadow-sm">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <AlertTriangle className="h-5 w-5 text-red-400" aria-hidden="true" />
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">Emergency Contact Information</h3>
-                    <div className="mt-2 text-sm text-red-700 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <p><span className="font-semibold">Name:</span> {patient.emergencyContact.name}</p>
-                      <p><span className="font-semibold">Relation:</span> {patient.emergencyContact.relation || 'N/A'}</p>
-                      <p>
-                        <span className="font-semibold">Phone:</span>{' '}
-                        <a href={`tel:${patient.emergencyContact.phone}`} className="underline hover:text-red-900">
-                          {patient.emergencyContact.phone}
-                        </a>
-                      </p>
+      <div className="flex flex-col h-[calc(100vh-64px)] -m-6 bg-bg overflow-hidden">
+        
+        {/* Sticky Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[var(--color-cruz)] shadow-sm"
+        >
+          <div className="px-8 pt-6 pb-2">
+            {/* Top Row: Back & Actions */}
+            <div className="flex justify-between items-start mb-4">
+                <button 
+                    onClick={() => navigate('/patients')}
+                    className="flex items-center gap-2 text-sm text-[var(--color-text)] opacity-60 hover:opacity-100 transition-opacity group"
+                >
+                    <div className="p-1 rounded-full bg-transparent group-hover:bg-gray-100 transition-colors">
+                        <ArrowLeft size={18} />
                     </div>
-                  </div>
+                    <span>Volver</span>
+                </button>
+                
+                <div className="flex items-center gap-3">
+                    {patient.contactPhone && (
+                        <>
+                            <a 
+                                href={`https://wa.me/${patient.contactPhone.replace(/\D/g, '')}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="p-2 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-full transition-colors"
+                                title="WhatsApp"
+                            >
+                                <MessageCircle size={18} />
+                            </a>
+                            <a 
+                                href={`tel:${patient.contactPhone}`}
+                                className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors"
+                                title="Llamar"
+                            >
+                                <Phone size={18} />
+                            </a>
+                        </>
+                    )}
+                    <div className="h-6 w-px bg-gray-200 mx-1"></div>
+                     <button className="p-2 text-gray-400 hover:text-[var(--color-kanji)] rounded-full hover:bg-gray-50 transition-colors">
+                        <Edit size={18} />
+                    </button>
                 </div>
-              </div>
-            )}
-            {/* Payment History Section */}
-            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-              <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">Historial de Pagos</h3>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                  Estado financiero de las sesiones. Deuda total: <span className={Number(patient.totalDebt) > 0 ? 'text-red-600 font-bold' : 'text-gray-900'}>${Number(patient.totalDebt || 0)}</span>
-                </p>
-              </div>
-              <ul className="divide-y divide-gray-200">
-                {patient.appointments && patient.appointments.length > 0 ? (
-                  patient.appointments.map((app) => {
-                    const isPaid = app.paymentStatus === 'PAID';
-                    const isCancelled = app.status === 'CANCELLED' || app.status === 'NO_SHOW';
-                    const methodLabels: Record<string, string> = { CASH: 'Efectivo', CARD: 'Tarjeta', TRANSFER: 'Transferencia' };
-                    const statusLabels: Record<string, string> = {
-                      SCHEDULED: 'Agendada',
-                      IN_PROGRESS: 'En curso',
-                      COMPLETED: 'Completada',
-                      CANCELLED: 'Cancelada',
-                      NO_SHOW: 'No asistió',
-                    };
+            </div>
 
-                    return (
-                      <li key={app.id} className={`px-4 py-4 sm:px-6 hover:bg-gray-50 flex items-center justify-between ${isCancelled ? 'opacity-50' : ''}`}>
-                        <div className="flex items-center gap-4">
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium text-gray-900">
-                              {new Date(app.startTime).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              ${app.price} · {statusLabels[app.status] || app.status}
-                              {isPaid && app.paymentMethod ? ` · ${methodLabels[app.paymentMethod] || app.paymentMethod}` : ''}
-                            </span>
-                          </div>
-                        </div>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          isPaid
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : isCancelled
-                              ? 'bg-gray-100 text-gray-600'
-                              : 'bg-amber-100 text-amber-800'
+            {/* Patient Info Row */}
+            <div className="flex items-center gap-6 mb-6">
+                <motion.div 
+                    layoutId={`avatar-${patient.id}`}
+                    className="w-16 h-16 rounded-2xl bg-[var(--color-kanji)] text-white flex items-center justify-center text-xl font-bold shadow-lg shadow-kio/20"
+                >
+                    {getInitials(patient.fullName)}
+                </motion.div>
+                
+                <div>
+                    <h1 className="text-3xl font-bold text-[var(--color-kanji)] tracking-tight flex items-center gap-3">
+                        {patient.fullName}
+                        <span className={`text-xs px-2.5 py-1 rounded-full border ${
+                            patient.status === 'ACTIVE' 
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                                : 'bg-gray-50 text-gray-600 border-gray-200'
                         }`}>
-                          {isPaid ? 'Pagado' : isCancelled ? statusLabels[app.status] : 'Pendiente'}
+                            {patient.status === 'ACTIVE' ? 'Activo' : patient.status === 'WAITLIST' ? 'Espera' : 'Archivado'}
                         </span>
-                      </li>
-                    );
-                  })
-                ) : (
-                  <li className="px-4 py-8 text-center text-gray-500 text-sm">
-                    No hay sesiones registradas.
-                  </li>
-                )}
-              </ul>
+                    </h1>
+                    <div className="flex items-center gap-4 mt-1 text-sm text-[var(--color-text)] opacity-60">
+                         {patient.diagnosis && (
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                                {patient.diagnosis}
+                            </span>
+                         )}
+                         {Number(patient.totalDebt) > 0 && (
+                             <span className="flex items-center gap-1 text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded-md">
+                                 Deuda: ${Number(patient.totalDebt)}
+                             </span>
+                         )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex items-center gap-8">
+                {TABS.map((tab) => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`pb-3 text-sm font-medium transition-all relative flex items-center gap-2 ${
+                            activeTab === tab.id
+                                ? 'text-[var(--color-kanji)]'
+                                : 'text-[var(--color-text)] opacity-50 hover:opacity-100'
+                        }`}
+                    >
+                        <tab.icon size={16} />
+                        {tab.label}
+                        {activeTab === tab.id && (
+                            <motion.div 
+                                layoutId="activeTabDetails"
+                                className="absolute bottom-0 left-0 w-full h-[2px] bg-[var(--color-kanji)] rounded-t-full" 
+                            />
+                        )}
+                    </button>
+                ))}
             </div>
           </div>
-        )}
+        </motion.div>
 
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto bg-gray-50/50 p-8">
+            <AnimatePresence mode="wait">
+                {activeTab === 'history' ? (
+                    <motion.div
+                        key="history"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="max-w-4xl mx-auto"
+                    >
+                        <TimelineContainer patientId={patient.id} />
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="info"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6"
+                    >
+                        {/* Left Column: Profile & Contacts */}
+                        <div className="space-y-6">
+                            {/* Personal Info Card */}
+                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-[var(--color-cruz)]">
+                                <h3 className="text-lg font-bold text-[var(--color-kanji)] mb-4 flex items-center gap-2">
+                                    <User size={18} />
+                                    Datos Personales
+                                </h3>
+                                <dl className="space-y-4">
+                                    <div>
+                                        <dt className="text-xs text-gray-400 uppercase font-bold tracking-wider">Fecha de Nacimiento</dt>
+                                        <dd className="text-sm font-medium text-gray-700 mt-1">
+                                            {patient.dateOfBirth ? new Date(patient.dateOfBirth).toLocaleDateString() : 'No registrada'}
+                                        </dd>
+                                    </div>
+                                    <div>
+                                        <dt className="text-xs text-gray-400 uppercase font-bold tracking-wider">Teléfono</dt>
+                                        <dd className="text-sm font-medium text-gray-700 mt-1">{patient.contactPhone || 'No registrado'}</dd>
+                                    </div>
+                                    <div>
+                                        <dt className="text-xs text-gray-400 uppercase font-bold tracking-wider">Diagnóstico</dt>
+                                        <dd className="text-sm font-medium text-gray-700 mt-1 bg-gray-50 p-2 rounded-lg border border-gray-100">
+                                            {patient.diagnosis || 'Sin diagnóstico'}
+                                        </dd>
+                                    </div>
+                                    <div>
+                                        <dt className="text-xs text-gray-400 uppercase font-bold tracking-wider">Contexto Clínico</dt>
+                                        <dd className="text-sm text-gray-600 mt-1 leading-relaxed">
+                                            {patient.clinicalContext || 'Sin contexto registrado.'}
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+
+                            {/* Emergency Contact */}
+                            {patient.emergencyContact && (
+                                <div className="bg-rose-50 p-6 rounded-2xl border border-rose-100">
+                                    <h3 className="text-sm font-bold text-rose-800 mb-3 flex items-center gap-2">
+                                        <AlertTriangle size={16} />
+                                        Contacto de Emergencia
+                                    </h3>
+                                    <div className="text-sm text-rose-700 space-y-1">
+                                        <p><span className="font-semibold">{patient.emergencyContact.name}</span> ({patient.emergencyContact.relation || 'Relación no esp.'})</p>
+                                        <a href={`tel:${patient.emergencyContact.phone}`} className="flex items-center gap-2 hover:underline mt-1 font-medium">
+                                            <Phone size={14} />
+                                            {patient.emergencyContact.phone}
+                                        </a>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Middle/Right Column: Charts & Tasks */}
+                        <div className="lg:col-span-2 space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <MoodChart patientId={patient.id} />
+                                <div className="h-full">
+                                    <TasksWidget patientId={patient.id} />
+                                </div>
+                            </div>
+
+                            {/* Payment History */}
+                            <div className="bg-white rounded-2xl shadow-sm border border-[var(--color-cruz)] overflow-hidden">
+                                <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                                    <h3 className="font-bold text-[var(--color-kanji)] flex items-center gap-2">
+                                        <CreditCard size={18} />
+                                        Historial de Pagos
+                                    </h3>
+                                    <span className="text-xs font-bold text-gray-500 bg-white px-2 py-1 rounded-md border border-gray-200">
+                                        Últimas 5 sesiones
+                                    </span>
+                                </div>
+                                <div className="divide-y divide-gray-100">
+                                    {patient.appointments && patient.appointments.length > 0 ? (
+                                        patient.appointments.slice(0, 5).map((app) => (
+                                            <div key={app.id} className="px-6 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                                                        <Calendar size={18} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-bold text-gray-700">
+                                                            {new Date(app.startTime).toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'short' })}
+                                                        </p>
+                                                        <p className="text-xs text-gray-400">
+                                                            {app.paymentMethod ? app.paymentMethod.toLowerCase() : 'Sin método'} · ${app.price}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                                                    app.paymentStatus === 'PAID' 
+                                                        ? 'bg-emerald-50 text-emerald-700' 
+                                                        : 'bg-amber-50 text-amber-700'
+                                                }`}>
+                                                    {app.paymentStatus === 'PAID' ? 'Pagado' : 'Pendiente'}
+                                                </span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="p-8 text-center text-gray-400 text-sm">
+                                            No hay historial de pagos registrado.
+                                        </div>
+                                    )}
+                                </div>
+                                {patient.appointments && patient.appointments.length > 5 && (
+                                    <div className="px-6 py-3 bg-gray-50 text-center border-t border-gray-100">
+                                        <button className="text-xs font-bold text-[var(--color-kanji)] hover:underline">
+                                            Ver todo el historial
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
       </div>
     </DashboardLayout>
   );

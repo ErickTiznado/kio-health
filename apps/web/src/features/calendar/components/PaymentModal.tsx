@@ -88,24 +88,24 @@ export function PaymentModal({ isOpen, onClose, appointment }: PaymentModalProps
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity animate-in fade-in"
+                className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in"
                 onClick={onClose}
             />
 
             {/* Modal */}
-            <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden animate-in zoom-in-95 flex flex-col">
+            <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden animate-in zoom-in-95 flex flex-col">
 
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-gray-50/50 dark:bg-slate-800">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900">Gestionar Cobro</h2>
-                        <p className="text-sm text-gray-500">
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Gestionar Cobro</h2>
+                        <p className="text-sm text-gray-500 dark:text-slate-400">
                             {appointment.type} - {appointment.patient.fullName}
                         </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
                     >
                         <X size={20} />
                     </button>
@@ -115,13 +115,13 @@ export function PaymentModal({ isOpen, onClose, appointment }: PaymentModalProps
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
 
                     {/* Status Switch */}
-                    <div className="flex gap-2 p-1 bg-gray-100 rounded-xl">
+                    <div className="flex gap-2 p-1 bg-gray-100 dark:bg-slate-800 rounded-xl">
                         <button
                             type="button"
                             onClick={() => setStatus('PENDING')}
                             className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${status === 'PENDING'
-                                ? 'bg-white text-gray-700 shadow-sm'
-                                : 'text-gray-400 hover:text-gray-600'
+                                ? 'bg-white dark:bg-slate-700 text-gray-700 dark:text-white shadow-sm'
+                                : 'text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300'
                                 }`}
                         >
                             <AlertCircle size={16} className={status === 'PENDING' ? 'text-amber-500' : ''} />
@@ -132,7 +132,7 @@ export function PaymentModal({ isOpen, onClose, appointment }: PaymentModalProps
                             onClick={() => setStatus('PAID')}
                             className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${status === 'PAID'
                                 ? 'bg-emerald-500 text-white shadow-sm'
-                                : 'text-gray-400 hover:text-gray-600'
+                                : 'text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300'
                                 }`}
                         >
                             <CheckCircle2 size={16} />
@@ -143,28 +143,28 @@ export function PaymentModal({ isOpen, onClose, appointment }: PaymentModalProps
                     <div className="space-y-4">
                         {/* Amount Input */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                                 Monto de la Sesión
                             </label>
                             <div className="relative">
-                                <span className="absolute left-4 top-3 text-gray-400 font-medium">$</span>
+                                <span className="absolute left-4 top-3 text-gray-400 dark:text-slate-500 font-medium">$</span>
                                 <input
                                     type="number"
                                     value={amount}
                                     onChange={(e) => setAmount(e.target.value)}
-                                    className="w-full pl-8 pr-16 py-3 bg-gray-50 border border-gray-200 rounded-xl text-lg font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/20 focus:border-[var(--color-kanji)] transition-all"
+                                    className="w-full pl-8 pr-16 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-lg font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/20 focus:border-[var(--color-kanji)] transition-all"
                                     placeholder="0.00"
                                     min="0"
                                     step="0.01"
                                 />
-                                <span className="absolute right-4 top-3.5 text-xs font-bold text-gray-400">USD</span>
+                                <span className="absolute right-4 top-3.5 text-xs font-bold text-gray-400 dark:text-slate-500">USD</span>
                             </div>
                         </div>
 
                         {/* Payment Method (Only visible if PAID) */}
                         {status === 'PAID' && (
                             <div className="space-y-1.5 animate-in slide-in-from-top-2 fade-in">
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                                     Método de Pago
                                 </label>
                                 <div className="grid grid-cols-3 gap-3">
@@ -172,8 +172,8 @@ export function PaymentModal({ isOpen, onClose, appointment }: PaymentModalProps
                                         type="button"
                                         onClick={() => setMethod('CASH')}
                                         className={`py-2.5 px-2 rounded-xl border text-xs font-bold transition-all flex flex-col items-center gap-1 ${method === 'CASH'
-                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                            : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                                            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-200'
+                                            : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:border-gray-300 dark:hover:border-slate-600'
                                             }`}
                                     >
                                         <Banknote size={18} />
@@ -183,8 +183,8 @@ export function PaymentModal({ isOpen, onClose, appointment }: PaymentModalProps
                                         type="button"
                                         onClick={() => setMethod('CARD')}
                                         className={`py-2.5 px-2 rounded-xl border text-xs font-bold transition-all flex flex-col items-center gap-1 ${method === 'CARD'
-                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                            : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                                            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-200'
+                                            : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:border-gray-300 dark:hover:border-slate-600'
                                             }`}
                                     >
                                         <CreditCard size={18} />
@@ -194,8 +194,8 @@ export function PaymentModal({ isOpen, onClose, appointment }: PaymentModalProps
                                         type="button"
                                         onClick={() => setMethod('TRANSFER')}
                                         className={`py-2.5 px-2 rounded-xl border text-xs font-bold transition-all flex flex-col items-center gap-1 ${method === 'TRANSFER'
-                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                            : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                                            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-200'
+                                            : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:border-gray-300 dark:hover:border-slate-600'
                                             }`}
                                     >
                                         <ArrowLeftRight size={18} />

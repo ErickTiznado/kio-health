@@ -25,10 +25,10 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const STATUS_CONFIG: Record<string, { label: string; className: string; dotColor: string }> = {
-  SCHEDULED: { label: 'Agendada', className: 'bg-purple-100 text-purple-700', dotColor: 'bg-purple-500' },
-  COMPLETED: { label: 'Completada', className: 'bg-emerald-100 text-emerald-700', dotColor: 'bg-emerald-500' },
-  CANCELLED: { label: 'Cancelada', className: 'bg-gray-100 text-gray-600', dotColor: 'bg-gray-400' },
-  NO_SHOW: { label: 'No asistió', className: 'bg-amber-100 text-amber-700', dotColor: 'bg-amber-500' },
+  SCHEDULED: { label: 'Agendada', className: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-200', dotColor: 'bg-purple-500' },
+  COMPLETED: { label: 'Completada', className: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-200', dotColor: 'bg-emerald-500' },
+  CANCELLED: { label: 'Cancelada', className: 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400', dotColor: 'bg-gray-400' },
+  NO_SHOW: { label: 'No asistió', className: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-200', dotColor: 'bg-amber-500' },
 };
 
 /**
@@ -63,7 +63,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
   // Relative time context
   const relativeTime = formatDistanceToNowStrict(startDate, { addSuffix: true, locale: es });
   const isFuture = startDate > new Date();
-  const timeBadgeColor = isFuture ? 'bg-[var(--color-kio-light)]/20 text-[var(--color-kanji)]' : 'bg-[var(--color-cruz)]/30 text-[var(--color-kanji)]/60';
+  const timeBadgeColor = isFuture ? 'bg-kio-light/20 dark:bg-kio/20 text-kanji dark:text-kio' : 'bg-gray-100 dark:bg-slate-700/50 text-kanji/60 dark:text-slate-400';
 
   const handleStartSession = () => {
     onClose();
@@ -72,14 +72,14 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
 
   const handleCancelClick = () => {
     toast.custom((t) => (
-      <div className="bg-white p-5 rounded-[24px] shadow-2xl border border-red-100 flex flex-col gap-4 w-[360px] animate-in fade-in slide-in-from-top-5 duration-300">
+      <div className="bg-white dark:bg-slate-800 p-5 rounded-[24px] shadow-2xl border border-red-100 dark:border-red-900/30 flex flex-col gap-4 w-[360px] animate-in fade-in slide-in-from-top-5 duration-300">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center text-red-500 shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500 shrink-0">
              <Ban size={24} />
           </div>
           <div>
-            <h3 className="font-bold text-[var(--color-kanji)] text-lg leading-tight">¿Cancelar cita?</h3>
-            <p className="text-xs text-[var(--color-text)] opacity-70 mt-1.5 leading-relaxed">
+            <h3 className="font-bold text-kanji dark:text-white text-lg leading-tight">¿Cancelar cita?</h3>
+            <p className="text-xs text-gray-500 dark:text-slate-400 opacity-70 mt-1.5 leading-relaxed">
               Esta acción es irreversible. El horario quedará libre y se notificará al paciente.
             </p>
           </div>
@@ -87,7 +87,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
         <div className="flex gap-3 pt-2">
           <button 
             onClick={() => toast.dismiss(t)} 
-            className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-[var(--color-kanji)] hover:bg-[var(--color-cruz)]/20 transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-kanji dark:text-kio hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
           >
             No, volver
           </button>
@@ -112,7 +112,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 z-40 transition-all duration-300 ${isOpen ? 'bg-[var(--color-kanji)]/10 backdrop-blur-sm opacity-100' : 'opacity-0 pointer-events-none'
+        className={`fixed inset-0 z-40 transition-all duration-300 ${isOpen ? 'bg-kanji/10 dark:bg-black/50 backdrop-blur-sm opacity-100' : 'opacity-0 pointer-events-none'
           }`}
         onClick={onClose}
         role="presentation"
@@ -120,17 +120,17 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
 
       {/* Drawer Panel */}
       <aside
-        className={`fixed top-0 right-0 h-full w-[420px] bg-white/95 backdrop-blur-xl shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-0 right-0 h-full w-[420px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
       >
         {/* Header — Patient Hero */}
-        <div className="relative px-6 pt-6 pb-5 bg-[var(--color-bg)]">
+        <div className="relative px-6 pt-6 pb-5 bg-white dark:bg-slate-900">
           {/* Header Actions (Secondary) */}
           <div className="absolute top-4 right-4 flex items-center gap-1">
             <button
               type="button"
               title="Editar Cita"
-              className="p-2 rounded-xl hover:bg-[var(--color-kio-light)]/20 text-[var(--color-kanji)]/60 hover:text-[var(--color-kio)] transition-colors"
+              className="p-2 rounded-xl hover:bg-kio-light/20 dark:hover:bg-slate-800 text-kanji/60 dark:text-slate-400 hover:text-kio transition-colors"
               onClick={() => toast.info('Edición completa próximamente', { description: 'Utiliza "Reagendar" para cambiar la fecha.' })}
             >
               <Edit2 size={16} />
@@ -138,7 +138,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
             <button
               type="button"
               title="Reagendar"
-              className="p-2 rounded-xl hover:bg-[var(--color-kio-light)]/20 text-[var(--color-kanji)]/60 hover:text-[var(--color-kanji)] transition-colors"
+              className="p-2 rounded-xl hover:bg-kio-light/20 dark:hover:bg-slate-800 text-kanji/60 dark:text-slate-400 hover:text-kanji dark:hover:text-kio transition-colors"
               onClick={() => setIsRescheduleModalOpen(true)}
             >
               <Calendar size={16} />
@@ -146,16 +146,16 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
             <button
               type="button"
               title="Cancelar Cita"
-              className="p-2 rounded-xl hover:bg-[var(--color-kio-light)]/20 text-[var(--color-kanji)]/60 hover:text-[var(--color-kanji)] transition-colors"
+              className="p-2 rounded-xl hover:bg-kio-light/20 dark:hover:bg-slate-800 text-kanji/60 dark:text-slate-400 hover:text-kanji dark:hover:text-kio transition-colors"
               onClick={handleCancelClick}
             >
               <Ban size={16} />
             </button>
-            <div className="w-px h-4 bg-[var(--color-cruz)] mx-1" />
+            <div className="w-px h-4 bg-gray-200 dark:bg-slate-700 mx-1" />
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl hover:bg-[var(--color-kio-light)]/20 text-[var(--color-kanji)]/40 hover:text-[var(--color-kanji)] transition-colors"
+              className="p-2 rounded-xl hover:bg-kio-light/20 dark:hover:bg-slate-800 text-kanji/40 dark:text-slate-500 hover:text-kanji dark:hover:text-kio transition-colors"
             >
               <X size={18} />
             </button>
@@ -165,12 +165,12 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
             {/* Deep Linking Avatar */}
             <Link
               to={`/patients/${appointment.patientId}`}
-              className="w-16 h-16 bg-[var(--color-kanji)] rounded-[20px] flex items-center justify-center shrink-0 shadow-sm relative overflow-hidden group cursor-pointer hover:shadow-md transition-all"
+              className="w-16 h-16 bg-kanji dark:bg-kio rounded-[20px] flex items-center justify-center shrink-0 shadow-sm relative overflow-hidden group cursor-pointer hover:shadow-md transition-all"
             >
-              <span className="text-white font-bold text-xl relative z-10">{initials}</span>
+              <span className="text-white dark:text-slate-900 font-bold text-xl relative z-10">{initials}</span>
               {/* Hover indication */}
               <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20">
-                <ExternalLink size={16} className="text-white" />
+                <ExternalLink size={16} className="text-white dark:text-slate-900" />
               </div>
             </Link>
 
@@ -180,10 +180,10 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
                 to={`/patients/${appointment.patientId}`}
                 className="group flex items-center gap-2"
               >
-                <p className="text-lg font-bold text-[var(--color-kanji)] truncate group-hover:text-[var(--color-kio)] transition-colors">
+                <p className="text-lg font-bold text-kanji dark:text-white truncate group-hover:text-kio transition-colors">
                   {appointment.patient.fullName}
                 </p>
-                <ExternalLink size={12} className="text-[var(--color-kanji)]/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ExternalLink size={12} className="text-kanji/40 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
               </Link>
 
               <div className="flex items-center gap-2 mt-2.5">
@@ -199,15 +199,15 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
           {/* Time & Type Card */}
-          <div className="bg-[var(--color-bg)] rounded-2xl p-4 space-y-3 border border-[var(--color-cruz)]">
+          <div className="bg-gray-50 dark:bg-slate-800 rounded-2xl p-4 space-y-3 border border-gray-200 dark:border-slate-700">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[var(--color-kanji)]/10 flex items-center justify-center text-[var(--color-kanji)]">
+              <div className="w-9 h-9 rounded-xl bg-kanji/10 dark:bg-kio/20 flex items-center justify-center text-kanji dark:text-kio">
                 <Clock size={16} />
               </div>
               <div>
-                <p className="text-[10px] font-bold text-[var(--color-kanji)]/60 uppercase tracking-widest">Horario</p>
+                <p className="text-[10px] font-bold text-kanji/60 dark:text-slate-400 uppercase tracking-widest">Horario</p>
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-[var(--color-kanji)]">
+                  <p className="text-sm font-semibold text-kanji dark:text-white">
                     {format(startDate, 'hh:mm a')} — {format(endDate, 'hh:mm a')}
                   </p>
                   {/* Relative Time Context */}
@@ -219,12 +219,12 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[var(--color-kanji)]/10 flex items-center justify-center text-[var(--color-kanji)]">
+              <div className="w-9 h-9 rounded-xl bg-kanji/10 dark:bg-kio/20 flex items-center justify-center text-kanji dark:text-kio">
                 <Stethoscope size={16} />
               </div>
               <div>
-                <p className="text-[10px] font-bold text-[var(--color-kanji)]/60 uppercase tracking-widest">Tipo</p>
-                <p className="text-sm font-semibold text-[var(--color-kanji)]">{typeLabel}</p>
+                <p className="text-[10px] font-bold text-kanji/60 dark:text-slate-400 uppercase tracking-widest">Tipo</p>
+                <p className="text-sm font-semibold text-kanji dark:text-white">{typeLabel}</p>
               </div>
             </div>
           </div>
@@ -233,12 +233,12 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
           {appointment.reason && (
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <FileText size={14} className="text-[var(--color-kanji)]/60" />
-                <p className="text-[10px] font-bold text-[var(--color-kanji)]/60 uppercase tracking-widest">Motivo de consulta</p>
+                <FileText size={14} className="text-kanji/60 dark:text-slate-400" />
+                <p className="text-[10px] font-bold text-kanji/60 dark:text-slate-400 uppercase tracking-widest">Motivo de consulta</p>
               </div>
               <div className="pl-6 relative">
-                <div className="absolute left-[3px] top-1 bottom-1 w-0.5 bg-[var(--color-cruz)] rounded-full" />
-                <p className="text-sm text-[var(--color-text)] leading-relaxed pl-4 py-1">
+                <div className="absolute left-[3px] top-1 bottom-1 w-0.5 bg-gray-200 dark:bg-slate-700 rounded-full" />
+                <p className="text-sm text-gray-600 dark:text-slate-300 leading-relaxed pl-4 py-1">
                   {appointment.reason}
                 </p>
               </div>
@@ -249,23 +249,23 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
           <div>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <ClipboardList size={14} className="text-[var(--color-kanji)]/60" />
-                <p className="text-[10px] font-bold text-[var(--color-kanji)]/60 uppercase tracking-widest">Historial reciente</p>
+                <ClipboardList size={14} className="text-kanji/60 dark:text-slate-400" />
+                <p className="text-[10px] font-bold text-kanji/60 dark:text-slate-400 uppercase tracking-widest">Historial reciente</p>
               </div>
               {history.length > 0 && (
-                <button className="text-[10px] font-bold text-[var(--color-kanji)] hover:underline">Ver todo</button>
+                <button className="text-[10px] font-bold text-kanji dark:text-kio hover:underline">Ver todo</button>
               )}
             </div>
 
             <div className="pl-6">
               {/* Empty State (Guidance) */}
               {history.length === 0 ? (
-                <div className="bg-[var(--color-bg)] rounded-xl p-4 border border-dashed border-[var(--color-cruz)] text-center">
-                  <p className="text-xs font-semibold text-[var(--color-kanji)]/80 mb-1">Primera sesión</p>
-                  <p className="text-[10px] text-[var(--color-text)]/60 mb-3">Este paciente no tiene historial clínico previo.</p>
+                <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 border border-dashed border-gray-200 dark:border-slate-700 text-center">
+                  <p className="text-xs font-semibold text-kanji/80 dark:text-slate-300 mb-1">Primera sesión</p>
+                  <p className="text-[10px] text-gray-500 dark:text-slate-500 mb-3">Este paciente no tiene historial clínico previo.</p>
                   <Link 
                     to={`/patients/${appointment.patientId}`} 
-                    className="text-xs font-bold text-[var(--color-kanji)] flex items-center justify-center gap-1.5 mx-auto hover:bg-[var(--color-kanji)]/5 px-3 py-1.5 rounded-lg transition-colors"
+                    className="text-xs font-bold text-kanji dark:text-kio flex items-center justify-center gap-1.5 mx-auto hover:bg-kanji/5 dark:hover:bg-kio/10 px-3 py-1.5 rounded-lg transition-colors"
                   >
                     <FileText size={12} />
                     Ver cuestionario de admisión
@@ -276,13 +276,13 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
                   {history.map((note) => (
                     <div key={note.id} className="group relative">
                       {/* Timeline dot */}
-                      <div className="absolute -left-[27px] top-1.5 w-2.5 h-2.5 rounded-full border-[2px] border-white ring-1 ring-[var(--color-cruz)] bg-[var(--color-cruz)] group-hover:bg-[var(--color-kanji)] group-hover:ring-[var(--color-kanji)]/30 transition-colors z-10" />
+                      <div className="absolute -left-[27px] top-1.5 w-2.5 h-2.5 rounded-full border-[2px] border-white dark:border-slate-900 ring-1 ring-gray-200 dark:ring-slate-700 bg-gray-200 dark:bg-slate-700 group-hover:bg-kanji dark:group-hover:bg-kio group-hover:ring-kanji/30 dark:group-hover:ring-kio/30 transition-colors z-10" />
                       {/* Timeline line */}
-                      <div className="absolute -left-[23px] top-3.5 bottom-[-14px] w-px bg-[var(--color-cruz)] group-last:hidden" />
+                      <div className="absolute -left-[23px] top-3.5 bottom-[-14px] w-px bg-gray-200 dark:bg-slate-700 group-last:hidden" />
 
-                      <div className="bg-white rounded-xl p-3 border border-[var(--color-cruz)] shadow-sm hover:shadow-md hover:border-[var(--color-kanji)]/20 transition-all cursor-default">
+                      <div className="bg-white dark:bg-slate-800 rounded-xl p-3 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-kanji/20 dark:hover:border-kio/20 transition-all cursor-default">
                         <div className="flex items-center justify-between mb-1.5">
-                          <p className="text-[10px] font-bold text-[var(--color-kanji)]/60">
+                          <p className="text-[10px] font-bold text-kanji/60 dark:text-slate-400">
                             {format(parseISO(note.date), "d 'de' MMM", { locale: es })}
                           </p>
                           <div className="flex gap-1">
@@ -293,7 +293,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
                             ))}
                           </div>
                         </div>
-                        <p className="text-xs text-[var(--color-text)] leading-relaxed">
+                        <p className="text-xs text-gray-600 dark:text-slate-300 leading-relaxed">
                           {note.summary}
                         </p>
                       </div>
@@ -306,19 +306,19 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
         </div>
 
         {/* Visual Separation: Administrative/Financial Block (Proximity Law) */}
-        <div className="bg-[var(--color-bg)]/80 border-t border-[var(--color-cruz)] p-6 space-y-4">
+        <div className="bg-gray-50/80 dark:bg-slate-900/80 border-t border-gray-200 dark:border-slate-700 p-6 space-y-4">
           {/* Payment Actionable (Fitts's Law) */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <CreditCard size={14} className="text-[var(--color-kanji)]/60" />
-              <p className="text-[10px] font-bold text-[var(--color-kanji)]/60 uppercase tracking-widest">Estado del Pago</p>
+              <CreditCard size={14} className="text-kanji/60 dark:text-slate-400" />
+              <p className="text-[10px] font-bold text-kanji/60 dark:text-slate-400 uppercase tracking-widest">Estado del Pago</p>
             </div>
-            <div className="flex items-center justify-between bg-white rounded-xl p-3 border border-[var(--color-cruz)] shadow-sm">
+            <div className="flex items-center justify-between bg-white dark:bg-slate-800 rounded-xl p-3 border border-gray-200 dark:border-slate-700 shadow-sm">
               <div className="flex flex-col">
-                <p className="text-sm font-bold text-[var(--color-kanji)]">${amount} MXN</p>
+                <p className="text-sm font-bold text-kanji dark:text-white">${amount} MXN</p>
                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md w-fit mt-1 ${appointment.paymentStatus === 'PAID'
-                  ? 'bg-[var(--color-kio-light)]/40 text-[var(--color-kio)]'
-                  : 'bg-[var(--color-cruz)]/40 text-[var(--color-kanji)]'
+                  ? 'bg-kio-light/40 dark:bg-kio/20 text-kio'
+                  : 'bg-gray-100 dark:bg-slate-700 text-kanji/80 dark:text-slate-300'
                   }`}>
                   {appointment.paymentStatus === 'PAID' ? 'PAGADO' : 'PENDIENTE'}
                 </span>
@@ -326,7 +326,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
 
               <button
                 onClick={() => setIsPaymentModalOpen(true)}
-                className="px-4 py-2 bg-[var(--color-kanji)] text-white text-xs font-bold rounded-lg hover:bg-[var(--color-kio)] transition-colors flex items-center gap-1.5"
+                className="px-4 py-2 bg-kanji dark:bg-kio text-white dark:text-slate-900 text-xs font-bold rounded-lg hover:bg-kio dark:hover:bg-white transition-colors flex items-center gap-1.5"
               >
                 <CreditCard size={14} />
                 Gestionar
@@ -344,7 +344,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
           <button
             type="button"
             onClick={handleStartSession}
-            className="w-full bg-[var(--color-kanji)] text-white py-4 rounded-[16px] font-bold text-base flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[1px] active:shadow-md transition-all duration-200 group relative overflow-hidden"
+            className="w-full bg-kanji dark:bg-kio text-white dark:text-slate-900 py-4 rounded-[16px] font-bold text-base flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[1px] active:shadow-md transition-all duration-200 group relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
             {/* Feedforward Icon based on probable action */}

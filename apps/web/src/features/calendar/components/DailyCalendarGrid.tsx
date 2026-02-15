@@ -2,9 +2,12 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { Appointment } from '../../../types/appointments.types';
 
-// Placeholder components
+// Placeholder components (enhanced for dark mode)
 const AppointmentPill = ({ appointment, onSelect }: any) => (
-  <div onClick={() => onSelect(appointment)} className="bg-blue-100 p-2 rounded text-xs cursor-pointer mb-1">
+  <div 
+    onClick={() => onSelect(appointment)} 
+    className="bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-blue-900 dark:text-blue-100 border-l-4 border-blue-500 p-2 rounded-r text-xs cursor-pointer mb-1 transition-colors font-medium shadow-sm"
+  >
     {appointment.patient?.fullName}
   </div>
 );
@@ -26,7 +29,7 @@ export function DailyCalendarGrid({ selectedDay, appointments, onSelectAppointme
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
-      <div className="p-4 font-bold border-b border-[var(--color-cruz)] text-center text-[var(--color-kanji)]">
+      <div className="p-4 font-bold border-b border-gray-200 dark:border-slate-800 text-center text-kanji dark:text-kio">
         {format(selectedDay, 'EEEE, d MMMM', { locale: es })}
       </div>
       <div className="relative flex-1">
@@ -43,12 +46,12 @@ export function DailyCalendarGrid({ selectedDay, appointments, onSelectAppointme
           });
 
           return (
-            <div key={hour} className="flex border-b border-[var(--color-cruz)] min-h-[5rem]">
-              <div className="w-16 text-right pr-2 text-sm text-[var(--color-kanji)]/50 pt-2">
+            <div key={hour} className="flex border-b border-gray-200 dark:border-slate-800 min-h-[5rem]">
+              <div className="w-16 text-right pr-2 text-sm text-kanji/50 dark:text-kio/50 pt-2">
                 {hour}:00
               </div>
               <div
-                className="flex-1 p-1 hover:bg-[var(--color-kio-light)]/20 cursor-pointer transition-colors"
+                className="flex-1 p-1 hover:bg-kio-light/20 dark:hover:bg-slate-800 cursor-pointer transition-colors"
                 onClick={() => onSlotClick(hourDate)}
               >
                 {slotAppointments.map(a => (

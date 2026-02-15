@@ -1,19 +1,57 @@
 @import "tailwindcss";
 
-@theme {
-  --color-bg: #ffffff;
-  --color-text: #213547;
-  --color-kio: #ae93fe;
-  --color-kio-light: rgba(174, 147, 254, 0.28);
-  --color-kanji: #8a72d1;
-  --color-cruz: #ddd3fa;
-  --font-roboto: Roboto, sans-serif;
-  --font-inter: Inter, sans-serif;
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
-  /* ... existing styles ... */
-  
+  :root {
+    color-scheme: light;
+    /* Light Mode Variables */
+    --bg-primary: #ffffff;
+    --bg-surface: #ffffff;
+    --bg-secondary: #f8fafc;
+
+    --text-primary: #213547;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+
+    --border-base: #e2e8f0;
+
+    /* Tooltip */
+    --tooltip-bg: #ffffff;
+    --tooltip-border: #e2e8f0;
+
+    /* Brand Colors - Preserved but variable-ized if needed */
+    --kio-base: #ae93fe;
+    --kanji-base: #8a72d1;
+  }
+
+  .dark {
+    color-scheme: dark;
+    /* Dark Mode Variables - Slate Palette */
+    --bg-primary: #020617;
+    /* Slate 950 */
+    --bg-surface: #0f172a;
+    /* Slate 900 */
+    --bg-secondary: #1e293b;
+    /* Slate 800 */
+
+    --text-primary: #f8fafc;
+    /* Slate 50 */
+    --text-secondary: #94a3b8;
+    /* Slate 400 */
+    --text-muted: #64748b;
+    /* Slate 500 */
+
+    --border-base: #1e293b;
+    /* Slate 800 */
+
+    /* Tooltip - elevated above slate-900 card bg */
+    --tooltip-bg: #1e293b;
+    /* Slate 800 */
+    --tooltip-border: #334155;
+    /* Slate 700 */
+  }
+
   /* Force native calendar accent color */
   [type="date"] {
     accent-color: var(--color-kio);
@@ -23,4 +61,30 @@
     background-color: var(--color-bg);
     color: var(--color-text);
   }
+}
+
+@theme {
+  /* Semantic Colors */
+  --color-bg: var(--bg-primary);
+  --color-surface: var(--bg-surface);
+  --color-secondary: var(--bg-secondary);
+
+  --color-text: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --color-border: var(--border-base);
+
+  /* Tooltip */
+  --color-tooltip-bg: var(--tooltip-bg);
+  --color-tooltip-border: var(--tooltip-border);
+
+  /* Brand Colors */
+  --color-kio: #ae93fe;
+  --color-kio-light: rgba(174, 147, 254, 0.28);
+  --color-kanji: #8a72d1;
+  --color-cruz: #ddd3fa;
+
+  --font-roboto: Roboto, sans-serif;
+  --font-inter: Inter, sans-serif;
 }

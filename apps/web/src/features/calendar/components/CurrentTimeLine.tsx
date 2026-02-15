@@ -45,14 +45,12 @@ export function CurrentTimeLine() {
 
       {/* Circle indicator */}
       <div
-        className="w-4 h-4 rounded-full bg-[var(--color-kio)] -ml-[8px] shrink-0 z-10 border-2 border-white"
-        style={{ boxShadow: '0 0 10px rgba(174, 147, 254, 0.7), 0 0 20px rgba(174, 147, 254, 0.3)' }}
+        className="w-4 h-4 rounded-full bg-kio -ml-[8px] shrink-0 z-10 border-2 border-white dark:border-slate-900"
       />
 
       {/* Line */}
       <div
-        className="flex-1 h-[2px] bg-[var(--color-kio)]/80"
-        style={{ boxShadow: '0 0 8px rgba(174, 147, 254, 0.4)' }}
+        className="flex-1 h-[2px] bg-kio"
       />
     </div>
   );

@@ -33,8 +33,8 @@ export function PatientForm({ initialData, onSubmit, onCancel, isLoading }: Pati
     },
   });
 
-  const inputClass = "mt-1.5 block w-full rounded-xl border-gray-200 shadow-sm focus:border-kio focus:ring-kio focus:ring-2 focus:ring-opacity-50 text-sm font-medium text-[var(--color-kanji)] transition-all duration-200 bg-gray-50/50 hover:bg-white focus:bg-white py-2.5 px-3.5 placeholder:text-gray-400 placeholder:font-normal";
-  const labelClass = "block text-[11px] font-bold text-[var(--color-text)] opacity-70 uppercase tracking-wider ml-1";
+  const inputClass = "mt-1.5 block w-full rounded-xl border-gray-200 dark:border-slate-700 shadow-sm focus:border-kio focus:ring-kio focus:ring-2 focus:ring-opacity-50 text-sm font-medium text-kanji dark:text-white transition-all duration-200 bg-gray-50/50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 focus:bg-white dark:focus:bg-slate-700 py-2.5 px-3.5 placeholder:text-gray-400 dark:placeholder:text-slate-500 placeholder:font-normal";
+  const labelClass = "block text-[11px] font-bold text-gray-600 dark:text-slate-400 opacity-70 uppercase tracking-wider ml-1";
 
   // Date input specific styling for branding
   // accent-kio forces the browser's native picker to use the brand color
@@ -99,9 +99,9 @@ export function PatientForm({ initialData, onSubmit, onCancel, isLoading }: Pati
           </div>
         </div>
 
-        <div className="border-t border-gray-100 pt-5 mt-5">
-          <h3 className="text-xs font-bold text-[var(--color-kanji)] mb-4 flex items-center gap-2 uppercase tracking-wide">
-            <ShieldAlert size={14} className="text-gray-400" />
+        <div className="border-t border-gray-100 dark:border-slate-800 pt-5 mt-5">
+          <h3 className="text-xs font-bold text-kanji dark:text-white mb-4 flex items-center gap-2 uppercase tracking-wide">
+            <ShieldAlert size={14} className="text-gray-400 dark:text-slate-500" />
             Contacto de Emergencia
           </h3>
           <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-4">
@@ -140,13 +140,13 @@ export function PatientForm({ initialData, onSubmit, onCancel, isLoading }: Pati
       </div>
 
       {/* Sticky Footer Action Bar */}
-      <div className="flex justify-end gap-3 pt-5 border-t border-gray-100 mt-auto bg-white sticky bottom-0 z-10">
+      <div className="flex justify-end gap-3 pt-5 border-t border-gray-100 dark:border-slate-800 mt-auto bg-white dark:bg-slate-900 sticky bottom-0 z-10">
         <motion.button
-          whileHover={{ scale: 1.02, backgroundColor: "#f9fafb" }}
+          whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           type="button"
           onClick={onCancel}
-          className="px-5 py-2.5 text-xs font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:text-gray-800 hover:border-gray-300 focus:outline-none transition-all"
+          className="px-5 py-2.5 text-xs font-bold text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:text-gray-800 dark:hover:text-white hover:border-gray-300 dark:hover:border-slate-600 focus:outline-none transition-all"
         >
           Cancelar
         </motion.button>
@@ -155,7 +155,7 @@ export function PatientForm({ initialData, onSubmit, onCancel, isLoading }: Pati
           whileTap={{ scale: 0.98 }}
           type="submit"
           disabled={isLoading}
-          className="px-6 py-2.5 text-xs font-bold text-white bg-kio hover:bg-[#7c3aed] border border-transparent rounded-xl shadow-md shadow-kio/20 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2.5 text-xs font-bold text-white dark:text-slate-900 bg-kanji dark:bg-kio hover:bg-[#7c3aed] border border-transparent rounded-xl shadow-md shadow-kio/20 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Guardando...' : 'Guardar Expediente'}
         </motion.button>

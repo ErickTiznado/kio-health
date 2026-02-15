@@ -65,16 +65,23 @@ export class AppointmentsService {
       startOfRange = new Date(from);
       startOfRange.setHours(0, 0, 0, 0);
       endOfRange = new Date(to);
+      endOfRange.setDate(endOfRange.getDate() + 1); // Buffer for timezone spillover
       endOfRange.setHours(23, 59, 59, 999);
     } else {
       const targetDate = dateString ? new Date(dateString) : new Date();
       startOfRange = new Date(targetDate);
       startOfRange.setHours(0, 0, 0, 0);
       endOfRange = new Date(targetDate);
+      endOfRange.setDate(endOfRange.getDate() + 1); // Buffer
       endOfRange.setHours(23, 59, 59, 999);
     }
 
-    return this.prisma.appointment.findMany({
+    console.log('--- DEBUG FIND BY DATE ---');
+    console.log('Clinician:', profile.id);
+    console.log('Range Input:', from, to);
+    console.log('Range Object:', startOfRange.toISOString(), '->', endOfRange.toISOString());
+
+    const results = await this.prisma.appointment.findMany({
       where: {
         clinicianId: profile.id,
         startTime: { gte: startOfRange, lte: endOfRange },
@@ -84,6 +91,12 @@ export class AppointmentsService {
       },
       orderBy: { startTime: 'asc' },
     });
+
+    console.log('Found:', results.length, 'appointments');
+    results.forEach(r => console.log(`- ID: ${r.id} | Start: ${r.startTime.toISOString()} | Status: ${r.status}`));
+    console.log('--------------------------');
+
+    return results;
   }
 
   /**

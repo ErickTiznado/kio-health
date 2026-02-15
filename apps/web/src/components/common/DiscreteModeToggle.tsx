@@ -9,8 +9,8 @@ export function DiscreteModeToggle() {
       onClick={toggleDiscreteMode}
       className={`p-2 rounded-full transition-all ${
         isDiscreteMode 
-          ? 'bg-[var(--color-kanji)] text-white' 
-          : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+          ? 'bg-kanji dark:bg-kio text-white dark:text-slate-900' 
+          : 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700'
       }`}
       title={isDiscreteMode ? "Desactivar Modo Discreto" : "Activar Modo Discreto"}
     >

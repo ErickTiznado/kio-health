@@ -29,37 +29,37 @@ export function WaitlistPanel() {
   });
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full max-h-[400px]">
-      <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-amber-50/50">
-        <h3 className="font-bold text-gray-800 flex items-center gap-2 text-sm">
+    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden flex flex-col h-full max-h-[400px]">
+      <div className="p-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-amber-50/50 dark:bg-amber-900/10">
+        <h3 className="font-bold text-gray-800 dark:text-white flex items-center gap-2 text-sm">
           <User size={16} className="text-amber-500" />
           Lista de Espera
         </h3>
-        <span className="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+        <span className="text-xs font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-200 px-2 py-0.5 rounded-full">
           {waitlist.length}
         </span>
       </div>
 
       <div className="flex-1 overflow-y-auto p-2 space-y-2">
         {isLoading ? (
-          <div className="flex justify-center p-4"><Loader2 className="animate-spin text-gray-300" /></div>
+          <div className="flex justify-center p-4"><Loader2 className="animate-spin text-gray-300 dark:text-gray-600" /></div>
         ) : waitlist.length === 0 ? (
-          <div className="text-center py-8 text-gray-400 text-xs">
+          <div className="text-center py-8 text-gray-400 dark:text-gray-500 text-xs">
             No hay pacientes en espera.
           </div>
         ) : (
           waitlist.map((patient: WaitlistPatient) => (
-            <div key={patient.id} className="group bg-gray-50 hover:bg-white border border-transparent hover:border-amber-200 hover:shadow-sm rounded-lg p-3 transition-all cursor-pointer relative">
+            <div key={patient.id} className="group bg-gray-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 border border-transparent dark:border-slate-700 hover:border-amber-200 dark:hover:border-amber-700 hover:shadow-sm rounded-lg p-3 transition-all cursor-pointer relative">
               <div className="flex justify-between items-start mb-1">
-                <span className="font-bold text-gray-700 text-sm truncate max-w-[140px]">{patient.fullName}</span>
-                <span className="text-[10px] text-gray-400 whitespace-nowrap">
+                <span className="font-bold text-gray-700 dark:text-gray-200 text-sm truncate max-w-[140px]">{patient.fullName}</span>
+                <span className="text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap">
                   Hace {format(new Date(patient.updatedAt), 'd MMM', { locale: es })}
                 </span>
               </div>
-              <p className="text-[10px] text-gray-500 mb-2 truncate">{patient.contactPhone}</p>
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-2 truncate">{patient.contactPhone}</p>
               
               <button 
-                className="w-full bg-amber-100 hover:bg-amber-500 text-amber-700 hover:text-white text-[10px] font-bold py-1.5 rounded transition-colors flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 absolute bottom-2 left-2 right-2 width-auto"
+                className="w-full bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-500 dark:hover:bg-amber-600 text-amber-700 dark:text-amber-200 hover:text-white text-[10px] font-bold py-1.5 rounded transition-colors flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 absolute bottom-2 left-2 right-2 width-auto"
                 onClick={(e) => {
                     e.stopPropagation();
                     // Open Promote Modal logic here (TODO)

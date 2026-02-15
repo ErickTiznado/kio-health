@@ -2,6 +2,7 @@ import { type FC, type ReactNode, useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/auth.store';
 import { DiscreteModeToggle } from './common/DiscreteModeToggle';
+import { ThemeToggle } from './common/ThemeToggle';
 import {
   LayoutDashboard,
   Calendar,
@@ -71,7 +72,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
   const pageLabel = currentNavItem?.label || 'Dashboard';
 
   return (
-    <div className="min-h-screen bg-bg flex">
+    <div className="min-h-screen bg-bg flex transition-colors duration-200">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div
@@ -82,19 +83,19 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
 
       {/* Sidebar */}
       <aside
-        className={`w-64 bg-white border-r border-gray-200 flex flex-col fixed h-full z-30 transition-transform duration-200 ${
+        className={`w-64 lg:w-60 xl:w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex flex-col fixed h-full z-30 transition-all duration-200 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-5">
+        <div className="h-16 flex items-center justify-between px-5 border-b border-transparent dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-kio to-kanji rounded-xl flex items-center justify-center">
+            <div className="w-9 h-9 bg-gradient-to-br from-kio to-kanji rounded-xl flex items-center justify-center shadow-sm">
               <span className="text-white font-bold text-sm">K</span>
             </div>
             <div>
-              <span className="font-bold text-kanji text-lg">Kio</span>
-              <span className="text-gray-400 text-lg ml-0.5">Health</span>
+              <span className="font-bold text-kanji dark:text-kio text-lg">Kio</span>
+              <span className="text-gray-400 dark:text-kanji text-lg ml-0.5">Health</span>
             </div>
           </div>
           <button
@@ -108,7 +109,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
 
         {/* Navigation */}
         <nav className="flex-1 py-4 px-3 overflow-y-auto">
-          <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2">
+          <p className="text-[11px] font-semibold text-gray-400 dark:text-kanji uppercase tracking-wider px-3 mb-2">
             Menú
           </p>
           <ul className="space-y-0.5">
@@ -120,8 +121,8 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                   className={({ isActive }) =>
                     `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative ${
                       isActive
-                        ? 'bg-kio-light text-kio'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-kanji'
+                        ? 'bg-kio-light dark:bg-kio/10 text-kio'
+                        : 'text-gray-600 dark:text-kio hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-kanji dark:hover:text-kio'
                     }`
                   }
                 >
@@ -129,9 +130,9 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                     <>
                       {/* Active Indicator Bar */}
                       {isActive && (
-                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-kio rounded-r-full" />
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-kio rounded-r-full shadow-[0_0_10px_rgba(174,147,254,0.4)]" />
                       )}
-                      <span className={isActive ? 'text-kio' : 'text-gray-400 group-hover:text-kanji'}>
+                      <span className={isActive ? 'text-kio' : 'text-gray-400 dark:text-kanji group-hover:text-kanji dark:group-hover:text-kio'}>
                         {item.icon}
                       </span>
                       {item.label}
@@ -144,15 +145,15 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
         </nav>
 
         {/* Bottom Section */}
-        <div className="px-3 pb-4 border-t border-gray-100 pt-3 space-y-0.5">
+        <div className="px-3 pb-4 border-t border-gray-100 dark:border-slate-800 pt-3 space-y-0.5">
           <NavLink
             to="/settings"
             onClick={() => setSidebarOpen(false)}
             className={({ isActive }) =>
               `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative ${
                 isActive
-                  ? 'bg-kio-light text-kio'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-kanji'
+                  ? 'bg-kio-light dark:bg-kio/10 text-kio'
+                  : 'text-gray-600 dark:text-kio hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-kanji dark:hover:text-kio'
               }`
             }
           >
@@ -161,7 +162,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                 {isActive && (
                   <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-kio rounded-r-full" />
                 )}
-                <Settings size={20} className={isActive ? 'text-kio' : 'text-gray-400 group-hover:text-kanji'} />
+                <Settings size={20} className={isActive ? 'text-kio' : 'text-gray-400 dark:text-kanji group-hover:text-kanji dark:group-hover:text-kio'} />
                 Configuración
               </>
             )}
@@ -169,7 +170,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all duration-150"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 dark:text-kanji hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-all duration-150"
           >
             <LogOut size={20} />
             Cerrar sesión
@@ -178,34 +179,35 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col lg:ml-64">
+      <div className="flex-1 flex flex-col lg:ml-60 xl:ml-64 transition-all duration-200">
         {/* Top Header */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-10">
+        <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-6 sticky top-0 z-10 transition-colors duration-200">
           {/* Hamburger + Breadcrumb */}
           <div className="flex items-center gap-3 text-sm">
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-500 hover:text-kanji"
+              className="lg:hidden text-gray-500 dark:text-kio hover:text-kanji dark:hover:text-kio"
             >
               <Menu size={22} />
             </button>
-            <span className="text-gray-400 font-medium">Inicio</span>
-            <ChevronRight size={14} className="text-gray-300" />
-            <span className="text-kanji font-bold">{pageLabel}</span>
+            <span className="text-gray-400 dark:text-kanji font-medium">Inicio</span>
+            <ChevronRight size={14} className="text-gray-300 dark:text-kanji/60" />
+            <span className="text-kanji dark:text-kio font-bold">{pageLabel}</span>
           </div>
 
           {/* User Avatar */}
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <DiscreteModeToggle />
-            <div className="w-px h-6 bg-gray-200 mx-1" />
+            <div className="w-px h-6 bg-gray-200 dark:bg-slate-700 mx-1" />
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium text-kanji">{userName}</p>
-              <p className="text-xs text-gray-400">
+              <p className="text-sm font-medium text-kanji dark:text-kio">{userName}</p>
+              <p className="text-xs text-gray-400 dark:text-kanji">
                 {clinicianType === 'PSYCHOLOGIST' ? 'Psicólogo' : 'Nutricionista'}
               </p>
             </div>
-            <div className="w-10 h-10 bg-gradient-to-br from-kio to-kanji rounded-full flex items-center justify-center shadow-sm">
+            <div className="w-10 h-10 bg-gradient-to-br from-kio to-kanji rounded-full flex items-center justify-center shadow-sm ring-2 ring-white dark:ring-slate-800">
               <span className="text-white font-semibold text-sm">{initials}</span>
             </div>
           </div>
