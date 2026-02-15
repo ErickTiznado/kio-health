@@ -7,7 +7,7 @@ import {
     IsUUID,
     Min,
 } from 'class-validator';
-import { AppointmentType } from '@prisma/client';
+import { AppointmentType } from '#generated/prisma';
 
 export class CreateAppointmentDto {
     @IsUUID()

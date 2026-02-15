@@ -1,5 +1,5 @@
 import { IsEnum, IsNumber, IsOptional, Min } from 'class-validator';
-import { PaymentStatus, PaymentMethod } from '@prisma/client';
+import { PaymentStatus, PaymentMethod } from '#generated/prisma';
 
 export class UpdatePaymentDto {
     @IsEnum(PaymentStatus)

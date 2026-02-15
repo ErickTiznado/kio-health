@@ -2,12 +2,12 @@ import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PrismaService } from '../prisma/prisma.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { User } from '@prisma/client';
+import { User } from '#generated/prisma';
 
 @Controller('search')
 @UseGuards(JwtAuthGuard)
 export class SearchController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   @Get()
   async search(@CurrentUser() user: any, @Query('q') query: string) {
@@ -46,11 +46,11 @@ export class SearchController {
         reason: { contains: query, mode: 'insensitive' },
       },
       take: 3,
-      select: { 
-        id: true, 
-        startTime: true, 
-        reason: true, 
-        patient: { select: { fullName: true } } 
+      select: {
+        id: true,
+        startTime: true,
+        reason: true,
+        patient: { select: { fullName: true } }
       }
     });
 

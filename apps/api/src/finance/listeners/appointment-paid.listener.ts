@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { FinanceService } from '../finance.service';
-import { TransactionType } from '@prisma/client';
+import { TransactionType } from '#generated/prisma';
 
 @Injectable()
 export class AppointmentPaidListener {
-  constructor(private readonly financeService: FinanceService) {}
+  constructor(private readonly financeService: FinanceService) { }
 
   @OnEvent('appointment.paid')
   async handleAppointmentPaidEvent(payload: any) {
     const { appointment } = payload;
-    
+
     // Create transaction via service
     // Ensure createFromListener exists on service
     await this.financeService.createFromListener(appointment.clinicianId, {

@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { TransactionType } from '@prisma/client';
+import { TransactionType } from '#generated/prisma';
 import { endOfMonth } from 'date-fns';
 
 @Injectable()
 export class FinanceService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   private async resolveClinicianProfile(userId: string) {
     const profile = await this.prisma.clinicianProfile.findUnique({
@@ -20,7 +20,7 @@ export class FinanceService {
 
   async create(userId: string, dto: CreateTransactionDto) {
     const profile = await this.resolveClinicianProfile(userId);
-    
+
     return this.prisma.financeTransaction.create({
       data: {
         clinicianId: profile.id,
@@ -35,24 +35,24 @@ export class FinanceService {
   }
 
   async createFromListener(clinicianId: string, dto: CreateTransactionDto) {
-     if (dto.appointmentId) {
-        const existing = await this.prisma.financeTransaction.findUnique({
-          where: { appointmentId: dto.appointmentId },
+    if (dto.appointmentId) {
+      const existing = await this.prisma.financeTransaction.findUnique({
+        where: { appointmentId: dto.appointmentId },
+      });
+
+      if (existing) {
+        return this.prisma.financeTransaction.update({
+          where: { id: existing.id },
+          data: {
+            amount: dto.amount,
+            type: dto.type,
+            date: dto.date ? new Date(dto.date) : new Date(),
+          },
         });
+      }
+    }
 
-        if (existing) {
-          return this.prisma.financeTransaction.update({
-            where: { id: existing.id },
-            data: {
-              amount: dto.amount,
-              type: dto.type,
-              date: dto.date ? new Date(dto.date) : new Date(),
-            },
-          });
-        }
-     }
-
-     return this.prisma.financeTransaction.create({
+    return this.prisma.financeTransaction.create({
       data: {
         clinicianId,
         type: dto.type,
