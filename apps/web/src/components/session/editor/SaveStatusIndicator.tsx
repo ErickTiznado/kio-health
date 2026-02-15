@@ -10,7 +10,7 @@ interface SaveStatusIndicatorProps {
 export function SaveStatusIndicator({ status, lastSaved, error }: SaveStatusIndicatorProps) {
   if (status === 'error') {
     return (
-      <div className="flex items-center gap-1.5 text-red-600 bg-red-50 px-3 py-1 rounded-full border border-red-200 animate-pulse" title={error || ''}>
+      <div className="flex items-center gap-1.5 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded-full border border-red-200 dark:border-red-800 animate-pulse" title={error || ''}>
         <AlertCircle size={14} />
         <span className="text-xs font-bold">Error al guardar</span>
       </div>
@@ -19,7 +19,7 @@ export function SaveStatusIndicator({ status, lastSaved, error }: SaveStatusIndi
 
   if (status === 'saving') {
     return (
-      <div className="flex items-center gap-1.5 text-gray-500">
+      <div className="flex items-center gap-1.5 text-gray-500 dark:text-slate-400">
         <Loader2 size={14} className="animate-spin" />
         <span className="text-xs">Guardando...</span>
       </div>
@@ -28,7 +28,7 @@ export function SaveStatusIndicator({ status, lastSaved, error }: SaveStatusIndi
 
   if (status === 'saved' && lastSaved) {
     return (
-      <div className="flex items-center gap-1.5 text-emerald-600 transition-opacity duration-500">
+      <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 transition-opacity duration-500">
         <CheckCircle2 size={14} />
         <span className="text-xs">
           Guardado {format(lastSaved, 'HH:mm')}

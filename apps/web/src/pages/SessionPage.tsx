@@ -25,15 +25,15 @@ export function SessionPage() {
 
     if (sessionContext?.appointment.status === 'IN_PROGRESS') {
       const startTime = new Date(sessionContext.appointment.startTime).getTime();
-      
+
       const updateTimer = () => {
         const now = Date.now();
         const diff = Math.max(0, Math.floor((now - startTime) / 1000));
-        
+
         const hours = Math.floor(diff / 3600);
         const minutes = Math.floor((diff % 3600) / 60);
         const seconds = diff % 60;
-        
+
         setElapsedTime(
           [hours, minutes, seconds]
             .map((unit) => String(unit).padStart(2, '0'))
@@ -52,8 +52,8 @@ export function SessionPage() {
 
   if (isLoading || !sessionContext) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-kio"></div>
       </div>
     );
   }
@@ -73,15 +73,15 @@ export function SessionPage() {
 
   const handleNoShow = () => {
     if (confirm('¿Marcar cita como No Asistió?')) {
-        markNoShow(appointmentId!, {
-            onSuccess: () => {
-                toast.success('Cita marcada como No Asistió');
-                navigate('/agenda');
-            },
-            onError: () => {
-                toast.error('Error al marcar como No Asistió');
-            }
-        });
+      markNoShow(appointmentId!, {
+        onSuccess: () => {
+          toast.success('Cita marcada como No Asistió');
+          navigate('/agenda');
+        },
+        onError: () => {
+          toast.error('Error al marcar como No Asistió');
+        }
+      });
     }
   };
 
@@ -111,7 +111,7 @@ export function SessionPage() {
         status={appointment.status}
         onStartSession={handleStartSession}
         onFinishSession={handleFinishSession}
-        onNoShow={handleNoShow} 
+        onNoShow={handleNoShow}
       >
         <div className="grid grid-cols-[30%_70%] h-full">
           {/* Left — Patient Context */}
@@ -125,7 +125,7 @@ export function SessionPage() {
           />
 
           {/* Right — Role-specific panel */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-full">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden h-full">
             <EditorContainer appointmentId={appointment.id} patientId={patient.id} />
           </div>
         </div>

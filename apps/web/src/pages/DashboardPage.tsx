@@ -45,10 +45,10 @@ export function DashboardPage() {
         {/* HEADER */}
         <div className="flex items-center justify-between px-6 py-4">
           <div>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">
+            <p className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
               {formatDateHeader()}
             </p>
-            <h1 className="text-2xl font-bold text-kanji tracking-tight">
+            <h1 className="text-2xl font-bold text-kanji dark:text-white tracking-tight">
               {getGreeting()}, <span className="text-kio">{userName}</span>
             </h1>
           </div>
@@ -90,7 +90,7 @@ export function DashboardPage() {
         {/* MAIN CONTENT AREA */}
         <div className="grid grid-cols-12 gap-4 xl:gap-6 px-4 mt-6 pb-10">
           <RecentPatientsWidget patients={recentPatients} />
-          
+
           <div className="col-span-12 lg:col-span-5 flex flex-col gap-4 xl:gap-6 h-full">
             <div className="flex-1 min-h-0">
               <TodayAgendaWidget appointments={todayAppointments} isLoading={isTodayLoading} />

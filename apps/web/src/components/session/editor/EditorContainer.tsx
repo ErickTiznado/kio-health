@@ -20,7 +20,7 @@ interface EditorContainerProps {
 
 export function EditorContainer({ appointmentId, patientId }: EditorContainerProps) {
   const { currentNote, status, lastSaved, error, fetchNote } = useNoteStore();
-  
+
   // Local state for immediate UI feedback (synced with store via auto-save)
   const [templateType, setTemplateType] = useState<NoteTemplateType>(NoteTemplateType.FREE);
   const [content, setContent] = useState<any>({ body: '' });
@@ -44,8 +44,6 @@ export function EditorContainer({ appointmentId, patientId }: EditorContainerPro
       setContent(currentNote.content);
       if (currentNote.moodRating) setMoodRating(currentNote.moodRating);
       if (currentNote.privateNotes) setPrivateNotes(currentNote.privateNotes);
-      // Assuming currentNote has tags. I need to update types/appointments.types.ts first!
-      // But PsychNote response from backend will include it.
       if ((currentNote as any).tags) setTags((currentNote as any).tags);
       hasInitialized.current = true;
     }
@@ -53,11 +51,10 @@ export function EditorContainer({ appointmentId, patientId }: EditorContainerPro
 
   // Auto-save Hook
   useAutoSave(appointmentId, content, templateType, moodRating, privateNotes, tags);
-  
+
   // Handlers
   const handleTemplateChange = (type: NoteTemplateType) => {
     setTemplateType(type);
-    // Reset content structure based on new type to avoid schema validation errors
     if (type === NoteTemplateType.SOAP) {
       setContent({ s: '', o: '', a: '', p: '' });
     } else {
@@ -67,7 +64,7 @@ export function EditorContainer({ appointmentId, patientId }: EditorContainerPro
 
   const handleCopyStructure = () => {
     let textToCopy = '';
-    
+
     if (templateType === NoteTemplateType.SOAP) {
       textToCopy = `S: ${content.s || ''}
 
@@ -88,7 +85,7 @@ P: ${content.p || ''}`;
     try {
       const includePrivate = confirm('¿Incluir notas privadas en el reporte PDF?');
       toast.info('Generando PDF...');
-      
+
       const response = await api.get(`/appointments/${appointmentId}/export/pdf`, {
         params: { includePrivate },
         responseType: 'blob',
@@ -109,89 +106,85 @@ P: ${content.p || ''}`;
 
   const handleDuplicateLast = async () => {
     if (JSON.stringify(content).length > 20 && !confirm('¿Sobrescribir nota actual con la anterior?')) {
-        return;
+      return;
     }
 
     try {
-        const { data: lastNote } = await api.get(`/patients/${patientId}/last-note`);
-        if (!lastNote) {
-            toast.warning('No hay notas previas para duplicar');
-            return;
-        }
-        
-        // NoteTemplateType mismatch handling?
-        // Ideally we switch template if different?
-        // For now assume compatible or just set content.
-        
-        if (lastNote.templateType) setTemplateType(lastNote.templateType);
-        if (lastNote.content) setContent(lastNote.content);
-        if (lastNote.tags) setTags(lastNote.tags);
-        
-        toast.success('Nota duplicada');
+      const { data: lastNote } = await api.get(`/patients/${patientId}/last-note`);
+      if (!lastNote) {
+        toast.warning('No hay notas previas para duplicar');
+        return;
+      }
+
+      if (lastNote.templateType) setTemplateType(lastNote.templateType);
+      if (lastNote.content) setContent(lastNote.content);
+      if (lastNote.tags) setTags(lastNote.tags);
+
+      toast.success('Nota duplicada');
     } catch (_e) {
-        toast.error('Error al duplicar nota');
+      toast.error('Error al duplicar nota');
     }
   };
 
   return (
-    <div className="flex flex-col h-full bg-[var(--color-bg)] relative overflow-hidden">
+    <div className="flex flex-col h-full bg-[var(--color-bg)] dark:bg-slate-950 relative overflow-hidden">
       {/* Header Toolbar */}
-      <div className="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 shadow-sm z-10">
+      <div className="flex items-center justify-between px-6 py-3 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 shadow-sm z-10">
         <div className="flex items-center gap-4">
-          <TemplateSelector 
-            currentType={templateType} 
-            onSelect={handleTemplateChange} 
-            hasContent={JSON.stringify(content).length > 20} 
+          <TemplateSelector
+            currentType={templateType}
+            onSelect={handleTemplateChange}
+            hasContent={JSON.stringify(content).length > 20}
           />
-          <div className="w-px h-6 bg-gray-200" />
+          <div className="w-px h-6 bg-gray-200 dark:bg-slate-700" />
           <MoodTracker value={moodRating} onChange={setMoodRating} />
         </div>
 
         <div className="flex items-center gap-4">
-           <SaveStatusIndicator status={status} lastSaved={lastSaved} error={error} />
-           
-           <div className="w-px h-6 bg-gray-200 mx-1" />
+          <SaveStatusIndicator status={status} lastSaved={lastSaved} error={error} />
 
-           <button 
-             onClick={handleDuplicateLast}
-             className="p-2 text-gray-400 hover:text-[var(--color-kanji)] hover:bg-gray-100 rounded-lg transition-colors"
-             title="Duplicar última nota"
-           >
-             <Repeat size={18} />
-           </button>
+          <div className="w-px h-6 bg-gray-200 dark:bg-slate-700 mx-1" />
 
-           <button 
-             className="p-2 text-gray-300 cursor-not-allowed rounded-lg transition-colors"
-             title="Resumen con IA (Próximamente)"
-           >
-             <Sparkles size={18} />
-           </button>
+          <button
+            onClick={handleDuplicateLast}
+            className="p-2 text-gray-400 dark:text-slate-500 hover:text-[var(--color-kanji)] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+            title="Duplicar última nota"
+          >
+            <Repeat size={18} />
+          </button>
 
-           <div className="w-px h-6 bg-gray-200 mx-1" />
+          <button
+            className="p-2 text-gray-300 dark:text-slate-600 cursor-not-allowed rounded-lg transition-colors"
+            title="Resumen con IA (Próximamente)"
+          >
+            <Sparkles size={18} />
+          </button>
 
-           <button 
-             onClick={handleCopyStructure}
-             className="p-2 text-gray-400 hover:text-[var(--color-kanji)] hover:bg-gray-100 rounded-lg transition-colors"
-             title="Copiar estructura"
-           >
-             <Copy size={18} />
-           </button>
+          <div className="w-px h-6 bg-gray-200 dark:bg-slate-700 mx-1" />
 
-           <button 
-             onClick={handleExportPdf}
-             className="p-2 text-gray-400 hover:text-[var(--color-kanji)] hover:bg-gray-100 rounded-lg transition-colors"
-             title="Exportar PDF"
-           >
-             <FileDown size={18} />
-           </button>
+          <button
+            onClick={handleCopyStructure}
+            className="p-2 text-gray-400 dark:text-slate-500 hover:text-[var(--color-kanji)] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+            title="Copiar estructura"
+          >
+            <Copy size={18} />
+          </button>
 
-           <button 
-             onClick={() => setIsPrivatePanelOpen(!isPrivatePanelOpen)}
-             className={`p-2 rounded-lg transition-colors ${isPrivatePanelOpen ? 'bg-amber-100 text-amber-600' : 'text-gray-400 hover:text-amber-500 hover:bg-amber-50'}`}
-             title="Notas Privadas"
-           >
-             <Lock size={18} />
-           </button>
+          <button
+            onClick={handleExportPdf}
+            className="p-2 text-gray-400 dark:text-slate-500 hover:text-[var(--color-kanji)] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+            title="Exportar PDF"
+          >
+            <FileDown size={18} />
+          </button>
+
+          <button
+            onClick={() => setIsPrivatePanelOpen(!isPrivatePanelOpen)}
+            className={`p-2 rounded-lg transition-colors ${isPrivatePanelOpen ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' : 'text-gray-400 dark:text-slate-500 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20'}`}
+            title="Notas Privadas"
+          >
+            <Lock size={18} />
+          </button>
         </div>
       </div>
 
@@ -201,23 +194,23 @@ P: ${content.p || ''}`;
         <div className="flex-1 p-6 overflow-y-auto">
           <div className="h-full max-w-5xl mx-auto">
             {templateType === NoteTemplateType.SOAP ? (
-            <SoapForm 
-              content={content} 
-              onChange={(key, val) => setContent((prev: any) => ({ ...prev, [key]: val }))} 
-            />
-          ) : (
-            <FreeForm 
-              content={content} 
-              onChange={(val) => setContent({ body: val })} 
-            />
-          )}
+              <SoapForm
+                content={content}
+                onChange={(key, val) => setContent((prev: any) => ({ ...prev, [key]: val }))}
+              />
+            ) : (
+              <FreeForm
+                content={content}
+                onChange={(val) => setContent({ body: val })}
+              />
+            )}
+          </div>
         </div>
-      </div>
       </div>
 
       {/* Private Notes Sidebar */}
-      <PrivateNotesPanel 
-        isOpen={isPrivatePanelOpen} 
+      <PrivateNotesPanel
+        isOpen={isPrivatePanelOpen}
         onToggle={() => setIsPrivatePanelOpen(!isPrivatePanelOpen)}
         value={privateNotes}
         onChange={setPrivateNotes}

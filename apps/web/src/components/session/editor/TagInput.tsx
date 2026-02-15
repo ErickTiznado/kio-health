@@ -28,11 +28,11 @@ export function TagInput({ tags, onChange }: TagInputProps) {
 
   return (
     <div className="flex items-center gap-2 flex-wrap px-4 pt-2">
-      <Hash size={14} className="text-gray-400" />
+      <Hash size={14} className="text-gray-400 dark:text-slate-500" />
       {tags.map(tag => (
-        <span key={tag} className="bg-gray-100 text-gray-600 text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1">
+        <span key={tag} className="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1">
           #{tag}
-          <button onClick={() => removeTag(tag)} className="hover:text-red-500">
+          <button onClick={() => removeTag(tag)} className="hover:text-red-500 dark:hover:text-red-400">
             <X size={12} />
           </button>
         </span>
@@ -43,7 +43,7 @@ export function TagInput({ tags, onChange }: TagInputProps) {
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={tags.length === 0 ? "Añadir etiquetas (ej. ansiedad)..." : "..."}
-        className="text-xs bg-transparent outline-none min-w-[120px] placeholder:text-gray-400"
+        className="text-xs bg-transparent outline-none min-w-[120px] placeholder:text-gray-400 dark:placeholder:text-slate-600 text-gray-700 dark:text-slate-300"
       />
     </div>
   );

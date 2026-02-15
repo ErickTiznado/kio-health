@@ -46,15 +46,15 @@ export function SettingsPage() {
       <div className="max-w-2xl mx-auto">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-kanji">⚙️ Configuración</h1>
-          <p className="text-text/60 mt-1">
+          <h1 className="text-2xl font-bold text-kanji dark:text-kio">⚙️ Configuración</h1>
+          <p className="text-text/60 dark:text-slate-400 mt-1">
             Personaliza tu perfil y preferencias de sesión.
           </p>
         </div>
 
         {/* Settings Form */}
-        <div className="bg-white rounded-3xl border border-cruz shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-kanji mb-6">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-cruz dark:border-slate-800 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-kanji dark:text-white mb-6">
             Preferencias de Sesión
           </h2>
 
@@ -63,7 +63,7 @@ export function SettingsPage() {
             <div>
               <label
                 htmlFor="sessionDefaultPrice"
-                className="block text-sm font-medium text-kanji mb-2"
+                className="block text-sm font-medium text-kanji dark:text-slate-200 mb-2"
               >
                 Precio por sesión ({user?.profile?.currency || 'USD'})
               </label>
@@ -73,7 +73,7 @@ export function SettingsPage() {
                 step="0.01"
                 min="0"
                 {...register('sessionDefaultPrice', { valueAsNumber: true })}
-                className="w-full px-4 py-3 rounded-xl border border-cruz bg-bg text-kanji placeholder:text-text/40 focus:outline-none focus:ring-2 focus:ring-kio focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-cruz dark:border-slate-700 bg-bg dark:bg-slate-800 text-kanji dark:text-white placeholder:text-text/40 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-kio focus:border-transparent transition-all"
                 placeholder="100.00"
               />
               {errors.sessionDefaultPrice && (
@@ -87,7 +87,7 @@ export function SettingsPage() {
             <div>
               <label
                 htmlFor="sessionDefaultDuration"
-                className="block text-sm font-medium text-kanji mb-2"
+                className="block text-sm font-medium text-kanji dark:text-slate-200 mb-2"
               >
                 Duración por sesión (minutos)
               </label>
@@ -97,7 +97,7 @@ export function SettingsPage() {
                 min="15"
                 max="180"
                 {...register('sessionDefaultDuration', { valueAsNumber: true })}
-                className="w-full px-4 py-3 rounded-xl border border-cruz bg-bg text-kanji placeholder:text-text/40 focus:outline-none focus:ring-2 focus:ring-kio focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-cruz dark:border-slate-700 bg-bg dark:bg-slate-800 text-kanji dark:text-white placeholder:text-text/40 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-kio focus:border-transparent transition-all"
                 placeholder="50"
               />
               {errors.sessionDefaultDuration && (
@@ -109,14 +109,14 @@ export function SettingsPage() {
 
             {/* Success Message */}
             {successMessage && (
-              <div className="p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm">
+              <div className="p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 text-sm">
                 ✓ {successMessage}
               </div>
             )}
 
             {/* Error Message */}
             {updateProfileMutation.isError && (
-              <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+              <div className="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm">
                 ✕ Error al guardar. Intenta de nuevo.
               </div>
             )}
@@ -125,7 +125,7 @@ export function SettingsPage() {
             <button
               type="submit"
               disabled={isSubmitting || updateProfileMutation.isPending}
-              className="w-full py-3 px-6 bg-kio text-white font-semibold rounded-xl shadow-md hover:bg-kanji focus:outline-none focus:ring-2 focus:ring-kio focus:ring-offset-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="w-full py-3 px-6 bg-kio text-white font-semibold rounded-xl shadow-md hover:bg-kanji focus:outline-none focus:ring-2 focus:ring-kio focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {updateProfileMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
             </button>
@@ -133,28 +133,28 @@ export function SettingsPage() {
         </div>
 
         {/* Account Info Card */}
-        <div className="mt-6 bg-white rounded-3xl border border-cruz shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-kanji mb-4">
+        <div className="mt-6 bg-white dark:bg-slate-900 rounded-3xl border border-cruz dark:border-slate-800 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-kanji dark:text-white mb-4">
             Información de Cuenta
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <p className="text-text/60 text-sm">Email</p>
-              <p className="font-medium text-kanji">{user?.email}</p>
+              <p className="text-text/60 dark:text-slate-400 text-sm">Email</p>
+              <p className="font-medium text-kanji dark:text-white">{user?.email}</p>
             </div>
             <div>
-              <p className="text-text/60 text-sm">Rol</p>
-              <p className="font-medium text-kanji">{user?.role}</p>
+              <p className="text-text/60 dark:text-slate-400 text-sm">Rol</p>
+              <p className="font-medium text-kanji dark:text-white">{user?.role}</p>
             </div>
             <div>
-              <p className="text-text/60 text-sm">Tipo</p>
-              <p className="font-medium text-kanji">
+              <p className="text-text/60 dark:text-slate-400 text-sm">Tipo</p>
+              <p className="font-medium text-kanji dark:text-white">
                 {user?.profile?.type === 'PSYCHOLOGIST' ? 'Psicólogo' : 'Nutriólogo'}
               </p>
             </div>
             <div>
-              <p className="text-text/60 text-sm">Número de Licencia</p>
-              <p className="font-medium text-kanji">
+              <p className="text-text/60 dark:text-slate-400 text-sm">Número de Licencia</p>
+              <p className="font-medium text-kanji dark:text-white">
                 {user?.profile?.licenseNumber || 'No especificado'}
               </p>
             </div>

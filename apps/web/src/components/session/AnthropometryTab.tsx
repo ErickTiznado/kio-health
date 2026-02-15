@@ -76,7 +76,7 @@ export const AnthropometryTab: FC = () => {
           <div
             key={field.id}
             className={`
-              bg-white rounded-3xl p-5 border border-gray-100/60
+              bg-white dark:bg-slate-900 rounded-3xl p-5 border border-gray-100/60 dark:border-slate-800
               shadow-sm hover:shadow-md transition-shadow duration-200
               ${field.colSpan === 2 ? 'col-span-2' : ''}
               ${field.isReadonly ? 'opacity-70' : ''}
@@ -84,7 +84,7 @@ export const AnthropometryTab: FC = () => {
           >
             {/* Label */}
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+              <span className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">
                 {field.label}
               </span>
 
@@ -93,7 +93,7 @@ export const AnthropometryTab: FC = () => {
                 <span
                   className={`
                     flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full
-                    ${weightTrend === 'down' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'}
+                    ${weightTrend === 'down' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400'}
                   `}
                 >
                   {weightTrend === 'down' ? (
@@ -117,11 +117,11 @@ export const AnthropometryTab: FC = () => {
                 placeholder={field.placeholder}
                 className={`
                   w-full text-3xl font-bold tracking-tight border-none outline-none bg-transparent
-                  placeholder:text-gray-200
-                  ${field.isReadonly ? 'text-gray-400 cursor-default' : 'text-gray-900'}
+                  placeholder:text-gray-200 dark:placeholder:text-slate-700
+                  ${field.isReadonly ? 'text-gray-400 dark:text-slate-500 cursor-default' : 'text-gray-900 dark:text-white'}
                 `}
               />
-              <span className="text-base font-semibold text-gray-300 shrink-0">
+              <span className="text-base font-semibold text-gray-300 dark:text-slate-600 shrink-0">
                 {field.unit}
               </span>
             </div>
@@ -129,18 +129,18 @@ export const AnthropometryTab: FC = () => {
         ))}
 
         {/* ── IMC Highlighted Card ── */}
-        <div className="col-span-2 bg-gradient-to-br from-kio/10 via-kanji/5 to-transparent rounded-3xl p-6 border border-kio/20 shadow-sm">
+        <div className="col-span-2 bg-gradient-to-br from-kio/10 via-kanji/5 to-transparent dark:from-kio/5 dark:via-kanji/5 dark:to-slate-900 rounded-3xl p-6 border border-kio/20 dark:border-kio/10 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-xl bg-kio/20 flex items-center justify-center">
-              <Activity size={16} className="text-kanji" />
+              <Activity size={16} className="text-kanji dark:text-kio" />
             </div>
-            <span className="text-[11px] font-bold text-kanji/70 uppercase tracking-widest">
+            <span className="text-[11px] font-bold text-kanji/70 dark:text-kio/70 uppercase tracking-widest">
               IMC — Índice de Masa Corporal
             </span>
           </div>
 
           <div className="flex items-baseline gap-3">
-            <span className="text-5xl font-black text-kanji tracking-tight">
+            <span className="text-5xl font-black text-kanji dark:text-white tracking-tight">
               {bmiValue !== null ? bmiValue.toFixed(1) : '—'}
             </span>
             {bmiCategory && (
@@ -152,8 +152,8 @@ export const AnthropometryTab: FC = () => {
 
           {/* Formula hint */}
           <div className="flex items-center gap-1.5 mt-3">
-            <Ruler size={12} className="text-gray-300" />
-            <span className="text-[10px] text-gray-400">
+            <Ruler size={12} className="text-gray-300 dark:text-slate-600" />
+            <span className="text-[10px] text-gray-400 dark:text-slate-500">
               Altura ref: {DEFAULT_HEIGHT_M}m · Fórmula: peso / altura²
             </span>
           </div>
@@ -161,8 +161,8 @@ export const AnthropometryTab: FC = () => {
           {/* Neutral weight indicator */}
           {weightTrend === 'neutral' && currentWeight > 0 && (
             <div className="flex items-center gap-1.5 mt-2">
-              <Minus size={12} className="text-gray-400" />
-              <span className="text-[10px] text-gray-400">
+              <Minus size={12} className="text-gray-400 dark:text-slate-500" />
+              <span className="text-[10px] text-gray-400 dark:text-slate-500">
                 Sin cambio respecto a cita anterior
               </span>
             </div>

@@ -47,26 +47,26 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-bg via-bg to-kio/5 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-bg via-bg to-kio/5 dark:from-slate-950 dark:via-slate-950 dark:to-kio/10 px-4">
       <div className="w-full max-w-md">
         {/* Logo & Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-kio rounded-2xl mb-4 shadow-lg shadow-kio/20">
             <span className="text-2xl font-bold text-white">K</span>
           </div>
-          <h1 className="text-3xl font-bold text-kanji">Welcome to Kio</h1>
-          <p className="text-text/60 mt-2">Sign in to your account</p>
+          <h1 className="text-3xl font-bold text-kanji dark:text-white">Welcome to Kio</h1>
+          <p className="text-text/60 dark:text-slate-400 mt-2">Sign in to your account</p>
         </div>
 
         {/* Login Form */}
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="bg-white rounded-3xl shadow-xl shadow-black/5 border border-cruz/50 p-8"
+          className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-black/5 dark:shadow-black/20 border border-cruz/50 dark:border-slate-800 p-8"
         >
           {/* Server Error */}
           {serverError && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-              <p className="text-red-600 text-sm font-medium">{serverError}</p>
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+              <p className="text-red-600 dark:text-red-400 text-sm font-medium">{serverError}</p>
             </div>
           )}
 
@@ -74,7 +74,7 @@ export function LoginPage() {
           <div className="mb-5">
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-kanji mb-2"
+              className="block text-sm font-medium text-kanji dark:text-slate-200 mb-2"
             >
               Email
             </label>
@@ -86,8 +86,9 @@ export function LoginPage() {
               placeholder="you@example.com"
               className={`
                 w-full px-4 py-3 rounded-xl border transition-all duration-200
-                bg-bg focus:outline-none focus:ring-2 focus:ring-kio/30 focus:border-kio
-                ${errors.email ? 'border-red-400' : 'border-cruz'}
+                bg-bg dark:bg-slate-800 text-kanji dark:text-white placeholder:text-text/40 dark:placeholder:text-slate-500
+                focus:outline-none focus:ring-2 focus:ring-kio/30 focus:border-kio
+                ${errors.email ? 'border-red-400' : 'border-cruz dark:border-slate-700'}
               `}
             />
             {errors.email && (
@@ -99,7 +100,7 @@ export function LoginPage() {
           <div className="mb-6">
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-kanji mb-2"
+              className="block text-sm font-medium text-kanji dark:text-slate-200 mb-2"
             >
               Password
             </label>
@@ -111,8 +112,9 @@ export function LoginPage() {
               placeholder="••••••••"
               className={`
                 w-full px-4 py-3 rounded-xl border transition-all duration-200
-                bg-bg focus:outline-none focus:ring-2 focus:ring-kio/30 focus:border-kio
-                ${errors.password ? 'border-red-400' : 'border-cruz'}
+                bg-bg dark:bg-slate-800 text-kanji dark:text-white placeholder:text-text/40 dark:placeholder:text-slate-500
+                focus:outline-none focus:ring-2 focus:ring-kio/30 focus:border-kio
+                ${errors.password ? 'border-red-400' : 'border-cruz dark:border-slate-700'}
               `}
             />
             {errors.password && (
@@ -130,7 +132,7 @@ export function LoginPage() {
               w-full py-3.5 px-6 rounded-xl font-semibold text-white
               bg-gradient-to-r from-kio to-kio/90
               hover:from-kio/95 hover:to-kio/85
-              focus:outline-none focus:ring-2 focus:ring-kio/50 focus:ring-offset-2
+              focus:outline-none focus:ring-2 focus:ring-kio/50 focus:ring-offset-2 dark:focus:ring-offset-slate-900
               transition-all duration-200 shadow-lg shadow-kio/20
               disabled:opacity-50 disabled:cursor-not-allowed
             `}
@@ -147,7 +149,7 @@ export function LoginPage() {
         </form>
 
         {/* Footer */}
-        <p className="text-center text-text/50 text-sm mt-6">
+        <p className="text-center text-text/50 dark:text-slate-500 text-sm mt-6">
           Test credentials: <strong>psych@kio.com</strong> /{' '}
           <strong>123456</strong>
         </p>

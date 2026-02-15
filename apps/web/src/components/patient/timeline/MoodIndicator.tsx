@@ -19,8 +19,8 @@ export function MoodIndicator({ rating, size = 'md' }: MoodIndicatorProps) {
   };
 
   return (
-    <div 
-      className={`${getSize()} rounded-full ${getColor(rating)} shadow-sm ring-2 ring-white`} 
+    <div
+      className={`${getSize()} rounded-full ${getColor(rating)} shadow-sm ring-2 ring-white dark:ring-slate-900`}
       title={`Ánimo: ${rating}/10`}
     />
   );

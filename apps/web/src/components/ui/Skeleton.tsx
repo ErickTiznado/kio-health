@@ -13,7 +13,7 @@ export const Skeleton: FC<SkeletonProps> = ({
   className = '',
   variant = 'rectangular',
 }) => {
-  const baseClasses = 'animate-pulse bg-cruz/40';
+  const baseClasses = 'animate-pulse bg-cruz/40 dark:bg-slate-800';
 
   const variantClasses = {
     text: 'h-4 rounded',
