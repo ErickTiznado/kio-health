@@ -3,7 +3,7 @@ import { format, addDays, isToday, parseISO, isSameDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import type { Appointment } from '../../types/appointments.types';
+import type { Appointment } from '../../../types/appointments.types';
 import { AppointmentPill } from './AppointmentPill';
 import { CurrentTimeLine } from './CurrentTimeLine';
 

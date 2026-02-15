@@ -3,10 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { X, Search, Calendar, User, FileText, Banknote, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { createAppointment } from '../../lib/appointments.api';
-import { usePatients } from '../../hooks/use-patients';
-import { useDebounce } from '../../hooks/use-debounce';
-import type { AppointmentType } from '../../types/appointments.types';
+import { createAppointment } from '../../../lib/appointments.api';
+import { usePatients } from '../../../hooks/use-patients';
+import { useDebounce } from '../../../hooks/use-debounce';
+import type { AppointmentType } from '../../../types/appointments.types';
 
 interface ScheduleAppointmentModalProps {
     isOpen: boolean;

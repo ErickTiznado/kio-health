@@ -3,7 +3,7 @@ import { X, CreditCard, FileText, Clock, Stethoscope, ClipboardList, Calendar, E
 import { format, parseISO, formatDistanceToNowStrict } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
-import type { Appointment } from '../../types/appointments.types';
+import type { Appointment } from '../../../types/appointments.types';
 
 import { useState } from 'react';
 

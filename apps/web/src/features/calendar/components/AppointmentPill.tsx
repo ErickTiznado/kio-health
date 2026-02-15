@@ -1,6 +1,6 @@
 import { MoreVertical, MapPin, Banknote } from 'lucide-react';
 import { format, parseISO, differenceInMinutes } from 'date-fns';
-import type { Appointment } from '../../types/appointments.types';
+import type { Appointment } from '../../../types/appointments.types';
 
 interface AppointmentPillProps {
   appointment: Appointment;

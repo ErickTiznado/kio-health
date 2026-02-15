@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { FinanceController } from './finance.controller';
 import { FinanceService } from './finance.service';
-import { PrismaModule } from '../../prisma/prisma.module';
+import { PrismaModule } from '../prisma/prisma.module';
 import { AppointmentPaidListener } from './listeners/appointment-paid.listener';
 
 @Module({

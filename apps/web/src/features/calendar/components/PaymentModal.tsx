@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, DollarSign, CreditCard, Banknote, ArrowLeftRight, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { updatePayment, type UpdatePaymentPayload } from '../../lib/appointments.api';
-import type { Appointment } from '../../types/appointments.types';
+import { updatePayment, type UpdatePaymentPayload } from '../../../lib/appointments.api';
+import type { Appointment } from '../../../types/appointments.types';
 
 interface PaymentModalProps {
     isOpen: boolean;

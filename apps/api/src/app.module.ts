@@ -10,7 +10,7 @@ import { PatientsModule } from './patients/patients.module';
 import { AccessLogModule } from './access-log/access-log.module';
 import { ExportModule } from './export/export.module';
 import { TasksModule } from './tasks/tasks.module';
-import { FinanceModule } from './modules/finance/finance.module';
+import { FinanceModule } from './finance/finance.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SearchModule } from './search/search.module';
 

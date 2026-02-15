@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { FinanceService } from './finance.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { CurrentUser } from '../../auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '@prisma/client';
 
 @Controller('finance')

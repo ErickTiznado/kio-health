@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import type { Appointment } from '../../types/appointments.types';
+import type { Appointment } from '../../../types/appointments.types';
 
 // Placeholder components
 const AppointmentPill = ({ appointment, onSelect }: any) => (
