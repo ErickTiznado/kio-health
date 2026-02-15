@@ -1,4 +1,4 @@
-import { CalendarClock, Coffee, ChevronRight, Clock, DollarSign } from 'lucide-react';
+import { CalendarClock, Coffee, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format, isWithinInterval, parseISO, differenceInMinutes } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -32,11 +32,7 @@ const TYPE_SHORT: Record<Appointment['type'], string> = {
   FOLLOW_UP: 'SEG',
 };
 
-const TYPE_LABELS: Record<Appointment['type'], string> = {
-  CONSULTATION: 'Consulta',
-  EVALUATION: 'Evaluación',
-  FOLLOW_UP: 'Seguimiento',
-};
+
 
 export function TodayAgendaWidget({
   appointments,
@@ -130,8 +126,8 @@ export function TodayAgendaWidget({
                     key={apt.id}
                     to={`/session/${apt.id}`}
                     className={`group relative flex items-center gap-2.5 py-2 px-2 rounded-xl transition-all ${isNow
-                        ? 'bg-kio/5 dark:bg-kio/10'
-                        : 'hover:bg-gray-50 dark:hover:bg-slate-800/50'
+                      ? 'bg-kio/5 dark:bg-kio/10'
+                      : 'hover:bg-gray-50 dark:hover:bg-slate-800/50'
                       } ${isCancelled ? 'opacity-40' : ''}`}
                   >
                     {/* Time */}
@@ -145,8 +141,8 @@ export function TodayAgendaWidget({
                     {/* Dot */}
                     <div className="relative z-10 shrink-0 flex items-center justify-center w-2.5">
                       <div className={`w-2 h-2 rounded-full transition-all ${isNow
-                          ? 'bg-kio ring-[3px] ring-kio/30 scale-125'
-                          : `${STATUS_COLORS[apt.status]} ${isPast ? '' : `ring-2 ${STATUS_RING[apt.status]}`}`
+                        ? 'bg-kio ring-[3px] ring-kio/30 scale-125'
+                        : `${STATUS_COLORS[apt.status]} ${isPast ? '' : `ring-2 ${STATUS_RING[apt.status]}`}`
                         }`} />
                     </div>
 
