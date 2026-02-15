@@ -34,7 +34,102 @@ const CLINICIANS_CONFIG = [
 
 const PATIENTS_COUNT = 25;
 const APPOINTMENTS_PER_DAY = 6;
-const DAYS_WINDOW = 14; // 2 weeks
+const FUTURE_DAYS_WINDOW = 14;   // 2 weeks forward
+const PAST_WEEKS = 8;            // 8 weeks of clinical history
+
+// ============================================
+// REALISTIC CLINICAL DATA
+// ============================================
+
+const DIAGNOSES = [
+  'Trastorno de Ansiedad Generalizada',
+  'Depresión Mayor',
+  'TDAH',
+  'Estrés Laboral',
+  'Trastorno de Adaptación',
+  'Trastorno de Pánico',
+  'Fobia Social',
+  'Duelo Patológico',
+  null,
+];
+
+const SOAP_SUBJECTIVE = [
+  'Paciente reporta mejoría en la calidad del sueño. Refiere haber dormido entre 6-7 horas las últimas noches sin despertares nocturnos.',
+  'Manifiesta sentirse "abrumado/a" por la carga laboral. Reporta peleas frecuentes con su pareja por irritabilidad.',
+  'Indica que pudo aplicar las técnicas de respiración durante un episodio de ansiedad. Refiere sentirse más en control.',
+  'Paciente llega con afecto aplanado. Menciona que no tiene motivación para actividades que antes disfrutaba.',
+  'Reporta una semana difícil. Tuvo un conflicto con un compañero de trabajo que detonó pensamientos negativos recurrentes.',
+  'Se muestra optimista. Menciona que empezó a hacer ejercicio 3 veces por semana como se acordó.',
+  'Refiere episodio de pánico el miércoles pasado en el supermercado. Duración aproximada: 20 minutos.',
+  'Paciente indica que la relación con sus padres ha mejorado desde que estableció límites claros.',
+  'Menciona dificultad para concentrarse en el trabajo. Se distrae con facilidad y olvida tareas importantes.',
+  'Reporta que los pensamientos intrusivos han disminuido en frecuencia desde la última sesión.',
+];
+
+const SOAP_OBJECTIVE = [
+  'Paciente llega puntual, vestimenta apropiada. Contacto visual adecuado. Afecto congruente.',
+  'Apariencia cuidada. Se observa inquietud psicomotriz. Habla rápida. Llanto contenido al hablar de su infancia.',
+  'Paciente alerta, orientado en tiempo, lugar y persona. Afecto reactivo. No se observan signos de ideación suicida.',
+  'Postura encorvada, mirada baja. Respuestas monosilábicas al inicio. Se fue abriendo durante la sesión.',
+  'Se presenta con energía notablemente más alta que en sesiones anteriores. Sonrisa espontánea.',
+  'Signos vitales estables. Paciente refiere estar durmiendo 8 horas. Ánimo mejorado respecto a las últimas 3 sesiones.',
+  'Se observa tensión muscular en hombros y mandíbula. Manos inquietas durante toda la sesión.',
+  'Lenguaje coherente y fluido. Capacidad de introspección adecuada. Expresa emociones sin dificultad.',
+];
+
+const SOAP_ASSESSMENT = [
+  'Se observa progreso en el manejo de la ansiedad. PCL-5 score disminuyó de 42 a 35.',
+  'Continúa con sintomatología depresiva moderada. PHQ-9: 14 (descenso de 2 puntos).',
+  'Adherencia parcial al plan terapéutico. Necesita reforzar técnicas de regulación emocional.',
+  'Mejoría significativa en habilidades sociales. Paciente reporta menos evitación.',
+  'Cogniciones distorsionadas persisten: catastrofización y pensamiento dicotómico.',
+  'Buen avance en reestructuración cognitiva. Paciente identifica pensamientos automáticos.',
+  'Estancamiento terapéutico. Evaluar ajuste de estrategia para próxima sesión.',
+  'Se alcanzaron dos de los tres objetivos terapéuticos planteados esta semana.',
+];
+
+const SOAP_PLAN = [
+  'Continuar con TCC. Tarea: Registro de pensamientos automáticos 3x/semana. Próxima sesión en 1 semana.',
+  'Mantener ejercicio de respiración diafragmática 2x/día. Iniciar diario de gratitud. Evaluar referencia a psiquiatría.',
+  'Ejercicio de exposición gradual: visitar centro comercial 15 min esta semana. Registro de ansiedad (SUDS).',
+  'Asignar técnica de activación conductual. Programar 3 actividades placenteras esta semana.',
+  'Practicar comunicación asertiva con ejercicio de role-play. Registrar situaciones de conflicto.',
+  'Incrementar frecuencia de mindfulness a 10 min/día. Revisar patrón de sueño con app de tracking.',
+  'Referir a evaluación psiquiátrica para valorar medicación co-adyuvante. Mantener sesiones semanales.',
+  'Tarea de reestructuración: Completar hoja de registro A-B-C para 5 situaciones. Próxima sesión: jueves.',
+];
+
+const FREE_NOTE_BODIES = [
+  'Primera sesión. Paciente acude por derivación médica. Presenta sintomatología ansiosa de aproximadamente 6 meses de evolución. Se establece el rapport inicial y se realiza la historia clínica. Se acuerda formato de sesiones semanales de 50 minutos. Objetivos iniciales: reducir frecuencia de ataques de pánico, mejorar calidad de sueño, desarrollar herramientas de afrontamiento.',
+  'Sesión enfocada en psicoeducación sobre el modelo cognitivo-conductual. Se explicó la relación pensamiento-emoción-conducta. Paciente se mostró receptivo/a y participativo/a. Se asignó como tarea completar el inventario de Beck (BDI-II) para la próxima sesión.',
+  'Se trabajó restructuración cognitiva sobre la creencia "si no soy perfecto/a, soy un fracaso". Paciente identificó varias situaciones donde este patrón se activa. Se utilizó la técnica de flecha descendente para llegar a la creencia nuclear. Avance notable en insight.',
+  'Sesión de seguimiento. Paciente reporta haber completado el registro de pensamientos durante la semana. Se revisaron 4 entradas y se modeló el proceso de disputa. Ánimo general mejorado. Se refuerza el compromiso terapéutico.',
+  'Se realizó ejercicio de relajación muscular progresiva de Jacobson (versión abreviada, 7 grupos musculares). Paciente logró alcanzar niveles de relajación satisfactorios. Se le proporcionó audio guiado para práctica en casa.',
+];
+
+const PRIVATE_NOTES = [
+  'Monitorear posible ideación suicida pasiva. No hay plan ni intención, pero menciona "a veces no le ve sentido a nada." Mantener vigilancia.',
+  'Nota: Posible conflicto con la madre no resuelto que interfiere con el proceso. Explorar con cuidado en próximas sesiones.',
+  'El paciente mostró resistencia al hablar del abuso reportado. No forzar. Respetar el ritmo.',
+  'Considerar derivación a psiquiatría si no hay mejoría en las próximas 2 sesiones. Sintomatología no cede con TCC sola.',
+  'Dinámica familiar compleja. El padre parece ser un factor de mantenimiento del cuadro ansioso.',
+  null,
+  null,
+  null,
+];
+
+const NOTE_TAGS = [
+  ['ansiedad', 'sueño', 'respiración'],
+  ['depresión', 'motivación', 'activación-conductual'],
+  ['TDAH', 'concentración', 'productividad'],
+  ['estrés', 'trabajo', 'límites'],
+  ['pánico', 'exposición', 'SUDS'],
+  ['autoestima', 'reestructuración', 'creencias-nucleares'],
+  ['duelo', 'procesamiento', 'pérdida'],
+  ['relaciones', 'asertividad', 'comunicación'],
+  ['sueño', 'higiene-del-sueño', 'relajación'],
+  ['trauma', 'procesamiento', 'EMDR'],
+];
 
 // ============================================
 // HELPER FUNCTIONS
@@ -48,14 +143,13 @@ function generateEmergencyContact(): object {
   return {
     name: faker.person.fullName(),
     relationship: faker.helpers.arrayElement([
-      'Spouse',
-      'Parent',
-      'Sibling',
-      'Friend',
-      'Child',
+      'Esposo/a',
+      'Padre/Madre',
+      'Hermano/a',
+      'Amigo/a',
+      'Hijo/a',
     ]),
     phone: faker.phone.number(),
-    email: faker.internet.email(),
   };
 }
 
@@ -63,15 +157,29 @@ function getRandomTimeSlot(
   baseDate: Date,
   slotIndex: number,
 ): { start: Date; end: Date } {
-  // Appointments start at 9 AM, 1 hour slots
-  const startHour = 9 + slotIndex; 
+  const startHour = 9 + slotIndex;
   const start = new Date(baseDate);
   start.setHours(startHour, 0, 0, 0);
 
   const end = new Date(start);
-  end.setMinutes(end.getMinutes() + 50); // 50 min session
+  end.setMinutes(end.getMinutes() + 50);
 
   return { start, end };
+}
+
+function generateSOAPContent() {
+  return {
+    s: faker.helpers.arrayElement(SOAP_SUBJECTIVE),
+    o: faker.helpers.arrayElement(SOAP_OBJECTIVE),
+    a: faker.helpers.arrayElement(SOAP_ASSESSMENT),
+    p: faker.helpers.arrayElement(SOAP_PLAN),
+  };
+}
+
+function generateFreeContent() {
+  return {
+    body: faker.helpers.arrayElement(FREE_NOTE_BODIES),
+  };
 }
 
 // ============================================
@@ -81,7 +189,6 @@ function getRandomTimeSlot(
 async function clearDatabase(): Promise<void> {
   console.log('🗑️  Clearing existing data...');
 
-  // Order matters due to foreign key constraints
   await prisma.accessLog.deleteMany();
   await prisma.task.deleteMany();
   await prisma.financeTransaction.deleteMany();
@@ -99,8 +206,7 @@ async function createClinicians(
 ): Promise<{ id: string; userId: string; type: 'PSYCHOLOGIST' }[]> {
   console.log('👨‍⚕️  Creating clinicians...');
 
-  const clinicians: { id: string; userId: string; type: 'PSYCHOLOGIST' }[] =
-    [];
+  const clinicians: { id: string; userId: string; type: 'PSYCHOLOGIST' }[] = [];
 
   for (const config of CLINICIANS_CONFIG) {
     const user = await prisma.user.create({
@@ -143,14 +249,7 @@ async function createPatientsForClinician(
         status: randomStatus(),
         contactPhone: faker.phone.number(),
         emergencyContact: generateEmergencyContact(),
-        diagnosis: faker.helpers.arrayElement([
-          'General Anxiety Disorder',
-          'Major Depression',
-          'ADHD',
-          'Work Stress',
-          'Adjustment Disorder',
-          null,
-        ]),
+        diagnosis: faker.helpers.arrayElement(DIAGNOSES),
         clinicalContext: faker.lorem.paragraph(),
         dateOfBirth: faker.date.birthdate({ min: 18, max: 65, mode: 'age' }),
       },
@@ -161,47 +260,186 @@ async function createPatientsForClinician(
   return patientIds;
 }
 
-async function createAppointmentsForClinician(
+// ============================================
+// PAST APPOINTMENTS + PSYCH NOTES (Clinical History)
+// ============================================
+
+async function createClinicalHistory(
   clinicianId: string,
   patientIds: string[],
   defaultPrice: number,
 ): Promise<void> {
   const today = new Date();
-  
-  // Start from tomorrow
+  today.setHours(0, 0, 0, 0);
+
+  let notesCreated = 0;
+  let pastAppointments = 0;
+
+  console.log(`📜 Creating clinical history (${PAST_WEEKS} weeks of past sessions)...`);
+
+  for (let week = 1; week <= PAST_WEEKS; week++) {
+    // Each patient has ~1 session per week (realistic for therapy)
+    for (const patientId of patientIds) {
+      // Not every patient has a session every single week (70% chance)
+      if (Math.random() > 0.7) continue;
+
+      // Pick a random weekday in that week
+      const dayOffset = -(week * 7) + faker.number.int({ min: 0, max: 4 }); // Mon-Fri
+      const sessionDate = new Date(today);
+      sessionDate.setDate(today.getDate() + dayOffset);
+
+      // Skip weekends
+      if (sessionDate.getDay() === 0 || sessionDate.getDay() === 6) continue;
+
+      const slotIndex = faker.number.int({ min: 0, max: 5 });
+      const { start, end } = getRandomTimeSlot(sessionDate, slotIndex);
+
+      // Most past appointments are COMPLETED, some NO_SHOW or CANCELLED
+      const status = faker.helpers.weightedArrayElement([
+        { weight: 0.80, value: AppointmentStatus.COMPLETED },
+        { weight: 0.10, value: AppointmentStatus.CANCELLED },
+        { weight: 0.10, value: AppointmentStatus.NO_SHOW },
+      ]);
+
+      // Payment: completed sessions are mostly paid
+      const paymentStatus = status === AppointmentStatus.COMPLETED
+        ? faker.helpers.weightedArrayElement([
+          { weight: 0.75, value: PaymentStatus.PAID },
+          { weight: 0.25, value: PaymentStatus.PENDING }, // Some have debt
+        ])
+        : PaymentStatus.PENDING;
+
+      const paymentMethod = paymentStatus === PaymentStatus.PAID
+        ? faker.helpers.arrayElement(['CASH', 'CARD', 'TRANSFER'] as const)
+        : null;
+
+      const appointment = await prisma.appointment.create({
+        data: {
+          patientId,
+          clinicianId,
+          startTime: start,
+          endTime: end,
+          type: faker.helpers.arrayElement(Object.values(AppointmentType)),
+          status,
+          paymentStatus,
+          paymentMethod,
+          price: defaultPrice,
+          reason: faker.lorem.sentence(),
+          notes: status === AppointmentStatus.COMPLETED
+            ? faker.helpers.maybe(() => faker.lorem.sentence(), { probability: 0.3 }) ?? null
+            : null,
+        },
+      });
+
+      pastAppointments++;
+
+      // Create PsychNote only for COMPLETED appointments (clinical notes)
+      if (status === AppointmentStatus.COMPLETED) {
+        const templateType = faker.helpers.weightedArrayElement([
+          { weight: 0.55, value: NoteTemplateType.SOAP },
+          { weight: 0.25, value: NoteTemplateType.FREE },
+          { weight: 0.10, value: NoteTemplateType.INITIAL },
+          { weight: 0.10, value: NoteTemplateType.CBT },
+        ]);
+
+        // Build content based on the template type
+        const content = templateType === NoteTemplateType.SOAP
+          ? generateSOAPContent()
+          : generateFreeContent();
+
+        // Mood rating (1-10, some sessions might not have it)
+        const moodRating = faker.helpers.maybe(
+          () => faker.number.int({ min: 2, max: 9 }),
+          { probability: 0.75 },
+        ) ?? null;
+
+        // Private notes (encrypted) — ~30% of sessions
+        const rawPrivateNote = faker.helpers.arrayElement(PRIVATE_NOTES);
+        const encryptedPrivateNote = rawPrivateNote
+          ? EncryptionService.encrypt(rawPrivateNote)
+          : null;
+
+        // Tags — ~60% of sessions have tags
+        const tags = faker.helpers.maybe(
+          () => faker.helpers.arrayElement(NOTE_TAGS),
+          { probability: 0.6 },
+        ) ?? [];
+
+        // Pin some important notes (~10%)
+        const isPinned = Math.random() < 0.1;
+
+        await prisma.psychNote.create({
+          data: {
+            appointmentId: appointment.id,
+            patientId,
+            templateType,
+            content,
+            moodRating,
+            privateNotes: encryptedPrivateNote,
+            isPinned,
+            tags,
+          },
+        });
+
+        notesCreated++;
+      }
+
+      // Finance transaction for paid appointments
+      if (paymentStatus === PaymentStatus.PAID) {
+        await prisma.financeTransaction.create({
+          data: {
+            clinicianId,
+            appointmentId: appointment.id,
+            type: TransactionType.INCOME,
+            category: 'Consulta',
+            amount: defaultPrice,
+            description: `Pago por sesión del ${start.toLocaleDateString('es-MX')}`,
+            date: start,
+          },
+        });
+      }
+    }
+  }
+
+  console.log(`  ✓ ${pastAppointments} past appointments created`);
+  console.log(`  ✓ ${notesCreated} clinical notes (PsychNotes) created`);
+}
+
+// ============================================
+// FUTURE APPOINTMENTS (Agenda)
+// ============================================
+
+async function createFutureAppointments(
+  clinicianId: string,
+  patientIds: string[],
+  defaultPrice: number,
+): Promise<void> {
+  const today = new Date();
   const startDate = new Date(today);
   startDate.setDate(today.getDate() + 1);
-  startDate.setHours(0,0,0,0);
+  startDate.setHours(0, 0, 0, 0);
 
-  console.log(`📅 Scheduling appointments from ${startDate.toDateString()} for ${DAYS_WINDOW} days...`);
+  console.log(`📅 Scheduling future appointments (${FUTURE_DAYS_WINDOW} days)...`);
 
-  for (let d = 0; d < DAYS_WINDOW; d++) {
+  for (let d = 0; d < FUTURE_DAYS_WINDOW; d++) {
     const currentDate = new Date(startDate);
     currentDate.setDate(startDate.getDate() + d);
 
-    // Skip weekends (optional, but realistic)
     if (currentDate.getDay() === 0 || currentDate.getDay() === 6) continue;
 
     for (let i = 0; i < APPOINTMENTS_PER_DAY; i++) {
       const { start, end } = getRandomTimeSlot(currentDate, i);
       const patientId = faker.helpers.arrayElement(patientIds);
-      
-      // Randomize appointment details
+
       const type = faker.helpers.arrayElement(Object.values(AppointmentType));
       const status = faker.helpers.weightedArrayElement([
-        { weight: 0.8, value: AppointmentStatus.SCHEDULED },
-        { weight: 0.1, value: AppointmentStatus.CANCELLED },
-        { weight: 0.1, value: AppointmentStatus.NO_SHOW }, // Rare for future? Maybe 'No Show' implies past.
-      ]); 
-
-      // If status is SCHEDULED, it's future. 
-      // If CANCELLED, it can be future.
-      // NO_SHOW is strictly past. Let's fix that.
-      const finalStatus = (status === AppointmentStatus.NO_SHOW) ? AppointmentStatus.SCHEDULED : status;
+        { weight: 0.85, value: AppointmentStatus.SCHEDULED },
+        { weight: 0.15, value: AppointmentStatus.CANCELLED },
+      ]);
 
       const paymentStatus = faker.helpers.weightedArrayElement([
         { weight: 0.9, value: PaymentStatus.PENDING },
-        { weight: 0.1, value: PaymentStatus.PAID }, // Pre-paid
+        { weight: 0.1, value: PaymentStatus.PAID },
       ]);
 
       const appointment = await prisma.appointment.create({
@@ -211,25 +449,24 @@ async function createAppointmentsForClinician(
           startTime: start,
           endTime: end,
           type,
-          status: finalStatus,
+          status,
           paymentStatus,
           price: defaultPrice,
-          reason: faker.lorem.sentence(), 
-          notes: null, // Future appointments usually don't have notes yet
+          reason: faker.lorem.sentence(),
+          notes: null,
         },
       });
 
-      // If PAID, create transaction (Income)
       if (paymentStatus === PaymentStatus.PAID) {
         await prisma.financeTransaction.create({
           data: {
             clinicianId,
             appointmentId: appointment.id,
             type: TransactionType.INCOME,
-            category: 'Consultation',
+            category: 'Consulta',
             amount: defaultPrice,
-            description: `Pre-payment for session on ${start.toLocaleDateString()}`,
-            date: start, // Transaction date same as appointment date (simplified)
+            description: `Pre-pago para sesión del ${start.toLocaleDateString('es-MX')}`,
+            date: start,
           },
         });
       }
@@ -238,66 +475,96 @@ async function createAppointmentsForClinician(
 }
 
 async function createTasksForPatients(patientIds: string[]): Promise<void> {
-    console.log('✅ Creating tasks...');
-    const today = new Date();
-    const startDate = new Date(today);
-    startDate.setDate(today.getDate() + 1);
+  console.log('✅ Creating tasks...');
+  const today = new Date();
 
-    for (const patientId of patientIds) {
-        // Create 1-3 tasks per patient
-        const taskCount = faker.number.int({ min: 1, max: 3 });
-        for (let i = 0; i < taskCount; i++) {
-            const dueDate = new Date(startDate);
-            dueDate.setDate(startDate.getDate() + faker.number.int({ min: 0, max: 14 }));
-            
-            await prisma.task.create({
-                data: {
-                    patientId,
-                    description: faker.lorem.sentence(),
-                    isCompleted: faker.datatype.boolean(0.2), // Mostly incomplete
-                    dueDate,
-                }
-            });
-        }
+  for (const patientId of patientIds) {
+    const taskCount = faker.number.int({ min: 1, max: 4 });
+    for (let i = 0; i < taskCount; i++) {
+      const dueDate = new Date(today);
+      dueDate.setDate(today.getDate() + faker.number.int({ min: -3, max: 14 }));
+
+      await prisma.task.create({
+        data: {
+          patientId,
+          description: faker.helpers.arrayElement([
+            'Completar registro de pensamientos automáticos',
+            'Practicar respiración diafragmática 2x/día',
+            'Escribir 3 entradas en el diario de gratitud',
+            'Ejercicio de exposición gradual: 15 min en lugar concurrido',
+            'Practicar relajación muscular progresiva antes de dormir',
+            'Completar hoja de registro A-B-C para 5 situaciones',
+            'Realizar 30 min de ejercicio aeróbico 3x esta semana',
+            'Leer capítulo asignado del libro de autoayuda',
+            'Registrar horas de sueño y calidad cada mañana',
+            'Practicar técnica de mindfulness 10 min/día',
+          ]),
+          isCompleted: faker.datatype.boolean(0.3),
+          dueDate,
+        },
+      });
     }
+  }
 }
 
 async function createAccessLogs(userId: string, patientIds: string[]): Promise<void> {
-    console.log('🔒 Creating access logs...');
-    // Create some recent logs
-    for (let i = 0; i < 20; i++) {
-        await prisma.accessLog.create({
-            data: {
-                userId,
-                patientId: faker.helpers.arrayElement(patientIds),
-                action: faker.helpers.arrayElement(['VIEW_PATIENT', 'CREATE_APPOINTMENT', 'UPDATE_NOTE']),
-                resource: 'patient',
-                details: faker.lorem.sentence(),
-                ipAddress: faker.internet.ipv4(),
-                userAgent: faker.internet.userAgent(),
-            }
-        });
-    }
+  console.log('🔒 Creating access logs...');
+  for (let i = 0; i < 30; i++) {
+    const daysAgo = faker.number.int({ min: 0, max: 14 });
+    const logDate = new Date();
+    logDate.setDate(logDate.getDate() - daysAgo);
+
+    await prisma.accessLog.create({
+      data: {
+        userId,
+        patientId: faker.helpers.arrayElement(patientIds),
+        action: faker.helpers.arrayElement([
+          'VIEW_PROFILE',
+          'VIEW_TIMELINE',
+          'CREATE_APPOINTMENT',
+          'UPDATE_NOTE',
+          'VIEW_PATIENT',
+        ]),
+        resource: 'patient',
+        details: faker.lorem.sentence(),
+        ipAddress: faker.internet.ipv4(),
+        userAgent: faker.internet.userAgent(),
+        createdAt: logDate,
+      },
+    });
+  }
 }
 
 async function createExpenses(clinicianId: string): Promise<void> {
   console.log('💸 Creating expenses...');
-  const startDate = new Date();
-  startDate.setDate(startDate.getDate() + 1); // Tomorrow
 
-  for (let i = 0; i < 5; i++) {
-    const date = new Date(startDate);
-    date.setDate(startDate.getDate() + faker.number.int({ min: 0, max: 14 }));
-    
+  for (let i = 0; i < 8; i++) {
+    const daysAgo = faker.number.int({ min: 1, max: 56 }); // up to 8 weeks back
+    const date = new Date();
+    date.setDate(date.getDate() - daysAgo);
+
     await prisma.financeTransaction.create({
       data: {
         clinicianId,
         type: TransactionType.EXPENSE,
-        category: faker.helpers.arrayElement(['Rent', 'Software Subscription', 'Office Supplies']),
-        amount: faker.number.float({ min: 50, max: 300, fractionDigits: 2 }),
-        description: faker.finance.transactionDescription(),
+        category: faker.helpers.arrayElement([
+          'Renta de consultorio',
+          'Suscripción de software',
+          'Material de oficina',
+          'Capacitación profesional',
+          'Seguro profesional',
+        ]),
+        amount: faker.number.float({ min: 30, max: 500, fractionDigits: 2 }),
+        description: faker.helpers.arrayElement([
+          'Pago mensual de renta',
+          'Licencia anual de plataforma clínica',
+          'Compra de papelería y materiales',
+          'Taller de actualización en TCC',
+          'Póliza de responsabilidad civil',
+          'Pago de servicios (luz, internet)',
+        ]),
         date,
-      }
+      },
     });
   }
 }
@@ -307,19 +574,14 @@ async function createExpenses(clinicianId: string): Promise<void> {
 // ============================================
 
 async function main(): Promise<void> {
-  console.log('🌱 Starting ROBUST database seed (Tomorrow -> +2 Weeks)...\n');
+  console.log('🌱 Starting database seed (8 weeks past + 2 weeks future)...\n');
 
-  // Clear existing data (idempotent)
   await clearDatabase();
 
-  // Hash the fixed password once
   const passwordHash = await bcrypt.hash(FIXED_PASSWORD, SALT_ROUNDS);
-
-  // Create clinicians
   const clinicians = await createClinicians(passwordHash);
 
-  // Create patients and appointments for each clinician
-  console.log('\n👥 Creating patients, appointments, tasks...');
+  console.log('\n👥 Creating patients, clinical history, and agenda...');
 
   for (const clinician of clinicians) {
     const patientIds = await createPatientsForClinician(clinician.id);
@@ -328,11 +590,11 @@ async function main(): Promise<void> {
     const config = CLINICIANS_CONFIG.find((c) => c.type === clinician.type);
     const defaultPrice = config?.sessionDefaultPrice ?? 100;
 
-    await createAppointmentsForClinician(
-      clinician.id,
-      patientIds,
-      defaultPrice,
-    );
+    // Past: Clinical history with notes
+    await createClinicalHistory(clinician.id, patientIds, defaultPrice);
+
+    // Future: Upcoming agenda
+    await createFutureAppointments(clinician.id, patientIds, defaultPrice);
 
     await createTasksForPatients(patientIds);
     await createAccessLogs(clinician.userId, patientIds);
@@ -345,6 +607,7 @@ async function main(): Promise<void> {
   console.log(`  • Clinician Profiles: ${await prisma.clinicianProfile.count()}`);
   console.log(`  • Patients: ${await prisma.patient.count()}`);
   console.log(`  • Appointments: ${await prisma.appointment.count()}`);
+  console.log(`  • PsychNotes: ${await prisma.psychNote.count()}`);
   console.log(`  • Tasks: ${await prisma.task.count()}`);
   console.log(`  • Access Logs: ${await prisma.accessLog.count()}`);
   console.log(`  • Finance Transactions: ${await prisma.financeTransaction.count()}`);
