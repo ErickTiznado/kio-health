@@ -7,7 +7,6 @@ import { NextAppointmentWidget } from '../components/widgets/NextAppointmentWidg
 import { AvailabilityWidget } from '../components/widgets/AvailabilityWidget';
 import { PendingNotesWidget } from '../components/widgets/PendingNotesWidget';
 import { RecentPatientsWidget } from '../components/widgets/RecentPatientsWidget';
-import { QuickActionsWidget } from '../components/widgets/QuickActionsWidget';
 import { TodayAgendaWidget } from '../components/widgets/TodayAgendaWidget';
 import { useDocumentTitle } from '../hooks/use-document-title';
 
@@ -95,7 +94,6 @@ export function DashboardPage() {
             <div className="flex-1 min-h-0">
               <TodayAgendaWidget appointments={todayAppointments} isLoading={isTodayLoading} />
             </div>
-            <QuickActionsWidget />
           </div>
         </div>
       </div>

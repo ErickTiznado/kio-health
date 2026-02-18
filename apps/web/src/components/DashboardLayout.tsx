@@ -1,7 +1,6 @@
 import { type FC, type ReactNode, useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/auth.store';
-import { DiscreteModeToggle } from './common/DiscreteModeToggle';
 import { ThemeToggle } from './common/ThemeToggle';
 import {
   LayoutDashboard,
@@ -15,7 +14,13 @@ import {
   Menu,
   X,
   DollarSign,
+  UserPlus,
+  CalendarPlus,
 } from 'lucide-react';
+import { PatientModal } from './patients/PatientModal';
+import { ScheduleAppointmentModal } from '../features/calendar/components/ScheduleAppointmentModal';
+import { useCreatePatient } from '../hooks/use-patients';
+import type { PatientFormValues } from '../schemas/patients.schema';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -52,6 +57,11 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
   const location = useLocation();
   const { user, logout } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Quick Actions State
+  const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
+  const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
+  const createPatientMutation = useCreatePatient();
 
   const clinicianType = user?.profile?.type;
   const navItems = clinicianType === 'NUTRITIONIST' ? NUTRITIONIST_NAV : PSYCHOLOGIST_NAV;
@@ -60,6 +70,14 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
     setSidebarOpen(false);
     logout();
     navigate('/login', { replace: true });
+  };
+  
+  const handleCreatePatient = (data: PatientFormValues) => {
+    createPatientMutation.mutate(data, {
+      onSuccess: () => {
+        setIsPatientModalOpen(false);
+      },
+    });
   };
 
   const userName = user?.email?.split('@')[0] || 'Doctor';
@@ -109,9 +127,6 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
 
         {/* Navigation */}
         <nav className="flex-1 py-4 px-3 overflow-y-auto">
-          <p className="text-[11px] font-semibold text-gray-400 dark:text-kanji uppercase tracking-wider px-3 mb-2">
-            Menú
-          </p>
           <ul className="space-y-0.5">
             {navItems.map((item) => (
               <li key={item.to}>
@@ -198,8 +213,27 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
 
           {/* User Avatar */}
           <div className="flex items-center gap-3">
+            {/* Quick Actions (Header) */}
+            <div className="flex items-center gap-1 mr-2">
+              <button
+                onClick={() => setIsPatientModalOpen(true)}
+                className="p-2 rounded-full transition-all bg-gray-50 dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-kanji dark:hover:text-kio"
+                title="Nuevo Paciente"
+              >
+                <UserPlus size={20} />
+              </button>
+              <button
+                onClick={() => setIsAppointmentModalOpen(true)}
+                className="p-2 rounded-full transition-all bg-gray-50 dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400"
+                title="Agendar Cita"
+              >
+                <CalendarPlus size={20} />
+              </button>
+            </div>
+            
+            <div className="w-px h-6 bg-gray-200 dark:bg-slate-700 mx-1" />
+
             <ThemeToggle />
-            <DiscreteModeToggle />
             <div className="w-px h-6 bg-gray-200 dark:bg-slate-700 mx-1" />
             <div className="text-right hidden sm:block">
               <p className="text-sm font-medium text-kanji dark:text-kio">{userName}</p>
@@ -215,6 +249,21 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
 
         {/* Page Content */}
         <main className="flex-1 p-6 overflow-auto">{children}</main>
+
+        {/* Global Modals */}
+        <PatientModal 
+            isOpen={isPatientModalOpen} 
+            onClose={() => setIsPatientModalOpen(false)} 
+            onSubmit={handleCreatePatient}
+            isLoading={createPatientMutation.isPending}
+         />
+
+         <ScheduleAppointmentModal
+            isOpen={isAppointmentModalOpen}
+            onClose={() => setIsAppointmentModalOpen(false)}
+            initialDate={new Date()}
+            isRescheduleMode={false}
+         />
       </div>
     </div>
   );
