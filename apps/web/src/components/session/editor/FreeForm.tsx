@@ -13,12 +13,12 @@ export function FreeForm({ content, onChange, readOnly }: FreeFormProps) {
         <span className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Notas Libres (Bloques)</span>
         <span className="text-[10px] text-gray-400 dark:text-slate-500">Arrastra elementos</span>
       </div>
-      
+
       <div className="flex-1 w-full overflow-y-auto p-6 custom-scrollbar">
-        <BlockEditor 
-            initialContent={content.body || ''} 
-            onChange={onChange} 
-            readOnly={readOnly}
+        <BlockEditor
+          initialContent={content.body || ''}
+          onChange={onChange}
+          readOnly={readOnly}
         />
       </div>
     </div>

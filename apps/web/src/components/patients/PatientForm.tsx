@@ -39,9 +39,6 @@ export function PatientForm({ initialData, onSubmit, onCancel, isLoading }: Pati
   const inputClass = "mt-1.5 block w-full rounded-xl border-gray-200 dark:border-slate-700 shadow-sm focus:border-kio focus:ring-kio focus:ring-2 focus:ring-opacity-50 text-sm font-medium text-kanji dark:text-white transition-all duration-200 bg-gray-50/50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 focus:bg-white dark:focus:bg-slate-700 py-2.5 px-3.5 placeholder:text-gray-400 dark:placeholder:text-slate-500 placeholder:font-normal";
   const labelClass = "block text-[11px] font-bold text-gray-600 dark:text-slate-400 opacity-70 uppercase tracking-wider ml-1";
 
-  // Date input specific styling for branding
-  // accent-kio forces the browser's native picker to use the brand color
-  const dateInputClass = `${inputClass} uppercase accent-kio [&::-webkit-calendar-picker-indicator]:opacity-60 [&::-webkit-calendar-picker-indicator]:hover:opacity-100 [&::-webkit-calendar-picker-indicator]:cursor-pointer`;
 
   return (
     <form id="patient-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full max-h-[75vh]">

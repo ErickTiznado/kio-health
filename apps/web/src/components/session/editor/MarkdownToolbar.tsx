@@ -1,7 +1,7 @@
 import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Quote } from 'lucide-react';
 
 interface MarkdownToolbarProps {
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   onTextChange: (newText: string) => void;
 }
 
@@ -16,14 +16,13 @@ export function MarkdownToolbar({ textareaRef, onTextChange }: MarkdownToolbarPr
     const selection = text.substring(start, end);
 
     const newText = text.substring(0, start) + prefix + selection + suffix + text.substring(end);
-    
+
     // Optimistic update
     onTextChange(newText);
 
     // Restore focus and cursor
     requestAnimationFrame(() => {
       textarea.focus();
-      const newCursorPos = start + prefix.length + selection.length + suffix.length;
       // Ideally keep selection if it existed, but simple cursor placement is fine for MVP
       textarea.setSelectionRange(start + prefix.length, start + prefix.length + selection.length);
     });

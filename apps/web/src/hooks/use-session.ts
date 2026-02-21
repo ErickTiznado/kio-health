@@ -51,7 +51,7 @@ export const useUpsertAnthropometry = () => {
     mutationFn: ({ appointmentId, data }: { appointmentId: string; data: CreateAnthropometryPayload }) =>
       upsertAnthropometry(appointmentId, data),
     onSuccess: (_data, { appointmentId }) => {
-      queryClient.invalidateQueries({ queryKey: [session, appointmentId] });
+      queryClient.invalidateQueries({ queryKey: ['session', appointmentId] });
     },
   });
 };
@@ -62,7 +62,7 @@ export const useUpsertMealPlan = () => {
     mutationFn: ({ appointmentId, data }: { appointmentId: string; data: CreateMealPlanPayload }) =>
       upsertMealPlan(appointmentId, data),
     onSuccess: (_data, { appointmentId }) => {
-      queryClient.invalidateQueries({ queryKey: [session, appointmentId] });
+      queryClient.invalidateQueries({ queryKey: ['session', appointmentId] });
     },
   });
 };

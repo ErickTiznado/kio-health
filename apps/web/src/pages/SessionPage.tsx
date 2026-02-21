@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SessionLayout } from '../components/session/SessionLayout';
-import { PatientContextPanel } from '../components/session/PatientContextPanel';
+
 import { EditorContainer } from '../components/session/editor/EditorContainer';
 import { SessionCheckoutModal } from '../components/session/SessionCheckoutModal';
 import { useSessionSnapshot, useStartSession, useMarkNoShow } from '../hooks/use-session';
@@ -94,7 +94,7 @@ export function SessionPage() {
   const psychContext = {
     diagnosis: patient.diagnosis || 'Sin diagnóstico',
     clinicalContext: patient.clinicalContext || 'Sin contexto registrado',
-    treatmentGoals: patient.treatmentGoals || [],
+    treatmentGoals: (patient as any).treatmentGoals || [],
     totalSessions: sessionNumber,
   };
 
@@ -113,8 +113,8 @@ export function SessionPage() {
         onFinishSession={handleFinishSession}
         onNoShow={handleNoShow}
       >
-        <EditorContainer 
-          appointmentId={appointment.id} 
+        <EditorContainer
+          appointmentId={appointment.id}
           patientId={patient.id}
           patientName={patient.fullName}
           patientAge={age}

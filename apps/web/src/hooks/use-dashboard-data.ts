@@ -64,7 +64,7 @@ export function useDashboardData(): DashboardData {
 
     /* 2. Recent patients (from LocalStorage + API hydration) */
     const storedRecentPatients = useMemo(() => getRecentPatientsFromStorage(), []);
-    
+
     const recentPatientQueries = useQueries({
         queries: storedRecentPatients.map((entry) => ({
             queryKey: ['patient', entry.id],
@@ -78,12 +78,13 @@ export function useDashboardData(): DashboardData {
             .map((entry, index) => {
                 const query = recentPatientQueries[index];
                 if (!query?.data) return null;
-                return {
+                const patient: RecentPatient = {
                     id: entry.id,
                     name: query.data.fullName,
-                    reason: query.data.diagnosis,
+                    reason: query.data.diagnosis ?? null,
                     lastAppointmentTime: new Date(entry.timestamp).toISOString(),
                 };
+                return patient;
             })
             .filter((p): p is RecentPatient => p !== null);
     }, [storedRecentPatients, recentPatientQueries]);

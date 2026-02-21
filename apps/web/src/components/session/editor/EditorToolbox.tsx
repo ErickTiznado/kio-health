@@ -5,8 +5,6 @@ import {
   ListOrdered,
   Quote,
   CheckSquare,
-  Bold,
-  Italic,
   FileDown,
   Copy,
   PenTool,
@@ -67,8 +65,8 @@ export function EditorToolbox({ onTemplateChange, onExport, onCopy, currentTempl
           <button
             onClick={() => onTemplateChange(NoteTemplateType.FREE)}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${currentTemplate === NoteTemplateType.FREE
-                ? 'bg-kio/10 text-kanji dark:text-kio border border-kio/20'
-                : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'
+              ? 'bg-kio/10 text-kanji dark:text-kio border border-kio/20'
+              : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'
               }`}
           >
             <PenTool size={16} />
@@ -77,8 +75,8 @@ export function EditorToolbox({ onTemplateChange, onExport, onCopy, currentTempl
           <button
             onClick={() => onTemplateChange(NoteTemplateType.SOAP)}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${currentTemplate === NoteTemplateType.SOAP
-                ? 'bg-kio/10 text-kanji dark:text-kio border border-kio/20'
-                : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'
+              ? 'bg-kio/10 text-kanji dark:text-kio border border-kio/20'
+              : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'
               }`}
           >
             <LayoutTemplate size={16} />

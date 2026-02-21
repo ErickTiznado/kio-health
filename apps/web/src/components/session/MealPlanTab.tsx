@@ -22,13 +22,13 @@ export const MealPlanTab: FC<MealPlanTabProps> = ({ appointmentId, initialData }
   }, [initialData]);
 
   const handleSave = () => {
-    save({ 
-       appointmentId, 
-       data: { 
-         content: planText,
-         fileName: attachedFileName 
-         // TODO: Handle file upload to storage and get URL
-       } 
+    save({
+      appointmentId,
+      data: {
+        content: planText,
+        fileName: attachedFileName ?? undefined
+        // TODO: Handle file upload to storage and get URL
+      }
     }, {
       onSuccess: () => toast.success('Plan alimenticio guardado')
     });
@@ -61,16 +61,16 @@ export const MealPlanTab: FC<MealPlanTabProps> = ({ appointmentId, initialData }
 
   return (
     <div className="h-full overflow-y-auto p-6 space-y-5">
-        <div className="flex justify-end">
-             <button 
-                onClick={handleSave}
-                disabled={isPending}
-                className="flex items-center gap-2 bg-kio hover:bg-kanji text-white px-4 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50"
-             >
-                <Save size={16} />
-                {isPending ? 'Guardando...' : 'Guardar Plan'}
-             </button>
-         </div>
+      <div className="flex justify-end">
+        <button
+          onClick={handleSave}
+          disabled={isPending}
+          className="flex items-center gap-2 bg-kio hover:bg-kanji text-white px-4 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50"
+        >
+          <Save size={16} />
+          {isPending ? 'Guardando...' : 'Guardar Plan'}
+        </button>
+      </div>
 
       {/* ── Diet Plan Textarea ── */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-gray-100/60 dark:border-slate-800 shadow-sm">
