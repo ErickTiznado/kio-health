@@ -250,7 +250,6 @@ export function EditorContainer({
                 >
                   <motion.div variants={itemVariants} className="text-center mb-8">
                     <h2 className="text-2xl font-bold text-kanji dark:text-white mb-2">Preparación de Sesión</h2>
-                    <p className="text-gray-500 dark:text-slate-400">Revisa el contexto y define el estado inicial del paciente.</p>
                   </motion.div>
 
                   <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-200 dark:border-slate-800 shadow-sm space-y-8">

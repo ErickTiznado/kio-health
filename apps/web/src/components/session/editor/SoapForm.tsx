@@ -76,26 +76,22 @@ export function SoapForm({ content, onChange }: SoapFormProps) {
   const fields = [
     {
       key: 's',
-      label: 'Lo que dice el paciente',
-      sub: 'Subjetivo',
+      label: 'Subjetivo',
       placeholder: 'Describe el motivo de consulta, síntomas reportados y eventos relevantes desde la última sesión...'
     },
     {
       key: 'o',
-      label: 'Mis observaciones',
-      sub: 'Objetivo',
+      label: 'Objetivo',
       placeholder: 'Apariencia, afecto, comportamiento durante la sesión y resultados de pruebas...'
     },
     {
       key: 'a',
-      label: 'Análisis Clínico',
-      sub: 'Análisis',
+      label: 'Análisis',
       placeholder: 'Interpretación de los datos, impresión diagnóstica y progreso hacia los objetivos...'
     },
     {
       key: 'p',
-      label: 'Plan de Tratamiento',
-      sub: 'Plan',
+      label: 'Plan',
       placeholder: 'Intervenciones futuras, tareas asignadas y próxima cita...'
     },
   ] as const;

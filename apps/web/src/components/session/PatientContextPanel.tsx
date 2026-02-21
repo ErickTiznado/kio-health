@@ -40,14 +40,15 @@ export const PatientContextPanel: FC<PatientContextPanelProps> = ({
           <div className="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 p-3 rounded-xl font-medium text-sm border border-indigo-100 dark:border-indigo-800/30 mb-3">
             {psychContext.diagnosis || 'Sin diagnóstico'}
           </div>
-          
+
           <button
             onClick={() => setIsDetailsOpen(true)}
             className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition-colors border border-gray-200 dark:border-slate-700 group"
+            title="Ver Contexto y Objetivos"
           >
             <div className="flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-slate-300">
-               <FileText size={16} className="text-gray-400 dark:text-slate-500 group-hover:text-kio transition-colors" />
-               Ver Contexto y Objetivos
+              <FileText size={16} className="text-gray-400 dark:text-slate-500 group-hover:text-kio transition-colors" />
+              Contexto y Objetivos
             </div>
             <ArrowRight size={16} className="text-gray-400 group-hover:translate-x-1 transition-transform" />
           </button>
@@ -60,25 +61,25 @@ export const PatientContextPanel: FC<PatientContextPanelProps> = ({
           </h3>
           {recentHistory.length > 0 ? (
             <ul className="space-y-4">
-               {recentHistory.map((item) => {
-                 const content = item.psychNote?.content;
-                 const snippet = content?.s || content?.body || item.reason || 'Sin detalles';
-                 
-                 return (
+              {recentHistory.map((item) => {
+                const content = item.psychNote?.content;
+                const snippet = content?.s || content?.body || item.reason || 'Sin detalles';
+
+                return (
                   <li key={item.id} className="relative pl-4 border-l-2 border-gray-200 dark:border-slate-700 pb-1">
-                     <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-gray-300 dark:bg-slate-600" />
-                     <div className="font-bold text-gray-700 dark:text-slate-200 text-sm">
-                        {format(new Date(item.startTime), "d 'de' MMMM", { locale: es })}
-                     </div>
-                     <div className="text-gray-500 dark:text-slate-400 text-xs line-clamp-2 mt-1">
-                        {typeof snippet === 'string' ? snippet : JSON.stringify(snippet)}
-                     </div>
+                    <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-gray-300 dark:bg-slate-600" />
+                    <div className="font-bold text-gray-700 dark:text-slate-200 text-sm">
+                      {format(new Date(item.startTime), "d 'de' MMMM", { locale: es })}
+                    </div>
+                    <div className="text-gray-500 dark:text-slate-400 text-xs line-clamp-2 mt-1">
+                      {typeof snippet === 'string' ? snippet : JSON.stringify(snippet)}
+                    </div>
                   </li>
-                 );
-               })}
+                );
+              })}
             </ul>
           ) : (
-             <p className="text-gray-400 dark:text-slate-500 text-sm italic">Sin historial previo.</p>
+            <p className="text-gray-400 dark:text-slate-500 text-sm italic">Sin historial previo.</p>
           )}
         </div>
 
@@ -88,8 +89,8 @@ export const PatientContextPanel: FC<PatientContextPanelProps> = ({
             onClick={() => setIsTasksOpen(true)}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 rounded-xl transition-all border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md font-bold text-sm"
           >
-             <ListTodo size={18} className="text-kio" />
-             Gestionar Tareas
+            <ListTodo size={18} className="text-kio" />
+            Gestionar Tareas
           </button>
         </div>
       </div>

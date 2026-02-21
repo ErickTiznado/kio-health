@@ -127,10 +127,7 @@ Notas adicionales...`}
             </div>
             <div className="text-center">
               <p className="text-sm font-semibold text-gray-600 dark:text-slate-300">
-                Arrastra un archivo o{' '}
-                <span className="text-kanji dark:text-kio underline underline-offset-2">
-                  selecciona
-                </span>
+                Seleccionar o arrastrar
               </p>
               <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-1">
                 PDF, DOC, DOCX — máx. 10 MB
