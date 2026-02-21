@@ -563,16 +563,15 @@ export class AppointmentsService {
 
   /**
    * Create a new appointment.
-   * - Resolves default duration/price from profile.
+   * - Resolves default duration/price from profile if not provided in DTO.
    * - Validates time slot overlap.
    */
   async create(userId: string, dto: CreateAppointmentDto) {
     const profile = await this.resolveClinicianProfile(userId);
 
-    // Calculate end time based on profile duration if not provided (though DTO doesn't have endTime yet, we assume fixed duration logic)
-    // Wait, the DTO I created earlier doesn't have duration. Let's use the profile default.
     const startTime = new Date(dto.startTime);
-    const durationMs = profile.sessionDefaultDuration * 60 * 1000;
+    const durationMinutes = dto.duration ?? profile.sessionDefaultDuration;
+    const durationMs = durationMinutes * 60 * 1000;
     const endTime = new Date(startTime.getTime() + durationMs);
 
     // Validate overlap
@@ -598,7 +597,7 @@ export class AppointmentsService {
 
   /**
    * Reschedule an existing appointment.
-   * - Keeps the same duration.
+   * - Keeps the same duration unless a new one is provided.
    * - Validates time slot overlap (excluding itself).
    */
   async reschedule(userId: string, appointmentId: string, dto: RescheduleAppointmentDto) {
@@ -606,10 +605,11 @@ export class AppointmentsService {
     const appointment = await this.findAppointmentOrFail(appointmentId);
     this.assertOwnership(appointment.clinicianId, profile.id);
 
-    // Calculate new end time maintaining original duration
     const originalDurationMs = appointment.endTime.getTime() - appointment.startTime.getTime();
+    const newDurationMs = dto.duration ? dto.duration * 60 * 1000 : originalDurationMs;
+
     const newStartTime = new Date(dto.startTime);
-    const newEndTime = new Date(newStartTime.getTime() + originalDurationMs);
+    const newEndTime = new Date(newStartTime.getTime() + newDurationMs);
 
     // Validate overlap excluding this appointment
     await this.validateOverlap(profile.id, newStartTime, newEndTime, appointmentId);

@@ -9,9 +9,10 @@ interface PaymentModalProps {
     isOpen: boolean;
     onClose: () => void;
     appointment: Appointment | null;
+    defaultStatus?: 'PENDING' | 'PAID';
 }
 
-export function PaymentModal({ isOpen, onClose, appointment }: PaymentModalProps) {
+export function PaymentModal({ isOpen, onClose, appointment, defaultStatus }: PaymentModalProps) {
     const queryClient = useQueryClient();
     const [amount, setAmount] = useState<string>('');
     const [status, setStatus] = useState<'PENDING' | 'PAID'>('PENDING');
@@ -20,10 +21,11 @@ export function PaymentModal({ isOpen, onClose, appointment }: PaymentModalProps
     useEffect(() => {
         if (isOpen && appointment) {
             setAmount(appointment.price.toString());
-            setStatus(appointment.paymentStatus || 'PENDING');
+            // Use defaultStatus if provided and appointment is not already paid
+            setStatus(appointment.paymentStatus === 'PAID' ? 'PAID' : (defaultStatus || appointment.paymentStatus || 'PENDING'));
             setMethod(appointment.paymentMethod || 'CASH');
         }
-    }, [isOpen, appointment]);
+    }, [isOpen, appointment, defaultStatus]);
 
     const mutation = useMutation({
         mutationFn: (payload: UpdatePaymentPayload) =>

@@ -14,7 +14,7 @@ interface AppointmentDrawerProps {
   appointment: Appointment | null;
   isOpen: boolean;
   onClose: () => void;
-  onReschedule: (id: string, date: Date) => void;
+  onReschedule: (id: string, date: Date, duration?: number) => void;
   onCancel: (id: string) => void;
 }
 
@@ -75,7 +75,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
       <div className="bg-white dark:bg-slate-800 p-5 rounded-[24px] shadow-2xl border border-red-100 dark:border-red-900/30 flex flex-col gap-4 w-[360px] animate-in fade-in slide-in-from-top-5 duration-300">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500 shrink-0">
-             <Ban size={24} />
+            <Ban size={24} />
           </div>
           <div>
             <h3 className="font-bold text-kanji dark:text-white text-lg leading-tight">¿Cancelar cita?</h3>
@@ -85,17 +85,17 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
           </div>
         </div>
         <div className="flex gap-3 pt-2">
-          <button 
-            onClick={() => toast.dismiss(t)} 
+          <button
+            onClick={() => toast.dismiss(t)}
             className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-kanji dark:text-kio hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
           >
             No, volver
           </button>
-          <button 
+          <button
             onClick={() => {
               onCancel(appointment.id);
               toast.dismiss(t);
-            }} 
+            }}
             className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/20 transition-all active:scale-95"
           >
             Sí, cancelar
@@ -263,8 +263,8 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
                 <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 border border-dashed border-gray-200 dark:border-slate-700 text-center">
                   <p className="text-xs font-semibold text-kanji/80 dark:text-slate-300 mb-1">Primera sesión</p>
                   <p className="text-[10px] text-gray-500 dark:text-slate-500 mb-3">Este paciente no tiene historial clínico previo.</p>
-                  <Link 
-                    to={`/patients/${appointment.patientId}`} 
+                  <Link
+                    to={`/patients/${appointment.patientId}`}
                     className="text-xs font-bold text-kanji dark:text-kio flex items-center justify-center gap-1.5 mx-auto hover:bg-kanji/5 dark:hover:bg-kio/10 px-3 py-1.5 rounded-lg transition-colors"
                   >
                     <FileText size={12} />
@@ -359,8 +359,8 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
         isOpen={isRescheduleModalOpen}
         onClose={() => setIsRescheduleModalOpen(false)}
         initialDate={startDate}
-        onConfirm={(newDate) => {
-          onReschedule(appointment.id, newDate);
+        onConfirm={(newDate, duration) => {
+          onReschedule(appointment.id, newDate, duration);
           setIsRescheduleModalOpen(false);
         }}
         isRescheduleMode={true}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
-import { X, Search, Calendar, User, FileText, Banknote, Loader2 } from 'lucide-react';
+import { X, Search, Calendar, User, FileText, Banknote, Loader2, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { createAppointment } from '../../../lib/appointments.api';
 import { usePatients } from '../../../hooks/use-patients';
@@ -13,7 +13,7 @@ interface ScheduleAppointmentModalProps {
     onClose: () => void;
     initialDate: Date | null;
     isRescheduleMode?: boolean;
-    onConfirm?: (date: Date) => void;
+    onConfirm?: (date: Date, duration?: number) => void;
 }
 
 export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isRescheduleMode, onConfirm }: ScheduleAppointmentModalProps) {
@@ -23,6 +23,7 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
     const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
     const [patientSearch, setPatientSearch] = useState('');
     const [startTime, setStartTime] = useState('');
+    const [duration, setDuration] = useState<string>('50'); // Default 50 mins
     const [type, setType] = useState<AppointmentType>('CONSULTATION');
     const [reason, setReason] = useState('');
     const [price, setPrice] = useState<string>(''); // string for input handling
@@ -36,6 +37,7 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
             setStartTime(format(initialDate, "yyyy-MM-dd'T'HH:mm"));
             setPatientSearch('');
             setSelectedPatientId(null);
+            setDuration('50');
             setType('CONSULTATION');
             setReason('');
             setPrice(''); // Default via backend
@@ -62,7 +64,7 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!startTime) {
             toast.error('Selecciona fecha y hora');
             return;
@@ -72,7 +74,7 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
         const parsedDate = parseISO(startTime);
 
         if (isRescheduleMode && onConfirm) {
-            onConfirm(parsedDate);
+            onConfirm(parsedDate, Number(duration));
             return;
         }
 
@@ -87,6 +89,7 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
             type,
             reason,
             price: price ? parseFloat(price) : undefined,
+            duration: Number(duration),
         });
     };
 
@@ -181,8 +184,8 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                             </div>
                         )}
 
-                        {/* Date & Time */}
-                        <div className={`grid ${isRescheduleMode ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'} gap-5`}>
+                        {/* Date & Time and Duration */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <div className="space-y-1.5">
                                 <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                                     <Calendar size={14} /> Fecha y Hora
@@ -196,7 +199,26 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                                 />
                             </div>
 
-                            {!isRescheduleMode && (
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                    <Clock size={14} /> Duración
+                                </label>
+                                <select
+                                    value={duration}
+                                    onChange={(e) => setDuration(e.target.value)}
+                                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/20 focus:border-[var(--color-kanji)] transition-all appearance-none"
+                                >
+                                    <option value="30">30 minutos</option>
+                                    <option value="45">45 minutos</option>
+                                    <option value="50">50 minutos</option>
+                                    <option value="60">60 minutos (1 hora)</option>
+                                    <option value="90">90 minutos (1.5 horas)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {!isRescheduleMode && (
+                            <>
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                                         <FileText size={14} /> Tipo de Cita
@@ -211,11 +233,6 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                                         <option value="FOLLOW_UP">Seguimiento</option>
                                     </select>
                                 </div>
-                            )}
-                        </div>
-
-                        {!isRescheduleMode && (
-                            <>
                                 {/* Reason */}
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">

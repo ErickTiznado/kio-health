@@ -1,10 +1,12 @@
-import { MoreVertical, MapPin, Banknote } from 'lucide-react';
+import { MapPin, Banknote, Calendar } from 'lucide-react';
 import { format, parseISO, differenceInMinutes } from 'date-fns';
 import type { Appointment } from '../../../types/appointments.types';
 
 interface AppointmentPillProps {
   appointment: Appointment;
   onSelect: (appointment: Appointment) => void;
+  onQuickPay?: (appointment: Appointment) => void;
+  onQuickReschedule?: (appointment: Appointment) => void;
 }
 
 const GRID_START_HOUR = 8;
@@ -48,7 +50,7 @@ function getStatusHoverBg(status: string, paymentStatus?: string | null) {
 /**
  * Appointment Card component with semantic border and clean layout.
  */
-export function AppointmentPill({ appointment, onSelect }: AppointmentPillProps) {
+export function AppointmentPill({ appointment, onSelect, onQuickPay, onQuickReschedule }: AppointmentPillProps) {
   const startDate = parseISO(appointment.startTime.replace(' ', 'T'));
   const endDate = parseISO(appointment.endTime.replace(' ', 'T'));
 
@@ -126,9 +128,34 @@ export function AppointmentPill({ appointment, onSelect }: AppointmentPillProps)
               )}
             </div>
 
-            {/* Hover Menu Icon */}
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-              <MoreVertical size={16} className="text-gray-400 hover:text-gray-600 dark:text-slate-500 dark:hover:text-slate-300" />
+            {/* Hover Menu Icons */}
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm -mr-1 -mt-0.5 rounded-md relative z-10">
+              {onQuickPay && !isInactive && (
+                <button
+                  type="button"
+                  title="Registrar Pago"
+                  className="p-1 rounded-md hover:bg-emerald-50 dark:hover:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onQuickPay(appointment);
+                  }}
+                >
+                  <Banknote size={14} />
+                </button>
+              )}
+              {onQuickReschedule && isDraggable && (
+                <button
+                  type="button"
+                  title="Reagendar"
+                  className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 text-kanji/60 dark:text-slate-400 hover:text-kanji dark:hover:text-white transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onQuickReschedule(appointment);
+                  }}
+                >
+                  <Calendar size={14} />
+                </button>
+              )}
             </div>
           </div>
 

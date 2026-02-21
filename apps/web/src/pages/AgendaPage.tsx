@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { startOfWeek, addWeeks, subWeeks, addDays, subDays, format } from 'date-fns';
+import { startOfWeek, addWeeks, subWeeks, addDays, subDays, format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 import { ChevronLeft, ChevronRight, Calendar, CalendarDays, Loader2, Plus, CheckCircle2, XCircle, Banknote } from 'lucide-react';
@@ -10,6 +10,7 @@ import { WeeklyCalendarGrid } from '../features/calendar/components/WeeklyCalend
 import { DailyCalendarGrid } from '../features/calendar/components/DailyCalendarGrid';
 import { AppointmentDrawer } from '../features/calendar/components/AppointmentDrawer';
 import { ScheduleAppointmentModal } from '../features/calendar/components/ScheduleAppointmentModal';
+import { PaymentModal } from '../features/calendar/components/PaymentModal';
 import { fetchAppointmentsByRange, rescheduleAppointment, cancelAppointment } from '../lib/appointments.api';
 import type { Appointment } from '../types/appointments.types';
 import type { CalendarView } from '../types/agenda.types';
@@ -32,6 +33,8 @@ export function AgendaPage() {
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [scheduleSlot, setScheduleSlot] = useState<Date | null>(null);
+  const [rescheduleAppointmentInfo, setRescheduleAppointmentInfo] = useState<Appointment | null>(null);
+  const [paymentAppointment, setPaymentAppointment] = useState<Appointment | null>(null);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const queryClient = useQueryClient();
 
@@ -69,7 +72,7 @@ export function AgendaPage() {
       // "OR" Logic: Match any selected filter
       const matchesStatus = activeFilters.includes(apt.status);
       const matchesUnpaid = activeFilters.includes('UNPAID') && apt.paymentStatus === 'PENDING';
-      
+
       return matchesStatus || matchesUnpaid;
     });
   }, [appointments, activeFilters]);
@@ -131,6 +134,14 @@ export function AgendaPage() {
     setIsDrawerOpen(false);
   }, []);
 
+  const handleQuickPay = useCallback((appointment: Appointment) => {
+    setPaymentAppointment(appointment);
+  }, []);
+
+  const handleQuickReschedule = useCallback((appointment: Appointment) => {
+    setRescheduleAppointmentInfo(appointment);
+  }, []);
+
   /* ── Scheduling handlers ── */
 
   const handleSlotClick = useCallback((date: Date) => {
@@ -155,8 +166,8 @@ export function AgendaPage() {
   }, []);
 
   const rescheduleMutation = useMutation({
-    mutationFn: ({ id, startTime }: { id: string; startTime: string }) =>
-      rescheduleAppointment(id, { startTime }),
+    mutationFn: ({ id, ...payload }: { id: string; startTime: string; duration?: number }) =>
+      rescheduleAppointment(id, payload),
     onSuccess: () => {
       toast.success('Cita reagendada correctamente');
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
@@ -167,10 +178,11 @@ export function AgendaPage() {
     },
   });
 
-  const handleReschedule = useCallback((appointmentId: string, newStartTime: Date) => {
+  const handleReschedule = useCallback((appointmentId: string, newStartTime: Date, duration?: number) => {
     rescheduleMutation.mutate({
       id: appointmentId,
       startTime: newStartTime.toISOString(),
+      duration,
     });
   }, [rescheduleMutation]);
 
@@ -231,13 +243,12 @@ export function AgendaPage() {
                   <button
                     key={filter.key}
                     onClick={() => toggleFilter(filter.key)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all border border-transparent ${
-                      isActive 
-                        ? `${filter.activeBg} border-current/10 shadow-sm` 
-                        : 'hover:bg-gray-100 dark:hover:bg-slate-800 opacity-60 hover:opacity-100'
-                    }`}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all border border-transparent ${isActive
+                      ? `${filter.activeBg} border-current/10 shadow-sm`
+                      : 'hover:bg-gray-100 dark:hover:bg-slate-800 opacity-60 hover:opacity-100'
+                      }`}
                   >
-                    <Icon size={12} className={isActive ? 'text-current' : filter.color} /> 
+                    <Icon size={12} className={isActive ? 'text-current' : filter.color} />
                     {filter.label}
                   </button>
                 );
@@ -326,6 +337,8 @@ export function AgendaPage() {
                 onSelectAppointment={handleSelectAppointment}
                 onSlotClick={handleSlotClick}
                 onReschedule={handleReschedule}
+                onQuickPay={handleQuickPay}
+                onQuickReschedule={handleQuickReschedule}
               />
             ) : (
               <DailyCalendarGrid
@@ -333,7 +346,8 @@ export function AgendaPage() {
                 appointments={filteredAppointments}
                 onSelectAppointment={handleSelectAppointment}
                 onSlotClick={handleSlotClick}
-                onReschedule={handleReschedule}
+                onQuickPay={handleQuickPay}
+                onQuickReschedule={handleQuickReschedule}
               />
             )}
           </div>
@@ -355,6 +369,28 @@ export function AgendaPage() {
         isOpen={!!scheduleSlot}
         onClose={handleCloseSchedule}
         initialDate={scheduleSlot}
+      />
+
+      {/* Quick Reschedule Modal */}
+      <ScheduleAppointmentModal
+        isOpen={!!rescheduleAppointmentInfo}
+        onClose={() => setRescheduleAppointmentInfo(null)}
+        initialDate={rescheduleAppointmentInfo ? parseISO(rescheduleAppointmentInfo.startTime.replace(' ', 'T')) : null}
+        onConfirm={(newDate, duration) => {
+          if (rescheduleAppointmentInfo) {
+            handleReschedule(rescheduleAppointmentInfo.id, newDate, duration);
+            setRescheduleAppointmentInfo(null);
+          }
+        }}
+        isRescheduleMode={true}
+      />
+
+      {/* Quick Pay Modal */}
+      <PaymentModal
+        isOpen={!!paymentAppointment}
+        onClose={() => setPaymentAppointment(null)}
+        appointment={paymentAppointment}
+        defaultStatus="PAID"
       />
     </DashboardLayout>
   );

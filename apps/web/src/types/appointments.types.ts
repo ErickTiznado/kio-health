@@ -79,11 +79,13 @@ export interface CreateAppointmentPayload {
   type?: AppointmentType;
   reason?: string;
   price?: number;
+  duration?: number; // In minutes
 }
 
 /** Payload sent to PATCH /appointments/:id/reschedule */
 export interface ReschedulePayload {
   startTime: string; // ISO
+  duration?: number; // In minutes
 }
 
 export const NoteTemplateType = {

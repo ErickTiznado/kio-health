@@ -1,16 +1,7 @@
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { Appointment } from '../../../types/appointments.types';
-
-// Placeholder components (enhanced for dark mode)
-const AppointmentPill = ({ appointment, onSelect }: any) => (
-  <div 
-    onClick={() => onSelect(appointment)} 
-    className="bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-blue-900 dark:text-blue-100 border-l-4 border-blue-500 p-2 rounded-r text-xs cursor-pointer mb-1 transition-colors font-medium shadow-sm"
-  >
-    {appointment.patient?.fullName}
-  </div>
-);
+import { AppointmentPill } from './AppointmentPill';
 
 interface DailyCalendarGridProps {
   selectedDay: Date;
@@ -18,13 +9,22 @@ interface DailyCalendarGridProps {
   onSelectAppointment: (appointment: Appointment) => void;
   onSlotClick: (date: Date) => void;
   onReschedule?: (appointmentId: string, newStartTime: Date) => void;
+  onQuickPay?: (appointment: Appointment) => void;
+  onQuickReschedule?: (appointment: Appointment) => void;
 }
 
 const GRID_START_HOUR = 8;
 const GRID_END_HOUR = 20;
 const TOTAL_HOURS = GRID_END_HOUR - GRID_START_HOUR;
 
-export function DailyCalendarGrid({ selectedDay, appointments, onSelectAppointment, onSlotClick }: DailyCalendarGridProps) {
+export function DailyCalendarGrid({
+  selectedDay,
+  appointments,
+  onSelectAppointment,
+  onSlotClick,
+  onQuickPay,
+  onQuickReschedule
+}: DailyCalendarGridProps) {
   const hours = Array.from({ length: TOTAL_HOURS }, (_, i) => GRID_START_HOUR + i);
 
   return (
@@ -55,7 +55,14 @@ export function DailyCalendarGrid({ selectedDay, appointments, onSelectAppointme
                 onClick={() => onSlotClick(hourDate)}
               >
                 {slotAppointments.map(a => (
-                  <AppointmentPill key={a.id} appointment={a} onSelect={onSelectAppointment} />
+                  <div key={a.id} className="relative h-20 w-full mb-1">
+                    <AppointmentPill
+                      appointment={a}
+                      onSelect={onSelectAppointment}
+                      onQuickPay={onQuickPay}
+                      onQuickReschedule={onQuickReschedule}
+                    />
+                  </div>
                 ))}
               </div>
             </div>
