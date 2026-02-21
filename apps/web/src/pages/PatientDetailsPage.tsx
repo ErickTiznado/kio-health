@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePatient } from '../hooks/use-patients';
+import { addRecentPatientToStorage } from '../lib/recent-patients.storage';
 import {
     ArrowLeft,
     Phone,
@@ -28,6 +29,12 @@ export default function PatientDetailsPage() {
     const navigate = useNavigate();
     const { data: patient, isLoading, error } = usePatient(id || '');
     const [activeTab, setActiveTab] = useState('history');
+
+    useEffect(() => {
+        if (patient?.id) {
+            addRecentPatientToStorage(patient.id);
+        }
+    }, [patient?.id]);
 
     if (isLoading) {
         return (

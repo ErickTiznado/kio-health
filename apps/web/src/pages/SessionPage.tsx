@@ -90,12 +90,12 @@ export function SessionPage() {
     ? new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()
     : undefined;
 
-  // Mock data for panels until we implement full history fetching
-  const mockPsychContext = {
+  // Real data derived from session context
+  const psychContext = {
     diagnosis: patient.diagnosis || 'Sin diagnóstico',
     clinicalContext: patient.clinicalContext || 'Sin contexto registrado',
-    treatmentGoals: [],
-    totalSessions: 0,
+    treatmentGoals: patient.treatmentGoals || [],
+    totalSessions: sessionNumber,
   };
 
   return (
@@ -113,22 +113,13 @@ export function SessionPage() {
         onFinishSession={handleFinishSession}
         onNoShow={handleNoShow}
       >
-        <div className="grid grid-cols-[30%_70%] h-full">
-          {/* Left — Patient Context */}
-          <PatientContextPanel
-            patientId={patient.id}
-            patientName={patient.fullName}
-            patientAge={age || 0}
-            clinicianType="PSYCHOLOGIST" // Dynamic later
-            psychContext={mockPsychContext}
-            sessionHistory={[]} // Fetch real history later
-          />
-
-          {/* Right — Role-specific panel */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden h-full">
-            <EditorContainer appointmentId={appointment.id} patientId={patient.id} />
-          </div>
-        </div>
+        <EditorContainer 
+          appointmentId={appointment.id} 
+          patientId={patient.id}
+          patientName={patient.fullName}
+          patientAge={age}
+          psychContext={psychContext}
+        />
       </SessionLayout>
 
       <SessionCheckoutModal

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchSessionContext, startSession, markNoShow, updateNotes } from '../lib/appointments.api';
+import { fetchSessionContext, startSession, markNoShow, updateNotes, upsertAnthropometry, upsertMealPlan } from '../lib/appointments.api';
+import type { CreateAnthropometryPayload, CreateMealPlanPayload } from '../types/appointments.types';
 
 export const useSessionSnapshot = (appointmentId: string) => {
   return useQuery({
@@ -43,3 +44,26 @@ export const useUpdateNotes = () => {
     },
   });
 };
+
+export const useUpsertAnthropometry = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ appointmentId, data }: { appointmentId: string; data: CreateAnthropometryPayload }) =>
+      upsertAnthropometry(appointmentId, data),
+    onSuccess: (_data, { appointmentId }) => {
+      queryClient.invalidateQueries({ queryKey: [session, appointmentId] });
+    },
+  });
+};
+
+export const useUpsertMealPlan = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ appointmentId, data }: { appointmentId: string; data: CreateMealPlanPayload }) =>
+      upsertMealPlan(appointmentId, data),
+    onSuccess: (_data, { appointmentId }) => {
+      queryClient.invalidateQueries({ queryKey: [session, appointmentId] });
+    },
+  });
+};
+

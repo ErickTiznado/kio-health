@@ -34,16 +34,16 @@ interface NavItem {
 
 const PSYCHOLOGIST_NAV: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-  { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} /> },
   { to: '/patients', label: 'Pacientes', icon: <Users size={20} /> },
+  { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} /> },
   { to: '/bitacora', label: 'Bitácora', icon: <BookOpen size={20} /> },
   { to: '/finance', label: 'Finanzas', icon: <DollarSign size={20} /> },
 ];
 
 const NUTRITIONIST_NAV: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-  { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} /> },
   { to: '/patients', label: 'Pacientes', icon: <Users size={20} /> },
+  { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} /> },
   { to: '/measurements', label: 'Mediciones', icon: <Ruler size={20} /> },
   { to: '/finance', label: 'Finanzas', icon: <DollarSign size={20} /> },
 ];
@@ -94,14 +94,14 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/30 z-20 lg:hidden"
+          className="fixed inset-0 bg-black/30 z-30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`w-64 lg:w-60 xl:w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex flex-col fixed h-full z-30 transition-all duration-200 ${
+        className={`w-64 lg:w-60 xl:w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex flex-col fixed h-full z-40 transition-all duration-200 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0`}
       >
@@ -196,7 +196,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col lg:ml-60 xl:ml-64 transition-all duration-200">
         {/* Top Header */}
-        <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-6 sticky top-0 z-10 transition-colors duration-200">
+        <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-6 sticky top-0 z-20 transition-colors duration-200">
           {/* Hamburger + Breadcrumb */}
           <div className="flex items-center gap-3 text-sm">
             <button

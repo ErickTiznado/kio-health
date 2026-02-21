@@ -1,19 +1,20 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueries } from '@tanstack/react-query';
 import { addDays, format, startOfMonth } from 'date-fns';
 import {
     fetchNextAppointment,
-    fetchRecentPatients,
     fetchDaySummary,
     fetchPendingNotesCount,
     fetchAppointmentsByDate,
     getTodayDateString,
 } from '../lib/appointments.api';
+import { getPatient } from '../lib/patients.api';
+import { getRecentPatientsFromStorage } from '../lib/recent-patients.storage';
 import {
     mapRecentPatients,
     buildCalendarDays,
 } from '../lib/dashboard.helpers';
-import type { Appointment } from '../types/appointments.types';
+import type { Appointment, RecentPatient } from '../types/appointments.types';
 import type { CalendarDay, MappedRecentPatient } from '../lib/dashboard.helpers';
 
 /* ── Query keys (colocation) ────────────────────── */
@@ -50,7 +51,7 @@ export interface DashboardData {
 /**
  * Single entry-point for all Dashboard data.
  *
- * Encapsulates four parallel queries and all data transformations.
+ * Encapsulates parallel queries and all data transformations.
  * The page component only receives ready-to-render values (ISP).
  */
 export function useDashboardData(): DashboardData {
@@ -61,12 +62,31 @@ export function useDashboardData(): DashboardData {
         staleTime: 1000 * 60 * 5,
     });
 
-    /* 2. Recent patients */
-    const { data: rawPatients } = useQuery({
-        queryKey: QUERY_KEYS.recentPatients,
-        queryFn: fetchRecentPatients,
-        staleTime: 1000 * 60 * 5,
+    /* 2. Recent patients (from LocalStorage + API hydration) */
+    const storedRecentPatients = useMemo(() => getRecentPatientsFromStorage(), []);
+    
+    const recentPatientQueries = useQueries({
+        queries: storedRecentPatients.map((entry) => ({
+            queryKey: ['patient', entry.id],
+            queryFn: () => getPatient(entry.id),
+            staleTime: 1000 * 60 * 5,
+        })),
     });
+
+    const rawPatients: RecentPatient[] = useMemo(() => {
+        return storedRecentPatients
+            .map((entry, index) => {
+                const query = recentPatientQueries[index];
+                if (!query?.data) return null;
+                return {
+                    id: entry.id,
+                    name: query.data.fullName,
+                    reason: query.data.diagnosis,
+                    lastAppointmentTime: new Date(entry.timestamp).toISOString(),
+                };
+            })
+            .filter((p): p is RecentPatient => p !== null);
+    }, [storedRecentPatients, recentPatientQueries]);
 
     /* 3. Availability calendar */
     const calendarRange = useMemo(() => {

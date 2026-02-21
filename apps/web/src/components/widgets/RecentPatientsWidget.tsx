@@ -1,4 +1,4 @@
-import { History, ExternalLink } from 'lucide-react';
+import { History } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Patient {
@@ -71,10 +71,7 @@ export function RecentPatientsWidget({ patients }: RecentPatientsWidgetProps) {
                   </p>
                 </div>
 
-                {/* Hover Action Icon */}
-                <div className="absolute top-5 right-5 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-0 translate-x-2 text-gray-300 dark:text-kanji">
-                  <ExternalLink size={16} />
-                </div>
+
               </div>
             ))}
           </div>

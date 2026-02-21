@@ -1,8 +1,10 @@
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useCreateTransaction } from '../api/useFinanceSummary';
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { DatePicker } from '../../../components/ui/DatePicker';
+import { format } from 'date-fns';
 
 interface ExpenseModalProps {
   isOpen: boolean;
@@ -17,7 +19,11 @@ interface ExpenseForm {
 }
 
 export function ExpenseModal({ isOpen, onClose }: ExpenseModalProps) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ExpenseForm>();
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<ExpenseForm>({
+    defaultValues: {
+        date: new Date().toISOString().split('T')[0]
+    }
+  });
   const createMutation = useCreateTransaction();
 
   const onSubmit = async (data: ExpenseForm) => {
@@ -110,12 +116,17 @@ export function ExpenseModal({ isOpen, onClose }: ExpenseModalProps) {
                 </div>
 
                 <div>
-                    <label className={labelClass}>Fecha</label>
-                    <input 
-                        type="date" 
-                        {...register('date', { required: 'Fecha requerida' })}
-                        defaultValue={new Date().toISOString().split('T')[0]}
-                        className={`${inputClass} uppercase accent-kio [&::-webkit-calendar-picker-indicator]:opacity-60 [&::-webkit-calendar-picker-indicator]:hover:opacity-100 [&::-webkit-calendar-picker-indicator]:cursor-pointer`}
+                    <Controller
+                        control={control}
+                        name="date"
+                        render={({ field }) => (
+                            <DatePicker
+                                label="Fecha"
+                                value={field.value}
+                                onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                                error={errors.date?.message}
+                            />
+                        )}
                     />
                 </div>
 

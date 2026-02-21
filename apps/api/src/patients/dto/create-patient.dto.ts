@@ -40,4 +40,8 @@ export class CreatePatientDto {
   @ValidateNested()
   @Type(() => EmergencyContactDto)
   emergencyContact?: EmergencyContactDto;
+
+  @IsOptional()
+  @IsString({ each: true })
+  treatmentGoals?: string[];
 }

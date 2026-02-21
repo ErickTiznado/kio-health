@@ -151,6 +151,7 @@ exports.Prisma.PatientScalarFieldEnum = {
   status: 'status',
   contactPhone: 'contactPhone',
   emergencyContact: 'emergencyContact',
+  treatmentGoals: 'treatmentGoals',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -217,6 +218,30 @@ exports.Prisma.FinanceTransactionScalarFieldEnum = {
   amount: 'amount',
   description: 'description',
   date: 'date',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AnthropometryScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  appointmentId: 'appointmentId',
+  weight: 'weight',
+  height: 'height',
+  bodyFat: 'bodyFat',
+  waist: 'waist',
+  hip: 'hip',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MealPlanScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  appointmentId: 'appointmentId',
+  content: 'content',
+  fileUrl: 'fileUrl',
+  fileName: 'fileName',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -310,7 +335,9 @@ exports.Prisma.ModelName = {
   PsychNote: 'PsychNote',
   Task: 'Task',
   AccessLog: 'AccessLog',
-  FinanceTransaction: 'FinanceTransaction'
+  FinanceTransaction: 'FinanceTransaction',
+  Anthropometry: 'Anthropometry',
+  MealPlan: 'MealPlan'
 };
 
 /**

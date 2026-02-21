@@ -1,14 +1,38 @@
-import { useState, type FC } from 'react';
-import { Upload, FileText, X } from 'lucide-react';
+import { useState, useEffect, type FC } from 'react';
+import { Upload, FileText, X, Save } from 'lucide-react';
+import { useUpsertMealPlan } from '../../hooks/use-session';
+import { toast } from 'sonner';
 
-/**
- * Meal Plan tab — simple textarea for diet notes + mock PDF drop zone.
- * Liquid/Soft aesthetic with large rounded inputs.
- */
-export const MealPlanTab: FC = () => {
+interface MealPlanTabProps {
+  appointmentId: string;
+  initialData?: any;
+}
+
+export const MealPlanTab: FC<MealPlanTabProps> = ({ appointmentId, initialData }) => {
   const [planText, setPlanText] = useState('');
   const [attachedFileName, setAttachedFileName] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const { mutate: save, isPending } = useUpsertMealPlan();
+
+  useEffect(() => {
+    if (initialData) {
+      if (initialData.content) setPlanText(initialData.content);
+      if (initialData.fileName) setAttachedFileName(initialData.fileName);
+    }
+  }, [initialData]);
+
+  const handleSave = () => {
+    save({ 
+       appointmentId, 
+       data: { 
+         content: planText,
+         fileName: attachedFileName 
+         // TODO: Handle file upload to storage and get URL
+       } 
+    }, {
+      onSuccess: () => toast.success('Plan alimenticio guardado')
+    });
+  };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -37,6 +61,17 @@ export const MealPlanTab: FC = () => {
 
   return (
     <div className="h-full overflow-y-auto p-6 space-y-5">
+        <div className="flex justify-end">
+             <button 
+                onClick={handleSave}
+                disabled={isPending}
+                className="flex items-center gap-2 bg-kio hover:bg-kanji text-white px-4 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50"
+             >
+                <Save size={16} />
+                {isPending ? 'Guardando...' : 'Guardar Plan'}
+             </button>
+         </div>
+
       {/* ── Diet Plan Textarea ── */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-gray-100/60 dark:border-slate-800 shadow-sm">
         <label

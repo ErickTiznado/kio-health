@@ -2,8 +2,8 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { startOfWeek, addWeeks, subWeeks, addDays, subDays, format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { WaitlistPanel } from '../features/calendar/components/WaitlistPanel';
-import { ChevronLeft, ChevronRight, Calendar, CalendarDays, Loader2, Plus, CheckCircle2, XCircle, Banknote, List } from 'lucide-react';
+
+import { ChevronLeft, ChevronRight, Calendar, CalendarDays, Loader2, Plus, CheckCircle2, XCircle, Banknote } from 'lucide-react';
 import { useIsMobile } from '../hooks/use-is-mobile';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { WeeklyCalendarGrid } from '../features/calendar/components/WeeklyCalendarGrid';
@@ -33,8 +33,8 @@ export function AgendaPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [scheduleSlot, setScheduleSlot] = useState<Date | null>(null);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const queryClient = useQueryClient();
+
 
   /* ── Data fetching ── */
 
@@ -304,23 +304,6 @@ export function AgendaPage() {
               </div>
             )}
 
-            {/* Waitlist Toggle */}
-            <button
-              type="button"
-              onClick={() => setIsWaitlistOpen(!isWaitlistOpen)}
-              className={`p-2.5 rounded-[24px] transition-all flex items-center gap-2 border shadow-sm ${
-                isWaitlistOpen 
-                  ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-200 border-amber-200 dark:border-amber-800' 
-                  : 'bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-slate-200'
-              }`}
-              title="Lista de Espera"
-            >
-              <List size={18} />
-              <span className={`text-xs font-bold transition-all ${isWaitlistOpen ? 'max-w-20 opacity-100' : 'max-w-0 opacity-0 overflow-hidden'}`}>
-                Espera
-              </span>
-            </button>
-
             {/* Primary CTA */}
             <button
               type="button"
@@ -355,12 +338,6 @@ export function AgendaPage() {
             )}
           </div>
 
-          {/* Waitlist Sidebar */}
-          {isWaitlistOpen && (
-            <div className="w-80 h-full shrink-0 animate-in slide-in-from-right-10 fade-in duration-300 border-l border-gray-100 dark:border-slate-800 pl-6">
-               <WaitlistPanel />
-            </div>
-          )}
         </div>
       </div>
 

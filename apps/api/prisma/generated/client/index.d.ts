@@ -53,6 +53,16 @@ export type AccessLog = $Result.DefaultSelection<Prisma.$AccessLogPayload>
  * 
  */
 export type FinanceTransaction = $Result.DefaultSelection<Prisma.$FinanceTransactionPayload>
+/**
+ * Model Anthropometry
+ * 
+ */
+export type Anthropometry = $Result.DefaultSelection<Prisma.$AnthropometryPayload>
+/**
+ * Model MealPlan
+ * 
+ */
+export type MealPlan = $Result.DefaultSelection<Prisma.$MealPlanPayload>
 
 /**
  * Enums
@@ -370,6 +380,26 @@ export class PrismaClient<
     * ```
     */
   get financeTransaction(): Prisma.FinanceTransactionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.anthropometry`: Exposes CRUD operations for the **Anthropometry** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Anthropometries
+    * const anthropometries = await prisma.anthropometry.findMany()
+    * ```
+    */
+  get anthropometry(): Prisma.AnthropometryDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.mealPlan`: Exposes CRUD operations for the **MealPlan** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MealPlans
+    * const mealPlans = await prisma.mealPlan.findMany()
+    * ```
+    */
+  get mealPlan(): Prisma.MealPlanDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -811,7 +841,9 @@ export namespace Prisma {
     PsychNote: 'PsychNote',
     Task: 'Task',
     AccessLog: 'AccessLog',
-    FinanceTransaction: 'FinanceTransaction'
+    FinanceTransaction: 'FinanceTransaction',
+    Anthropometry: 'Anthropometry',
+    MealPlan: 'MealPlan'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -827,7 +859,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "clinicianProfile" | "patient" | "appointment" | "psychNote" | "task" | "accessLog" | "financeTransaction"
+      modelProps: "user" | "clinicianProfile" | "patient" | "appointment" | "psychNote" | "task" | "accessLog" | "financeTransaction" | "anthropometry" | "mealPlan"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1423,6 +1455,154 @@ export namespace Prisma {
           }
         }
       }
+      Anthropometry: {
+        payload: Prisma.$AnthropometryPayload<ExtArgs>
+        fields: Prisma.AnthropometryFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AnthropometryFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AnthropometryFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>
+          }
+          findFirst: {
+            args: Prisma.AnthropometryFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AnthropometryFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>
+          }
+          findMany: {
+            args: Prisma.AnthropometryFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>[]
+          }
+          create: {
+            args: Prisma.AnthropometryCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>
+          }
+          createMany: {
+            args: Prisma.AnthropometryCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AnthropometryCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>[]
+          }
+          delete: {
+            args: Prisma.AnthropometryDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>
+          }
+          update: {
+            args: Prisma.AnthropometryUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>
+          }
+          deleteMany: {
+            args: Prisma.AnthropometryDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AnthropometryUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AnthropometryUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>[]
+          }
+          upsert: {
+            args: Prisma.AnthropometryUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>
+          }
+          aggregate: {
+            args: Prisma.AnthropometryAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAnthropometry>
+          }
+          groupBy: {
+            args: Prisma.AnthropometryGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AnthropometryGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AnthropometryCountArgs<ExtArgs>
+            result: $Utils.Optional<AnthropometryCountAggregateOutputType> | number
+          }
+        }
+      }
+      MealPlan: {
+        payload: Prisma.$MealPlanPayload<ExtArgs>
+        fields: Prisma.MealPlanFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MealPlanFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MealPlanFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>
+          }
+          findFirst: {
+            args: Prisma.MealPlanFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MealPlanFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>
+          }
+          findMany: {
+            args: Prisma.MealPlanFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>[]
+          }
+          create: {
+            args: Prisma.MealPlanCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>
+          }
+          createMany: {
+            args: Prisma.MealPlanCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MealPlanCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>[]
+          }
+          delete: {
+            args: Prisma.MealPlanDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>
+          }
+          update: {
+            args: Prisma.MealPlanUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>
+          }
+          deleteMany: {
+            args: Prisma.MealPlanDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MealPlanUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MealPlanUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>[]
+          }
+          upsert: {
+            args: Prisma.MealPlanUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>
+          }
+          aggregate: {
+            args: Prisma.MealPlanAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMealPlan>
+          }
+          groupBy: {
+            args: Prisma.MealPlanGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MealPlanGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MealPlanCountArgs<ExtArgs>
+            result: $Utils.Optional<MealPlanCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1539,6 +1719,8 @@ export namespace Prisma {
     task?: TaskOmit
     accessLog?: AccessLogOmit
     financeTransaction?: FinanceTransactionOmit
+    anthropometry?: AnthropometryOmit
+    mealPlan?: MealPlanOmit
   }
 
   /* Types for Logging */
@@ -1703,6 +1885,8 @@ export namespace Prisma {
     psychNotes: number
     accessLogs: number
     tasks: number
+    anthropometries: number
+    mealPlans: number
   }
 
   export type PatientCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1710,6 +1894,8 @@ export namespace Prisma {
     psychNotes?: boolean | PatientCountOutputTypeCountPsychNotesArgs
     accessLogs?: boolean | PatientCountOutputTypeCountAccessLogsArgs
     tasks?: boolean | PatientCountOutputTypeCountTasksArgs
+    anthropometries?: boolean | PatientCountOutputTypeCountAnthropometriesArgs
+    mealPlans?: boolean | PatientCountOutputTypeCountMealPlansArgs
   }
 
   // Custom InputTypes
@@ -1749,6 +1935,20 @@ export namespace Prisma {
    */
   export type PatientCountOutputTypeCountTasksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TaskWhereInput
+  }
+
+  /**
+   * PatientCountOutputType without action
+   */
+  export type PatientCountOutputTypeCountAnthropometriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AnthropometryWhereInput
+  }
+
+  /**
+   * PatientCountOutputType without action
+   */
+  export type PatientCountOutputTypeCountMealPlansArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MealPlanWhereInput
   }
 
 
@@ -4142,6 +4342,7 @@ export namespace Prisma {
     status: number
     contactPhone: number
     emergencyContact: number
+    treatmentGoals: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -4184,6 +4385,7 @@ export namespace Prisma {
     status?: true
     contactPhone?: true
     emergencyContact?: true
+    treatmentGoals?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -4271,6 +4473,7 @@ export namespace Prisma {
     status: $Enums.PatientStatus
     contactPhone: string | null
     emergencyContact: JsonValue | null
+    treatmentGoals: string[]
     createdAt: Date
     updatedAt: Date
     _count: PatientCountAggregateOutputType | null
@@ -4302,6 +4505,7 @@ export namespace Prisma {
     status?: boolean
     contactPhone?: boolean
     emergencyContact?: boolean
+    treatmentGoals?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
@@ -4309,6 +4513,8 @@ export namespace Prisma {
     psychNotes?: boolean | Patient$psychNotesArgs<ExtArgs>
     accessLogs?: boolean | Patient$accessLogsArgs<ExtArgs>
     tasks?: boolean | Patient$tasksArgs<ExtArgs>
+    anthropometries?: boolean | Patient$anthropometriesArgs<ExtArgs>
+    mealPlans?: boolean | Patient$mealPlansArgs<ExtArgs>
     _count?: boolean | PatientCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["patient"]>
 
@@ -4322,6 +4528,7 @@ export namespace Prisma {
     status?: boolean
     contactPhone?: boolean
     emergencyContact?: boolean
+    treatmentGoals?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
@@ -4337,6 +4544,7 @@ export namespace Prisma {
     status?: boolean
     contactPhone?: boolean
     emergencyContact?: boolean
+    treatmentGoals?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
@@ -4352,17 +4560,20 @@ export namespace Prisma {
     status?: boolean
     contactPhone?: boolean
     emergencyContact?: boolean
+    treatmentGoals?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PatientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clinicianId" | "fullName" | "dateOfBirth" | "diagnosis" | "clinicalContext" | "status" | "contactPhone" | "emergencyContact" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
+  export type PatientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clinicianId" | "fullName" | "dateOfBirth" | "diagnosis" | "clinicalContext" | "status" | "contactPhone" | "emergencyContact" | "treatmentGoals" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
   export type PatientInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
     appointments?: boolean | Patient$appointmentsArgs<ExtArgs>
     psychNotes?: boolean | Patient$psychNotesArgs<ExtArgs>
     accessLogs?: boolean | Patient$accessLogsArgs<ExtArgs>
     tasks?: boolean | Patient$tasksArgs<ExtArgs>
+    anthropometries?: boolean | Patient$anthropometriesArgs<ExtArgs>
+    mealPlans?: boolean | Patient$mealPlansArgs<ExtArgs>
     _count?: boolean | PatientCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PatientIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4380,6 +4591,8 @@ export namespace Prisma {
       psychNotes: Prisma.$PsychNotePayload<ExtArgs>[]
       accessLogs: Prisma.$AccessLogPayload<ExtArgs>[]
       tasks: Prisma.$TaskPayload<ExtArgs>[]
+      anthropometries: Prisma.$AnthropometryPayload<ExtArgs>[]
+      mealPlans: Prisma.$MealPlanPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4391,6 +4604,7 @@ export namespace Prisma {
       status: $Enums.PatientStatus
       contactPhone: string | null
       emergencyContact: Prisma.JsonValue | null
+      treatmentGoals: string[]
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["patient"]>
@@ -4792,6 +5006,8 @@ export namespace Prisma {
     psychNotes<T extends Patient$psychNotesArgs<ExtArgs> = {}>(args?: Subset<T, Patient$psychNotesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PsychNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     accessLogs<T extends Patient$accessLogsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$accessLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     tasks<T extends Patient$tasksArgs<ExtArgs> = {}>(args?: Subset<T, Patient$tasksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    anthropometries<T extends Patient$anthropometriesArgs<ExtArgs> = {}>(args?: Subset<T, Patient$anthropometriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    mealPlans<T extends Patient$mealPlansArgs<ExtArgs> = {}>(args?: Subset<T, Patient$mealPlansArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4830,6 +5046,7 @@ export namespace Prisma {
     readonly status: FieldRef<"Patient", 'PatientStatus'>
     readonly contactPhone: FieldRef<"Patient", 'String'>
     readonly emergencyContact: FieldRef<"Patient", 'Json'>
+    readonly treatmentGoals: FieldRef<"Patient", 'String[]'>
     readonly createdAt: FieldRef<"Patient", 'DateTime'>
     readonly updatedAt: FieldRef<"Patient", 'DateTime'>
   }
@@ -5324,6 +5541,54 @@ export namespace Prisma {
   }
 
   /**
+   * Patient.anthropometries
+   */
+  export type Patient$anthropometriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    where?: AnthropometryWhereInput
+    orderBy?: AnthropometryOrderByWithRelationInput | AnthropometryOrderByWithRelationInput[]
+    cursor?: AnthropometryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AnthropometryScalarFieldEnum | AnthropometryScalarFieldEnum[]
+  }
+
+  /**
+   * Patient.mealPlans
+   */
+  export type Patient$mealPlansArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    where?: MealPlanWhereInput
+    orderBy?: MealPlanOrderByWithRelationInput | MealPlanOrderByWithRelationInput[]
+    cursor?: MealPlanWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MealPlanScalarFieldEnum | MealPlanScalarFieldEnum[]
+  }
+
+  /**
    * Patient without action
    */
   export type PatientDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5616,6 +5881,8 @@ export namespace Prisma {
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
     psychNote?: boolean | Appointment$psychNoteArgs<ExtArgs>
     transaction?: boolean | Appointment$transactionArgs<ExtArgs>
+    anthropometry?: boolean | Appointment$anthropometryArgs<ExtArgs>
+    mealPlan?: boolean | Appointment$mealPlanArgs<ExtArgs>
   }, ExtArgs["result"]["appointment"]>
 
   export type AppointmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -5679,6 +5946,8 @@ export namespace Prisma {
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
     psychNote?: boolean | Appointment$psychNoteArgs<ExtArgs>
     transaction?: boolean | Appointment$transactionArgs<ExtArgs>
+    anthropometry?: boolean | Appointment$anthropometryArgs<ExtArgs>
+    mealPlan?: boolean | Appointment$mealPlanArgs<ExtArgs>
   }
   export type AppointmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     patient?: boolean | PatientDefaultArgs<ExtArgs>
@@ -5696,6 +5965,8 @@ export namespace Prisma {
       clinician: Prisma.$ClinicianProfilePayload<ExtArgs>
       psychNote: Prisma.$PsychNotePayload<ExtArgs> | null
       transaction: Prisma.$FinanceTransactionPayload<ExtArgs> | null
+      anthropometry: Prisma.$AnthropometryPayload<ExtArgs> | null
+      mealPlan: Prisma.$MealPlanPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6110,6 +6381,8 @@ export namespace Prisma {
     clinician<T extends ClinicianProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClinicianProfileDefaultArgs<ExtArgs>>): Prisma__ClinicianProfileClient<$Result.GetResult<Prisma.$ClinicianProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     psychNote<T extends Appointment$psychNoteArgs<ExtArgs> = {}>(args?: Subset<T, Appointment$psychNoteArgs<ExtArgs>>): Prisma__PsychNoteClient<$Result.GetResult<Prisma.$PsychNotePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     transaction<T extends Appointment$transactionArgs<ExtArgs> = {}>(args?: Subset<T, Appointment$transactionArgs<ExtArgs>>): Prisma__FinanceTransactionClient<$Result.GetResult<Prisma.$FinanceTransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    anthropometry<T extends Appointment$anthropometryArgs<ExtArgs> = {}>(args?: Subset<T, Appointment$anthropometryArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    mealPlan<T extends Appointment$mealPlanArgs<ExtArgs> = {}>(args?: Subset<T, Appointment$mealPlanArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6584,6 +6857,44 @@ export namespace Prisma {
      */
     include?: FinanceTransactionInclude<ExtArgs> | null
     where?: FinanceTransactionWhereInput
+  }
+
+  /**
+   * Appointment.anthropometry
+   */
+  export type Appointment$anthropometryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    where?: AnthropometryWhereInput
+  }
+
+  /**
+   * Appointment.mealPlan
+   */
+  export type Appointment$mealPlanArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    where?: MealPlanWhereInput
   }
 
   /**
@@ -11181,6 +11492,2292 @@ export namespace Prisma {
 
 
   /**
+   * Model Anthropometry
+   */
+
+  export type AggregateAnthropometry = {
+    _count: AnthropometryCountAggregateOutputType | null
+    _avg: AnthropometryAvgAggregateOutputType | null
+    _sum: AnthropometrySumAggregateOutputType | null
+    _min: AnthropometryMinAggregateOutputType | null
+    _max: AnthropometryMaxAggregateOutputType | null
+  }
+
+  export type AnthropometryAvgAggregateOutputType = {
+    weight: Decimal | null
+    height: Decimal | null
+    bodyFat: Decimal | null
+    waist: Decimal | null
+    hip: Decimal | null
+  }
+
+  export type AnthropometrySumAggregateOutputType = {
+    weight: Decimal | null
+    height: Decimal | null
+    bodyFat: Decimal | null
+    waist: Decimal | null
+    hip: Decimal | null
+  }
+
+  export type AnthropometryMinAggregateOutputType = {
+    id: string | null
+    patientId: string | null
+    appointmentId: string | null
+    weight: Decimal | null
+    height: Decimal | null
+    bodyFat: Decimal | null
+    waist: Decimal | null
+    hip: Decimal | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AnthropometryMaxAggregateOutputType = {
+    id: string | null
+    patientId: string | null
+    appointmentId: string | null
+    weight: Decimal | null
+    height: Decimal | null
+    bodyFat: Decimal | null
+    waist: Decimal | null
+    hip: Decimal | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AnthropometryCountAggregateOutputType = {
+    id: number
+    patientId: number
+    appointmentId: number
+    weight: number
+    height: number
+    bodyFat: number
+    waist: number
+    hip: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AnthropometryAvgAggregateInputType = {
+    weight?: true
+    height?: true
+    bodyFat?: true
+    waist?: true
+    hip?: true
+  }
+
+  export type AnthropometrySumAggregateInputType = {
+    weight?: true
+    height?: true
+    bodyFat?: true
+    waist?: true
+    hip?: true
+  }
+
+  export type AnthropometryMinAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    weight?: true
+    height?: true
+    bodyFat?: true
+    waist?: true
+    hip?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AnthropometryMaxAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    weight?: true
+    height?: true
+    bodyFat?: true
+    waist?: true
+    hip?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AnthropometryCountAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    weight?: true
+    height?: true
+    bodyFat?: true
+    waist?: true
+    hip?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AnthropometryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Anthropometry to aggregate.
+     */
+    where?: AnthropometryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Anthropometries to fetch.
+     */
+    orderBy?: AnthropometryOrderByWithRelationInput | AnthropometryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AnthropometryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Anthropometries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Anthropometries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Anthropometries
+    **/
+    _count?: true | AnthropometryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AnthropometryAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AnthropometrySumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AnthropometryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AnthropometryMaxAggregateInputType
+  }
+
+  export type GetAnthropometryAggregateType<T extends AnthropometryAggregateArgs> = {
+        [P in keyof T & keyof AggregateAnthropometry]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAnthropometry[P]>
+      : GetScalarType<T[P], AggregateAnthropometry[P]>
+  }
+
+
+
+
+  export type AnthropometryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AnthropometryWhereInput
+    orderBy?: AnthropometryOrderByWithAggregationInput | AnthropometryOrderByWithAggregationInput[]
+    by: AnthropometryScalarFieldEnum[] | AnthropometryScalarFieldEnum
+    having?: AnthropometryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AnthropometryCountAggregateInputType | true
+    _avg?: AnthropometryAvgAggregateInputType
+    _sum?: AnthropometrySumAggregateInputType
+    _min?: AnthropometryMinAggregateInputType
+    _max?: AnthropometryMaxAggregateInputType
+  }
+
+  export type AnthropometryGroupByOutputType = {
+    id: string
+    patientId: string
+    appointmentId: string
+    weight: Decimal
+    height: Decimal
+    bodyFat: Decimal | null
+    waist: Decimal | null
+    hip: Decimal | null
+    createdAt: Date
+    updatedAt: Date
+    _count: AnthropometryCountAggregateOutputType | null
+    _avg: AnthropometryAvgAggregateOutputType | null
+    _sum: AnthropometrySumAggregateOutputType | null
+    _min: AnthropometryMinAggregateOutputType | null
+    _max: AnthropometryMaxAggregateOutputType | null
+  }
+
+  type GetAnthropometryGroupByPayload<T extends AnthropometryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AnthropometryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AnthropometryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AnthropometryGroupByOutputType[P]>
+            : GetScalarType<T[P], AnthropometryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AnthropometrySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    weight?: boolean
+    height?: boolean
+    bodyFat?: boolean
+    waist?: boolean
+    hip?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["anthropometry"]>
+
+  export type AnthropometrySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    weight?: boolean
+    height?: boolean
+    bodyFat?: boolean
+    waist?: boolean
+    hip?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["anthropometry"]>
+
+  export type AnthropometrySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    weight?: boolean
+    height?: boolean
+    bodyFat?: boolean
+    waist?: boolean
+    hip?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["anthropometry"]>
+
+  export type AnthropometrySelectScalar = {
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    weight?: boolean
+    height?: boolean
+    bodyFat?: boolean
+    waist?: boolean
+    hip?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type AnthropometryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "appointmentId" | "weight" | "height" | "bodyFat" | "waist" | "hip" | "createdAt" | "updatedAt", ExtArgs["result"]["anthropometry"]>
+  export type AnthropometryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+  export type AnthropometryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+  export type AnthropometryIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+
+  export type $AnthropometryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Anthropometry"
+    objects: {
+      patient: Prisma.$PatientPayload<ExtArgs>
+      appointment: Prisma.$AppointmentPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      patientId: string
+      appointmentId: string
+      weight: Prisma.Decimal
+      height: Prisma.Decimal
+      bodyFat: Prisma.Decimal | null
+      waist: Prisma.Decimal | null
+      hip: Prisma.Decimal | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["anthropometry"]>
+    composites: {}
+  }
+
+  type AnthropometryGetPayload<S extends boolean | null | undefined | AnthropometryDefaultArgs> = $Result.GetResult<Prisma.$AnthropometryPayload, S>
+
+  type AnthropometryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AnthropometryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AnthropometryCountAggregateInputType | true
+    }
+
+  export interface AnthropometryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Anthropometry'], meta: { name: 'Anthropometry' } }
+    /**
+     * Find zero or one Anthropometry that matches the filter.
+     * @param {AnthropometryFindUniqueArgs} args - Arguments to find a Anthropometry
+     * @example
+     * // Get one Anthropometry
+     * const anthropometry = await prisma.anthropometry.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AnthropometryFindUniqueArgs>(args: SelectSubset<T, AnthropometryFindUniqueArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Anthropometry that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AnthropometryFindUniqueOrThrowArgs} args - Arguments to find a Anthropometry
+     * @example
+     * // Get one Anthropometry
+     * const anthropometry = await prisma.anthropometry.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AnthropometryFindUniqueOrThrowArgs>(args: SelectSubset<T, AnthropometryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Anthropometry that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnthropometryFindFirstArgs} args - Arguments to find a Anthropometry
+     * @example
+     * // Get one Anthropometry
+     * const anthropometry = await prisma.anthropometry.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AnthropometryFindFirstArgs>(args?: SelectSubset<T, AnthropometryFindFirstArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Anthropometry that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnthropometryFindFirstOrThrowArgs} args - Arguments to find a Anthropometry
+     * @example
+     * // Get one Anthropometry
+     * const anthropometry = await prisma.anthropometry.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AnthropometryFindFirstOrThrowArgs>(args?: SelectSubset<T, AnthropometryFindFirstOrThrowArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Anthropometries that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnthropometryFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Anthropometries
+     * const anthropometries = await prisma.anthropometry.findMany()
+     * 
+     * // Get first 10 Anthropometries
+     * const anthropometries = await prisma.anthropometry.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const anthropometryWithIdOnly = await prisma.anthropometry.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AnthropometryFindManyArgs>(args?: SelectSubset<T, AnthropometryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Anthropometry.
+     * @param {AnthropometryCreateArgs} args - Arguments to create a Anthropometry.
+     * @example
+     * // Create one Anthropometry
+     * const Anthropometry = await prisma.anthropometry.create({
+     *   data: {
+     *     // ... data to create a Anthropometry
+     *   }
+     * })
+     * 
+     */
+    create<T extends AnthropometryCreateArgs>(args: SelectSubset<T, AnthropometryCreateArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Anthropometries.
+     * @param {AnthropometryCreateManyArgs} args - Arguments to create many Anthropometries.
+     * @example
+     * // Create many Anthropometries
+     * const anthropometry = await prisma.anthropometry.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AnthropometryCreateManyArgs>(args?: SelectSubset<T, AnthropometryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Anthropometries and returns the data saved in the database.
+     * @param {AnthropometryCreateManyAndReturnArgs} args - Arguments to create many Anthropometries.
+     * @example
+     * // Create many Anthropometries
+     * const anthropometry = await prisma.anthropometry.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Anthropometries and only return the `id`
+     * const anthropometryWithIdOnly = await prisma.anthropometry.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AnthropometryCreateManyAndReturnArgs>(args?: SelectSubset<T, AnthropometryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Anthropometry.
+     * @param {AnthropometryDeleteArgs} args - Arguments to delete one Anthropometry.
+     * @example
+     * // Delete one Anthropometry
+     * const Anthropometry = await prisma.anthropometry.delete({
+     *   where: {
+     *     // ... filter to delete one Anthropometry
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AnthropometryDeleteArgs>(args: SelectSubset<T, AnthropometryDeleteArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Anthropometry.
+     * @param {AnthropometryUpdateArgs} args - Arguments to update one Anthropometry.
+     * @example
+     * // Update one Anthropometry
+     * const anthropometry = await prisma.anthropometry.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AnthropometryUpdateArgs>(args: SelectSubset<T, AnthropometryUpdateArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Anthropometries.
+     * @param {AnthropometryDeleteManyArgs} args - Arguments to filter Anthropometries to delete.
+     * @example
+     * // Delete a few Anthropometries
+     * const { count } = await prisma.anthropometry.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AnthropometryDeleteManyArgs>(args?: SelectSubset<T, AnthropometryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Anthropometries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnthropometryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Anthropometries
+     * const anthropometry = await prisma.anthropometry.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AnthropometryUpdateManyArgs>(args: SelectSubset<T, AnthropometryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Anthropometries and returns the data updated in the database.
+     * @param {AnthropometryUpdateManyAndReturnArgs} args - Arguments to update many Anthropometries.
+     * @example
+     * // Update many Anthropometries
+     * const anthropometry = await prisma.anthropometry.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Anthropometries and only return the `id`
+     * const anthropometryWithIdOnly = await prisma.anthropometry.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AnthropometryUpdateManyAndReturnArgs>(args: SelectSubset<T, AnthropometryUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Anthropometry.
+     * @param {AnthropometryUpsertArgs} args - Arguments to update or create a Anthropometry.
+     * @example
+     * // Update or create a Anthropometry
+     * const anthropometry = await prisma.anthropometry.upsert({
+     *   create: {
+     *     // ... data to create a Anthropometry
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Anthropometry we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AnthropometryUpsertArgs>(args: SelectSubset<T, AnthropometryUpsertArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Anthropometries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnthropometryCountArgs} args - Arguments to filter Anthropometries to count.
+     * @example
+     * // Count the number of Anthropometries
+     * const count = await prisma.anthropometry.count({
+     *   where: {
+     *     // ... the filter for the Anthropometries we want to count
+     *   }
+     * })
+    **/
+    count<T extends AnthropometryCountArgs>(
+      args?: Subset<T, AnthropometryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AnthropometryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Anthropometry.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnthropometryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AnthropometryAggregateArgs>(args: Subset<T, AnthropometryAggregateArgs>): Prisma.PrismaPromise<GetAnthropometryAggregateType<T>>
+
+    /**
+     * Group by Anthropometry.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnthropometryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AnthropometryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AnthropometryGroupByArgs['orderBy'] }
+        : { orderBy?: AnthropometryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AnthropometryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAnthropometryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Anthropometry model
+   */
+  readonly fields: AnthropometryFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Anthropometry.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AnthropometryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    patient<T extends PatientDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PatientDefaultArgs<ExtArgs>>): Prisma__PatientClient<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    appointment<T extends AppointmentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AppointmentDefaultArgs<ExtArgs>>): Prisma__AppointmentClient<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Anthropometry model
+   */
+  interface AnthropometryFieldRefs {
+    readonly id: FieldRef<"Anthropometry", 'String'>
+    readonly patientId: FieldRef<"Anthropometry", 'String'>
+    readonly appointmentId: FieldRef<"Anthropometry", 'String'>
+    readonly weight: FieldRef<"Anthropometry", 'Decimal'>
+    readonly height: FieldRef<"Anthropometry", 'Decimal'>
+    readonly bodyFat: FieldRef<"Anthropometry", 'Decimal'>
+    readonly waist: FieldRef<"Anthropometry", 'Decimal'>
+    readonly hip: FieldRef<"Anthropometry", 'Decimal'>
+    readonly createdAt: FieldRef<"Anthropometry", 'DateTime'>
+    readonly updatedAt: FieldRef<"Anthropometry", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Anthropometry findUnique
+   */
+  export type AnthropometryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * Filter, which Anthropometry to fetch.
+     */
+    where: AnthropometryWhereUniqueInput
+  }
+
+  /**
+   * Anthropometry findUniqueOrThrow
+   */
+  export type AnthropometryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * Filter, which Anthropometry to fetch.
+     */
+    where: AnthropometryWhereUniqueInput
+  }
+
+  /**
+   * Anthropometry findFirst
+   */
+  export type AnthropometryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * Filter, which Anthropometry to fetch.
+     */
+    where?: AnthropometryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Anthropometries to fetch.
+     */
+    orderBy?: AnthropometryOrderByWithRelationInput | AnthropometryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Anthropometries.
+     */
+    cursor?: AnthropometryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Anthropometries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Anthropometries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Anthropometries.
+     */
+    distinct?: AnthropometryScalarFieldEnum | AnthropometryScalarFieldEnum[]
+  }
+
+  /**
+   * Anthropometry findFirstOrThrow
+   */
+  export type AnthropometryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * Filter, which Anthropometry to fetch.
+     */
+    where?: AnthropometryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Anthropometries to fetch.
+     */
+    orderBy?: AnthropometryOrderByWithRelationInput | AnthropometryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Anthropometries.
+     */
+    cursor?: AnthropometryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Anthropometries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Anthropometries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Anthropometries.
+     */
+    distinct?: AnthropometryScalarFieldEnum | AnthropometryScalarFieldEnum[]
+  }
+
+  /**
+   * Anthropometry findMany
+   */
+  export type AnthropometryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * Filter, which Anthropometries to fetch.
+     */
+    where?: AnthropometryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Anthropometries to fetch.
+     */
+    orderBy?: AnthropometryOrderByWithRelationInput | AnthropometryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Anthropometries.
+     */
+    cursor?: AnthropometryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Anthropometries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Anthropometries.
+     */
+    skip?: number
+    distinct?: AnthropometryScalarFieldEnum | AnthropometryScalarFieldEnum[]
+  }
+
+  /**
+   * Anthropometry create
+   */
+  export type AnthropometryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Anthropometry.
+     */
+    data: XOR<AnthropometryCreateInput, AnthropometryUncheckedCreateInput>
+  }
+
+  /**
+   * Anthropometry createMany
+   */
+  export type AnthropometryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Anthropometries.
+     */
+    data: AnthropometryCreateManyInput | AnthropometryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Anthropometry createManyAndReturn
+   */
+  export type AnthropometryCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * The data used to create many Anthropometries.
+     */
+    data: AnthropometryCreateManyInput | AnthropometryCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Anthropometry update
+   */
+  export type AnthropometryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Anthropometry.
+     */
+    data: XOR<AnthropometryUpdateInput, AnthropometryUncheckedUpdateInput>
+    /**
+     * Choose, which Anthropometry to update.
+     */
+    where: AnthropometryWhereUniqueInput
+  }
+
+  /**
+   * Anthropometry updateMany
+   */
+  export type AnthropometryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Anthropometries.
+     */
+    data: XOR<AnthropometryUpdateManyMutationInput, AnthropometryUncheckedUpdateManyInput>
+    /**
+     * Filter which Anthropometries to update
+     */
+    where?: AnthropometryWhereInput
+    /**
+     * Limit how many Anthropometries to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Anthropometry updateManyAndReturn
+   */
+  export type AnthropometryUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * The data used to update Anthropometries.
+     */
+    data: XOR<AnthropometryUpdateManyMutationInput, AnthropometryUncheckedUpdateManyInput>
+    /**
+     * Filter which Anthropometries to update
+     */
+    where?: AnthropometryWhereInput
+    /**
+     * Limit how many Anthropometries to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Anthropometry upsert
+   */
+  export type AnthropometryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Anthropometry to update in case it exists.
+     */
+    where: AnthropometryWhereUniqueInput
+    /**
+     * In case the Anthropometry found by the `where` argument doesn't exist, create a new Anthropometry with this data.
+     */
+    create: XOR<AnthropometryCreateInput, AnthropometryUncheckedCreateInput>
+    /**
+     * In case the Anthropometry was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AnthropometryUpdateInput, AnthropometryUncheckedUpdateInput>
+  }
+
+  /**
+   * Anthropometry delete
+   */
+  export type AnthropometryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * Filter which Anthropometry to delete.
+     */
+    where: AnthropometryWhereUniqueInput
+  }
+
+  /**
+   * Anthropometry deleteMany
+   */
+  export type AnthropometryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Anthropometries to delete
+     */
+    where?: AnthropometryWhereInput
+    /**
+     * Limit how many Anthropometries to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Anthropometry without action
+   */
+  export type AnthropometryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MealPlan
+   */
+
+  export type AggregateMealPlan = {
+    _count: MealPlanCountAggregateOutputType | null
+    _min: MealPlanMinAggregateOutputType | null
+    _max: MealPlanMaxAggregateOutputType | null
+  }
+
+  export type MealPlanMinAggregateOutputType = {
+    id: string | null
+    patientId: string | null
+    appointmentId: string | null
+    content: string | null
+    fileUrl: string | null
+    fileName: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MealPlanMaxAggregateOutputType = {
+    id: string | null
+    patientId: string | null
+    appointmentId: string | null
+    content: string | null
+    fileUrl: string | null
+    fileName: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MealPlanCountAggregateOutputType = {
+    id: number
+    patientId: number
+    appointmentId: number
+    content: number
+    fileUrl: number
+    fileName: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MealPlanMinAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    content?: true
+    fileUrl?: true
+    fileName?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MealPlanMaxAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    content?: true
+    fileUrl?: true
+    fileName?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MealPlanCountAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    content?: true
+    fileUrl?: true
+    fileName?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MealPlanAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MealPlan to aggregate.
+     */
+    where?: MealPlanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MealPlans to fetch.
+     */
+    orderBy?: MealPlanOrderByWithRelationInput | MealPlanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MealPlanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MealPlans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MealPlans.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MealPlans
+    **/
+    _count?: true | MealPlanCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MealPlanMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MealPlanMaxAggregateInputType
+  }
+
+  export type GetMealPlanAggregateType<T extends MealPlanAggregateArgs> = {
+        [P in keyof T & keyof AggregateMealPlan]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMealPlan[P]>
+      : GetScalarType<T[P], AggregateMealPlan[P]>
+  }
+
+
+
+
+  export type MealPlanGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MealPlanWhereInput
+    orderBy?: MealPlanOrderByWithAggregationInput | MealPlanOrderByWithAggregationInput[]
+    by: MealPlanScalarFieldEnum[] | MealPlanScalarFieldEnum
+    having?: MealPlanScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MealPlanCountAggregateInputType | true
+    _min?: MealPlanMinAggregateInputType
+    _max?: MealPlanMaxAggregateInputType
+  }
+
+  export type MealPlanGroupByOutputType = {
+    id: string
+    patientId: string
+    appointmentId: string
+    content: string | null
+    fileUrl: string | null
+    fileName: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: MealPlanCountAggregateOutputType | null
+    _min: MealPlanMinAggregateOutputType | null
+    _max: MealPlanMaxAggregateOutputType | null
+  }
+
+  type GetMealPlanGroupByPayload<T extends MealPlanGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MealPlanGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MealPlanGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MealPlanGroupByOutputType[P]>
+            : GetScalarType<T[P], MealPlanGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MealPlanSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    content?: boolean
+    fileUrl?: boolean
+    fileName?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mealPlan"]>
+
+  export type MealPlanSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    content?: boolean
+    fileUrl?: boolean
+    fileName?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mealPlan"]>
+
+  export type MealPlanSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    content?: boolean
+    fileUrl?: boolean
+    fileName?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mealPlan"]>
+
+  export type MealPlanSelectScalar = {
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    content?: boolean
+    fileUrl?: boolean
+    fileName?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type MealPlanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "appointmentId" | "content" | "fileUrl" | "fileName" | "createdAt" | "updatedAt", ExtArgs["result"]["mealPlan"]>
+  export type MealPlanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+  export type MealPlanIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+  export type MealPlanIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+
+  export type $MealPlanPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MealPlan"
+    objects: {
+      patient: Prisma.$PatientPayload<ExtArgs>
+      appointment: Prisma.$AppointmentPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      patientId: string
+      appointmentId: string
+      content: string | null
+      fileUrl: string | null
+      fileName: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["mealPlan"]>
+    composites: {}
+  }
+
+  type MealPlanGetPayload<S extends boolean | null | undefined | MealPlanDefaultArgs> = $Result.GetResult<Prisma.$MealPlanPayload, S>
+
+  type MealPlanCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MealPlanFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MealPlanCountAggregateInputType | true
+    }
+
+  export interface MealPlanDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MealPlan'], meta: { name: 'MealPlan' } }
+    /**
+     * Find zero or one MealPlan that matches the filter.
+     * @param {MealPlanFindUniqueArgs} args - Arguments to find a MealPlan
+     * @example
+     * // Get one MealPlan
+     * const mealPlan = await prisma.mealPlan.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MealPlanFindUniqueArgs>(args: SelectSubset<T, MealPlanFindUniqueArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MealPlan that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MealPlanFindUniqueOrThrowArgs} args - Arguments to find a MealPlan
+     * @example
+     * // Get one MealPlan
+     * const mealPlan = await prisma.mealPlan.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MealPlanFindUniqueOrThrowArgs>(args: SelectSubset<T, MealPlanFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MealPlan that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MealPlanFindFirstArgs} args - Arguments to find a MealPlan
+     * @example
+     * // Get one MealPlan
+     * const mealPlan = await prisma.mealPlan.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MealPlanFindFirstArgs>(args?: SelectSubset<T, MealPlanFindFirstArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MealPlan that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MealPlanFindFirstOrThrowArgs} args - Arguments to find a MealPlan
+     * @example
+     * // Get one MealPlan
+     * const mealPlan = await prisma.mealPlan.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MealPlanFindFirstOrThrowArgs>(args?: SelectSubset<T, MealPlanFindFirstOrThrowArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MealPlans that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MealPlanFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MealPlans
+     * const mealPlans = await prisma.mealPlan.findMany()
+     * 
+     * // Get first 10 MealPlans
+     * const mealPlans = await prisma.mealPlan.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const mealPlanWithIdOnly = await prisma.mealPlan.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MealPlanFindManyArgs>(args?: SelectSubset<T, MealPlanFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MealPlan.
+     * @param {MealPlanCreateArgs} args - Arguments to create a MealPlan.
+     * @example
+     * // Create one MealPlan
+     * const MealPlan = await prisma.mealPlan.create({
+     *   data: {
+     *     // ... data to create a MealPlan
+     *   }
+     * })
+     * 
+     */
+    create<T extends MealPlanCreateArgs>(args: SelectSubset<T, MealPlanCreateArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MealPlans.
+     * @param {MealPlanCreateManyArgs} args - Arguments to create many MealPlans.
+     * @example
+     * // Create many MealPlans
+     * const mealPlan = await prisma.mealPlan.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MealPlanCreateManyArgs>(args?: SelectSubset<T, MealPlanCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MealPlans and returns the data saved in the database.
+     * @param {MealPlanCreateManyAndReturnArgs} args - Arguments to create many MealPlans.
+     * @example
+     * // Create many MealPlans
+     * const mealPlan = await prisma.mealPlan.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MealPlans and only return the `id`
+     * const mealPlanWithIdOnly = await prisma.mealPlan.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MealPlanCreateManyAndReturnArgs>(args?: SelectSubset<T, MealPlanCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MealPlan.
+     * @param {MealPlanDeleteArgs} args - Arguments to delete one MealPlan.
+     * @example
+     * // Delete one MealPlan
+     * const MealPlan = await prisma.mealPlan.delete({
+     *   where: {
+     *     // ... filter to delete one MealPlan
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MealPlanDeleteArgs>(args: SelectSubset<T, MealPlanDeleteArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MealPlan.
+     * @param {MealPlanUpdateArgs} args - Arguments to update one MealPlan.
+     * @example
+     * // Update one MealPlan
+     * const mealPlan = await prisma.mealPlan.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MealPlanUpdateArgs>(args: SelectSubset<T, MealPlanUpdateArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MealPlans.
+     * @param {MealPlanDeleteManyArgs} args - Arguments to filter MealPlans to delete.
+     * @example
+     * // Delete a few MealPlans
+     * const { count } = await prisma.mealPlan.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MealPlanDeleteManyArgs>(args?: SelectSubset<T, MealPlanDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MealPlans.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MealPlanUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MealPlans
+     * const mealPlan = await prisma.mealPlan.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MealPlanUpdateManyArgs>(args: SelectSubset<T, MealPlanUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MealPlans and returns the data updated in the database.
+     * @param {MealPlanUpdateManyAndReturnArgs} args - Arguments to update many MealPlans.
+     * @example
+     * // Update many MealPlans
+     * const mealPlan = await prisma.mealPlan.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MealPlans and only return the `id`
+     * const mealPlanWithIdOnly = await prisma.mealPlan.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MealPlanUpdateManyAndReturnArgs>(args: SelectSubset<T, MealPlanUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MealPlan.
+     * @param {MealPlanUpsertArgs} args - Arguments to update or create a MealPlan.
+     * @example
+     * // Update or create a MealPlan
+     * const mealPlan = await prisma.mealPlan.upsert({
+     *   create: {
+     *     // ... data to create a MealPlan
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MealPlan we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MealPlanUpsertArgs>(args: SelectSubset<T, MealPlanUpsertArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MealPlans.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MealPlanCountArgs} args - Arguments to filter MealPlans to count.
+     * @example
+     * // Count the number of MealPlans
+     * const count = await prisma.mealPlan.count({
+     *   where: {
+     *     // ... the filter for the MealPlans we want to count
+     *   }
+     * })
+    **/
+    count<T extends MealPlanCountArgs>(
+      args?: Subset<T, MealPlanCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MealPlanCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MealPlan.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MealPlanAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MealPlanAggregateArgs>(args: Subset<T, MealPlanAggregateArgs>): Prisma.PrismaPromise<GetMealPlanAggregateType<T>>
+
+    /**
+     * Group by MealPlan.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MealPlanGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MealPlanGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MealPlanGroupByArgs['orderBy'] }
+        : { orderBy?: MealPlanGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MealPlanGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMealPlanGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MealPlan model
+   */
+  readonly fields: MealPlanFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MealPlan.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MealPlanClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    patient<T extends PatientDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PatientDefaultArgs<ExtArgs>>): Prisma__PatientClient<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    appointment<T extends AppointmentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AppointmentDefaultArgs<ExtArgs>>): Prisma__AppointmentClient<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MealPlan model
+   */
+  interface MealPlanFieldRefs {
+    readonly id: FieldRef<"MealPlan", 'String'>
+    readonly patientId: FieldRef<"MealPlan", 'String'>
+    readonly appointmentId: FieldRef<"MealPlan", 'String'>
+    readonly content: FieldRef<"MealPlan", 'String'>
+    readonly fileUrl: FieldRef<"MealPlan", 'String'>
+    readonly fileName: FieldRef<"MealPlan", 'String'>
+    readonly createdAt: FieldRef<"MealPlan", 'DateTime'>
+    readonly updatedAt: FieldRef<"MealPlan", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MealPlan findUnique
+   */
+  export type MealPlanFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * Filter, which MealPlan to fetch.
+     */
+    where: MealPlanWhereUniqueInput
+  }
+
+  /**
+   * MealPlan findUniqueOrThrow
+   */
+  export type MealPlanFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * Filter, which MealPlan to fetch.
+     */
+    where: MealPlanWhereUniqueInput
+  }
+
+  /**
+   * MealPlan findFirst
+   */
+  export type MealPlanFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * Filter, which MealPlan to fetch.
+     */
+    where?: MealPlanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MealPlans to fetch.
+     */
+    orderBy?: MealPlanOrderByWithRelationInput | MealPlanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MealPlans.
+     */
+    cursor?: MealPlanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MealPlans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MealPlans.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MealPlans.
+     */
+    distinct?: MealPlanScalarFieldEnum | MealPlanScalarFieldEnum[]
+  }
+
+  /**
+   * MealPlan findFirstOrThrow
+   */
+  export type MealPlanFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * Filter, which MealPlan to fetch.
+     */
+    where?: MealPlanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MealPlans to fetch.
+     */
+    orderBy?: MealPlanOrderByWithRelationInput | MealPlanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MealPlans.
+     */
+    cursor?: MealPlanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MealPlans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MealPlans.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MealPlans.
+     */
+    distinct?: MealPlanScalarFieldEnum | MealPlanScalarFieldEnum[]
+  }
+
+  /**
+   * MealPlan findMany
+   */
+  export type MealPlanFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * Filter, which MealPlans to fetch.
+     */
+    where?: MealPlanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MealPlans to fetch.
+     */
+    orderBy?: MealPlanOrderByWithRelationInput | MealPlanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MealPlans.
+     */
+    cursor?: MealPlanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MealPlans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MealPlans.
+     */
+    skip?: number
+    distinct?: MealPlanScalarFieldEnum | MealPlanScalarFieldEnum[]
+  }
+
+  /**
+   * MealPlan create
+   */
+  export type MealPlanCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MealPlan.
+     */
+    data: XOR<MealPlanCreateInput, MealPlanUncheckedCreateInput>
+  }
+
+  /**
+   * MealPlan createMany
+   */
+  export type MealPlanCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MealPlans.
+     */
+    data: MealPlanCreateManyInput | MealPlanCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MealPlan createManyAndReturn
+   */
+  export type MealPlanCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * The data used to create many MealPlans.
+     */
+    data: MealPlanCreateManyInput | MealPlanCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MealPlan update
+   */
+  export type MealPlanUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MealPlan.
+     */
+    data: XOR<MealPlanUpdateInput, MealPlanUncheckedUpdateInput>
+    /**
+     * Choose, which MealPlan to update.
+     */
+    where: MealPlanWhereUniqueInput
+  }
+
+  /**
+   * MealPlan updateMany
+   */
+  export type MealPlanUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MealPlans.
+     */
+    data: XOR<MealPlanUpdateManyMutationInput, MealPlanUncheckedUpdateManyInput>
+    /**
+     * Filter which MealPlans to update
+     */
+    where?: MealPlanWhereInput
+    /**
+     * Limit how many MealPlans to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MealPlan updateManyAndReturn
+   */
+  export type MealPlanUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * The data used to update MealPlans.
+     */
+    data: XOR<MealPlanUpdateManyMutationInput, MealPlanUncheckedUpdateManyInput>
+    /**
+     * Filter which MealPlans to update
+     */
+    where?: MealPlanWhereInput
+    /**
+     * Limit how many MealPlans to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MealPlan upsert
+   */
+  export type MealPlanUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MealPlan to update in case it exists.
+     */
+    where: MealPlanWhereUniqueInput
+    /**
+     * In case the MealPlan found by the `where` argument doesn't exist, create a new MealPlan with this data.
+     */
+    create: XOR<MealPlanCreateInput, MealPlanUncheckedCreateInput>
+    /**
+     * In case the MealPlan was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MealPlanUpdateInput, MealPlanUncheckedUpdateInput>
+  }
+
+  /**
+   * MealPlan delete
+   */
+  export type MealPlanDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * Filter which MealPlan to delete.
+     */
+    where: MealPlanWhereUniqueInput
+  }
+
+  /**
+   * MealPlan deleteMany
+   */
+  export type MealPlanDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MealPlans to delete
+     */
+    where?: MealPlanWhereInput
+    /**
+     * Limit how many MealPlans to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MealPlan without action
+   */
+  export type MealPlanDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -11231,6 +13828,7 @@ export namespace Prisma {
     status: 'status',
     contactPhone: 'contactPhone',
     emergencyContact: 'emergencyContact',
+    treatmentGoals: 'treatmentGoals',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -11317,6 +13915,36 @@ export namespace Prisma {
   };
 
   export type FinanceTransactionScalarFieldEnum = (typeof FinanceTransactionScalarFieldEnum)[keyof typeof FinanceTransactionScalarFieldEnum]
+
+
+  export const AnthropometryScalarFieldEnum: {
+    id: 'id',
+    patientId: 'patientId',
+    appointmentId: 'appointmentId',
+    weight: 'weight',
+    height: 'height',
+    bodyFat: 'bodyFat',
+    waist: 'waist',
+    hip: 'hip',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AnthropometryScalarFieldEnum = (typeof AnthropometryScalarFieldEnum)[keyof typeof AnthropometryScalarFieldEnum]
+
+
+  export const MealPlanScalarFieldEnum: {
+    id: 'id',
+    patientId: 'patientId',
+    appointmentId: 'appointmentId',
+    content: 'content',
+    fileUrl: 'fileUrl',
+    fileName: 'fileName',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MealPlanScalarFieldEnum = (typeof MealPlanScalarFieldEnum)[keyof typeof MealPlanScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -11754,6 +14382,7 @@ export namespace Prisma {
     status?: EnumPatientStatusFilter<"Patient"> | $Enums.PatientStatus
     contactPhone?: StringNullableFilter<"Patient"> | string | null
     emergencyContact?: JsonNullableFilter<"Patient">
+    treatmentGoals?: StringNullableListFilter<"Patient">
     createdAt?: DateTimeFilter<"Patient"> | Date | string
     updatedAt?: DateTimeFilter<"Patient"> | Date | string
     clinician?: XOR<ClinicianProfileScalarRelationFilter, ClinicianProfileWhereInput>
@@ -11761,6 +14390,8 @@ export namespace Prisma {
     psychNotes?: PsychNoteListRelationFilter
     accessLogs?: AccessLogListRelationFilter
     tasks?: TaskListRelationFilter
+    anthropometries?: AnthropometryListRelationFilter
+    mealPlans?: MealPlanListRelationFilter
   }
 
   export type PatientOrderByWithRelationInput = {
@@ -11773,6 +14404,7 @@ export namespace Prisma {
     status?: SortOrder
     contactPhone?: SortOrderInput | SortOrder
     emergencyContact?: SortOrderInput | SortOrder
+    treatmentGoals?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     clinician?: ClinicianProfileOrderByWithRelationInput
@@ -11780,6 +14412,8 @@ export namespace Prisma {
     psychNotes?: PsychNoteOrderByRelationAggregateInput
     accessLogs?: AccessLogOrderByRelationAggregateInput
     tasks?: TaskOrderByRelationAggregateInput
+    anthropometries?: AnthropometryOrderByRelationAggregateInput
+    mealPlans?: MealPlanOrderByRelationAggregateInput
   }
 
   export type PatientWhereUniqueInput = Prisma.AtLeast<{
@@ -11795,6 +14429,7 @@ export namespace Prisma {
     status?: EnumPatientStatusFilter<"Patient"> | $Enums.PatientStatus
     contactPhone?: StringNullableFilter<"Patient"> | string | null
     emergencyContact?: JsonNullableFilter<"Patient">
+    treatmentGoals?: StringNullableListFilter<"Patient">
     createdAt?: DateTimeFilter<"Patient"> | Date | string
     updatedAt?: DateTimeFilter<"Patient"> | Date | string
     clinician?: XOR<ClinicianProfileScalarRelationFilter, ClinicianProfileWhereInput>
@@ -11802,6 +14437,8 @@ export namespace Prisma {
     psychNotes?: PsychNoteListRelationFilter
     accessLogs?: AccessLogListRelationFilter
     tasks?: TaskListRelationFilter
+    anthropometries?: AnthropometryListRelationFilter
+    mealPlans?: MealPlanListRelationFilter
   }, "id">
 
   export type PatientOrderByWithAggregationInput = {
@@ -11814,6 +14451,7 @@ export namespace Prisma {
     status?: SortOrder
     contactPhone?: SortOrderInput | SortOrder
     emergencyContact?: SortOrderInput | SortOrder
+    treatmentGoals?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: PatientCountOrderByAggregateInput
@@ -11834,6 +14472,7 @@ export namespace Prisma {
     status?: EnumPatientStatusWithAggregatesFilter<"Patient"> | $Enums.PatientStatus
     contactPhone?: StringNullableWithAggregatesFilter<"Patient"> | string | null
     emergencyContact?: JsonNullableWithAggregatesFilter<"Patient">
+    treatmentGoals?: StringNullableListFilter<"Patient">
     createdAt?: DateTimeWithAggregatesFilter<"Patient"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Patient"> | Date | string
   }
@@ -11860,6 +14499,8 @@ export namespace Prisma {
     clinician?: XOR<ClinicianProfileScalarRelationFilter, ClinicianProfileWhereInput>
     psychNote?: XOR<PsychNoteNullableScalarRelationFilter, PsychNoteWhereInput> | null
     transaction?: XOR<FinanceTransactionNullableScalarRelationFilter, FinanceTransactionWhereInput> | null
+    anthropometry?: XOR<AnthropometryNullableScalarRelationFilter, AnthropometryWhereInput> | null
+    mealPlan?: XOR<MealPlanNullableScalarRelationFilter, MealPlanWhereInput> | null
   }
 
   export type AppointmentOrderByWithRelationInput = {
@@ -11881,6 +14522,8 @@ export namespace Prisma {
     clinician?: ClinicianProfileOrderByWithRelationInput
     psychNote?: PsychNoteOrderByWithRelationInput
     transaction?: FinanceTransactionOrderByWithRelationInput
+    anthropometry?: AnthropometryOrderByWithRelationInput
+    mealPlan?: MealPlanOrderByWithRelationInput
   }
 
   export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
@@ -11905,6 +14548,8 @@ export namespace Prisma {
     clinician?: XOR<ClinicianProfileScalarRelationFilter, ClinicianProfileWhereInput>
     psychNote?: XOR<PsychNoteNullableScalarRelationFilter, PsychNoteWhereInput> | null
     transaction?: XOR<FinanceTransactionNullableScalarRelationFilter, FinanceTransactionWhereInput> | null
+    anthropometry?: XOR<AnthropometryNullableScalarRelationFilter, AnthropometryWhereInput> | null
+    mealPlan?: XOR<MealPlanNullableScalarRelationFilter, MealPlanWhereInput> | null
   }, "id">
 
   export type AppointmentOrderByWithAggregationInput = {
@@ -12267,6 +14912,164 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"FinanceTransaction"> | Date | string
   }
 
+  export type AnthropometryWhereInput = {
+    AND?: AnthropometryWhereInput | AnthropometryWhereInput[]
+    OR?: AnthropometryWhereInput[]
+    NOT?: AnthropometryWhereInput | AnthropometryWhereInput[]
+    id?: UuidFilter<"Anthropometry"> | string
+    patientId?: UuidFilter<"Anthropometry"> | string
+    appointmentId?: UuidFilter<"Anthropometry"> | string
+    weight?: DecimalFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    height?: DecimalFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    bodyFat?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    waist?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    hip?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFilter<"Anthropometry"> | Date | string
+    updatedAt?: DateTimeFilter<"Anthropometry"> | Date | string
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
+  }
+
+  export type AnthropometryOrderByWithRelationInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    weight?: SortOrder
+    height?: SortOrder
+    bodyFat?: SortOrderInput | SortOrder
+    waist?: SortOrderInput | SortOrder
+    hip?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    patient?: PatientOrderByWithRelationInput
+    appointment?: AppointmentOrderByWithRelationInput
+  }
+
+  export type AnthropometryWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    appointmentId?: string
+    AND?: AnthropometryWhereInput | AnthropometryWhereInput[]
+    OR?: AnthropometryWhereInput[]
+    NOT?: AnthropometryWhereInput | AnthropometryWhereInput[]
+    patientId?: UuidFilter<"Anthropometry"> | string
+    weight?: DecimalFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    height?: DecimalFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    bodyFat?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    waist?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    hip?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFilter<"Anthropometry"> | Date | string
+    updatedAt?: DateTimeFilter<"Anthropometry"> | Date | string
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
+  }, "id" | "appointmentId">
+
+  export type AnthropometryOrderByWithAggregationInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    weight?: SortOrder
+    height?: SortOrder
+    bodyFat?: SortOrderInput | SortOrder
+    waist?: SortOrderInput | SortOrder
+    hip?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AnthropometryCountOrderByAggregateInput
+    _avg?: AnthropometryAvgOrderByAggregateInput
+    _max?: AnthropometryMaxOrderByAggregateInput
+    _min?: AnthropometryMinOrderByAggregateInput
+    _sum?: AnthropometrySumOrderByAggregateInput
+  }
+
+  export type AnthropometryScalarWhereWithAggregatesInput = {
+    AND?: AnthropometryScalarWhereWithAggregatesInput | AnthropometryScalarWhereWithAggregatesInput[]
+    OR?: AnthropometryScalarWhereWithAggregatesInput[]
+    NOT?: AnthropometryScalarWhereWithAggregatesInput | AnthropometryScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"Anthropometry"> | string
+    patientId?: UuidWithAggregatesFilter<"Anthropometry"> | string
+    appointmentId?: UuidWithAggregatesFilter<"Anthropometry"> | string
+    weight?: DecimalWithAggregatesFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    height?: DecimalWithAggregatesFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    bodyFat?: DecimalNullableWithAggregatesFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    waist?: DecimalNullableWithAggregatesFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    hip?: DecimalNullableWithAggregatesFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Anthropometry"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Anthropometry"> | Date | string
+  }
+
+  export type MealPlanWhereInput = {
+    AND?: MealPlanWhereInput | MealPlanWhereInput[]
+    OR?: MealPlanWhereInput[]
+    NOT?: MealPlanWhereInput | MealPlanWhereInput[]
+    id?: UuidFilter<"MealPlan"> | string
+    patientId?: UuidFilter<"MealPlan"> | string
+    appointmentId?: UuidFilter<"MealPlan"> | string
+    content?: StringNullableFilter<"MealPlan"> | string | null
+    fileUrl?: StringNullableFilter<"MealPlan"> | string | null
+    fileName?: StringNullableFilter<"MealPlan"> | string | null
+    createdAt?: DateTimeFilter<"MealPlan"> | Date | string
+    updatedAt?: DateTimeFilter<"MealPlan"> | Date | string
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
+  }
+
+  export type MealPlanOrderByWithRelationInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    content?: SortOrderInput | SortOrder
+    fileUrl?: SortOrderInput | SortOrder
+    fileName?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    patient?: PatientOrderByWithRelationInput
+    appointment?: AppointmentOrderByWithRelationInput
+  }
+
+  export type MealPlanWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    appointmentId?: string
+    AND?: MealPlanWhereInput | MealPlanWhereInput[]
+    OR?: MealPlanWhereInput[]
+    NOT?: MealPlanWhereInput | MealPlanWhereInput[]
+    patientId?: UuidFilter<"MealPlan"> | string
+    content?: StringNullableFilter<"MealPlan"> | string | null
+    fileUrl?: StringNullableFilter<"MealPlan"> | string | null
+    fileName?: StringNullableFilter<"MealPlan"> | string | null
+    createdAt?: DateTimeFilter<"MealPlan"> | Date | string
+    updatedAt?: DateTimeFilter<"MealPlan"> | Date | string
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
+  }, "id" | "appointmentId">
+
+  export type MealPlanOrderByWithAggregationInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    content?: SortOrderInput | SortOrder
+    fileUrl?: SortOrderInput | SortOrder
+    fileName?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: MealPlanCountOrderByAggregateInput
+    _max?: MealPlanMaxOrderByAggregateInput
+    _min?: MealPlanMinOrderByAggregateInput
+  }
+
+  export type MealPlanScalarWhereWithAggregatesInput = {
+    AND?: MealPlanScalarWhereWithAggregatesInput | MealPlanScalarWhereWithAggregatesInput[]
+    OR?: MealPlanScalarWhereWithAggregatesInput[]
+    NOT?: MealPlanScalarWhereWithAggregatesInput | MealPlanScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"MealPlan"> | string
+    patientId?: UuidWithAggregatesFilter<"MealPlan"> | string
+    appointmentId?: UuidWithAggregatesFilter<"MealPlan"> | string
+    content?: StringNullableWithAggregatesFilter<"MealPlan"> | string | null
+    fileUrl?: StringNullableWithAggregatesFilter<"MealPlan"> | string | null
+    fileName?: StringNullableWithAggregatesFilter<"MealPlan"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"MealPlan"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"MealPlan"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     email: string
@@ -12442,6 +15245,7 @@ export namespace Prisma {
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
@@ -12449,6 +15253,8 @@ export namespace Prisma {
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
     tasks?: TaskCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateInput = {
@@ -12461,12 +15267,15 @@ export namespace Prisma {
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
     tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUpdateInput = {
@@ -12478,6 +15287,7 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
@@ -12485,6 +15295,8 @@ export namespace Prisma {
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
     tasks?: TaskUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateInput = {
@@ -12497,12 +15309,15 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
     tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientCreateManyInput = {
@@ -12515,6 +15330,7 @@ export namespace Prisma {
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -12528,6 +15344,7 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12542,6 +15359,7 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12563,6 +15381,8 @@ export namespace Prisma {
     clinician: ClinicianProfileCreateNestedOneWithoutAppointmentsInput
     psychNote?: PsychNoteCreateNestedOneWithoutAppointmentInput
     transaction?: FinanceTransactionCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanCreateNestedOneWithoutAppointmentInput
   }
 
   export type AppointmentUncheckedCreateInput = {
@@ -12582,6 +15402,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     psychNote?: PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput
     transaction?: FinanceTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanUncheckedCreateNestedOneWithoutAppointmentInput
   }
 
   export type AppointmentUpdateInput = {
@@ -12601,6 +15423,8 @@ export namespace Prisma {
     clinician?: ClinicianProfileUpdateOneRequiredWithoutAppointmentsNestedInput
     psychNote?: PsychNoteUpdateOneWithoutAppointmentNestedInput
     transaction?: FinanceTransactionUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUpdateOneWithoutAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateInput = {
@@ -12620,6 +15444,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     psychNote?: PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput
     transaction?: FinanceTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput
   }
 
   export type AppointmentCreateManyInput = {
@@ -13007,6 +15833,170 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AnthropometryCreateInput = {
+    id?: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutAnthropometriesInput
+    appointment: AppointmentCreateNestedOneWithoutAnthropometryInput
+  }
+
+  export type AnthropometryUncheckedCreateInput = {
+    id?: string
+    patientId: string
+    appointmentId: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AnthropometryUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutAnthropometriesNestedInput
+    appointment?: AppointmentUpdateOneRequiredWithoutAnthropometryNestedInput
+  }
+
+  export type AnthropometryUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AnthropometryCreateManyInput = {
+    id?: string
+    patientId: string
+    appointmentId: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AnthropometryUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AnthropometryUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MealPlanCreateInput = {
+    id?: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutMealPlansInput
+    appointment: AppointmentCreateNestedOneWithoutMealPlanInput
+  }
+
+  export type MealPlanUncheckedCreateInput = {
+    id?: string
+    patientId: string
+    appointmentId: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MealPlanUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutMealPlansNestedInput
+    appointment?: AppointmentUpdateOneRequiredWithoutMealPlanNestedInput
+  }
+
+  export type MealPlanUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MealPlanCreateManyInput = {
+    id?: string
+    patientId: string
+    appointmentId: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MealPlanUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MealPlanUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UuidFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -13382,6 +16372,14 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
   export type ClinicianProfileScalarRelationFilter = {
     is?: ClinicianProfileWhereInput
     isNot?: ClinicianProfileWhereInput
@@ -13399,11 +16397,31 @@ export namespace Prisma {
     none?: TaskWhereInput
   }
 
+  export type AnthropometryListRelationFilter = {
+    every?: AnthropometryWhereInput
+    some?: AnthropometryWhereInput
+    none?: AnthropometryWhereInput
+  }
+
+  export type MealPlanListRelationFilter = {
+    every?: MealPlanWhereInput
+    some?: MealPlanWhereInput
+    none?: MealPlanWhereInput
+  }
+
   export type PsychNoteOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type TaskOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AnthropometryOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MealPlanOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -13417,6 +16435,7 @@ export namespace Prisma {
     status?: SortOrder
     contactPhone?: SortOrder
     emergencyContact?: SortOrder
+    treatmentGoals?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -13538,6 +16557,16 @@ export namespace Prisma {
   export type FinanceTransactionNullableScalarRelationFilter = {
     is?: FinanceTransactionWhereInput | null
     isNot?: FinanceTransactionWhereInput | null
+  }
+
+  export type AnthropometryNullableScalarRelationFilter = {
+    is?: AnthropometryWhereInput | null
+    isNot?: AnthropometryWhereInput | null
+  }
+
+  export type MealPlanNullableScalarRelationFilter = {
+    is?: MealPlanWhereInput | null
+    isNot?: MealPlanWhereInput | null
   }
 
   export type AppointmentCountOrderByAggregateInput = {
@@ -13683,14 +16712,6 @@ export namespace Prisma {
   export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type StringNullableListFilter<$PrismaModel = never> = {
-    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    has?: string | StringFieldRefInput<$PrismaModel> | null
-    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
-    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
-    isEmpty?: boolean
   }
 
   export type AppointmentScalarRelationFilter = {
@@ -13971,6 +16992,121 @@ export namespace Prisma {
     _max?: NestedEnumTransactionTypeFilter<$PrismaModel>
   }
 
+  export type DecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type AnthropometryCountOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    weight?: SortOrder
+    height?: SortOrder
+    bodyFat?: SortOrder
+    waist?: SortOrder
+    hip?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AnthropometryAvgOrderByAggregateInput = {
+    weight?: SortOrder
+    height?: SortOrder
+    bodyFat?: SortOrder
+    waist?: SortOrder
+    hip?: SortOrder
+  }
+
+  export type AnthropometryMaxOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    weight?: SortOrder
+    height?: SortOrder
+    bodyFat?: SortOrder
+    waist?: SortOrder
+    hip?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AnthropometryMinOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    weight?: SortOrder
+    height?: SortOrder
+    bodyFat?: SortOrder
+    waist?: SortOrder
+    hip?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AnthropometrySumOrderByAggregateInput = {
+    weight?: SortOrder
+    height?: SortOrder
+    bodyFat?: SortOrder
+    waist?: SortOrder
+    hip?: SortOrder
+  }
+
+  export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type MealPlanCountOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    content?: SortOrder
+    fileUrl?: SortOrder
+    fileName?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MealPlanMaxOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    content?: SortOrder
+    fileUrl?: SortOrder
+    fileName?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MealPlanMinOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    content?: SortOrder
+    fileUrl?: SortOrder
+    fileName?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
   export type ClinicianProfileCreateNestedOneWithoutUserInput = {
     create?: XOR<ClinicianProfileCreateWithoutUserInput, ClinicianProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: ClinicianProfileCreateOrConnectWithoutUserInput
@@ -14221,6 +17357,10 @@ export namespace Prisma {
     deleteMany?: FinanceTransactionScalarWhereInput | FinanceTransactionScalarWhereInput[]
   }
 
+  export type PatientCreatetreatmentGoalsInput = {
+    set: string[]
+  }
+
   export type ClinicianProfileCreateNestedOneWithoutPatientsInput = {
     create?: XOR<ClinicianProfileCreateWithoutPatientsInput, ClinicianProfileUncheckedCreateWithoutPatientsInput>
     connectOrCreate?: ClinicianProfileCreateOrConnectWithoutPatientsInput
@@ -14255,6 +17395,20 @@ export namespace Prisma {
     connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
   }
 
+  export type AnthropometryCreateNestedManyWithoutPatientInput = {
+    create?: XOR<AnthropometryCreateWithoutPatientInput, AnthropometryUncheckedCreateWithoutPatientInput> | AnthropometryCreateWithoutPatientInput[] | AnthropometryUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutPatientInput | AnthropometryCreateOrConnectWithoutPatientInput[]
+    createMany?: AnthropometryCreateManyPatientInputEnvelope
+    connect?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+  }
+
+  export type MealPlanCreateNestedManyWithoutPatientInput = {
+    create?: XOR<MealPlanCreateWithoutPatientInput, MealPlanUncheckedCreateWithoutPatientInput> | MealPlanCreateWithoutPatientInput[] | MealPlanUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: MealPlanCreateOrConnectWithoutPatientInput | MealPlanCreateOrConnectWithoutPatientInput[]
+    createMany?: MealPlanCreateManyPatientInputEnvelope
+    connect?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+  }
+
   export type AppointmentUncheckedCreateNestedManyWithoutPatientInput = {
     create?: XOR<AppointmentCreateWithoutPatientInput, AppointmentUncheckedCreateWithoutPatientInput> | AppointmentCreateWithoutPatientInput[] | AppointmentUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: AppointmentCreateOrConnectWithoutPatientInput | AppointmentCreateOrConnectWithoutPatientInput[]
@@ -14283,12 +17437,31 @@ export namespace Prisma {
     connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
   }
 
+  export type AnthropometryUncheckedCreateNestedManyWithoutPatientInput = {
+    create?: XOR<AnthropometryCreateWithoutPatientInput, AnthropometryUncheckedCreateWithoutPatientInput> | AnthropometryCreateWithoutPatientInput[] | AnthropometryUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutPatientInput | AnthropometryCreateOrConnectWithoutPatientInput[]
+    createMany?: AnthropometryCreateManyPatientInputEnvelope
+    connect?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+  }
+
+  export type MealPlanUncheckedCreateNestedManyWithoutPatientInput = {
+    create?: XOR<MealPlanCreateWithoutPatientInput, MealPlanUncheckedCreateWithoutPatientInput> | MealPlanCreateWithoutPatientInput[] | MealPlanUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: MealPlanCreateOrConnectWithoutPatientInput | MealPlanCreateOrConnectWithoutPatientInput[]
+    createMany?: MealPlanCreateManyPatientInputEnvelope
+    connect?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+  }
+
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
   }
 
   export type EnumPatientStatusFieldUpdateOperationsInput = {
     set?: $Enums.PatientStatus
+  }
+
+  export type PatientUpdatetreatmentGoalsInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput = {
@@ -14355,6 +17528,34 @@ export namespace Prisma {
     deleteMany?: TaskScalarWhereInput | TaskScalarWhereInput[]
   }
 
+  export type AnthropometryUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<AnthropometryCreateWithoutPatientInput, AnthropometryUncheckedCreateWithoutPatientInput> | AnthropometryCreateWithoutPatientInput[] | AnthropometryUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutPatientInput | AnthropometryCreateOrConnectWithoutPatientInput[]
+    upsert?: AnthropometryUpsertWithWhereUniqueWithoutPatientInput | AnthropometryUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: AnthropometryCreateManyPatientInputEnvelope
+    set?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    disconnect?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    delete?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    connect?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    update?: AnthropometryUpdateWithWhereUniqueWithoutPatientInput | AnthropometryUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: AnthropometryUpdateManyWithWhereWithoutPatientInput | AnthropometryUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: AnthropometryScalarWhereInput | AnthropometryScalarWhereInput[]
+  }
+
+  export type MealPlanUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<MealPlanCreateWithoutPatientInput, MealPlanUncheckedCreateWithoutPatientInput> | MealPlanCreateWithoutPatientInput[] | MealPlanUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: MealPlanCreateOrConnectWithoutPatientInput | MealPlanCreateOrConnectWithoutPatientInput[]
+    upsert?: MealPlanUpsertWithWhereUniqueWithoutPatientInput | MealPlanUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: MealPlanCreateManyPatientInputEnvelope
+    set?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    disconnect?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    delete?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    connect?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    update?: MealPlanUpdateWithWhereUniqueWithoutPatientInput | MealPlanUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: MealPlanUpdateManyWithWhereWithoutPatientInput | MealPlanUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: MealPlanScalarWhereInput | MealPlanScalarWhereInput[]
+  }
+
   export type AppointmentUncheckedUpdateManyWithoutPatientNestedInput = {
     create?: XOR<AppointmentCreateWithoutPatientInput, AppointmentUncheckedCreateWithoutPatientInput> | AppointmentCreateWithoutPatientInput[] | AppointmentUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: AppointmentCreateOrConnectWithoutPatientInput | AppointmentCreateOrConnectWithoutPatientInput[]
@@ -14411,6 +17612,34 @@ export namespace Prisma {
     deleteMany?: TaskScalarWhereInput | TaskScalarWhereInput[]
   }
 
+  export type AnthropometryUncheckedUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<AnthropometryCreateWithoutPatientInput, AnthropometryUncheckedCreateWithoutPatientInput> | AnthropometryCreateWithoutPatientInput[] | AnthropometryUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutPatientInput | AnthropometryCreateOrConnectWithoutPatientInput[]
+    upsert?: AnthropometryUpsertWithWhereUniqueWithoutPatientInput | AnthropometryUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: AnthropometryCreateManyPatientInputEnvelope
+    set?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    disconnect?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    delete?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    connect?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    update?: AnthropometryUpdateWithWhereUniqueWithoutPatientInput | AnthropometryUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: AnthropometryUpdateManyWithWhereWithoutPatientInput | AnthropometryUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: AnthropometryScalarWhereInput | AnthropometryScalarWhereInput[]
+  }
+
+  export type MealPlanUncheckedUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<MealPlanCreateWithoutPatientInput, MealPlanUncheckedCreateWithoutPatientInput> | MealPlanCreateWithoutPatientInput[] | MealPlanUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: MealPlanCreateOrConnectWithoutPatientInput | MealPlanCreateOrConnectWithoutPatientInput[]
+    upsert?: MealPlanUpsertWithWhereUniqueWithoutPatientInput | MealPlanUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: MealPlanCreateManyPatientInputEnvelope
+    set?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    disconnect?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    delete?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    connect?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    update?: MealPlanUpdateWithWhereUniqueWithoutPatientInput | MealPlanUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: MealPlanUpdateManyWithWhereWithoutPatientInput | MealPlanUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: MealPlanScalarWhereInput | MealPlanScalarWhereInput[]
+  }
+
   export type PatientCreateNestedOneWithoutAppointmentsInput = {
     create?: XOR<PatientCreateWithoutAppointmentsInput, PatientUncheckedCreateWithoutAppointmentsInput>
     connectOrCreate?: PatientCreateOrConnectWithoutAppointmentsInput
@@ -14435,6 +17664,18 @@ export namespace Prisma {
     connect?: FinanceTransactionWhereUniqueInput
   }
 
+  export type AnthropometryCreateNestedOneWithoutAppointmentInput = {
+    create?: XOR<AnthropometryCreateWithoutAppointmentInput, AnthropometryUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutAppointmentInput
+    connect?: AnthropometryWhereUniqueInput
+  }
+
+  export type MealPlanCreateNestedOneWithoutAppointmentInput = {
+    create?: XOR<MealPlanCreateWithoutAppointmentInput, MealPlanUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: MealPlanCreateOrConnectWithoutAppointmentInput
+    connect?: MealPlanWhereUniqueInput
+  }
+
   export type PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput = {
     create?: XOR<PsychNoteCreateWithoutAppointmentInput, PsychNoteUncheckedCreateWithoutAppointmentInput>
     connectOrCreate?: PsychNoteCreateOrConnectWithoutAppointmentInput
@@ -14445,6 +17686,18 @@ export namespace Prisma {
     create?: XOR<FinanceTransactionCreateWithoutAppointmentInput, FinanceTransactionUncheckedCreateWithoutAppointmentInput>
     connectOrCreate?: FinanceTransactionCreateOrConnectWithoutAppointmentInput
     connect?: FinanceTransactionWhereUniqueInput
+  }
+
+  export type AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput = {
+    create?: XOR<AnthropometryCreateWithoutAppointmentInput, AnthropometryUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutAppointmentInput
+    connect?: AnthropometryWhereUniqueInput
+  }
+
+  export type MealPlanUncheckedCreateNestedOneWithoutAppointmentInput = {
+    create?: XOR<MealPlanCreateWithoutAppointmentInput, MealPlanUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: MealPlanCreateOrConnectWithoutAppointmentInput
+    connect?: MealPlanWhereUniqueInput
   }
 
   export type EnumAppointmentTypeFieldUpdateOperationsInput = {
@@ -14499,6 +17752,26 @@ export namespace Prisma {
     update?: XOR<XOR<FinanceTransactionUpdateToOneWithWhereWithoutAppointmentInput, FinanceTransactionUpdateWithoutAppointmentInput>, FinanceTransactionUncheckedUpdateWithoutAppointmentInput>
   }
 
+  export type AnthropometryUpdateOneWithoutAppointmentNestedInput = {
+    create?: XOR<AnthropometryCreateWithoutAppointmentInput, AnthropometryUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutAppointmentInput
+    upsert?: AnthropometryUpsertWithoutAppointmentInput
+    disconnect?: AnthropometryWhereInput | boolean
+    delete?: AnthropometryWhereInput | boolean
+    connect?: AnthropometryWhereUniqueInput
+    update?: XOR<XOR<AnthropometryUpdateToOneWithWhereWithoutAppointmentInput, AnthropometryUpdateWithoutAppointmentInput>, AnthropometryUncheckedUpdateWithoutAppointmentInput>
+  }
+
+  export type MealPlanUpdateOneWithoutAppointmentNestedInput = {
+    create?: XOR<MealPlanCreateWithoutAppointmentInput, MealPlanUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: MealPlanCreateOrConnectWithoutAppointmentInput
+    upsert?: MealPlanUpsertWithoutAppointmentInput
+    disconnect?: MealPlanWhereInput | boolean
+    delete?: MealPlanWhereInput | boolean
+    connect?: MealPlanWhereUniqueInput
+    update?: XOR<XOR<MealPlanUpdateToOneWithWhereWithoutAppointmentInput, MealPlanUpdateWithoutAppointmentInput>, MealPlanUncheckedUpdateWithoutAppointmentInput>
+  }
+
   export type PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput = {
     create?: XOR<PsychNoteCreateWithoutAppointmentInput, PsychNoteUncheckedCreateWithoutAppointmentInput>
     connectOrCreate?: PsychNoteCreateOrConnectWithoutAppointmentInput
@@ -14517,6 +17790,26 @@ export namespace Prisma {
     delete?: FinanceTransactionWhereInput | boolean
     connect?: FinanceTransactionWhereUniqueInput
     update?: XOR<XOR<FinanceTransactionUpdateToOneWithWhereWithoutAppointmentInput, FinanceTransactionUpdateWithoutAppointmentInput>, FinanceTransactionUncheckedUpdateWithoutAppointmentInput>
+  }
+
+  export type AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput = {
+    create?: XOR<AnthropometryCreateWithoutAppointmentInput, AnthropometryUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutAppointmentInput
+    upsert?: AnthropometryUpsertWithoutAppointmentInput
+    disconnect?: AnthropometryWhereInput | boolean
+    delete?: AnthropometryWhereInput | boolean
+    connect?: AnthropometryWhereUniqueInput
+    update?: XOR<XOR<AnthropometryUpdateToOneWithWhereWithoutAppointmentInput, AnthropometryUpdateWithoutAppointmentInput>, AnthropometryUncheckedUpdateWithoutAppointmentInput>
+  }
+
+  export type MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput = {
+    create?: XOR<MealPlanCreateWithoutAppointmentInput, MealPlanUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: MealPlanCreateOrConnectWithoutAppointmentInput
+    upsert?: MealPlanUpsertWithoutAppointmentInput
+    disconnect?: MealPlanWhereInput | boolean
+    delete?: MealPlanWhereInput | boolean
+    connect?: MealPlanWhereUniqueInput
+    update?: XOR<XOR<MealPlanUpdateToOneWithWhereWithoutAppointmentInput, MealPlanUpdateWithoutAppointmentInput>, MealPlanUncheckedUpdateWithoutAppointmentInput>
   }
 
   export type PsychNoteCreatetagsInput = {
@@ -14648,6 +17941,70 @@ export namespace Prisma {
     delete?: AppointmentWhereInput | boolean
     connect?: AppointmentWhereUniqueInput
     update?: XOR<XOR<AppointmentUpdateToOneWithWhereWithoutTransactionInput, AppointmentUpdateWithoutTransactionInput>, AppointmentUncheckedUpdateWithoutTransactionInput>
+  }
+
+  export type PatientCreateNestedOneWithoutAnthropometriesInput = {
+    create?: XOR<PatientCreateWithoutAnthropometriesInput, PatientUncheckedCreateWithoutAnthropometriesInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutAnthropometriesInput
+    connect?: PatientWhereUniqueInput
+  }
+
+  export type AppointmentCreateNestedOneWithoutAnthropometryInput = {
+    create?: XOR<AppointmentCreateWithoutAnthropometryInput, AppointmentUncheckedCreateWithoutAnthropometryInput>
+    connectOrCreate?: AppointmentCreateOrConnectWithoutAnthropometryInput
+    connect?: AppointmentWhereUniqueInput
+  }
+
+  export type NullableDecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string | null
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type PatientUpdateOneRequiredWithoutAnthropometriesNestedInput = {
+    create?: XOR<PatientCreateWithoutAnthropometriesInput, PatientUncheckedCreateWithoutAnthropometriesInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutAnthropometriesInput
+    upsert?: PatientUpsertWithoutAnthropometriesInput
+    connect?: PatientWhereUniqueInput
+    update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutAnthropometriesInput, PatientUpdateWithoutAnthropometriesInput>, PatientUncheckedUpdateWithoutAnthropometriesInput>
+  }
+
+  export type AppointmentUpdateOneRequiredWithoutAnthropometryNestedInput = {
+    create?: XOR<AppointmentCreateWithoutAnthropometryInput, AppointmentUncheckedCreateWithoutAnthropometryInput>
+    connectOrCreate?: AppointmentCreateOrConnectWithoutAnthropometryInput
+    upsert?: AppointmentUpsertWithoutAnthropometryInput
+    connect?: AppointmentWhereUniqueInput
+    update?: XOR<XOR<AppointmentUpdateToOneWithWhereWithoutAnthropometryInput, AppointmentUpdateWithoutAnthropometryInput>, AppointmentUncheckedUpdateWithoutAnthropometryInput>
+  }
+
+  export type PatientCreateNestedOneWithoutMealPlansInput = {
+    create?: XOR<PatientCreateWithoutMealPlansInput, PatientUncheckedCreateWithoutMealPlansInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutMealPlansInput
+    connect?: PatientWhereUniqueInput
+  }
+
+  export type AppointmentCreateNestedOneWithoutMealPlanInput = {
+    create?: XOR<AppointmentCreateWithoutMealPlanInput, AppointmentUncheckedCreateWithoutMealPlanInput>
+    connectOrCreate?: AppointmentCreateOrConnectWithoutMealPlanInput
+    connect?: AppointmentWhereUniqueInput
+  }
+
+  export type PatientUpdateOneRequiredWithoutMealPlansNestedInput = {
+    create?: XOR<PatientCreateWithoutMealPlansInput, PatientUncheckedCreateWithoutMealPlansInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutMealPlansInput
+    upsert?: PatientUpsertWithoutMealPlansInput
+    connect?: PatientWhereUniqueInput
+    update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutMealPlansInput, PatientUpdateWithoutMealPlansInput>, PatientUncheckedUpdateWithoutMealPlansInput>
+  }
+
+  export type AppointmentUpdateOneRequiredWithoutMealPlanNestedInput = {
+    create?: XOR<AppointmentCreateWithoutMealPlanInput, AppointmentUncheckedCreateWithoutMealPlanInput>
+    connectOrCreate?: AppointmentCreateOrConnectWithoutMealPlanInput
+    upsert?: AppointmentUpsertWithoutMealPlanInput
+    connect?: AppointmentWhereUniqueInput
+    update?: XOR<XOR<AppointmentUpdateToOneWithWhereWithoutMealPlanInput, AppointmentUpdateWithoutMealPlanInput>, AppointmentUncheckedUpdateWithoutMealPlanInput>
   }
 
   export type NestedUuidFilter<$PrismaModel = never> = {
@@ -15127,6 +18484,33 @@ export namespace Prisma {
     _max?: NestedEnumTransactionTypeFilter<$PrismaModel>
   }
 
+  export type NestedDecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
   export type ClinicianProfileCreateWithoutUserInput = {
     id?: string
     type: $Enums.ClinicianType
@@ -15296,12 +18680,15 @@ export namespace Prisma {
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
     tasks?: TaskCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutClinicianInput = {
@@ -15313,12 +18700,15 @@ export namespace Prisma {
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
     tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutClinicianInput = {
@@ -15347,6 +18737,8 @@ export namespace Prisma {
     patient: PatientCreateNestedOneWithoutAppointmentsInput
     psychNote?: PsychNoteCreateNestedOneWithoutAppointmentInput
     transaction?: FinanceTransactionCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanCreateNestedOneWithoutAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutClinicianInput = {
@@ -15365,6 +18757,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     psychNote?: PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput
     transaction?: FinanceTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanUncheckedCreateNestedOneWithoutAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutClinicianInput = {
@@ -15471,6 +18865,7 @@ export namespace Prisma {
     status?: EnumPatientStatusFilter<"Patient"> | $Enums.PatientStatus
     contactPhone?: StringNullableFilter<"Patient"> | string | null
     emergencyContact?: JsonNullableFilter<"Patient">
+    treatmentGoals?: StringNullableListFilter<"Patient">
     createdAt?: DateTimeFilter<"Patient"> | Date | string
     updatedAt?: DateTimeFilter<"Patient"> | Date | string
   }
@@ -15592,6 +18987,8 @@ export namespace Prisma {
     clinician: ClinicianProfileCreateNestedOneWithoutAppointmentsInput
     psychNote?: PsychNoteCreateNestedOneWithoutAppointmentInput
     transaction?: FinanceTransactionCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanCreateNestedOneWithoutAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutPatientInput = {
@@ -15610,6 +19007,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     psychNote?: PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput
     transaction?: FinanceTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanUncheckedCreateNestedOneWithoutAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutPatientInput = {
@@ -15715,6 +19114,70 @@ export namespace Prisma {
 
   export type TaskCreateManyPatientInputEnvelope = {
     data: TaskCreateManyPatientInput | TaskCreateManyPatientInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AnthropometryCreateWithoutPatientInput = {
+    id?: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointment: AppointmentCreateNestedOneWithoutAnthropometryInput
+  }
+
+  export type AnthropometryUncheckedCreateWithoutPatientInput = {
+    id?: string
+    appointmentId: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AnthropometryCreateOrConnectWithoutPatientInput = {
+    where: AnthropometryWhereUniqueInput
+    create: XOR<AnthropometryCreateWithoutPatientInput, AnthropometryUncheckedCreateWithoutPatientInput>
+  }
+
+  export type AnthropometryCreateManyPatientInputEnvelope = {
+    data: AnthropometryCreateManyPatientInput | AnthropometryCreateManyPatientInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MealPlanCreateWithoutPatientInput = {
+    id?: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointment: AppointmentCreateNestedOneWithoutMealPlanInput
+  }
+
+  export type MealPlanUncheckedCreateWithoutPatientInput = {
+    id?: string
+    appointmentId: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MealPlanCreateOrConnectWithoutPatientInput = {
+    where: MealPlanWhereUniqueInput
+    create: XOR<MealPlanCreateWithoutPatientInput, MealPlanUncheckedCreateWithoutPatientInput>
+  }
+
+  export type MealPlanCreateManyPatientInputEnvelope = {
+    data: MealPlanCreateManyPatientInput | MealPlanCreateManyPatientInput[]
     skipDuplicates?: boolean
   }
 
@@ -15851,6 +19314,68 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Task"> | Date | string
   }
 
+  export type AnthropometryUpsertWithWhereUniqueWithoutPatientInput = {
+    where: AnthropometryWhereUniqueInput
+    update: XOR<AnthropometryUpdateWithoutPatientInput, AnthropometryUncheckedUpdateWithoutPatientInput>
+    create: XOR<AnthropometryCreateWithoutPatientInput, AnthropometryUncheckedCreateWithoutPatientInput>
+  }
+
+  export type AnthropometryUpdateWithWhereUniqueWithoutPatientInput = {
+    where: AnthropometryWhereUniqueInput
+    data: XOR<AnthropometryUpdateWithoutPatientInput, AnthropometryUncheckedUpdateWithoutPatientInput>
+  }
+
+  export type AnthropometryUpdateManyWithWhereWithoutPatientInput = {
+    where: AnthropometryScalarWhereInput
+    data: XOR<AnthropometryUpdateManyMutationInput, AnthropometryUncheckedUpdateManyWithoutPatientInput>
+  }
+
+  export type AnthropometryScalarWhereInput = {
+    AND?: AnthropometryScalarWhereInput | AnthropometryScalarWhereInput[]
+    OR?: AnthropometryScalarWhereInput[]
+    NOT?: AnthropometryScalarWhereInput | AnthropometryScalarWhereInput[]
+    id?: UuidFilter<"Anthropometry"> | string
+    patientId?: UuidFilter<"Anthropometry"> | string
+    appointmentId?: UuidFilter<"Anthropometry"> | string
+    weight?: DecimalFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    height?: DecimalFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    bodyFat?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    waist?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    hip?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFilter<"Anthropometry"> | Date | string
+    updatedAt?: DateTimeFilter<"Anthropometry"> | Date | string
+  }
+
+  export type MealPlanUpsertWithWhereUniqueWithoutPatientInput = {
+    where: MealPlanWhereUniqueInput
+    update: XOR<MealPlanUpdateWithoutPatientInput, MealPlanUncheckedUpdateWithoutPatientInput>
+    create: XOR<MealPlanCreateWithoutPatientInput, MealPlanUncheckedCreateWithoutPatientInput>
+  }
+
+  export type MealPlanUpdateWithWhereUniqueWithoutPatientInput = {
+    where: MealPlanWhereUniqueInput
+    data: XOR<MealPlanUpdateWithoutPatientInput, MealPlanUncheckedUpdateWithoutPatientInput>
+  }
+
+  export type MealPlanUpdateManyWithWhereWithoutPatientInput = {
+    where: MealPlanScalarWhereInput
+    data: XOR<MealPlanUpdateManyMutationInput, MealPlanUncheckedUpdateManyWithoutPatientInput>
+  }
+
+  export type MealPlanScalarWhereInput = {
+    AND?: MealPlanScalarWhereInput | MealPlanScalarWhereInput[]
+    OR?: MealPlanScalarWhereInput[]
+    NOT?: MealPlanScalarWhereInput | MealPlanScalarWhereInput[]
+    id?: UuidFilter<"MealPlan"> | string
+    patientId?: UuidFilter<"MealPlan"> | string
+    appointmentId?: UuidFilter<"MealPlan"> | string
+    content?: StringNullableFilter<"MealPlan"> | string | null
+    fileUrl?: StringNullableFilter<"MealPlan"> | string | null
+    fileName?: StringNullableFilter<"MealPlan"> | string | null
+    createdAt?: DateTimeFilter<"MealPlan"> | Date | string
+    updatedAt?: DateTimeFilter<"MealPlan"> | Date | string
+  }
+
   export type PatientCreateWithoutAppointmentsInput = {
     id?: string
     fullName: string
@@ -15860,12 +19385,15 @@ export namespace Prisma {
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
     tasks?: TaskCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutAppointmentsInput = {
@@ -15878,11 +19406,14 @@ export namespace Prisma {
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
     tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutAppointmentsInput = {
@@ -15983,6 +19514,60 @@ export namespace Prisma {
     create: XOR<FinanceTransactionCreateWithoutAppointmentInput, FinanceTransactionUncheckedCreateWithoutAppointmentInput>
   }
 
+  export type AnthropometryCreateWithoutAppointmentInput = {
+    id?: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutAnthropometriesInput
+  }
+
+  export type AnthropometryUncheckedCreateWithoutAppointmentInput = {
+    id?: string
+    patientId: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AnthropometryCreateOrConnectWithoutAppointmentInput = {
+    where: AnthropometryWhereUniqueInput
+    create: XOR<AnthropometryCreateWithoutAppointmentInput, AnthropometryUncheckedCreateWithoutAppointmentInput>
+  }
+
+  export type MealPlanCreateWithoutAppointmentInput = {
+    id?: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutMealPlansInput
+  }
+
+  export type MealPlanUncheckedCreateWithoutAppointmentInput = {
+    id?: string
+    patientId: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MealPlanCreateOrConnectWithoutAppointmentInput = {
+    where: MealPlanWhereUniqueInput
+    create: XOR<MealPlanCreateWithoutAppointmentInput, MealPlanUncheckedCreateWithoutAppointmentInput>
+  }
+
   export type PatientUpsertWithoutAppointmentsInput = {
     update: XOR<PatientUpdateWithoutAppointmentsInput, PatientUncheckedUpdateWithoutAppointmentsInput>
     create: XOR<PatientCreateWithoutAppointmentsInput, PatientUncheckedCreateWithoutAppointmentsInput>
@@ -16003,12 +19588,15 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
     tasks?: TaskUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutAppointmentsInput = {
@@ -16021,11 +19609,14 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
     tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type ClinicianProfileUpsertWithoutAppointmentsInput = {
@@ -16139,6 +19730,72 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AnthropometryUpsertWithoutAppointmentInput = {
+    update: XOR<AnthropometryUpdateWithoutAppointmentInput, AnthropometryUncheckedUpdateWithoutAppointmentInput>
+    create: XOR<AnthropometryCreateWithoutAppointmentInput, AnthropometryUncheckedCreateWithoutAppointmentInput>
+    where?: AnthropometryWhereInput
+  }
+
+  export type AnthropometryUpdateToOneWithWhereWithoutAppointmentInput = {
+    where?: AnthropometryWhereInput
+    data: XOR<AnthropometryUpdateWithoutAppointmentInput, AnthropometryUncheckedUpdateWithoutAppointmentInput>
+  }
+
+  export type AnthropometryUpdateWithoutAppointmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutAnthropometriesNestedInput
+  }
+
+  export type AnthropometryUncheckedUpdateWithoutAppointmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MealPlanUpsertWithoutAppointmentInput = {
+    update: XOR<MealPlanUpdateWithoutAppointmentInput, MealPlanUncheckedUpdateWithoutAppointmentInput>
+    create: XOR<MealPlanCreateWithoutAppointmentInput, MealPlanUncheckedCreateWithoutAppointmentInput>
+    where?: MealPlanWhereInput
+  }
+
+  export type MealPlanUpdateToOneWithWhereWithoutAppointmentInput = {
+    where?: MealPlanWhereInput
+    data: XOR<MealPlanUpdateWithoutAppointmentInput, MealPlanUncheckedUpdateWithoutAppointmentInput>
+  }
+
+  export type MealPlanUpdateWithoutAppointmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutMealPlansNestedInput
+  }
+
+  export type MealPlanUncheckedUpdateWithoutAppointmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type AppointmentCreateWithoutPsychNoteInput = {
     id?: string
     startTime: Date | string
@@ -16155,6 +19812,8 @@ export namespace Prisma {
     patient: PatientCreateNestedOneWithoutAppointmentsInput
     clinician: ClinicianProfileCreateNestedOneWithoutAppointmentsInput
     transaction?: FinanceTransactionCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanCreateNestedOneWithoutAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutPsychNoteInput = {
@@ -16173,6 +19832,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     transaction?: FinanceTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanUncheckedCreateNestedOneWithoutAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutPsychNoteInput = {
@@ -16189,12 +19850,15 @@ export namespace Prisma {
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
     tasks?: TaskCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutPsychNotesInput = {
@@ -16207,11 +19871,14 @@ export namespace Prisma {
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
     tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutPsychNotesInput = {
@@ -16246,6 +19913,8 @@ export namespace Prisma {
     patient?: PatientUpdateOneRequiredWithoutAppointmentsNestedInput
     clinician?: ClinicianProfileUpdateOneRequiredWithoutAppointmentsNestedInput
     transaction?: FinanceTransactionUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUpdateOneWithoutAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutPsychNoteInput = {
@@ -16264,6 +19933,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transaction?: FinanceTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput
   }
 
   export type PatientUpsertWithoutPsychNotesInput = {
@@ -16286,12 +19957,15 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
     tasks?: TaskUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutPsychNotesInput = {
@@ -16304,11 +19978,14 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
     tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientCreateWithoutTasksInput = {
@@ -16320,12 +19997,15 @@ export namespace Prisma {
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutTasksInput = {
@@ -16338,11 +20018,14 @@ export namespace Prisma {
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutTasksInput = {
@@ -16370,12 +20053,15 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutTasksInput = {
@@ -16388,11 +20074,14 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type UserCreateWithoutAccessLogsInput = {
@@ -16429,12 +20118,15 @@ export namespace Prisma {
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
     tasks?: TaskCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutAccessLogsInput = {
@@ -16447,11 +20139,14 @@ export namespace Prisma {
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
     tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutAccessLogsInput = {
@@ -16510,12 +20205,15 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
     tasks?: TaskUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutAccessLogsInput = {
@@ -16528,11 +20226,14 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
     tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type ClinicianProfileCreateWithoutTransactionsInput = {
@@ -16584,6 +20285,8 @@ export namespace Prisma {
     patient: PatientCreateNestedOneWithoutAppointmentsInput
     clinician: ClinicianProfileCreateNestedOneWithoutAppointmentsInput
     psychNote?: PsychNoteCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanCreateNestedOneWithoutAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutTransactionInput = {
@@ -16602,6 +20305,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     psychNote?: PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanUncheckedCreateNestedOneWithoutAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutTransactionInput = {
@@ -16675,6 +20380,8 @@ export namespace Prisma {
     patient?: PatientUpdateOneRequiredWithoutAppointmentsNestedInput
     clinician?: ClinicianProfileUpdateOneRequiredWithoutAppointmentsNestedInput
     psychNote?: PsychNoteUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUpdateOneWithoutAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutTransactionInput = {
@@ -16693,6 +20400,392 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     psychNote?: PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput
+  }
+
+  export type PatientCreateWithoutAnthropometriesInput = {
+    id?: string
+    fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
+    status?: $Enums.PatientStatus
+    contactPhone?: string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
+    appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
+    tasks?: TaskCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientUncheckedCreateWithoutAnthropometriesInput = {
+    id?: string
+    clinicianId: string
+    fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
+    status?: $Enums.PatientStatus
+    contactPhone?: string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
+    tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientCreateOrConnectWithoutAnthropometriesInput = {
+    where: PatientWhereUniqueInput
+    create: XOR<PatientCreateWithoutAnthropometriesInput, PatientUncheckedCreateWithoutAnthropometriesInput>
+  }
+
+  export type AppointmentCreateWithoutAnthropometryInput = {
+    id?: string
+    startTime: Date | string
+    endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
+    status?: $Enums.AppointmentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
+    price: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutAppointmentsInput
+    clinician: ClinicianProfileCreateNestedOneWithoutAppointmentsInput
+    psychNote?: PsychNoteCreateNestedOneWithoutAppointmentInput
+    transaction?: FinanceTransactionCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanCreateNestedOneWithoutAppointmentInput
+  }
+
+  export type AppointmentUncheckedCreateWithoutAnthropometryInput = {
+    id?: string
+    patientId: string
+    clinicianId: string
+    startTime: Date | string
+    endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
+    status?: $Enums.AppointmentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
+    price: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    psychNote?: PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput
+    transaction?: FinanceTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanUncheckedCreateNestedOneWithoutAppointmentInput
+  }
+
+  export type AppointmentCreateOrConnectWithoutAnthropometryInput = {
+    where: AppointmentWhereUniqueInput
+    create: XOR<AppointmentCreateWithoutAnthropometryInput, AppointmentUncheckedCreateWithoutAnthropometryInput>
+  }
+
+  export type PatientUpsertWithoutAnthropometriesInput = {
+    update: XOR<PatientUpdateWithoutAnthropometriesInput, PatientUncheckedUpdateWithoutAnthropometriesInput>
+    create: XOR<PatientCreateWithoutAnthropometriesInput, PatientUncheckedCreateWithoutAnthropometriesInput>
+    where?: PatientWhereInput
+  }
+
+  export type PatientUpdateToOneWithWhereWithoutAnthropometriesInput = {
+    where?: PatientWhereInput
+    data: XOR<PatientUpdateWithoutAnthropometriesInput, PatientUncheckedUpdateWithoutAnthropometriesInput>
+  }
+
+  export type PatientUpdateWithoutAnthropometriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
+    appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateWithoutAnthropometriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clinicianId?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
+  }
+
+  export type AppointmentUpsertWithoutAnthropometryInput = {
+    update: XOR<AppointmentUpdateWithoutAnthropometryInput, AppointmentUncheckedUpdateWithoutAnthropometryInput>
+    create: XOR<AppointmentCreateWithoutAnthropometryInput, AppointmentUncheckedCreateWithoutAnthropometryInput>
+    where?: AppointmentWhereInput
+  }
+
+  export type AppointmentUpdateToOneWithWhereWithoutAnthropometryInput = {
+    where?: AppointmentWhereInput
+    data: XOR<AppointmentUpdateWithoutAnthropometryInput, AppointmentUncheckedUpdateWithoutAnthropometryInput>
+  }
+
+  export type AppointmentUpdateWithoutAnthropometryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutAppointmentsNestedInput
+    clinician?: ClinicianProfileUpdateOneRequiredWithoutAppointmentsNestedInput
+    psychNote?: PsychNoteUpdateOneWithoutAppointmentNestedInput
+    transaction?: FinanceTransactionUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUpdateOneWithoutAppointmentNestedInput
+  }
+
+  export type AppointmentUncheckedUpdateWithoutAnthropometryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    clinicianId?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    psychNote?: PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput
+    transaction?: FinanceTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput
+  }
+
+  export type PatientCreateWithoutMealPlansInput = {
+    id?: string
+    fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
+    status?: $Enums.PatientStatus
+    contactPhone?: string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
+    appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
+    tasks?: TaskCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientUncheckedCreateWithoutMealPlansInput = {
+    id?: string
+    clinicianId: string
+    fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
+    status?: $Enums.PatientStatus
+    contactPhone?: string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
+    tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientCreateOrConnectWithoutMealPlansInput = {
+    where: PatientWhereUniqueInput
+    create: XOR<PatientCreateWithoutMealPlansInput, PatientUncheckedCreateWithoutMealPlansInput>
+  }
+
+  export type AppointmentCreateWithoutMealPlanInput = {
+    id?: string
+    startTime: Date | string
+    endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
+    status?: $Enums.AppointmentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
+    price: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutAppointmentsInput
+    clinician: ClinicianProfileCreateNestedOneWithoutAppointmentsInput
+    psychNote?: PsychNoteCreateNestedOneWithoutAppointmentInput
+    transaction?: FinanceTransactionCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryCreateNestedOneWithoutAppointmentInput
+  }
+
+  export type AppointmentUncheckedCreateWithoutMealPlanInput = {
+    id?: string
+    patientId: string
+    clinicianId: string
+    startTime: Date | string
+    endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
+    status?: $Enums.AppointmentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
+    price: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    psychNote?: PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput
+    transaction?: FinanceTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput
+  }
+
+  export type AppointmentCreateOrConnectWithoutMealPlanInput = {
+    where: AppointmentWhereUniqueInput
+    create: XOR<AppointmentCreateWithoutMealPlanInput, AppointmentUncheckedCreateWithoutMealPlanInput>
+  }
+
+  export type PatientUpsertWithoutMealPlansInput = {
+    update: XOR<PatientUpdateWithoutMealPlansInput, PatientUncheckedUpdateWithoutMealPlansInput>
+    create: XOR<PatientCreateWithoutMealPlansInput, PatientUncheckedCreateWithoutMealPlansInput>
+    where?: PatientWhereInput
+  }
+
+  export type PatientUpdateToOneWithWhereWithoutMealPlansInput = {
+    where?: PatientWhereInput
+    data: XOR<PatientUpdateWithoutMealPlansInput, PatientUncheckedUpdateWithoutMealPlansInput>
+  }
+
+  export type PatientUpdateWithoutMealPlansInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
+    appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateWithoutMealPlansInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clinicianId?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+  }
+
+  export type AppointmentUpsertWithoutMealPlanInput = {
+    update: XOR<AppointmentUpdateWithoutMealPlanInput, AppointmentUncheckedUpdateWithoutMealPlanInput>
+    create: XOR<AppointmentCreateWithoutMealPlanInput, AppointmentUncheckedCreateWithoutMealPlanInput>
+    where?: AppointmentWhereInput
+  }
+
+  export type AppointmentUpdateToOneWithWhereWithoutMealPlanInput = {
+    where?: AppointmentWhereInput
+    data: XOR<AppointmentUpdateWithoutMealPlanInput, AppointmentUncheckedUpdateWithoutMealPlanInput>
+  }
+
+  export type AppointmentUpdateWithoutMealPlanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutAppointmentsNestedInput
+    clinician?: ClinicianProfileUpdateOneRequiredWithoutAppointmentsNestedInput
+    psychNote?: PsychNoteUpdateOneWithoutAppointmentNestedInput
+    transaction?: FinanceTransactionUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUpdateOneWithoutAppointmentNestedInput
+  }
+
+  export type AppointmentUncheckedUpdateWithoutMealPlanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    clinicianId?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    psychNote?: PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput
+    transaction?: FinanceTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput
   }
 
   export type AccessLogCreateManyUserInput = {
@@ -16748,6 +20841,7 @@ export namespace Prisma {
     status?: $Enums.PatientStatus
     contactPhone?: string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -16789,12 +20883,15 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
     tasks?: TaskUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutClinicianInput = {
@@ -16806,12 +20903,15 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
     tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateManyWithoutClinicianInput = {
@@ -16823,6 +20923,7 @@ export namespace Prisma {
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -16843,6 +20944,8 @@ export namespace Prisma {
     patient?: PatientUpdateOneRequiredWithoutAppointmentsNestedInput
     psychNote?: PsychNoteUpdateOneWithoutAppointmentNestedInput
     transaction?: FinanceTransactionUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUpdateOneWithoutAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutClinicianInput = {
@@ -16861,6 +20964,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     psychNote?: PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput
     transaction?: FinanceTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateManyWithoutClinicianInput = {
@@ -16964,6 +21069,28 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type AnthropometryCreateManyPatientInput = {
+    id?: string
+    appointmentId: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MealPlanCreateManyPatientInput = {
+    id?: string
+    appointmentId: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type AppointmentUpdateWithoutPatientInput = {
     id?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16980,6 +21107,8 @@ export namespace Prisma {
     clinician?: ClinicianProfileUpdateOneRequiredWithoutAppointmentsNestedInput
     psychNote?: PsychNoteUpdateOneWithoutAppointmentNestedInput
     transaction?: FinanceTransactionUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUpdateOneWithoutAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutPatientInput = {
@@ -16998,6 +21127,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     psychNote?: PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput
     transaction?: FinanceTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
@@ -17111,6 +21242,72 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     isCompleted?: BoolFieldUpdateOperationsInput | boolean
     dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AnthropometryUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointment?: AppointmentUpdateOneRequiredWithoutAnthropometryNestedInput
+  }
+
+  export type AnthropometryUncheckedUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AnthropometryUncheckedUpdateManyWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MealPlanUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointment?: AppointmentUpdateOneRequiredWithoutMealPlanNestedInput
+  }
+
+  export type MealPlanUncheckedUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MealPlanUncheckedUpdateManyWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

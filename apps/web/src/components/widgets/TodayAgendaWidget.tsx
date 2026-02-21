@@ -131,7 +131,7 @@ export function TodayAgendaWidget({
                       } ${isCancelled ? 'opacity-40' : ''}`}
                   >
                     {/* Time */}
-                    <div className={`w-[2.2rem] text-right shrink-0 ${isPast && !isNow ? 'opacity-50' : ''}`}>
+                    <div className={`w-[2.2rem] text-right shrink-0 pr-3 ${isPast && !isNow ? 'opacity-50' : ''}`}>
                       <span className={`text-[11px] font-bold tabular-nums leading-none ${isNow ? 'text-kio' : 'text-gray-900 dark:text-white'
                         }`}>
                         {format(startTime, 'HH:mm')}

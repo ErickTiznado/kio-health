@@ -1,9 +1,11 @@
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { patientSchema, type PatientFormValues } from '../../schemas/patients.schema';
 import type { Patient } from '../../types/patients.types';
 import { motion } from 'framer-motion';
 import { ShieldAlert } from 'lucide-react';
+import { DatePicker } from '../ui/DatePicker';
+import { format } from 'date-fns';
 
 interface PatientFormProps {
   initialData?: Patient;
@@ -16,6 +18,7 @@ export function PatientForm({ initialData, onSubmit, onCancel, isLoading }: Pati
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<PatientFormValues>({
     resolver: zodResolver(patientSchema),
@@ -67,14 +70,19 @@ export function PatientForm({ initialData, onSubmit, onCancel, isLoading }: Pati
             </div>
 
             <div>
-              <label className={labelClass}>Fecha de Nacimiento</label>
-              <input
-                type="date"
-                {...register('dateOfBirth')}
-                className={dateInputClass}
-                lang="es-MX" // Hint for browser date picker locale
+              <Controller
+                control={control}
+                name="dateOfBirth"
+                render={({ field }) => (
+                  <DatePicker
+                    label="Fecha de Nacimiento"
+                    value={field.value}
+                    onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                    error={errors.dateOfBirth?.message}
+                    className="w-full"
+                  />
+                )}
               />
-              {errors.dateOfBirth && <p className="mt-1.5 text-xs text-rose-600 font-bold ml-1">{errors.dateOfBirth.message}</p>}
             </div>
           </div>
 

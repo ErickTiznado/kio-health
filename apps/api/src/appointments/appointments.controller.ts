@@ -21,6 +21,8 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { RescheduleAppointmentDto } from './dto/reschedule-appointment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { CreatePsychNoteDto } from './dto/create-psych-note.dto';
+import { CreateAnthropometryDto } from './dto/create-anthropometry.dto';
+import { CreateMealPlanDto } from './dto/create-meal-plan.dto';
 
 @Controller('appointments')
 @UseGuards(JwtAuthGuard)
@@ -172,6 +174,24 @@ export class AppointmentsController {
     @Body() dto: CreatePsychNoteDto,
   ) {
     return this.appointmentsService.upsertPsychNote(user.userId, appointmentId, dto);
+  }
+
+  @Post(':id/anthropometry')
+  async upsertAnthropometry(
+    @CurrentUser() user: { userId: string; email: string; role: string },
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+    @Body() dto: CreateAnthropometryDto,
+  ) {
+    return this.appointmentsService.upsertAnthropometry(user.userId, appointmentId, dto);
+  }
+
+  @Post(':id/meal-plan')
+  async upsertMealPlan(
+    @CurrentUser() user: { userId: string; email: string; role: string },
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+    @Body() dto: CreateMealPlanDto,
+  ) {
+    return this.appointmentsService.upsertMealPlan(user.userId, appointmentId, dto);
   }
 
   @Patch(':id/notes/pin')

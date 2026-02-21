@@ -16,6 +16,7 @@ export interface Patient {
   status: 'ACTIVE' | 'ARCHIVED' | 'WAITLIST';
   contactPhone?: string;
   emergencyContact?: EmergencyContact;
+  treatmentGoals?: string[];
   createdAt: string;
   updatedAt: string;
   appointments?: {
@@ -36,6 +37,7 @@ export interface CreatePatientDto {
   clinicalContext?: string;
   contactPhone?: string;
   emergencyContact?: EmergencyContact;
+  treatmentGoals?: string[];
 }
 
 export type UpdatePatientDto = Partial<CreatePatientDto>;

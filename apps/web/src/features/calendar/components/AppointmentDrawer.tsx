@@ -348,7 +348,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
           >
             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
             {/* Feedforward Icon based on probable action */}
-            <Stethoscope fill="currentColor" size={18} />
+            <Stethoscope size={20} className="stroke-[2.5px]" />
             Iniciar Sesión Clínica
           </button>
         </div>
