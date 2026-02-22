@@ -19,12 +19,14 @@ export function SessionPage() {
 
   const [elapsedTime, setElapsedTime] = useState('00:00:00');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isOvertime, setIsOvertime] = useState(false);
 
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval>;
 
     if (sessionContext?.appointment.status === 'IN_PROGRESS') {
       const startTime = new Date(sessionContext.appointment.startTime).getTime();
+      const endTime = new Date(sessionContext.appointment.endTime).getTime();
 
       const updateTimer = () => {
         const now = Date.now();
@@ -39,16 +41,19 @@ export function SessionPage() {
             .map((unit) => String(unit).padStart(2, '0'))
             .join(':')
         );
+
+        setIsOvertime(now > endTime);
       };
 
       updateTimer();
       intervalId = setInterval(updateTimer, 1000);
     } else {
       setElapsedTime('00:00:00');
+      setIsOvertime(false);
     }
 
     return () => clearInterval(intervalId);
-  }, [sessionContext?.appointment.status, sessionContext?.appointment.startTime]);
+  }, [sessionContext?.appointment.status, sessionContext?.appointment.startTime, sessionContext?.appointment.endTime]);
 
   if (isLoading || !sessionContext) {
     return (
@@ -106,6 +111,7 @@ export function SessionPage() {
         patientAge={age}
         sessionNumber={sessionNumber}
         elapsedTime={elapsedTime}
+        isOvertime={isOvertime}
         totalBalance={totalBalance}
         lastVisit={lastVisit}
         status={appointment.status}

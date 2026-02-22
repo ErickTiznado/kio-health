@@ -2,8 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { startOfWeek, addWeeks, subWeeks, addDays, subDays, format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { WaitlistPanel } from '../features/calendar/components/WaitlistPanel';
-import { ChevronLeft, ChevronRight, Calendar, CalendarDays, Loader2, Plus, CheckCircle2, XCircle, Banknote, List } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, CalendarDays, Loader2, Plus, CheckCircle2, XCircle, Banknote } from 'lucide-react';
 import { useIsMobile } from '../hooks/use-is-mobile';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { WeeklyCalendarGrid } from '../features/calendar/components/WeeklyCalendarGrid';
@@ -33,7 +32,6 @@ export function AgendaPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [scheduleSlot, setScheduleSlot] = useState<Date | null>(null);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const queryClient = useQueryClient();
 
   /* ── Data fetching ── */
@@ -210,7 +208,7 @@ export function AgendaPage() {
     <DashboardLayout>
       <div className="flex flex-col h-[calc(100vh-64px)] -m-6">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 pt-4 pb-3 border-b border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky  z-30">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 pt-4 pb-3 bg-white dark:bg-slate-900 sticky z-30">
           <div>
             <h1 className="text-2xl font-bold text-kanji dark:text-kio tracking-tight">Mi Agenda</h1>
             <p className="text-sm text-gray-500 dark:text-slate-400 opacity-60 mt-0.5 capitalize">{dateLabel}</p>
@@ -218,7 +216,7 @@ export function AgendaPage() {
 
           <div className="flex items-center gap-3">
             {/* Legend - Using Interactive Filters */}
-            <div className="hidden xl:flex items-center gap-2 mr-4 text-[10px] font-bold text-kanji/60 dark:text-kio/60 uppercase tracking-widest border-r border-gray-200 dark:border-slate-800 pr-4">
+            <div className="hidden xl:flex items-center gap-2 mr-4 text-[11px] font-bold text-kanji/80 dark:text-kio/80 uppercase tracking-wider pr-4">
               {[
                 { key: 'COMPLETED', label: 'Completada', icon: CheckCircle2, color: 'text-emerald-500', activeBg: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-200' },
                 { key: 'SCHEDULED', label: 'Agendada', icon: Calendar, color: 'text-blue-500', activeBg: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-200' },
@@ -231,10 +229,10 @@ export function AgendaPage() {
                   <button
                     key={filter.key}
                     onClick={() => toggleFilter(filter.key)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all border border-transparent ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all border ${
                       isActive 
-                        ? `${filter.activeBg} border-current/10 shadow-sm` 
-                        : 'hover:bg-gray-100 dark:hover:bg-slate-800 opacity-60 hover:opacity-100'
+                        ? `${filter.activeBg} border-current/20 shadow-sm` 
+                        : 'bg-gray-50/50 dark:bg-slate-800/40 border-gray-100 dark:border-slate-800/60 text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:border-gray-200 dark:hover:border-slate-700'
                     }`}
                   >
                     <Icon size={12} className={isActive ? 'text-current' : filter.color} /> 
@@ -250,7 +248,7 @@ export function AgendaPage() {
             )}
 
             {/* Navigation */}
-            <div className="flex items-center gap-1 bg-white dark:bg-slate-800 rounded-[24px] border border-gray-200 dark:border-slate-700 shadow-sm p-1">
+            <div className="flex items-center gap-1 bg-gray-50 dark:bg-slate-800/50 rounded-[24px] shadow-sm p-1">
               <button
                 type="button"
                 onClick={navigatePrevious}
@@ -278,7 +276,7 @@ export function AgendaPage() {
 
             {/* View Toggle */}
             {!isMobile && (
-              <div className="flex items-center bg-white dark:bg-slate-800 rounded-[24px] border border-gray-200 dark:border-slate-700 shadow-sm p-1">
+              <div className="flex items-center bg-gray-50 dark:bg-slate-800/50 rounded-[24px] shadow-sm p-1">
                 <button
                   type="button"
                   onClick={switchToWeekView}
@@ -304,22 +302,7 @@ export function AgendaPage() {
               </div>
             )}
 
-            {/* Waitlist Toggle */}
-            <button
-              type="button"
-              onClick={() => setIsWaitlistOpen(!isWaitlistOpen)}
-              className={`p-2.5 rounded-[24px] transition-all flex items-center gap-2 border shadow-sm ${
-                isWaitlistOpen 
-                  ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-200 border-amber-200 dark:border-amber-800' 
-                  : 'bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-slate-200'
-              }`}
-              title="Lista de Espera"
-            >
-              <List size={18} />
-              <span className={`text-xs font-bold transition-all ${isWaitlistOpen ? 'max-w-20 opacity-100' : 'max-w-0 opacity-0 overflow-hidden'}`}>
-                Espera
-              </span>
-            </button>
+
 
             {/* Primary CTA */}
             <button
@@ -355,12 +338,7 @@ export function AgendaPage() {
             )}
           </div>
 
-          {/* Waitlist Sidebar */}
-          {isWaitlistOpen && (
-            <div className="w-80 h-full shrink-0 animate-in slide-in-from-right-10 fade-in duration-300 border-l border-gray-100 dark:border-slate-800 pl-6">
-               <WaitlistPanel />
-            </div>
-          )}
+
         </div>
       </div>
 

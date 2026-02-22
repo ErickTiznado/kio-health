@@ -1,7 +1,11 @@
-import { IsNumber, IsOptional, IsPositive, Min } from 'class-validator';
+import { IsNumber, IsOptional, IsPositive, Min, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class UpdateProfileDto {
+  @IsOptional()
+  @IsString()
+  currency?: string;
+
   @IsOptional()
   @Transform(({ value }) => {
     // Handle decimal/number conversion for Prisma Decimal type

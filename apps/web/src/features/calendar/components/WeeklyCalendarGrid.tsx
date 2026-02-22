@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import type { Appointment } from '../../../types/appointments.types';
 import { AppointmentPill } from './AppointmentPill';
 import { CurrentTimeLine } from './CurrentTimeLine';
+import { useAuthStore } from '../../../stores/auth.store';
 
 interface WeeklyCalendarGridProps {
   weekStart: Date;
@@ -33,6 +34,9 @@ function formatHourLabel(hour: number): string {
  * positioned appointment pills, and a live current-time indicator.
  */
 export function WeeklyCalendarGrid({ weekStart, appointments, onSelectAppointment, onSlotClick, onReschedule }: WeeklyCalendarGridProps) {
+  const { user } = useAuthStore();
+  const defaultDuration = user?.profile?.sessionDefaultDuration || 50;
+
   const [pastTimeHeight, setPastTimeHeight] = useState(0);
   const [ghostSlot, setGhostSlot] = useState<{ dayStr: string; hour: number; minute: 0 | 30 } | null>(null);
 
@@ -204,7 +208,7 @@ export function WeeklyCalendarGrid({ weekStart, appointments, onSelectAppointmen
                         className="absolute left-1 right-1 border-2 border-dashed border-kio/50 bg-kio/10 rounded-lg flex items-center justify-center z-10 transition-all duration-75 ease-out cursor-pointer"
                         style={{
                           top: ghostSlot.minute === 0 ? '2px' : '50%',
-                          height: 'calc(50% - 2px)',
+                          height: `calc(${(defaultDuration / 60) * 100}% - 4px)`,
                         }}
                         onClick={handleGhostClick}
                       >

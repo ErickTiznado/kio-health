@@ -31,6 +31,10 @@ export class UsersService {
       updateData.sessionDefaultDuration = data.sessionDefaultDuration;
     }
 
+    if (data.currency !== undefined) {
+      updateData.currency = data.currency;
+    }
+
     // Update the profile
     const updatedProfile = await this.prisma.clinicianProfile.update({
       where: { id: profile.id },

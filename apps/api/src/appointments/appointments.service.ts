@@ -515,10 +515,10 @@ export class AppointmentsService {
   async create(userId: string, dto: CreateAppointmentDto) {
     const profile = await this.resolveClinicianProfile(userId);
 
-    // Calculate end time based on profile duration if not provided (though DTO doesn't have endTime yet, we assume fixed duration logic)
-    // Wait, the DTO I created earlier doesn't have duration. Let's use the profile default.
+    // Calculate end time based on provided duration or profile duration
     const startTime = new Date(dto.startTime);
-    const durationMs = profile.sessionDefaultDuration * 60 * 1000;
+    const durationMinutes = dto.duration ?? profile.sessionDefaultDuration;
+    const durationMs = durationMinutes * 60 * 1000;
     const endTime = new Date(startTime.getTime() + durationMs);
 
     // Validate overlap
@@ -736,7 +736,7 @@ export class AppointmentsService {
     this.assertOwnership(appointment.clinicianId, profile.id);
 
     return this.prisma.$transaction(async (tx) => {
-      // 1. Mark appointment as completed with payment info
+      // 1. Mark appointment as completed with payment info and update endTime if overtime
       const updatedAppointment = await tx.appointment.update({
         where: { id: appointmentId },
         data: {
@@ -744,6 +744,7 @@ export class AppointmentsService {
           paymentStatus: dto.paymentStatus,
           paymentMethod: dto.paymentMethod,
           price: dto.amount,
+          endTime: new Date() > appointment.endTime ? new Date() : undefined,
         },
         include: {
           patient: { select: { id: true, fullName: true } },

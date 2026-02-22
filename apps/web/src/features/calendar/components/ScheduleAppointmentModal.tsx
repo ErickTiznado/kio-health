@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
-import { X, Search, Calendar, User, FileText, Banknote, Loader2 } from 'lucide-react';
+import { X, Search, Calendar, User, FileText, Banknote, Loader2, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { createAppointment } from '../../../lib/appointments.api';
 import { usePatients } from '../../../hooks/use-patients';
 import { useDebounce } from '../../../hooks/use-debounce';
 import type { AppointmentType } from '../../../types/appointments.types';
+import { useAuthStore } from '../../../stores/auth.store';
 
 interface ScheduleAppointmentModalProps {
     isOpen: boolean;
@@ -18,6 +19,8 @@ interface ScheduleAppointmentModalProps {
 
 export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isRescheduleMode, onConfirm }: ScheduleAppointmentModalProps) {
     const queryClient = useQueryClient();
+    const { user } = useAuthStore();
+    const defaultDuration = user?.profile?.sessionDefaultDuration || 50;
 
     // Form State
     const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
@@ -26,6 +29,7 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
     const [type, setType] = useState<AppointmentType>('CONSULTATION');
     const [reason, setReason] = useState('');
     const [price, setPrice] = useState<string>(''); // string for input handling
+    const [duration, setDuration] = useState<string>('');
 
     const debouncedSearch = useDebounce(patientSearch, 300);
 
@@ -39,6 +43,7 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
             setType('CONSULTATION');
             setReason('');
             setPrice(''); // Default via backend
+            setDuration(''); // Default via backend
         }
     }, [isOpen, initialDate]);
 
@@ -87,6 +92,7 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
             type,
             reason,
             price: price ? parseFloat(price) : undefined,
+            duration: duration ? parseInt(duration, 10) : undefined,
         });
     };
 
@@ -181,7 +187,7 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                             </div>
                         )}
 
-                        {/* Date & Time */}
+                        {/* Date & Time and Duration */}
                         <div className={`grid ${isRescheduleMode ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'} gap-5`}>
                             <div className="space-y-1.5">
                                 <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -199,23 +205,57 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                             {!isRescheduleMode && (
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                                        <FileText size={14} /> Tipo de Cita
+                                        <Clock size={14} /> Duración (minutos)
                                     </label>
-                                    <select
-                                        value={type}
-                                        onChange={(e) => setType(e.target.value as AppointmentType)}
-                                        className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/20 focus:border-[var(--color-kanji)] transition-all appearance-none"
-                                    >
-                                        <option value="CONSULTATION">Consulta</option>
-                                        <option value="EVALUATION">Evaluación</option>
-                                        <option value="FOLLOW_UP">Seguimiento</option>
-                                    </select>
+                                    <input
+                                        type="number"
+                                        value={duration}
+                                        onChange={(e) => setDuration(e.target.value)}
+                                        placeholder={`Por defecto (${defaultDuration} min)`}
+                                        min="1"
+                                        className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/20 focus:border-[var(--color-kanji)] transition-all placeholder:text-gray-400 dark:placeholder:text-slate-500"
+                                    />
                                 </div>
                             )}
                         </div>
 
                         {!isRescheduleMode && (
                             <>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                            <FileText size={14} /> Tipo de Cita
+                                        </label>
+                                        <select
+                                            value={type}
+                                            onChange={(e) => setType(e.target.value as AppointmentType)}
+                                            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/20 focus:border-[var(--color-kanji)] transition-all appearance-none"
+                                        >
+                                            <option value="CONSULTATION">Consulta</option>
+                                            <option value="EVALUATION">Evaluación</option>
+                                            <option value="FOLLOW_UP">Seguimiento</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                            <Banknote size={14} /> Precio (Opcional)
+                                        </label>
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-2.5 text-gray-400 dark:text-slate-500 text-sm">$</span>
+                                            <input
+                                                type="number"
+                                                value={price}
+                                                onChange={(e) => setPrice(e.target.value)}
+                                                placeholder="Precio por defecto del perfil"
+                                                min="0"
+                                                step="0.01"
+                                                className="w-full pl-8 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/20 focus:border-[var(--color-kanji)] transition-all placeholder:text-gray-400 dark:placeholder:text-slate-500"
+                                            />
+                                            <span className="absolute right-4 top-2.5 text-gray-400 dark:text-slate-500 text-xs font-bold">USD</span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {/* Reason */}
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -228,26 +268,6 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                                         rows={3}
                                         className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/20 focus:border-[var(--color-kanji)] transition-all resize-none"
                                     />
-                                </div>
-
-                                {/* Price Override */}
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                                        <Banknote size={14} /> Precio (Opcional)
-                                    </label>
-                                    <div className="relative">
-                                        <span className="absolute left-4 top-2.5 text-gray-400 dark:text-slate-500 text-sm">$</span>
-                                        <input
-                                            type="number"
-                                            value={price}
-                                            onChange={(e) => setPrice(e.target.value)} // Don't allow minus
-                                            placeholder="Precio por defecto del perfil"
-                                            min="0"
-                                            step="0.01"
-                                            className="w-full pl-8 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/20 focus:border-[var(--color-kanji)] transition-all placeholder:text-gray-400 dark:placeholder:text-slate-500"
-                                        />
-                                        <span className="absolute right-4 top-2.5 text-gray-400 dark:text-slate-500 text-xs font-bold">USD</span>
-                                    </div>
                                 </div>
                             </>
                         )}

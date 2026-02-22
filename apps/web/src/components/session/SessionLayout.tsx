@@ -10,6 +10,7 @@ interface SessionLayoutProps {
   patientAge?: number;
   sessionNumber?: number;
   elapsedTime: string;
+  isOvertime?: boolean;
   totalBalance: number;
   lastVisit: string | null;
   status: 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
@@ -25,6 +26,7 @@ export const SessionLayout: FC<SessionLayoutProps> = ({
   patientAge,
   sessionNumber,
   elapsedTime,
+  isOvertime,
   totalBalance,
   lastVisit,
   status,
@@ -76,9 +78,13 @@ export const SessionLayout: FC<SessionLayoutProps> = ({
         </div>
 
         {/* Center — Session Timer */}
-        <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 px-4 py-2 rounded-full border border-gray-200 dark:border-slate-700">
-          <Clock size={16} className="text-gray-400 dark:text-slate-500" />
-          <span className="text-sm font-mono font-medium text-gray-600 dark:text-slate-300 tracking-wider">
+        <div className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors ${
+          isOvertime 
+            ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400' 
+            : 'bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300'
+        }`}>
+          <Clock size={16} className={isOvertime ? 'animate-pulse' : 'text-gray-400 dark:text-slate-500'} />
+          <span className="text-sm font-mono font-medium tracking-wider">
             {elapsedTime}
           </span>
         </div>

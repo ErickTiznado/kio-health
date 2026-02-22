@@ -1,9 +1,13 @@
 import { z } from 'zod';
 
 export const settingsSchema = z.object({
+  currency: z
+    .string({ required_error: 'La moneda es requerida' })
+    .min(1, 'La moneda es requerida')
+    .max(5, 'La moneda no puede ser mayor a 5 caracteres'),
   sessionDefaultPrice: z
     .number({ required_error: 'El precio es requerido' })
-    .positive('El precio debe ser mayor a 0')
+    .nonnegative('El precio debe ser mayor o igual a 0')
     .max(10000, 'El precio no puede ser mayor a 10,000'),
   sessionDefaultDuration: z
     .number({ required_error: 'La duración es requerida' })

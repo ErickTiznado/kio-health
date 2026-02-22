@@ -86,6 +86,7 @@ export interface CreateAppointmentPayload {
   type?: AppointmentType;
   reason?: string;
   price?: number;
+  duration?: number;
 }
 
 /** Payload sent to PATCH /appointments/:id/reschedule */

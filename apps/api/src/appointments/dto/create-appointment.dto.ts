@@ -28,4 +28,9 @@ export class CreateAppointmentDto {
     @Min(0)
     @IsOptional()
     price?: number;
+
+    @IsNumber()
+    @Min(1)
+    @IsOptional()
+    duration?: number;
 }
