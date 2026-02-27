@@ -59,8 +59,8 @@ export function TimelineContainer({ patientId }: TimelineContainerProps) {
   return (
     <div className="space-y-8">
       {/* Search Bar */}
-      <div className="sticky top-20 z-20">
-        <div className="bg-white dark:bg-slate-900 p-1.5 rounded-full shadow-lg shadow-kio/5 dark:shadow-black/20 border border-[var(--color-cruz)] dark:border-slate-800 max-w-md mx-auto">
+      <div className="mb-6">
+        <div className="bg-white dark:bg-slate-900 p-1.5 rounded-full shadow-sm border border-[var(--color-cruz)] dark:border-slate-800 max-w-md mx-auto">
           <div className="relative flex items-center">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <Search size={18} className="text-[var(--color-text)] dark:text-slate-400 opacity-40" />

@@ -1,33 +1,50 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-import type { FinanceSummary, CreateTransactionPayload } from '../types';
-
-// Assuming global axios instance or similar. Using direct axios for simplicity based on prompt context.
-// Actually, context says `apps/web/src/lib/api.ts` might exist or similar.
-// I'll assume axios import is standard. If project uses a custom client, I should use it.
-// Checking `package.json`, axios is there.
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { api } from '../../../lib/api';
+import type {
+  FinanceSummary,
+  FinanceTransactionsResponse,
+  CreateTransactionPayload,
+} from '../types';
 
 export const fetchFinanceSummary = async (month: number, year: number): Promise<FinanceSummary> => {
-  const { data } = await axios.get(`${API_URL}/finance/summary`, {
-    params: { month, year },
-    headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }, // Basic auth handling
+  const { data } = await api.get('/finance/summary', { params: { month, year } });
+  return data;
+};
+
+export const fetchFinanceTransactions = async (
+  month: number,
+  year: number,
+  type?: 'INCOME' | 'EXPENSE',
+  page = 1,
+  limit = 15,
+): Promise<FinanceTransactionsResponse> => {
+  const { data } = await api.get('/finance/transactions', {
+    params: { month, year, type, page, limit },
   });
   return data;
 };
 
 export const createTransaction = async (payload: CreateTransactionPayload) => {
-  const { data } = await axios.post(`${API_URL}/finance`, payload, {
-    headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
-  });
+  const { data } = await api.post('/finance', payload);
   return data;
 };
 
 export function useFinanceSummary(month: number, year: number) {
   return useQuery({
-    queryKey: ['finance', month, year],
+    queryKey: ['finance', 'summary', month, year],
     queryFn: () => fetchFinanceSummary(month, year),
+  });
+}
+
+export function useFinanceTransactions(
+  month: number,
+  year: number,
+  type?: 'INCOME' | 'EXPENSE',
+  page = 1,
+) {
+  return useQuery({
+    queryKey: ['finance', 'transactions', month, year, type, page],
+    queryFn: () => fetchFinanceTransactions(month, year, type, page),
   });
 }
 

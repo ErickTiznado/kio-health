@@ -9,11 +9,12 @@ import {
   UseGuards,
   ParseUUIDPipe,
   Res,
+  Req,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Request } from 'express';
 import { AppointmentsService } from './appointments.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CurrentClinician } from '../auth/decorators/current-clinician.decorator';
 import { QueryAppointmentsDto } from './dto/query-appointments.dto';
 import { QueryDaySummaryDto } from './dto/query-day-summary.dto';
 import { CompleteCheckoutDto } from './dto/complete-checkout.dto';
@@ -21,36 +22,45 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { RescheduleAppointmentDto } from './dto/reschedule-appointment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { CreatePsychNoteDto } from './dto/create-psych-note.dto';
+import { CreateAnthropometryDto } from './dto/create-anthropometry.dto';
+import { AccessLogService } from '../access-log/access-log.service';
+import { CreateMealPlanDto } from './dto/create-meal-plan.dto';
+import { CreateClinicalScaleDto } from './dto/create-clinical-scale.dto';
+import { AppointmentOwnershipGuard } from '../auth/guards/appointment-ownership.guard';
 
 @Controller('appointments')
 @UseGuards(JwtAuthGuard)
 export class AppointmentsController {
-  constructor(private readonly appointmentsService: AppointmentsService) { }
+  constructor(
+    private readonly appointmentsService: AppointmentsService,
+    private readonly accessLogService: AccessLogService,
+  ) { }
 
   @Post()
   async create(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Body() dto: CreateAppointmentDto,
   ) {
-    return this.appointmentsService.create(user.userId, dto);
+    return this.appointmentsService.create(clinicianId, dto);
   }
 
+  @UseGuards(AppointmentOwnershipGuard)
   @Patch(':id/reschedule')
   async reschedule(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Body() dto: RescheduleAppointmentDto,
   ) {
-    return this.appointmentsService.reschedule(user.userId, appointmentId, dto);
+    return this.appointmentsService.reschedule(clinicianId, appointmentId, dto);
   }
 
   @Get()
   async findByDate(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Query() query: QueryAppointmentsDto,
   ) {
     return this.appointmentsService.findByDate(
-      user.userId,
+      clinicianId,
       query.date,
       query.from,
       query.to,
@@ -59,18 +69,18 @@ export class AppointmentsController {
 
   @Get('recent-patients')
   async getRecentPatients(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
   ) {
-    return this.appointmentsService.getRecentPatients(user.userId);
+    return this.appointmentsService.getRecentPatients(clinicianId);
   }
 
   @Get('day-summary')
   async getDaySummary(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Query() query: QueryDaySummaryDto,
   ) {
     return this.appointmentsService.getDaySummary(
-      user.userId,
+      clinicianId,
       query.from,
       query.to,
     );
@@ -78,37 +88,65 @@ export class AppointmentsController {
 
   @Get('next')
   async getNextUpcoming(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
   ) {
-    return this.appointmentsService.getNextUpcoming(user.userId);
+    return this.appointmentsService.getNextUpcoming(clinicianId);
   }
 
   @Get('pending-notes-count')
   async getPendingNotesCount(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
   ) {
-    return this.appointmentsService.getPendingNotesCount(user.userId);
+    return this.appointmentsService.getPendingNotesCount(clinicianId);
   }
 
+  @UseGuards(AppointmentOwnershipGuard)
   @Get(':id/context')
   async getSessionContext(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
+    @Req() req: any,
   ) {
-    return this.appointmentsService.getSessionContext(user.userId, appointmentId);
+    const result = await this.appointmentsService.getSessionContext(clinicianId, appointmentId);
+    
+    // Log access
+    await this.accessLogService.logAccess(
+      req.user.userId,
+      'VIEW_SESSION_CONTEXT',
+      `Appointment:${appointmentId}`,
+      result?.patient?.id,
+      undefined,
+      req.ip,
+      req.headers['user-agent'],
+    );
+    
+    return result;
   }
 
+  @UseGuards(AppointmentOwnershipGuard)
   @Get(':id/export/pdf')
   async exportPdf(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Query('includePrivate') includePrivate: string,
     @Res() res: any,
+    @Req() req: any,
   ) {
-    const buffer = await this.appointmentsService.exportPdf(
-      user.userId,
+    const { buffer, patientId } = await this.appointmentsService.exportPdf(
+      clinicianId,
       appointmentId,
       includePrivate === 'true',
+    );
+
+    // Log access with patientId for HIPAA audit trail
+    await this.accessLogService.logAccess(
+      req.user.userId,
+      'EXPORT_PDF',
+      `Appointment:${appointmentId}`,
+      patientId,
+      `Include private: ${includePrivate}`,
+      req.ip,
+      req.headers['user-agent'],
     );
 
     res.set({
@@ -120,83 +158,150 @@ export class AppointmentsController {
     res.end(buffer);
   }
 
+  @UseGuards(AppointmentOwnershipGuard)
   @Patch(':id/checkout')
   async completeCheckout(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Body() dto: CompleteCheckoutDto,
   ) {
     return this.appointmentsService.completeCheckout(
-      user.userId,
+      clinicianId,
       appointmentId,
       dto,
     );
   }
 
+  @UseGuards(AppointmentOwnershipGuard)
   @Patch(':id/start')
   async startSession(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
   ) {
-    return this.appointmentsService.startSession(user.userId, appointmentId);
+    return this.appointmentsService.startSession(clinicianId, appointmentId);
   }
 
+  @UseGuards(AppointmentOwnershipGuard)
   @Patch(':id/cancel')
   async cancelAppointment(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
   ) {
-    return this.appointmentsService.cancelAppointment(user.userId, appointmentId);
+    return this.appointmentsService.cancelAppointment(clinicianId, appointmentId);
   }
 
+  @UseGuards(AppointmentOwnershipGuard)
   @Patch(':id/no-show')
   async markNoShow(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
   ) {
-    return this.appointmentsService.markNoShow(user.userId, appointmentId);
+    return this.appointmentsService.markNoShow(clinicianId, appointmentId);
   }
 
+  @UseGuards(AppointmentOwnershipGuard)
   @Get(':id/notes')
   async getPsychNote(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
+    @Req() req: any,
   ) {
-    return this.appointmentsService.getPsychNote(user.userId, appointmentId);
+    const result = await this.appointmentsService.getPsychNote(clinicianId, appointmentId);
+    
+    // Log access
+    await this.accessLogService.logAccess(
+      req.user.userId,
+      'VIEW_PSYCH_NOTE',
+      `PsychNote:${result?.id || 'Unknown'}`,
+      result?.patientId,
+      `Appointment ID: ${appointmentId}`,
+      req.ip,
+      req.headers['user-agent'],
+    );
+    
+    return result;
   }
 
+  @UseGuards(AppointmentOwnershipGuard)
   @Post(':id/notes')
   async upsertPsychNote(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Body() dto: CreatePsychNoteDto,
+    @Req() req: any,
   ) {
-    return this.appointmentsService.upsertPsychNote(user.userId, appointmentId, dto);
+    const result = await this.appointmentsService.upsertPsychNote(clinicianId, appointmentId, dto);
+    
+    // Log access
+    await this.accessLogService.logAccess(
+      req.user.userId,
+      'UPSERT_PSYCH_NOTE',
+      `PsychNote:${result.id}`,
+      result.patientId,
+      `Appointment ID: ${appointmentId}, Template: ${dto.templateType}`,
+      req.ip,
+      req.headers['user-agent'],
+    );
+    
+    return result;
   }
 
+  @UseGuards(AppointmentOwnershipGuard)
+  @Post(':id/anthropometry')
+  async upsertAnthropometry(
+    @CurrentClinician() clinicianId: string,
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+    @Body() dto: CreateAnthropometryDto,
+  ) {
+    return this.appointmentsService.upsertAnthropometry(clinicianId, appointmentId, dto);
+  }
+
+  @UseGuards(AppointmentOwnershipGuard)
+  @Post(':id/meal-plan')
+  async upsertMealPlan(
+    @CurrentClinician() clinicianId: string,
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+    @Body() dto: CreateMealPlanDto,
+  ) {
+    return this.appointmentsService.upsertMealPlan(clinicianId, appointmentId, dto);
+  }
+
+  @UseGuards(AppointmentOwnershipGuard)
+  @Post(':id/clinical-scale')
+  async upsertClinicalScale(
+    @CurrentClinician() clinicianId: string,
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+    @Body() dto: CreateClinicalScaleDto,
+  ) {
+    return this.appointmentsService.upsertClinicalScale(clinicianId, appointmentId, dto);
+  }
+
+  @UseGuards(AppointmentOwnershipGuard)
   @Patch(':id/notes/pin')
   async togglePin(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
   ) {
-    return this.appointmentsService.togglePin(user.userId, appointmentId);
+    return this.appointmentsService.togglePin(clinicianId, appointmentId);
   }
 
+  @UseGuards(AppointmentOwnershipGuard)
   @Patch(':id/notes')
   async updateNotes(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Body('notes') notes: string,
   ) {
-    return this.appointmentsService.updateNotes(user.userId, appointmentId, notes);
+    return this.appointmentsService.updateNotes(clinicianId, appointmentId, notes);
   }
 
+  @UseGuards(AppointmentOwnershipGuard)
   @Patch(':id/payment')
   async updatePayment(
-    @CurrentUser() user: { userId: string; email: string; role: string },
+    @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Body() dto: UpdatePaymentDto,
   ) {
-    return this.appointmentsService.updatePayment(user.userId, appointmentId, dto);
+    return this.appointmentsService.updatePayment(clinicianId, appointmentId, dto);
   }
 }

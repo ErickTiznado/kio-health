@@ -1,4 +1,5 @@
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuthStore } from '../../../stores/auth.store';
 import { X, CreditCard, FileText, Clock, Stethoscope, ClipboardList, Calendar, Edit2, Ban, ExternalLink } from 'lucide-react';
 import { format, parseISO, formatDistanceToNowStrict } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -14,7 +15,7 @@ interface AppointmentDrawerProps {
   appointment: Appointment | null;
   isOpen: boolean;
   onClose: () => void;
-  onReschedule: (id: string, date: Date) => void;
+  onReschedule: (id: string, date: Date, duration?: number) => void;
   onCancel: (id: string) => void;
 }
 
@@ -40,6 +41,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
   const navigate = useNavigate();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
+  const currency = useAuthStore((s) => s.user?.profile?.currency ?? 'USD');
 
   // Derived state for display
   const amount = Number(appointment?.price) || 0;
@@ -72,10 +74,10 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
 
   const handleCancelClick = () => {
     toast.custom((t) => (
-      <div className="bg-white dark:bg-slate-800 p-5 rounded-[24px] shadow-2xl border border-red-100 dark:border-red-900/30 flex flex-col gap-4 w-[360px] animate-in fade-in slide-in-from-top-5 duration-300">
+      <div className="bg-surface dark:bg-slate-800 p-5 rounded-[24px] shadow-2xl border border-red-100 dark:border-red-900/30 flex flex-col gap-4 w-[360px] animate-in fade-in slide-in-from-top-5 duration-300">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500 shrink-0">
-             <Ban size={24} />
+            <Ban size={24} />
           </div>
           <div>
             <h3 className="font-bold text-kanji dark:text-white text-lg leading-tight">¿Cancelar cita?</h3>
@@ -85,17 +87,17 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
           </div>
         </div>
         <div className="flex gap-3 pt-2">
-          <button 
-            onClick={() => toast.dismiss(t)} 
+          <button
+            onClick={() => toast.dismiss(t)}
             className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-kanji dark:text-kio hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
           >
             No, volver
           </button>
-          <button 
+          <button
             onClick={() => {
               onCancel(appointment.id);
               toast.dismiss(t);
-            }} 
+            }}
             className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/20 transition-all active:scale-95"
           >
             Sí, cancelar
@@ -120,11 +122,11 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
 
       {/* Drawer Panel */}
       <aside
-        className={`fixed top-0 right-0 h-full w-[420px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-0 right-0 h-full w-[420px] bg-surface/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
       >
         {/* Header — Patient Hero */}
-        <div className="relative px-6 pt-6 pb-5 bg-white dark:bg-slate-900">
+        <div className="relative px-6 pt-6 pb-5 bg-surface dark:bg-slate-900">
           {/* Header Actions (Secondary) */}
           <div className="absolute top-4 right-4 flex items-center gap-1">
             <button
@@ -263,8 +265,8 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
                 <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 border border-dashed border-gray-200 dark:border-slate-700 text-center">
                   <p className="text-xs font-semibold text-kanji/80 dark:text-slate-300 mb-1">Primera sesión</p>
                   <p className="text-[10px] text-gray-500 dark:text-slate-500 mb-3">Este paciente no tiene historial clínico previo.</p>
-                  <Link 
-                    to={`/patients/${appointment.patientId}`} 
+                  <Link
+                    to={`/patients/${appointment.patientId}`}
                     className="text-xs font-bold text-kanji dark:text-kio flex items-center justify-center gap-1.5 mx-auto hover:bg-kanji/5 dark:hover:bg-kio/10 px-3 py-1.5 rounded-lg transition-colors"
                   >
                     <FileText size={12} />
@@ -280,7 +282,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
                       {/* Timeline line */}
                       <div className="absolute -left-[23px] top-3.5 bottom-[-14px] w-px bg-gray-200 dark:bg-slate-700 group-last:hidden" />
 
-                      <div className="bg-white dark:bg-slate-800 rounded-xl p-3 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-kanji/20 dark:hover:border-kio/20 transition-all cursor-default">
+                      <div className="bg-surface dark:bg-slate-800 rounded-xl p-3 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-kanji/20 dark:hover:border-kio/20 transition-all cursor-default">
                         <div className="flex items-center justify-between mb-1.5">
                           <p className="text-[10px] font-bold text-kanji/60 dark:text-slate-400">
                             {format(parseISO(note.date), "d 'de' MMM", { locale: es })}
@@ -313,9 +315,9 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
               <CreditCard size={14} className="text-kanji/60 dark:text-slate-400" />
               <p className="text-[10px] font-bold text-kanji/60 dark:text-slate-400 uppercase tracking-widest">Estado del Pago</p>
             </div>
-            <div className="flex items-center justify-between bg-white dark:bg-slate-800 rounded-xl p-3 border border-gray-200 dark:border-slate-700 shadow-sm">
+            <div className="flex items-center justify-between bg-surface dark:bg-slate-800 rounded-xl p-3 border border-gray-200 dark:border-slate-700 shadow-sm">
               <div className="flex flex-col">
-                <p className="text-sm font-bold text-kanji dark:text-white">${amount} MXN</p>
+                <p className="text-sm font-bold text-kanji dark:text-white">${amount} {currency}</p>
                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md w-fit mt-1 ${appointment.paymentStatus === 'PAID'
                   ? 'bg-kio-light/40 dark:bg-kio/20 text-kio'
                   : 'bg-gray-100 dark:bg-slate-700 text-kanji/80 dark:text-slate-300'
@@ -340,17 +342,41 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
             </div>
           </div>
 
-          {/* Footer CTA with Feedforward */}
-          <button
-            type="button"
-            onClick={handleStartSession}
-            className="w-full bg-kanji dark:bg-kio text-white dark:text-slate-900 py-4 rounded-[16px] font-bold text-base flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[1px] active:shadow-md transition-all duration-200 group relative overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
-            {/* Feedforward Icon based on probable action */}
-            <Stethoscope fill="currentColor" size={18} />
-            Iniciar Sesión Clínica
-          </button>
+          {/* Footer CTA — Status-Aware */}
+          {appointment.status === 'SCHEDULED' && (
+            <button
+              type="button"
+              onClick={handleStartSession}
+              className="w-full bg-kanji dark:bg-kio text-white dark:text-slate-900 py-4 rounded-[16px] font-bold text-base flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[1px] active:shadow-md transition-all duration-200 group relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
+              <Stethoscope size={20} className="stroke-[2.5px]" />
+              Iniciar Sesión Clínica
+            </button>
+          )}
+
+          {appointment.status === 'IN_PROGRESS' && (
+            <button
+              type="button"
+              onClick={handleStartSession}
+              className="w-full bg-indigo-600 dark:bg-indigo-500 text-white py-4 rounded-[16px] font-bold text-base flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[1px] active:shadow-md transition-all duration-200 group relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
+              <Stethoscope size={20} className="stroke-[2.5px]" />
+              Continuar Sesión
+            </button>
+          )}
+
+          {appointment.status === 'COMPLETED' && (
+            <button
+              type="button"
+              onClick={handleStartSession}
+              className="w-full bg-emerald-600 dark:bg-emerald-500 text-white py-4 rounded-[16px] font-bold text-base flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[1px] active:shadow-md transition-all duration-200 group relative overflow-hidden"
+            >
+              <FileText size={20} className="stroke-[2.5px]" />
+              Ver Notas de Sesión
+            </button>
+          )}
         </div>
       </aside>
 
@@ -359,8 +385,8 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
         isOpen={isRescheduleModalOpen}
         onClose={() => setIsRescheduleModalOpen(false)}
         initialDate={startDate}
-        onConfirm={(newDate) => {
-          onReschedule(appointment.id, newDate);
+        onConfirm={(newDate, duration) => {
+          onReschedule(appointment.id, newDate, duration);
           setIsRescheduleModalOpen(false);
         }}
         isRescheduleMode={true}

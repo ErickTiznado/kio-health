@@ -1,37 +1,76 @@
-import TextareaAutosize from 'react-textarea-autosize';
 import { useSettingsStore } from '../../../stores/settings.store';
+import { BlockEditor } from './blocks/BlockEditor';
 
 interface SoapFormProps {
   content: { s: string; o: string; a: string; p: string };
   onChange: (field: 's' | 'o' | 'a' | 'p', value: string) => void;
+  readOnly?: boolean;
 }
 
-export function SoapForm({ content, onChange }: SoapFormProps) {
+const SOAP_FIELDS = [
+  {
+    key: 's' as const,
+    label: 'Subjetivo',
+    description: 'Motivo de consulta, síntomas y eventos relevantes',
+    color: 'text-[var(--color-kanji)] dark:text-kio',
+    borderColor: 'border-[var(--color-cruz)] dark:border-slate-800',
+    bgAccent: 'bg-[var(--color-bg)] dark:bg-slate-800/50',
+  },
+  {
+    key: 'o' as const,
+    label: 'Objetivo',
+    description: 'Apariencia, afecto, comportamiento y resultados de pruebas',
+    color: 'text-[var(--color-kanji)] dark:text-kio',
+    borderColor: 'border-[var(--color-cruz)] dark:border-slate-800',
+    bgAccent: 'bg-[var(--color-bg)] dark:bg-slate-800/50',
+  },
+  {
+    key: 'a' as const,
+    label: 'Análisis',
+    description: 'Interpretación, impresión diagnóstica y progreso',
+    color: 'text-[var(--color-kanji)] dark:text-kio',
+    borderColor: 'border-[var(--color-cruz)] dark:border-slate-800',
+    bgAccent: 'bg-[var(--color-bg)] dark:bg-slate-800/50',
+  },
+  {
+    key: 'p' as const,
+    label: 'Plan',
+    description: 'Intervenciones futuras, tareas y próxima cita',
+    color: 'text-[var(--color-kanji)] dark:text-kio',
+    borderColor: 'border-[var(--color-cruz)] dark:border-slate-800',
+    bgAccent: 'bg-[var(--color-bg)] dark:bg-slate-800/50',
+  },
+] as const;
+
+export function SoapForm({ content, onChange, readOnly }: SoapFormProps) {
   const { isDiscreteMode } = useSettingsStore();
-  const fields = [
-    { key: 's', label: 'Subjetivo', placeholder: 'Lo que el paciente reporta (síntomas, preocupaciones, historia)...' },
-    { key: 'o', label: 'Objetivo', placeholder: 'Observaciones clínicas, apariencia, comportamiento, resultados de pruebas...' },
-    { key: 'a', label: 'Análisis', placeholder: 'Impresión diagnóstica, progreso hacia metas, interpretación clínica...' },
-    { key: 'p', label: 'Plan', placeholder: 'Próxima cita, tareas, intervenciones, referencias...' },
-  ] as const;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full overflow-y-auto pr-2 pb-20">
-      {fields.map(({ key, label, placeholder }) => (
-        <div key={key} className="flex flex-col h-full min-h-[200px] bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm focus-within:ring-2 focus-within:ring-[var(--color-kanji)]/20 focus-within:border-[var(--color-kanji)] transition-all">
-          <div className="bg-gray-50/50 dark:bg-slate-800/50 px-4 py-2 border-b border-gray-100 dark:border-slate-700 flex items-center gap-2">
-            <span className="w-6 h-6 rounded-md bg-[var(--color-kanji)]/10 text-[var(--color-kanji)] dark:text-kio font-bold flex items-center justify-center text-xs uppercase">
-              {key.toUpperCase()}
-            </span>
-            <span className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">{label}</span>
+    <div className="grid grid-cols-2 gap-4 h-full overflow-y-auto px-4 pb-32 pt-2">
+      {SOAP_FIELDS.map(({ key, label, description, color, borderColor, bgAccent }) => (
+        <div
+          key={key}
+          className={`bg-surface dark:bg-slate-900 rounded-2xl border ${borderColor} shadow-sm overflow-hidden transition-all focus-within:ring-2 focus-within:ring-kio/20`}
+        >
+          {/* Section Header */}
+          <div className={`${bgAccent} px-6 py-3 border-b ${borderColor} flex items-center justify-between`}>
+            <div className="flex items-center gap-3">
+              <span className={`text-lg font-black ${color} opacity-80`}>{key.toUpperCase()}</span>
+              <div className="flex flex-col leading-tight">
+                <span className="text-sm font-bold text-gray-800 dark:text-slate-200">{label}</span>
+                <span className="text-[10px] text-gray-400 dark:text-slate-500">{description}</span>
+              </div>
+            </div>
           </div>
-          <TextareaAutosize
-            value={content[key] || ''}
-            onChange={(e) => onChange(key, e.target.value)}
-            placeholder={placeholder}
-            className={`flex-1 w-full p-4 resize-none outline-none text-sm text-gray-700 dark:text-slate-300 leading-relaxed placeholder:text-gray-300 dark:placeholder:text-slate-600 bg-transparent ${isDiscreteMode ? 'blur-sm' : ''}`}
-            minRows={5}
-          />
+
+          {/* Block Editor */}
+          <div className={`w-full overflow-y-auto ${isDiscreteMode ? 'blur-sm select-none' : ''}`}>
+            <BlockEditor
+              initialContent={content[key] || ''}
+              onChange={(markdown) => onChange(key, markdown)}
+              readOnly={readOnly}
+            />
+          </div>
         </div>
       ))}
     </div>

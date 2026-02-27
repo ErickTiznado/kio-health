@@ -3,7 +3,7 @@
  * Client
 **/
 
-import * as runtime from './runtime/client.js';
+import * as runtime from './runtime/library.js';
 import $Types = runtime.Types // general types
 import $Public = runtime.Types.Public
 import $Utils = runtime.Types.Utils
@@ -18,6 +18,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  * 
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
+/**
+ * Model RefreshToken
+ * 
+ */
+export type RefreshToken = $Result.DefaultSelection<Prisma.$RefreshTokenPayload>
 /**
  * Model ClinicianProfile
  * 
@@ -53,6 +58,21 @@ export type AccessLog = $Result.DefaultSelection<Prisma.$AccessLogPayload>
  * 
  */
 export type FinanceTransaction = $Result.DefaultSelection<Prisma.$FinanceTransactionPayload>
+/**
+ * Model Anthropometry
+ * 
+ */
+export type Anthropometry = $Result.DefaultSelection<Prisma.$AnthropometryPayload>
+/**
+ * Model MealPlan
+ * 
+ */
+export type MealPlan = $Result.DefaultSelection<Prisma.$MealPlanPayload>
+/**
+ * Model ClinicalScale
+ * 
+ */
+export type ClinicalScale = $Result.DefaultSelection<Prisma.$ClinicalScalePayload>
 
 /**
  * Enums
@@ -136,6 +156,25 @@ export const NoteTemplateType: {
 
 export type NoteTemplateType = (typeof NoteTemplateType)[keyof typeof NoteTemplateType]
 
+
+export const ScaleType: {
+  PHQ9: 'PHQ9',
+  GAD7: 'GAD7'
+};
+
+export type ScaleType = (typeof ScaleType)[keyof typeof ScaleType]
+
+
+export const ScaleRiskLevel: {
+  MINIMAL: 'MINIMAL',
+  MILD: 'MILD',
+  MODERATE: 'MODERATE',
+  MODERATELY_SEVERE: 'MODERATELY_SEVERE',
+  SEVERE: 'SEVERE'
+};
+
+export type ScaleRiskLevel = (typeof ScaleRiskLevel)[keyof typeof ScaleRiskLevel]
+
 }
 
 export type UserRole = $Enums.UserRole
@@ -174,6 +213,14 @@ export type NoteTemplateType = $Enums.NoteTemplateType
 
 export const NoteTemplateType: typeof $Enums.NoteTemplateType
 
+export type ScaleType = $Enums.ScaleType
+
+export const ScaleType: typeof $Enums.ScaleType
+
+export type ScaleRiskLevel = $Enums.ScaleRiskLevel
+
+export const ScaleRiskLevel: typeof $Enums.ScaleRiskLevel
+
 /**
  * ##  Prisma Client ʲˢ
  *
@@ -186,7 +233,7 @@ export const NoteTemplateType: typeof $Enums.NoteTemplateType
  * ```
  *
  *
- * Read more in our [docs](https://pris.ly/d/client).
+ * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
  */
 export class PrismaClient<
   ClientOptions extends Prisma.PrismaClientOptions = Prisma.PrismaClientOptions,
@@ -207,7 +254,7 @@ export class PrismaClient<
    * ```
    *
    *
-   * Read more in our [docs](https://pris.ly/d/client).
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
    */
 
   constructor(optionsArg ?: Prisma.Subset<ClientOptions, Prisma.PrismaClientOptions>);
@@ -230,7 +277,7 @@ export class PrismaClient<
    * const result = await prisma.$executeRaw`UPDATE User SET cool = ${true} WHERE email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://pris.ly/d/raw-queries).
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
    */
   $executeRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -242,7 +289,7 @@ export class PrismaClient<
    * const result = await prisma.$executeRawUnsafe('UPDATE User SET cool = $1 WHERE email = $2 ;', true, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://pris.ly/d/raw-queries).
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
    */
   $executeRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -253,7 +300,7 @@ export class PrismaClient<
    * const result = await prisma.$queryRaw`SELECT * FROM User WHERE id = ${1} OR email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://pris.ly/d/raw-queries).
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
    */
   $queryRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<T>;
 
@@ -265,7 +312,7 @@ export class PrismaClient<
    * const result = await prisma.$queryRawUnsafe('SELECT * FROM User WHERE id = $1 OR email = $2;', 1, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://pris.ly/d/raw-queries).
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
    */
   $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<T>;
 
@@ -287,6 +334,7 @@ export class PrismaClient<
 
   $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<R>
 
+
   $extends: $Extensions.ExtendsHook<"extends", Prisma.TypeMapCb<ClientOptions>, ExtArgs, $Utils.Call<Prisma.TypeMapCb<ClientOptions>, {
     extArgs: ExtArgs
   }>>
@@ -300,6 +348,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.refreshToken`: Exposes CRUD operations for the **RefreshToken** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more RefreshTokens
+    * const refreshTokens = await prisma.refreshToken.findMany()
+    * ```
+    */
+  get refreshToken(): Prisma.RefreshTokenDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.clinicianProfile`: Exposes CRUD operations for the **ClinicianProfile** model.
@@ -370,6 +428,36 @@ export class PrismaClient<
     * ```
     */
   get financeTransaction(): Prisma.FinanceTransactionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.anthropometry`: Exposes CRUD operations for the **Anthropometry** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Anthropometries
+    * const anthropometries = await prisma.anthropometry.findMany()
+    * ```
+    */
+  get anthropometry(): Prisma.AnthropometryDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.mealPlan`: Exposes CRUD operations for the **MealPlan** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MealPlans
+    * const mealPlans = await prisma.mealPlan.findMany()
+    * ```
+    */
+  get mealPlan(): Prisma.MealPlanDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.clinicalScale`: Exposes CRUD operations for the **ClinicalScale** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ClinicalScales
+    * const clinicalScales = await prisma.clinicalScale.findMany()
+    * ```
+    */
+  get clinicalScale(): Prisma.ClinicalScaleDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -410,6 +498,14 @@ export namespace Prisma {
   export type DecimalJsLike = runtime.DecimalJsLike
 
   /**
+   * Metrics
+   */
+  export type Metrics = runtime.Metrics
+  export type Metric<T> = runtime.Metric<T>
+  export type MetricHistogram = runtime.MetricHistogram
+  export type MetricHistogramBucket = runtime.MetricHistogramBucket
+
+  /**
   * Extensions
   */
   export import Extension = $Extensions.UserArgs
@@ -420,12 +516,11 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 7.3.0
-   * Query Engine version: 9d6ad21cbbceab97458517b147a6a09ff43aa735
+   * Prisma Client JS version: 6.19.2
+   * Query Engine version: c2990dca591cba766e3b7ef5d9e8a84796e47ab7
    */
   export type PrismaVersion = {
     client: string
-    engine: string
   }
 
   export const prismaVersion: PrismaVersion
@@ -805,18 +900,25 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
+    RefreshToken: 'RefreshToken',
     ClinicianProfile: 'ClinicianProfile',
     Patient: 'Patient',
     Appointment: 'Appointment',
     PsychNote: 'PsychNote',
     Task: 'Task',
     AccessLog: 'AccessLog',
-    FinanceTransaction: 'FinanceTransaction'
+    FinanceTransaction: 'FinanceTransaction',
+    Anthropometry: 'Anthropometry',
+    MealPlan: 'MealPlan',
+    ClinicalScale: 'ClinicalScale'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
 
 
+  export type Datasources = {
+    db?: Datasource
+  }
 
   interface TypeMapCb<ClientOptions = {}> extends $Utils.Fn<{extArgs: $Extensions.InternalArgs }, $Utils.Record<string, any>> {
     returns: Prisma.TypeMap<this['params']['extArgs'], ClientOptions extends { omit: infer OmitOptions } ? OmitOptions : {}>
@@ -827,7 +929,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "clinicianProfile" | "patient" | "appointment" | "psychNote" | "task" | "accessLog" | "financeTransaction"
+      modelProps: "user" | "refreshToken" | "clinicianProfile" | "patient" | "appointment" | "psychNote" | "task" | "accessLog" | "financeTransaction" | "anthropometry" | "mealPlan" | "clinicalScale"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -902,6 +1004,80 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      RefreshToken: {
+        payload: Prisma.$RefreshTokenPayload<ExtArgs>
+        fields: Prisma.RefreshTokenFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.RefreshTokenFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RefreshTokenPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.RefreshTokenFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RefreshTokenPayload>
+          }
+          findFirst: {
+            args: Prisma.RefreshTokenFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RefreshTokenPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.RefreshTokenFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RefreshTokenPayload>
+          }
+          findMany: {
+            args: Prisma.RefreshTokenFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RefreshTokenPayload>[]
+          }
+          create: {
+            args: Prisma.RefreshTokenCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RefreshTokenPayload>
+          }
+          createMany: {
+            args: Prisma.RefreshTokenCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.RefreshTokenCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RefreshTokenPayload>[]
+          }
+          delete: {
+            args: Prisma.RefreshTokenDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RefreshTokenPayload>
+          }
+          update: {
+            args: Prisma.RefreshTokenUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RefreshTokenPayload>
+          }
+          deleteMany: {
+            args: Prisma.RefreshTokenDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.RefreshTokenUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.RefreshTokenUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RefreshTokenPayload>[]
+          }
+          upsert: {
+            args: Prisma.RefreshTokenUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RefreshTokenPayload>
+          }
+          aggregate: {
+            args: Prisma.RefreshTokenAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRefreshToken>
+          }
+          groupBy: {
+            args: Prisma.RefreshTokenGroupByArgs<ExtArgs>
+            result: $Utils.Optional<RefreshTokenGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.RefreshTokenCountArgs<ExtArgs>
+            result: $Utils.Optional<RefreshTokenCountAggregateOutputType> | number
           }
         }
       }
@@ -1423,6 +1599,228 @@ export namespace Prisma {
           }
         }
       }
+      Anthropometry: {
+        payload: Prisma.$AnthropometryPayload<ExtArgs>
+        fields: Prisma.AnthropometryFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AnthropometryFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AnthropometryFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>
+          }
+          findFirst: {
+            args: Prisma.AnthropometryFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AnthropometryFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>
+          }
+          findMany: {
+            args: Prisma.AnthropometryFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>[]
+          }
+          create: {
+            args: Prisma.AnthropometryCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>
+          }
+          createMany: {
+            args: Prisma.AnthropometryCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AnthropometryCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>[]
+          }
+          delete: {
+            args: Prisma.AnthropometryDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>
+          }
+          update: {
+            args: Prisma.AnthropometryUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>
+          }
+          deleteMany: {
+            args: Prisma.AnthropometryDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AnthropometryUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AnthropometryUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>[]
+          }
+          upsert: {
+            args: Prisma.AnthropometryUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AnthropometryPayload>
+          }
+          aggregate: {
+            args: Prisma.AnthropometryAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAnthropometry>
+          }
+          groupBy: {
+            args: Prisma.AnthropometryGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AnthropometryGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AnthropometryCountArgs<ExtArgs>
+            result: $Utils.Optional<AnthropometryCountAggregateOutputType> | number
+          }
+        }
+      }
+      MealPlan: {
+        payload: Prisma.$MealPlanPayload<ExtArgs>
+        fields: Prisma.MealPlanFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MealPlanFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MealPlanFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>
+          }
+          findFirst: {
+            args: Prisma.MealPlanFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MealPlanFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>
+          }
+          findMany: {
+            args: Prisma.MealPlanFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>[]
+          }
+          create: {
+            args: Prisma.MealPlanCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>
+          }
+          createMany: {
+            args: Prisma.MealPlanCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MealPlanCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>[]
+          }
+          delete: {
+            args: Prisma.MealPlanDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>
+          }
+          update: {
+            args: Prisma.MealPlanUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>
+          }
+          deleteMany: {
+            args: Prisma.MealPlanDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MealPlanUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MealPlanUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>[]
+          }
+          upsert: {
+            args: Prisma.MealPlanUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MealPlanPayload>
+          }
+          aggregate: {
+            args: Prisma.MealPlanAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMealPlan>
+          }
+          groupBy: {
+            args: Prisma.MealPlanGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MealPlanGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MealPlanCountArgs<ExtArgs>
+            result: $Utils.Optional<MealPlanCountAggregateOutputType> | number
+          }
+        }
+      }
+      ClinicalScale: {
+        payload: Prisma.$ClinicalScalePayload<ExtArgs>
+        fields: Prisma.ClinicalScaleFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ClinicalScaleFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClinicalScalePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ClinicalScaleFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClinicalScalePayload>
+          }
+          findFirst: {
+            args: Prisma.ClinicalScaleFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClinicalScalePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ClinicalScaleFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClinicalScalePayload>
+          }
+          findMany: {
+            args: Prisma.ClinicalScaleFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClinicalScalePayload>[]
+          }
+          create: {
+            args: Prisma.ClinicalScaleCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClinicalScalePayload>
+          }
+          createMany: {
+            args: Prisma.ClinicalScaleCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ClinicalScaleCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClinicalScalePayload>[]
+          }
+          delete: {
+            args: Prisma.ClinicalScaleDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClinicalScalePayload>
+          }
+          update: {
+            args: Prisma.ClinicalScaleUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClinicalScalePayload>
+          }
+          deleteMany: {
+            args: Prisma.ClinicalScaleDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ClinicalScaleUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ClinicalScaleUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClinicalScalePayload>[]
+          }
+          upsert: {
+            args: Prisma.ClinicalScaleUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClinicalScalePayload>
+          }
+          aggregate: {
+            args: Prisma.ClinicalScaleAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateClinicalScale>
+          }
+          groupBy: {
+            args: Prisma.ClinicalScaleGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ClinicalScaleGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ClinicalScaleCountArgs<ExtArgs>
+            result: $Utils.Optional<ClinicalScaleCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1452,6 +1850,14 @@ export namespace Prisma {
   export type ErrorFormat = 'pretty' | 'colorless' | 'minimal'
   export interface PrismaClientOptions {
     /**
+     * Overwrites the datasource url from your schema.prisma file
+     */
+    datasources?: Datasources
+    /**
+     * Overwrites the datasource url from your schema.prisma file
+     */
+    datasourceUrl?: string
+    /**
      * @default "colorless"
      */
     errorFormat?: ErrorFormat
@@ -1477,7 +1883,7 @@ export namespace Prisma {
      *  { emit: 'stdout', level: 'error' }
      * 
      * ```
-     * Read more in our [docs](https://pris.ly/d/logging).
+     * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
      */
     log?: (LogLevel | LogDefinition)[]
     /**
@@ -1493,11 +1899,7 @@ export namespace Prisma {
     /**
      * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-planetscale`
      */
-    adapter?: runtime.SqlDriverAdapterFactory
-    /**
-     * Prisma Accelerate URL allowing the client to connect through Accelerate instead of a direct database.
-     */
-    accelerateUrl?: string
+    adapter?: runtime.SqlDriverAdapterFactory | null
     /**
      * Global configuration for omitting model fields by default.
      * 
@@ -1513,25 +1915,10 @@ export namespace Prisma {
      * ```
      */
     omit?: Prisma.GlobalOmitConfig
-    /**
-     * SQL commenter plugins that add metadata to SQL queries as comments.
-     * Comments follow the sqlcommenter format: https://google.github.io/sqlcommenter/
-     * 
-     * @example
-     * ```
-     * const prisma = new PrismaClient({
-     *   adapter,
-     *   comments: [
-     *     traceContext(),
-     *     queryInsights(),
-     *   ],
-     * })
-     * ```
-     */
-    comments?: runtime.SqlCommenterPlugin[]
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
+    refreshToken?: RefreshTokenOmit
     clinicianProfile?: ClinicianProfileOmit
     patient?: PatientOmit
     appointment?: AppointmentOmit
@@ -1539,6 +1926,9 @@ export namespace Prisma {
     task?: TaskOmit
     accessLog?: AccessLogOmit
     financeTransaction?: FinanceTransactionOmit
+    anthropometry?: AnthropometryOmit
+    mealPlan?: MealPlanOmit
+    clinicalScale?: ClinicalScaleOmit
   }
 
   /* Types for Logging */
@@ -1620,10 +2010,12 @@ export namespace Prisma {
 
   export type UserCountOutputType = {
     accessLogs: number
+    refreshTokens: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accessLogs?: boolean | UserCountOutputTypeCountAccessLogsArgs
+    refreshTokens?: boolean | UserCountOutputTypeCountRefreshTokensArgs
   }
 
   // Custom InputTypes
@@ -1642,6 +2034,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountAccessLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AccessLogWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountRefreshTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RefreshTokenWhereInput
   }
 
 
@@ -1703,6 +2102,9 @@ export namespace Prisma {
     psychNotes: number
     accessLogs: number
     tasks: number
+    anthropometries: number
+    mealPlans: number
+    clinicalScales: number
   }
 
   export type PatientCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1710,6 +2112,9 @@ export namespace Prisma {
     psychNotes?: boolean | PatientCountOutputTypeCountPsychNotesArgs
     accessLogs?: boolean | PatientCountOutputTypeCountAccessLogsArgs
     tasks?: boolean | PatientCountOutputTypeCountTasksArgs
+    anthropometries?: boolean | PatientCountOutputTypeCountAnthropometriesArgs
+    mealPlans?: boolean | PatientCountOutputTypeCountMealPlansArgs
+    clinicalScales?: boolean | PatientCountOutputTypeCountClinicalScalesArgs
   }
 
   // Custom InputTypes
@@ -1749,6 +2154,58 @@ export namespace Prisma {
    */
   export type PatientCountOutputTypeCountTasksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TaskWhereInput
+  }
+
+  /**
+   * PatientCountOutputType without action
+   */
+  export type PatientCountOutputTypeCountAnthropometriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AnthropometryWhereInput
+  }
+
+  /**
+   * PatientCountOutputType without action
+   */
+  export type PatientCountOutputTypeCountMealPlansArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MealPlanWhereInput
+  }
+
+  /**
+   * PatientCountOutputType without action
+   */
+  export type PatientCountOutputTypeCountClinicalScalesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ClinicalScaleWhereInput
+  }
+
+
+  /**
+   * Count Type AppointmentCountOutputType
+   */
+
+  export type AppointmentCountOutputType = {
+    clinicalScales: number
+  }
+
+  export type AppointmentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    clinicalScales?: boolean | AppointmentCountOutputTypeCountClinicalScalesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * AppointmentCountOutputType without action
+   */
+  export type AppointmentCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppointmentCountOutputType
+     */
+    select?: AppointmentCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * AppointmentCountOutputType without action
+   */
+  export type AppointmentCountOutputTypeCountClinicalScalesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ClinicalScaleWhereInput
   }
 
 
@@ -1930,6 +2387,7 @@ export namespace Prisma {
     updatedAt?: boolean
     profile?: boolean | User$profileArgs<ExtArgs>
     accessLogs?: boolean | User$accessLogsArgs<ExtArgs>
+    refreshTokens?: boolean | User$refreshTokensArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -1964,6 +2422,7 @@ export namespace Prisma {
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     profile?: boolean | User$profileArgs<ExtArgs>
     accessLogs?: boolean | User$accessLogsArgs<ExtArgs>
+    refreshTokens?: boolean | User$refreshTokensArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -1974,6 +2433,7 @@ export namespace Prisma {
     objects: {
       profile: Prisma.$ClinicianProfilePayload<ExtArgs> | null
       accessLogs: Prisma.$AccessLogPayload<ExtArgs>[]
+      refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2378,6 +2838,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     profile<T extends User$profileArgs<ExtArgs> = {}>(args?: Subset<T, User$profileArgs<ExtArgs>>): Prisma__ClinicianProfileClient<$Result.GetResult<Prisma.$ClinicianProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     accessLogs<T extends User$accessLogsArgs<ExtArgs> = {}>(args?: Subset<T, User$accessLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    refreshTokens<T extends User$refreshTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2844,6 +3305,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.refreshTokens
+   */
+  export type User$refreshTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RefreshToken
+     */
+    select?: RefreshTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RefreshToken
+     */
+    omit?: RefreshTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefreshTokenInclude<ExtArgs> | null
+    where?: RefreshTokenWhereInput
+    orderBy?: RefreshTokenOrderByWithRelationInput | RefreshTokenOrderByWithRelationInput[]
+    cursor?: RefreshTokenWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RefreshTokenScalarFieldEnum | RefreshTokenScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2859,6 +3344,1064 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model RefreshToken
+   */
+
+  export type AggregateRefreshToken = {
+    _count: RefreshTokenCountAggregateOutputType | null
+    _min: RefreshTokenMinAggregateOutputType | null
+    _max: RefreshTokenMaxAggregateOutputType | null
+  }
+
+  export type RefreshTokenMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    tokenHash: string | null
+    expiresAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type RefreshTokenMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    tokenHash: string | null
+    expiresAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type RefreshTokenCountAggregateOutputType = {
+    id: number
+    userId: number
+    tokenHash: number
+    expiresAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type RefreshTokenMinAggregateInputType = {
+    id?: true
+    userId?: true
+    tokenHash?: true
+    expiresAt?: true
+    createdAt?: true
+  }
+
+  export type RefreshTokenMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    tokenHash?: true
+    expiresAt?: true
+    createdAt?: true
+  }
+
+  export type RefreshTokenCountAggregateInputType = {
+    id?: true
+    userId?: true
+    tokenHash?: true
+    expiresAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type RefreshTokenAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RefreshToken to aggregate.
+     */
+    where?: RefreshTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RefreshTokens to fetch.
+     */
+    orderBy?: RefreshTokenOrderByWithRelationInput | RefreshTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: RefreshTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RefreshTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RefreshTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned RefreshTokens
+    **/
+    _count?: true | RefreshTokenCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: RefreshTokenMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: RefreshTokenMaxAggregateInputType
+  }
+
+  export type GetRefreshTokenAggregateType<T extends RefreshTokenAggregateArgs> = {
+        [P in keyof T & keyof AggregateRefreshToken]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateRefreshToken[P]>
+      : GetScalarType<T[P], AggregateRefreshToken[P]>
+  }
+
+
+
+
+  export type RefreshTokenGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RefreshTokenWhereInput
+    orderBy?: RefreshTokenOrderByWithAggregationInput | RefreshTokenOrderByWithAggregationInput[]
+    by: RefreshTokenScalarFieldEnum[] | RefreshTokenScalarFieldEnum
+    having?: RefreshTokenScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: RefreshTokenCountAggregateInputType | true
+    _min?: RefreshTokenMinAggregateInputType
+    _max?: RefreshTokenMaxAggregateInputType
+  }
+
+  export type RefreshTokenGroupByOutputType = {
+    id: string
+    userId: string
+    tokenHash: string
+    expiresAt: Date
+    createdAt: Date
+    _count: RefreshTokenCountAggregateOutputType | null
+    _min: RefreshTokenMinAggregateOutputType | null
+    _max: RefreshTokenMaxAggregateOutputType | null
+  }
+
+  type GetRefreshTokenGroupByPayload<T extends RefreshTokenGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<RefreshTokenGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof RefreshTokenGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], RefreshTokenGroupByOutputType[P]>
+            : GetScalarType<T[P], RefreshTokenGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type RefreshTokenSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    tokenHash?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["refreshToken"]>
+
+  export type RefreshTokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    tokenHash?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["refreshToken"]>
+
+  export type RefreshTokenSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    tokenHash?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["refreshToken"]>
+
+  export type RefreshTokenSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    tokenHash?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type RefreshTokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "tokenHash" | "expiresAt" | "createdAt", ExtArgs["result"]["refreshToken"]>
+  export type RefreshTokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type RefreshTokenIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type RefreshTokenIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $RefreshTokenPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "RefreshToken"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      tokenHash: string
+      expiresAt: Date
+      createdAt: Date
+    }, ExtArgs["result"]["refreshToken"]>
+    composites: {}
+  }
+
+  type RefreshTokenGetPayload<S extends boolean | null | undefined | RefreshTokenDefaultArgs> = $Result.GetResult<Prisma.$RefreshTokenPayload, S>
+
+  type RefreshTokenCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<RefreshTokenFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: RefreshTokenCountAggregateInputType | true
+    }
+
+  export interface RefreshTokenDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RefreshToken'], meta: { name: 'RefreshToken' } }
+    /**
+     * Find zero or one RefreshToken that matches the filter.
+     * @param {RefreshTokenFindUniqueArgs} args - Arguments to find a RefreshToken
+     * @example
+     * // Get one RefreshToken
+     * const refreshToken = await prisma.refreshToken.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends RefreshTokenFindUniqueArgs>(args: SelectSubset<T, RefreshTokenFindUniqueArgs<ExtArgs>>): Prisma__RefreshTokenClient<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one RefreshToken that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {RefreshTokenFindUniqueOrThrowArgs} args - Arguments to find a RefreshToken
+     * @example
+     * // Get one RefreshToken
+     * const refreshToken = await prisma.refreshToken.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends RefreshTokenFindUniqueOrThrowArgs>(args: SelectSubset<T, RefreshTokenFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RefreshTokenClient<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RefreshToken that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RefreshTokenFindFirstArgs} args - Arguments to find a RefreshToken
+     * @example
+     * // Get one RefreshToken
+     * const refreshToken = await prisma.refreshToken.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends RefreshTokenFindFirstArgs>(args?: SelectSubset<T, RefreshTokenFindFirstArgs<ExtArgs>>): Prisma__RefreshTokenClient<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RefreshToken that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RefreshTokenFindFirstOrThrowArgs} args - Arguments to find a RefreshToken
+     * @example
+     * // Get one RefreshToken
+     * const refreshToken = await prisma.refreshToken.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends RefreshTokenFindFirstOrThrowArgs>(args?: SelectSubset<T, RefreshTokenFindFirstOrThrowArgs<ExtArgs>>): Prisma__RefreshTokenClient<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more RefreshTokens that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RefreshTokenFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all RefreshTokens
+     * const refreshTokens = await prisma.refreshToken.findMany()
+     * 
+     * // Get first 10 RefreshTokens
+     * const refreshTokens = await prisma.refreshToken.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const refreshTokenWithIdOnly = await prisma.refreshToken.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends RefreshTokenFindManyArgs>(args?: SelectSubset<T, RefreshTokenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a RefreshToken.
+     * @param {RefreshTokenCreateArgs} args - Arguments to create a RefreshToken.
+     * @example
+     * // Create one RefreshToken
+     * const RefreshToken = await prisma.refreshToken.create({
+     *   data: {
+     *     // ... data to create a RefreshToken
+     *   }
+     * })
+     * 
+     */
+    create<T extends RefreshTokenCreateArgs>(args: SelectSubset<T, RefreshTokenCreateArgs<ExtArgs>>): Prisma__RefreshTokenClient<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many RefreshTokens.
+     * @param {RefreshTokenCreateManyArgs} args - Arguments to create many RefreshTokens.
+     * @example
+     * // Create many RefreshTokens
+     * const refreshToken = await prisma.refreshToken.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends RefreshTokenCreateManyArgs>(args?: SelectSubset<T, RefreshTokenCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many RefreshTokens and returns the data saved in the database.
+     * @param {RefreshTokenCreateManyAndReturnArgs} args - Arguments to create many RefreshTokens.
+     * @example
+     * // Create many RefreshTokens
+     * const refreshToken = await prisma.refreshToken.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many RefreshTokens and only return the `id`
+     * const refreshTokenWithIdOnly = await prisma.refreshToken.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends RefreshTokenCreateManyAndReturnArgs>(args?: SelectSubset<T, RefreshTokenCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a RefreshToken.
+     * @param {RefreshTokenDeleteArgs} args - Arguments to delete one RefreshToken.
+     * @example
+     * // Delete one RefreshToken
+     * const RefreshToken = await prisma.refreshToken.delete({
+     *   where: {
+     *     // ... filter to delete one RefreshToken
+     *   }
+     * })
+     * 
+     */
+    delete<T extends RefreshTokenDeleteArgs>(args: SelectSubset<T, RefreshTokenDeleteArgs<ExtArgs>>): Prisma__RefreshTokenClient<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one RefreshToken.
+     * @param {RefreshTokenUpdateArgs} args - Arguments to update one RefreshToken.
+     * @example
+     * // Update one RefreshToken
+     * const refreshToken = await prisma.refreshToken.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends RefreshTokenUpdateArgs>(args: SelectSubset<T, RefreshTokenUpdateArgs<ExtArgs>>): Prisma__RefreshTokenClient<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more RefreshTokens.
+     * @param {RefreshTokenDeleteManyArgs} args - Arguments to filter RefreshTokens to delete.
+     * @example
+     * // Delete a few RefreshTokens
+     * const { count } = await prisma.refreshToken.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends RefreshTokenDeleteManyArgs>(args?: SelectSubset<T, RefreshTokenDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RefreshTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RefreshTokenUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many RefreshTokens
+     * const refreshToken = await prisma.refreshToken.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends RefreshTokenUpdateManyArgs>(args: SelectSubset<T, RefreshTokenUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RefreshTokens and returns the data updated in the database.
+     * @param {RefreshTokenUpdateManyAndReturnArgs} args - Arguments to update many RefreshTokens.
+     * @example
+     * // Update many RefreshTokens
+     * const refreshToken = await prisma.refreshToken.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more RefreshTokens and only return the `id`
+     * const refreshTokenWithIdOnly = await prisma.refreshToken.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends RefreshTokenUpdateManyAndReturnArgs>(args: SelectSubset<T, RefreshTokenUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one RefreshToken.
+     * @param {RefreshTokenUpsertArgs} args - Arguments to update or create a RefreshToken.
+     * @example
+     * // Update or create a RefreshToken
+     * const refreshToken = await prisma.refreshToken.upsert({
+     *   create: {
+     *     // ... data to create a RefreshToken
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the RefreshToken we want to update
+     *   }
+     * })
+     */
+    upsert<T extends RefreshTokenUpsertArgs>(args: SelectSubset<T, RefreshTokenUpsertArgs<ExtArgs>>): Prisma__RefreshTokenClient<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of RefreshTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RefreshTokenCountArgs} args - Arguments to filter RefreshTokens to count.
+     * @example
+     * // Count the number of RefreshTokens
+     * const count = await prisma.refreshToken.count({
+     *   where: {
+     *     // ... the filter for the RefreshTokens we want to count
+     *   }
+     * })
+    **/
+    count<T extends RefreshTokenCountArgs>(
+      args?: Subset<T, RefreshTokenCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], RefreshTokenCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a RefreshToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RefreshTokenAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends RefreshTokenAggregateArgs>(args: Subset<T, RefreshTokenAggregateArgs>): Prisma.PrismaPromise<GetRefreshTokenAggregateType<T>>
+
+    /**
+     * Group by RefreshToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RefreshTokenGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends RefreshTokenGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: RefreshTokenGroupByArgs['orderBy'] }
+        : { orderBy?: RefreshTokenGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, RefreshTokenGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRefreshTokenGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the RefreshToken model
+   */
+  readonly fields: RefreshTokenFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for RefreshToken.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__RefreshTokenClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the RefreshToken model
+   */
+  interface RefreshTokenFieldRefs {
+    readonly id: FieldRef<"RefreshToken", 'String'>
+    readonly userId: FieldRef<"RefreshToken", 'String'>
+    readonly tokenHash: FieldRef<"RefreshToken", 'String'>
+    readonly expiresAt: FieldRef<"RefreshToken", 'DateTime'>
+    readonly createdAt: FieldRef<"RefreshToken", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * RefreshToken findUnique
+   */
+  export type RefreshTokenFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RefreshToken
+     */
+    select?: RefreshTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RefreshToken
+     */
+    omit?: RefreshTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefreshTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which RefreshToken to fetch.
+     */
+    where: RefreshTokenWhereUniqueInput
+  }
+
+  /**
+   * RefreshToken findUniqueOrThrow
+   */
+  export type RefreshTokenFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RefreshToken
+     */
+    select?: RefreshTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RefreshToken
+     */
+    omit?: RefreshTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefreshTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which RefreshToken to fetch.
+     */
+    where: RefreshTokenWhereUniqueInput
+  }
+
+  /**
+   * RefreshToken findFirst
+   */
+  export type RefreshTokenFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RefreshToken
+     */
+    select?: RefreshTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RefreshToken
+     */
+    omit?: RefreshTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefreshTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which RefreshToken to fetch.
+     */
+    where?: RefreshTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RefreshTokens to fetch.
+     */
+    orderBy?: RefreshTokenOrderByWithRelationInput | RefreshTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RefreshTokens.
+     */
+    cursor?: RefreshTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RefreshTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RefreshTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RefreshTokens.
+     */
+    distinct?: RefreshTokenScalarFieldEnum | RefreshTokenScalarFieldEnum[]
+  }
+
+  /**
+   * RefreshToken findFirstOrThrow
+   */
+  export type RefreshTokenFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RefreshToken
+     */
+    select?: RefreshTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RefreshToken
+     */
+    omit?: RefreshTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefreshTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which RefreshToken to fetch.
+     */
+    where?: RefreshTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RefreshTokens to fetch.
+     */
+    orderBy?: RefreshTokenOrderByWithRelationInput | RefreshTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RefreshTokens.
+     */
+    cursor?: RefreshTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RefreshTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RefreshTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RefreshTokens.
+     */
+    distinct?: RefreshTokenScalarFieldEnum | RefreshTokenScalarFieldEnum[]
+  }
+
+  /**
+   * RefreshToken findMany
+   */
+  export type RefreshTokenFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RefreshToken
+     */
+    select?: RefreshTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RefreshToken
+     */
+    omit?: RefreshTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefreshTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which RefreshTokens to fetch.
+     */
+    where?: RefreshTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RefreshTokens to fetch.
+     */
+    orderBy?: RefreshTokenOrderByWithRelationInput | RefreshTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing RefreshTokens.
+     */
+    cursor?: RefreshTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RefreshTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RefreshTokens.
+     */
+    skip?: number
+    distinct?: RefreshTokenScalarFieldEnum | RefreshTokenScalarFieldEnum[]
+  }
+
+  /**
+   * RefreshToken create
+   */
+  export type RefreshTokenCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RefreshToken
+     */
+    select?: RefreshTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RefreshToken
+     */
+    omit?: RefreshTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefreshTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to create a RefreshToken.
+     */
+    data: XOR<RefreshTokenCreateInput, RefreshTokenUncheckedCreateInput>
+  }
+
+  /**
+   * RefreshToken createMany
+   */
+  export type RefreshTokenCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many RefreshTokens.
+     */
+    data: RefreshTokenCreateManyInput | RefreshTokenCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RefreshToken createManyAndReturn
+   */
+  export type RefreshTokenCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RefreshToken
+     */
+    select?: RefreshTokenSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RefreshToken
+     */
+    omit?: RefreshTokenOmit<ExtArgs> | null
+    /**
+     * The data used to create many RefreshTokens.
+     */
+    data: RefreshTokenCreateManyInput | RefreshTokenCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefreshTokenIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RefreshToken update
+   */
+  export type RefreshTokenUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RefreshToken
+     */
+    select?: RefreshTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RefreshToken
+     */
+    omit?: RefreshTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefreshTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to update a RefreshToken.
+     */
+    data: XOR<RefreshTokenUpdateInput, RefreshTokenUncheckedUpdateInput>
+    /**
+     * Choose, which RefreshToken to update.
+     */
+    where: RefreshTokenWhereUniqueInput
+  }
+
+  /**
+   * RefreshToken updateMany
+   */
+  export type RefreshTokenUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update RefreshTokens.
+     */
+    data: XOR<RefreshTokenUpdateManyMutationInput, RefreshTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which RefreshTokens to update
+     */
+    where?: RefreshTokenWhereInput
+    /**
+     * Limit how many RefreshTokens to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * RefreshToken updateManyAndReturn
+   */
+  export type RefreshTokenUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RefreshToken
+     */
+    select?: RefreshTokenSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RefreshToken
+     */
+    omit?: RefreshTokenOmit<ExtArgs> | null
+    /**
+     * The data used to update RefreshTokens.
+     */
+    data: XOR<RefreshTokenUpdateManyMutationInput, RefreshTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which RefreshTokens to update
+     */
+    where?: RefreshTokenWhereInput
+    /**
+     * Limit how many RefreshTokens to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefreshTokenIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RefreshToken upsert
+   */
+  export type RefreshTokenUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RefreshToken
+     */
+    select?: RefreshTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RefreshToken
+     */
+    omit?: RefreshTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefreshTokenInclude<ExtArgs> | null
+    /**
+     * The filter to search for the RefreshToken to update in case it exists.
+     */
+    where: RefreshTokenWhereUniqueInput
+    /**
+     * In case the RefreshToken found by the `where` argument doesn't exist, create a new RefreshToken with this data.
+     */
+    create: XOR<RefreshTokenCreateInput, RefreshTokenUncheckedCreateInput>
+    /**
+     * In case the RefreshToken was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<RefreshTokenUpdateInput, RefreshTokenUncheckedUpdateInput>
+  }
+
+  /**
+   * RefreshToken delete
+   */
+  export type RefreshTokenDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RefreshToken
+     */
+    select?: RefreshTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RefreshToken
+     */
+    omit?: RefreshTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefreshTokenInclude<ExtArgs> | null
+    /**
+     * Filter which RefreshToken to delete.
+     */
+    where: RefreshTokenWhereUniqueInput
+  }
+
+  /**
+   * RefreshToken deleteMany
+   */
+  export type RefreshTokenDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RefreshTokens to delete
+     */
+    where?: RefreshTokenWhereInput
+    /**
+     * Limit how many RefreshTokens to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * RefreshToken without action
+   */
+  export type RefreshTokenDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RefreshToken
+     */
+    select?: RefreshTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RefreshToken
+     */
+    omit?: RefreshTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefreshTokenInclude<ExtArgs> | null
   }
 
 
@@ -4115,6 +5658,7 @@ export namespace Prisma {
     clinicalContext: string | null
     status: $Enums.PatientStatus | null
     contactPhone: string | null
+    emergencyContact: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4128,6 +5672,7 @@ export namespace Prisma {
     clinicalContext: string | null
     status: $Enums.PatientStatus | null
     contactPhone: string | null
+    emergencyContact: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4142,6 +5687,7 @@ export namespace Prisma {
     status: number
     contactPhone: number
     emergencyContact: number
+    treatmentGoals: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -4157,6 +5703,7 @@ export namespace Prisma {
     clinicalContext?: true
     status?: true
     contactPhone?: true
+    emergencyContact?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4170,6 +5717,7 @@ export namespace Prisma {
     clinicalContext?: true
     status?: true
     contactPhone?: true
+    emergencyContact?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4184,6 +5732,7 @@ export namespace Prisma {
     status?: true
     contactPhone?: true
     emergencyContact?: true
+    treatmentGoals?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -4270,7 +5819,8 @@ export namespace Prisma {
     clinicalContext: string | null
     status: $Enums.PatientStatus
     contactPhone: string | null
-    emergencyContact: JsonValue | null
+    emergencyContact: string | null
+    treatmentGoals: string[]
     createdAt: Date
     updatedAt: Date
     _count: PatientCountAggregateOutputType | null
@@ -4302,6 +5852,7 @@ export namespace Prisma {
     status?: boolean
     contactPhone?: boolean
     emergencyContact?: boolean
+    treatmentGoals?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
@@ -4309,6 +5860,9 @@ export namespace Prisma {
     psychNotes?: boolean | Patient$psychNotesArgs<ExtArgs>
     accessLogs?: boolean | Patient$accessLogsArgs<ExtArgs>
     tasks?: boolean | Patient$tasksArgs<ExtArgs>
+    anthropometries?: boolean | Patient$anthropometriesArgs<ExtArgs>
+    mealPlans?: boolean | Patient$mealPlansArgs<ExtArgs>
+    clinicalScales?: boolean | Patient$clinicalScalesArgs<ExtArgs>
     _count?: boolean | PatientCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["patient"]>
 
@@ -4322,6 +5876,7 @@ export namespace Prisma {
     status?: boolean
     contactPhone?: boolean
     emergencyContact?: boolean
+    treatmentGoals?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
@@ -4337,6 +5892,7 @@ export namespace Prisma {
     status?: boolean
     contactPhone?: boolean
     emergencyContact?: boolean
+    treatmentGoals?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
@@ -4352,17 +5908,21 @@ export namespace Prisma {
     status?: boolean
     contactPhone?: boolean
     emergencyContact?: boolean
+    treatmentGoals?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PatientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clinicianId" | "fullName" | "dateOfBirth" | "diagnosis" | "clinicalContext" | "status" | "contactPhone" | "emergencyContact" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
+  export type PatientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clinicianId" | "fullName" | "dateOfBirth" | "diagnosis" | "clinicalContext" | "status" | "contactPhone" | "emergencyContact" | "treatmentGoals" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
   export type PatientInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
     appointments?: boolean | Patient$appointmentsArgs<ExtArgs>
     psychNotes?: boolean | Patient$psychNotesArgs<ExtArgs>
     accessLogs?: boolean | Patient$accessLogsArgs<ExtArgs>
     tasks?: boolean | Patient$tasksArgs<ExtArgs>
+    anthropometries?: boolean | Patient$anthropometriesArgs<ExtArgs>
+    mealPlans?: boolean | Patient$mealPlansArgs<ExtArgs>
+    clinicalScales?: boolean | Patient$clinicalScalesArgs<ExtArgs>
     _count?: boolean | PatientCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PatientIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4380,6 +5940,9 @@ export namespace Prisma {
       psychNotes: Prisma.$PsychNotePayload<ExtArgs>[]
       accessLogs: Prisma.$AccessLogPayload<ExtArgs>[]
       tasks: Prisma.$TaskPayload<ExtArgs>[]
+      anthropometries: Prisma.$AnthropometryPayload<ExtArgs>[]
+      mealPlans: Prisma.$MealPlanPayload<ExtArgs>[]
+      clinicalScales: Prisma.$ClinicalScalePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4390,7 +5953,8 @@ export namespace Prisma {
       clinicalContext: string | null
       status: $Enums.PatientStatus
       contactPhone: string | null
-      emergencyContact: Prisma.JsonValue | null
+      emergencyContact: string | null
+      treatmentGoals: string[]
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["patient"]>
@@ -4792,6 +6356,9 @@ export namespace Prisma {
     psychNotes<T extends Patient$psychNotesArgs<ExtArgs> = {}>(args?: Subset<T, Patient$psychNotesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PsychNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     accessLogs<T extends Patient$accessLogsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$accessLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccessLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     tasks<T extends Patient$tasksArgs<ExtArgs> = {}>(args?: Subset<T, Patient$tasksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    anthropometries<T extends Patient$anthropometriesArgs<ExtArgs> = {}>(args?: Subset<T, Patient$anthropometriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    mealPlans<T extends Patient$mealPlansArgs<ExtArgs> = {}>(args?: Subset<T, Patient$mealPlansArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    clinicalScales<T extends Patient$clinicalScalesArgs<ExtArgs> = {}>(args?: Subset<T, Patient$clinicalScalesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClinicalScalePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4829,7 +6396,8 @@ export namespace Prisma {
     readonly clinicalContext: FieldRef<"Patient", 'String'>
     readonly status: FieldRef<"Patient", 'PatientStatus'>
     readonly contactPhone: FieldRef<"Patient", 'String'>
-    readonly emergencyContact: FieldRef<"Patient", 'Json'>
+    readonly emergencyContact: FieldRef<"Patient", 'String'>
+    readonly treatmentGoals: FieldRef<"Patient", 'String[]'>
     readonly createdAt: FieldRef<"Patient", 'DateTime'>
     readonly updatedAt: FieldRef<"Patient", 'DateTime'>
   }
@@ -5324,6 +6892,78 @@ export namespace Prisma {
   }
 
   /**
+   * Patient.anthropometries
+   */
+  export type Patient$anthropometriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    where?: AnthropometryWhereInput
+    orderBy?: AnthropometryOrderByWithRelationInput | AnthropometryOrderByWithRelationInput[]
+    cursor?: AnthropometryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AnthropometryScalarFieldEnum | AnthropometryScalarFieldEnum[]
+  }
+
+  /**
+   * Patient.mealPlans
+   */
+  export type Patient$mealPlansArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    where?: MealPlanWhereInput
+    orderBy?: MealPlanOrderByWithRelationInput | MealPlanOrderByWithRelationInput[]
+    cursor?: MealPlanWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MealPlanScalarFieldEnum | MealPlanScalarFieldEnum[]
+  }
+
+  /**
+   * Patient.clinicalScales
+   */
+  export type Patient$clinicalScalesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalScale
+     */
+    select?: ClinicalScaleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalScale
+     */
+    omit?: ClinicalScaleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalScaleInclude<ExtArgs> | null
+    where?: ClinicalScaleWhereInput
+    orderBy?: ClinicalScaleOrderByWithRelationInput | ClinicalScaleOrderByWithRelationInput[]
+    cursor?: ClinicalScaleWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ClinicalScaleScalarFieldEnum | ClinicalScaleScalarFieldEnum[]
+  }
+
+  /**
    * Patient without action
    */
   export type PatientDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5616,6 +7256,10 @@ export namespace Prisma {
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
     psychNote?: boolean | Appointment$psychNoteArgs<ExtArgs>
     transaction?: boolean | Appointment$transactionArgs<ExtArgs>
+    anthropometry?: boolean | Appointment$anthropometryArgs<ExtArgs>
+    mealPlan?: boolean | Appointment$mealPlanArgs<ExtArgs>
+    clinicalScales?: boolean | Appointment$clinicalScalesArgs<ExtArgs>
+    _count?: boolean | AppointmentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["appointment"]>
 
   export type AppointmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -5679,6 +7323,10 @@ export namespace Prisma {
     clinician?: boolean | ClinicianProfileDefaultArgs<ExtArgs>
     psychNote?: boolean | Appointment$psychNoteArgs<ExtArgs>
     transaction?: boolean | Appointment$transactionArgs<ExtArgs>
+    anthropometry?: boolean | Appointment$anthropometryArgs<ExtArgs>
+    mealPlan?: boolean | Appointment$mealPlanArgs<ExtArgs>
+    clinicalScales?: boolean | Appointment$clinicalScalesArgs<ExtArgs>
+    _count?: boolean | AppointmentCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AppointmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     patient?: boolean | PatientDefaultArgs<ExtArgs>
@@ -5696,6 +7344,9 @@ export namespace Prisma {
       clinician: Prisma.$ClinicianProfilePayload<ExtArgs>
       psychNote: Prisma.$PsychNotePayload<ExtArgs> | null
       transaction: Prisma.$FinanceTransactionPayload<ExtArgs> | null
+      anthropometry: Prisma.$AnthropometryPayload<ExtArgs> | null
+      mealPlan: Prisma.$MealPlanPayload<ExtArgs> | null
+      clinicalScales: Prisma.$ClinicalScalePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6110,6 +7761,9 @@ export namespace Prisma {
     clinician<T extends ClinicianProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClinicianProfileDefaultArgs<ExtArgs>>): Prisma__ClinicianProfileClient<$Result.GetResult<Prisma.$ClinicianProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     psychNote<T extends Appointment$psychNoteArgs<ExtArgs> = {}>(args?: Subset<T, Appointment$psychNoteArgs<ExtArgs>>): Prisma__PsychNoteClient<$Result.GetResult<Prisma.$PsychNotePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     transaction<T extends Appointment$transactionArgs<ExtArgs> = {}>(args?: Subset<T, Appointment$transactionArgs<ExtArgs>>): Prisma__FinanceTransactionClient<$Result.GetResult<Prisma.$FinanceTransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    anthropometry<T extends Appointment$anthropometryArgs<ExtArgs> = {}>(args?: Subset<T, Appointment$anthropometryArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    mealPlan<T extends Appointment$mealPlanArgs<ExtArgs> = {}>(args?: Subset<T, Appointment$mealPlanArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    clinicalScales<T extends Appointment$clinicalScalesArgs<ExtArgs> = {}>(args?: Subset<T, Appointment$clinicalScalesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClinicalScalePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6584,6 +8238,68 @@ export namespace Prisma {
      */
     include?: FinanceTransactionInclude<ExtArgs> | null
     where?: FinanceTransactionWhereInput
+  }
+
+  /**
+   * Appointment.anthropometry
+   */
+  export type Appointment$anthropometryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    where?: AnthropometryWhereInput
+  }
+
+  /**
+   * Appointment.mealPlan
+   */
+  export type Appointment$mealPlanArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    where?: MealPlanWhereInput
+  }
+
+  /**
+   * Appointment.clinicalScales
+   */
+  export type Appointment$clinicalScalesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalScale
+     */
+    select?: ClinicalScaleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalScale
+     */
+    omit?: ClinicalScaleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalScaleInclude<ExtArgs> | null
+    where?: ClinicalScaleWhereInput
+    orderBy?: ClinicalScaleOrderByWithRelationInput | ClinicalScaleOrderByWithRelationInput[]
+    cursor?: ClinicalScaleWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ClinicalScaleScalarFieldEnum | ClinicalScaleScalarFieldEnum[]
   }
 
   /**
@@ -11181,6 +12897,3444 @@ export namespace Prisma {
 
 
   /**
+   * Model Anthropometry
+   */
+
+  export type AggregateAnthropometry = {
+    _count: AnthropometryCountAggregateOutputType | null
+    _avg: AnthropometryAvgAggregateOutputType | null
+    _sum: AnthropometrySumAggregateOutputType | null
+    _min: AnthropometryMinAggregateOutputType | null
+    _max: AnthropometryMaxAggregateOutputType | null
+  }
+
+  export type AnthropometryAvgAggregateOutputType = {
+    weight: Decimal | null
+    height: Decimal | null
+    bodyFat: Decimal | null
+    waist: Decimal | null
+    hip: Decimal | null
+  }
+
+  export type AnthropometrySumAggregateOutputType = {
+    weight: Decimal | null
+    height: Decimal | null
+    bodyFat: Decimal | null
+    waist: Decimal | null
+    hip: Decimal | null
+  }
+
+  export type AnthropometryMinAggregateOutputType = {
+    id: string | null
+    patientId: string | null
+    appointmentId: string | null
+    weight: Decimal | null
+    height: Decimal | null
+    bodyFat: Decimal | null
+    waist: Decimal | null
+    hip: Decimal | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AnthropometryMaxAggregateOutputType = {
+    id: string | null
+    patientId: string | null
+    appointmentId: string | null
+    weight: Decimal | null
+    height: Decimal | null
+    bodyFat: Decimal | null
+    waist: Decimal | null
+    hip: Decimal | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AnthropometryCountAggregateOutputType = {
+    id: number
+    patientId: number
+    appointmentId: number
+    weight: number
+    height: number
+    bodyFat: number
+    waist: number
+    hip: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AnthropometryAvgAggregateInputType = {
+    weight?: true
+    height?: true
+    bodyFat?: true
+    waist?: true
+    hip?: true
+  }
+
+  export type AnthropometrySumAggregateInputType = {
+    weight?: true
+    height?: true
+    bodyFat?: true
+    waist?: true
+    hip?: true
+  }
+
+  export type AnthropometryMinAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    weight?: true
+    height?: true
+    bodyFat?: true
+    waist?: true
+    hip?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AnthropometryMaxAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    weight?: true
+    height?: true
+    bodyFat?: true
+    waist?: true
+    hip?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AnthropometryCountAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    weight?: true
+    height?: true
+    bodyFat?: true
+    waist?: true
+    hip?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AnthropometryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Anthropometry to aggregate.
+     */
+    where?: AnthropometryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Anthropometries to fetch.
+     */
+    orderBy?: AnthropometryOrderByWithRelationInput | AnthropometryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AnthropometryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Anthropometries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Anthropometries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Anthropometries
+    **/
+    _count?: true | AnthropometryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AnthropometryAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AnthropometrySumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AnthropometryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AnthropometryMaxAggregateInputType
+  }
+
+  export type GetAnthropometryAggregateType<T extends AnthropometryAggregateArgs> = {
+        [P in keyof T & keyof AggregateAnthropometry]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAnthropometry[P]>
+      : GetScalarType<T[P], AggregateAnthropometry[P]>
+  }
+
+
+
+
+  export type AnthropometryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AnthropometryWhereInput
+    orderBy?: AnthropometryOrderByWithAggregationInput | AnthropometryOrderByWithAggregationInput[]
+    by: AnthropometryScalarFieldEnum[] | AnthropometryScalarFieldEnum
+    having?: AnthropometryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AnthropometryCountAggregateInputType | true
+    _avg?: AnthropometryAvgAggregateInputType
+    _sum?: AnthropometrySumAggregateInputType
+    _min?: AnthropometryMinAggregateInputType
+    _max?: AnthropometryMaxAggregateInputType
+  }
+
+  export type AnthropometryGroupByOutputType = {
+    id: string
+    patientId: string
+    appointmentId: string
+    weight: Decimal
+    height: Decimal
+    bodyFat: Decimal | null
+    waist: Decimal | null
+    hip: Decimal | null
+    createdAt: Date
+    updatedAt: Date
+    _count: AnthropometryCountAggregateOutputType | null
+    _avg: AnthropometryAvgAggregateOutputType | null
+    _sum: AnthropometrySumAggregateOutputType | null
+    _min: AnthropometryMinAggregateOutputType | null
+    _max: AnthropometryMaxAggregateOutputType | null
+  }
+
+  type GetAnthropometryGroupByPayload<T extends AnthropometryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AnthropometryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AnthropometryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AnthropometryGroupByOutputType[P]>
+            : GetScalarType<T[P], AnthropometryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AnthropometrySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    weight?: boolean
+    height?: boolean
+    bodyFat?: boolean
+    waist?: boolean
+    hip?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["anthropometry"]>
+
+  export type AnthropometrySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    weight?: boolean
+    height?: boolean
+    bodyFat?: boolean
+    waist?: boolean
+    hip?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["anthropometry"]>
+
+  export type AnthropometrySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    weight?: boolean
+    height?: boolean
+    bodyFat?: boolean
+    waist?: boolean
+    hip?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["anthropometry"]>
+
+  export type AnthropometrySelectScalar = {
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    weight?: boolean
+    height?: boolean
+    bodyFat?: boolean
+    waist?: boolean
+    hip?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type AnthropometryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "appointmentId" | "weight" | "height" | "bodyFat" | "waist" | "hip" | "createdAt" | "updatedAt", ExtArgs["result"]["anthropometry"]>
+  export type AnthropometryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+  export type AnthropometryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+  export type AnthropometryIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+
+  export type $AnthropometryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Anthropometry"
+    objects: {
+      patient: Prisma.$PatientPayload<ExtArgs>
+      appointment: Prisma.$AppointmentPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      patientId: string
+      appointmentId: string
+      weight: Prisma.Decimal
+      height: Prisma.Decimal
+      bodyFat: Prisma.Decimal | null
+      waist: Prisma.Decimal | null
+      hip: Prisma.Decimal | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["anthropometry"]>
+    composites: {}
+  }
+
+  type AnthropometryGetPayload<S extends boolean | null | undefined | AnthropometryDefaultArgs> = $Result.GetResult<Prisma.$AnthropometryPayload, S>
+
+  type AnthropometryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AnthropometryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AnthropometryCountAggregateInputType | true
+    }
+
+  export interface AnthropometryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Anthropometry'], meta: { name: 'Anthropometry' } }
+    /**
+     * Find zero or one Anthropometry that matches the filter.
+     * @param {AnthropometryFindUniqueArgs} args - Arguments to find a Anthropometry
+     * @example
+     * // Get one Anthropometry
+     * const anthropometry = await prisma.anthropometry.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AnthropometryFindUniqueArgs>(args: SelectSubset<T, AnthropometryFindUniqueArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Anthropometry that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AnthropometryFindUniqueOrThrowArgs} args - Arguments to find a Anthropometry
+     * @example
+     * // Get one Anthropometry
+     * const anthropometry = await prisma.anthropometry.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AnthropometryFindUniqueOrThrowArgs>(args: SelectSubset<T, AnthropometryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Anthropometry that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnthropometryFindFirstArgs} args - Arguments to find a Anthropometry
+     * @example
+     * // Get one Anthropometry
+     * const anthropometry = await prisma.anthropometry.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AnthropometryFindFirstArgs>(args?: SelectSubset<T, AnthropometryFindFirstArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Anthropometry that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnthropometryFindFirstOrThrowArgs} args - Arguments to find a Anthropometry
+     * @example
+     * // Get one Anthropometry
+     * const anthropometry = await prisma.anthropometry.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AnthropometryFindFirstOrThrowArgs>(args?: SelectSubset<T, AnthropometryFindFirstOrThrowArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Anthropometries that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnthropometryFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Anthropometries
+     * const anthropometries = await prisma.anthropometry.findMany()
+     * 
+     * // Get first 10 Anthropometries
+     * const anthropometries = await prisma.anthropometry.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const anthropometryWithIdOnly = await prisma.anthropometry.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AnthropometryFindManyArgs>(args?: SelectSubset<T, AnthropometryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Anthropometry.
+     * @param {AnthropometryCreateArgs} args - Arguments to create a Anthropometry.
+     * @example
+     * // Create one Anthropometry
+     * const Anthropometry = await prisma.anthropometry.create({
+     *   data: {
+     *     // ... data to create a Anthropometry
+     *   }
+     * })
+     * 
+     */
+    create<T extends AnthropometryCreateArgs>(args: SelectSubset<T, AnthropometryCreateArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Anthropometries.
+     * @param {AnthropometryCreateManyArgs} args - Arguments to create many Anthropometries.
+     * @example
+     * // Create many Anthropometries
+     * const anthropometry = await prisma.anthropometry.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AnthropometryCreateManyArgs>(args?: SelectSubset<T, AnthropometryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Anthropometries and returns the data saved in the database.
+     * @param {AnthropometryCreateManyAndReturnArgs} args - Arguments to create many Anthropometries.
+     * @example
+     * // Create many Anthropometries
+     * const anthropometry = await prisma.anthropometry.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Anthropometries and only return the `id`
+     * const anthropometryWithIdOnly = await prisma.anthropometry.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AnthropometryCreateManyAndReturnArgs>(args?: SelectSubset<T, AnthropometryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Anthropometry.
+     * @param {AnthropometryDeleteArgs} args - Arguments to delete one Anthropometry.
+     * @example
+     * // Delete one Anthropometry
+     * const Anthropometry = await prisma.anthropometry.delete({
+     *   where: {
+     *     // ... filter to delete one Anthropometry
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AnthropometryDeleteArgs>(args: SelectSubset<T, AnthropometryDeleteArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Anthropometry.
+     * @param {AnthropometryUpdateArgs} args - Arguments to update one Anthropometry.
+     * @example
+     * // Update one Anthropometry
+     * const anthropometry = await prisma.anthropometry.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AnthropometryUpdateArgs>(args: SelectSubset<T, AnthropometryUpdateArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Anthropometries.
+     * @param {AnthropometryDeleteManyArgs} args - Arguments to filter Anthropometries to delete.
+     * @example
+     * // Delete a few Anthropometries
+     * const { count } = await prisma.anthropometry.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AnthropometryDeleteManyArgs>(args?: SelectSubset<T, AnthropometryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Anthropometries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnthropometryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Anthropometries
+     * const anthropometry = await prisma.anthropometry.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AnthropometryUpdateManyArgs>(args: SelectSubset<T, AnthropometryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Anthropometries and returns the data updated in the database.
+     * @param {AnthropometryUpdateManyAndReturnArgs} args - Arguments to update many Anthropometries.
+     * @example
+     * // Update many Anthropometries
+     * const anthropometry = await prisma.anthropometry.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Anthropometries and only return the `id`
+     * const anthropometryWithIdOnly = await prisma.anthropometry.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AnthropometryUpdateManyAndReturnArgs>(args: SelectSubset<T, AnthropometryUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Anthropometry.
+     * @param {AnthropometryUpsertArgs} args - Arguments to update or create a Anthropometry.
+     * @example
+     * // Update or create a Anthropometry
+     * const anthropometry = await prisma.anthropometry.upsert({
+     *   create: {
+     *     // ... data to create a Anthropometry
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Anthropometry we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AnthropometryUpsertArgs>(args: SelectSubset<T, AnthropometryUpsertArgs<ExtArgs>>): Prisma__AnthropometryClient<$Result.GetResult<Prisma.$AnthropometryPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Anthropometries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnthropometryCountArgs} args - Arguments to filter Anthropometries to count.
+     * @example
+     * // Count the number of Anthropometries
+     * const count = await prisma.anthropometry.count({
+     *   where: {
+     *     // ... the filter for the Anthropometries we want to count
+     *   }
+     * })
+    **/
+    count<T extends AnthropometryCountArgs>(
+      args?: Subset<T, AnthropometryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AnthropometryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Anthropometry.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnthropometryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AnthropometryAggregateArgs>(args: Subset<T, AnthropometryAggregateArgs>): Prisma.PrismaPromise<GetAnthropometryAggregateType<T>>
+
+    /**
+     * Group by Anthropometry.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AnthropometryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AnthropometryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AnthropometryGroupByArgs['orderBy'] }
+        : { orderBy?: AnthropometryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AnthropometryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAnthropometryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Anthropometry model
+   */
+  readonly fields: AnthropometryFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Anthropometry.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AnthropometryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    patient<T extends PatientDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PatientDefaultArgs<ExtArgs>>): Prisma__PatientClient<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    appointment<T extends AppointmentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AppointmentDefaultArgs<ExtArgs>>): Prisma__AppointmentClient<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Anthropometry model
+   */
+  interface AnthropometryFieldRefs {
+    readonly id: FieldRef<"Anthropometry", 'String'>
+    readonly patientId: FieldRef<"Anthropometry", 'String'>
+    readonly appointmentId: FieldRef<"Anthropometry", 'String'>
+    readonly weight: FieldRef<"Anthropometry", 'Decimal'>
+    readonly height: FieldRef<"Anthropometry", 'Decimal'>
+    readonly bodyFat: FieldRef<"Anthropometry", 'Decimal'>
+    readonly waist: FieldRef<"Anthropometry", 'Decimal'>
+    readonly hip: FieldRef<"Anthropometry", 'Decimal'>
+    readonly createdAt: FieldRef<"Anthropometry", 'DateTime'>
+    readonly updatedAt: FieldRef<"Anthropometry", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Anthropometry findUnique
+   */
+  export type AnthropometryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * Filter, which Anthropometry to fetch.
+     */
+    where: AnthropometryWhereUniqueInput
+  }
+
+  /**
+   * Anthropometry findUniqueOrThrow
+   */
+  export type AnthropometryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * Filter, which Anthropometry to fetch.
+     */
+    where: AnthropometryWhereUniqueInput
+  }
+
+  /**
+   * Anthropometry findFirst
+   */
+  export type AnthropometryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * Filter, which Anthropometry to fetch.
+     */
+    where?: AnthropometryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Anthropometries to fetch.
+     */
+    orderBy?: AnthropometryOrderByWithRelationInput | AnthropometryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Anthropometries.
+     */
+    cursor?: AnthropometryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Anthropometries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Anthropometries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Anthropometries.
+     */
+    distinct?: AnthropometryScalarFieldEnum | AnthropometryScalarFieldEnum[]
+  }
+
+  /**
+   * Anthropometry findFirstOrThrow
+   */
+  export type AnthropometryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * Filter, which Anthropometry to fetch.
+     */
+    where?: AnthropometryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Anthropometries to fetch.
+     */
+    orderBy?: AnthropometryOrderByWithRelationInput | AnthropometryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Anthropometries.
+     */
+    cursor?: AnthropometryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Anthropometries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Anthropometries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Anthropometries.
+     */
+    distinct?: AnthropometryScalarFieldEnum | AnthropometryScalarFieldEnum[]
+  }
+
+  /**
+   * Anthropometry findMany
+   */
+  export type AnthropometryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * Filter, which Anthropometries to fetch.
+     */
+    where?: AnthropometryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Anthropometries to fetch.
+     */
+    orderBy?: AnthropometryOrderByWithRelationInput | AnthropometryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Anthropometries.
+     */
+    cursor?: AnthropometryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Anthropometries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Anthropometries.
+     */
+    skip?: number
+    distinct?: AnthropometryScalarFieldEnum | AnthropometryScalarFieldEnum[]
+  }
+
+  /**
+   * Anthropometry create
+   */
+  export type AnthropometryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Anthropometry.
+     */
+    data: XOR<AnthropometryCreateInput, AnthropometryUncheckedCreateInput>
+  }
+
+  /**
+   * Anthropometry createMany
+   */
+  export type AnthropometryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Anthropometries.
+     */
+    data: AnthropometryCreateManyInput | AnthropometryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Anthropometry createManyAndReturn
+   */
+  export type AnthropometryCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * The data used to create many Anthropometries.
+     */
+    data: AnthropometryCreateManyInput | AnthropometryCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Anthropometry update
+   */
+  export type AnthropometryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Anthropometry.
+     */
+    data: XOR<AnthropometryUpdateInput, AnthropometryUncheckedUpdateInput>
+    /**
+     * Choose, which Anthropometry to update.
+     */
+    where: AnthropometryWhereUniqueInput
+  }
+
+  /**
+   * Anthropometry updateMany
+   */
+  export type AnthropometryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Anthropometries.
+     */
+    data: XOR<AnthropometryUpdateManyMutationInput, AnthropometryUncheckedUpdateManyInput>
+    /**
+     * Filter which Anthropometries to update
+     */
+    where?: AnthropometryWhereInput
+    /**
+     * Limit how many Anthropometries to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Anthropometry updateManyAndReturn
+   */
+  export type AnthropometryUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * The data used to update Anthropometries.
+     */
+    data: XOR<AnthropometryUpdateManyMutationInput, AnthropometryUncheckedUpdateManyInput>
+    /**
+     * Filter which Anthropometries to update
+     */
+    where?: AnthropometryWhereInput
+    /**
+     * Limit how many Anthropometries to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Anthropometry upsert
+   */
+  export type AnthropometryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Anthropometry to update in case it exists.
+     */
+    where: AnthropometryWhereUniqueInput
+    /**
+     * In case the Anthropometry found by the `where` argument doesn't exist, create a new Anthropometry with this data.
+     */
+    create: XOR<AnthropometryCreateInput, AnthropometryUncheckedCreateInput>
+    /**
+     * In case the Anthropometry was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AnthropometryUpdateInput, AnthropometryUncheckedUpdateInput>
+  }
+
+  /**
+   * Anthropometry delete
+   */
+  export type AnthropometryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+    /**
+     * Filter which Anthropometry to delete.
+     */
+    where: AnthropometryWhereUniqueInput
+  }
+
+  /**
+   * Anthropometry deleteMany
+   */
+  export type AnthropometryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Anthropometries to delete
+     */
+    where?: AnthropometryWhereInput
+    /**
+     * Limit how many Anthropometries to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Anthropometry without action
+   */
+  export type AnthropometryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Anthropometry
+     */
+    select?: AnthropometrySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Anthropometry
+     */
+    omit?: AnthropometryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AnthropometryInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MealPlan
+   */
+
+  export type AggregateMealPlan = {
+    _count: MealPlanCountAggregateOutputType | null
+    _min: MealPlanMinAggregateOutputType | null
+    _max: MealPlanMaxAggregateOutputType | null
+  }
+
+  export type MealPlanMinAggregateOutputType = {
+    id: string | null
+    patientId: string | null
+    appointmentId: string | null
+    content: string | null
+    fileUrl: string | null
+    fileName: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MealPlanMaxAggregateOutputType = {
+    id: string | null
+    patientId: string | null
+    appointmentId: string | null
+    content: string | null
+    fileUrl: string | null
+    fileName: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MealPlanCountAggregateOutputType = {
+    id: number
+    patientId: number
+    appointmentId: number
+    content: number
+    fileUrl: number
+    fileName: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MealPlanMinAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    content?: true
+    fileUrl?: true
+    fileName?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MealPlanMaxAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    content?: true
+    fileUrl?: true
+    fileName?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MealPlanCountAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    content?: true
+    fileUrl?: true
+    fileName?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MealPlanAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MealPlan to aggregate.
+     */
+    where?: MealPlanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MealPlans to fetch.
+     */
+    orderBy?: MealPlanOrderByWithRelationInput | MealPlanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MealPlanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MealPlans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MealPlans.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MealPlans
+    **/
+    _count?: true | MealPlanCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MealPlanMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MealPlanMaxAggregateInputType
+  }
+
+  export type GetMealPlanAggregateType<T extends MealPlanAggregateArgs> = {
+        [P in keyof T & keyof AggregateMealPlan]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMealPlan[P]>
+      : GetScalarType<T[P], AggregateMealPlan[P]>
+  }
+
+
+
+
+  export type MealPlanGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MealPlanWhereInput
+    orderBy?: MealPlanOrderByWithAggregationInput | MealPlanOrderByWithAggregationInput[]
+    by: MealPlanScalarFieldEnum[] | MealPlanScalarFieldEnum
+    having?: MealPlanScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MealPlanCountAggregateInputType | true
+    _min?: MealPlanMinAggregateInputType
+    _max?: MealPlanMaxAggregateInputType
+  }
+
+  export type MealPlanGroupByOutputType = {
+    id: string
+    patientId: string
+    appointmentId: string
+    content: string | null
+    fileUrl: string | null
+    fileName: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: MealPlanCountAggregateOutputType | null
+    _min: MealPlanMinAggregateOutputType | null
+    _max: MealPlanMaxAggregateOutputType | null
+  }
+
+  type GetMealPlanGroupByPayload<T extends MealPlanGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MealPlanGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MealPlanGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MealPlanGroupByOutputType[P]>
+            : GetScalarType<T[P], MealPlanGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MealPlanSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    content?: boolean
+    fileUrl?: boolean
+    fileName?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mealPlan"]>
+
+  export type MealPlanSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    content?: boolean
+    fileUrl?: boolean
+    fileName?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mealPlan"]>
+
+  export type MealPlanSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    content?: boolean
+    fileUrl?: boolean
+    fileName?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mealPlan"]>
+
+  export type MealPlanSelectScalar = {
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    content?: boolean
+    fileUrl?: boolean
+    fileName?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type MealPlanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "appointmentId" | "content" | "fileUrl" | "fileName" | "createdAt" | "updatedAt", ExtArgs["result"]["mealPlan"]>
+  export type MealPlanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+  export type MealPlanIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+  export type MealPlanIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+
+  export type $MealPlanPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MealPlan"
+    objects: {
+      patient: Prisma.$PatientPayload<ExtArgs>
+      appointment: Prisma.$AppointmentPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      patientId: string
+      appointmentId: string
+      content: string | null
+      fileUrl: string | null
+      fileName: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["mealPlan"]>
+    composites: {}
+  }
+
+  type MealPlanGetPayload<S extends boolean | null | undefined | MealPlanDefaultArgs> = $Result.GetResult<Prisma.$MealPlanPayload, S>
+
+  type MealPlanCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MealPlanFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MealPlanCountAggregateInputType | true
+    }
+
+  export interface MealPlanDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MealPlan'], meta: { name: 'MealPlan' } }
+    /**
+     * Find zero or one MealPlan that matches the filter.
+     * @param {MealPlanFindUniqueArgs} args - Arguments to find a MealPlan
+     * @example
+     * // Get one MealPlan
+     * const mealPlan = await prisma.mealPlan.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MealPlanFindUniqueArgs>(args: SelectSubset<T, MealPlanFindUniqueArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MealPlan that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MealPlanFindUniqueOrThrowArgs} args - Arguments to find a MealPlan
+     * @example
+     * // Get one MealPlan
+     * const mealPlan = await prisma.mealPlan.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MealPlanFindUniqueOrThrowArgs>(args: SelectSubset<T, MealPlanFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MealPlan that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MealPlanFindFirstArgs} args - Arguments to find a MealPlan
+     * @example
+     * // Get one MealPlan
+     * const mealPlan = await prisma.mealPlan.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MealPlanFindFirstArgs>(args?: SelectSubset<T, MealPlanFindFirstArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MealPlan that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MealPlanFindFirstOrThrowArgs} args - Arguments to find a MealPlan
+     * @example
+     * // Get one MealPlan
+     * const mealPlan = await prisma.mealPlan.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MealPlanFindFirstOrThrowArgs>(args?: SelectSubset<T, MealPlanFindFirstOrThrowArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MealPlans that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MealPlanFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MealPlans
+     * const mealPlans = await prisma.mealPlan.findMany()
+     * 
+     * // Get first 10 MealPlans
+     * const mealPlans = await prisma.mealPlan.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const mealPlanWithIdOnly = await prisma.mealPlan.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MealPlanFindManyArgs>(args?: SelectSubset<T, MealPlanFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MealPlan.
+     * @param {MealPlanCreateArgs} args - Arguments to create a MealPlan.
+     * @example
+     * // Create one MealPlan
+     * const MealPlan = await prisma.mealPlan.create({
+     *   data: {
+     *     // ... data to create a MealPlan
+     *   }
+     * })
+     * 
+     */
+    create<T extends MealPlanCreateArgs>(args: SelectSubset<T, MealPlanCreateArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MealPlans.
+     * @param {MealPlanCreateManyArgs} args - Arguments to create many MealPlans.
+     * @example
+     * // Create many MealPlans
+     * const mealPlan = await prisma.mealPlan.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MealPlanCreateManyArgs>(args?: SelectSubset<T, MealPlanCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MealPlans and returns the data saved in the database.
+     * @param {MealPlanCreateManyAndReturnArgs} args - Arguments to create many MealPlans.
+     * @example
+     * // Create many MealPlans
+     * const mealPlan = await prisma.mealPlan.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MealPlans and only return the `id`
+     * const mealPlanWithIdOnly = await prisma.mealPlan.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MealPlanCreateManyAndReturnArgs>(args?: SelectSubset<T, MealPlanCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MealPlan.
+     * @param {MealPlanDeleteArgs} args - Arguments to delete one MealPlan.
+     * @example
+     * // Delete one MealPlan
+     * const MealPlan = await prisma.mealPlan.delete({
+     *   where: {
+     *     // ... filter to delete one MealPlan
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MealPlanDeleteArgs>(args: SelectSubset<T, MealPlanDeleteArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MealPlan.
+     * @param {MealPlanUpdateArgs} args - Arguments to update one MealPlan.
+     * @example
+     * // Update one MealPlan
+     * const mealPlan = await prisma.mealPlan.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MealPlanUpdateArgs>(args: SelectSubset<T, MealPlanUpdateArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MealPlans.
+     * @param {MealPlanDeleteManyArgs} args - Arguments to filter MealPlans to delete.
+     * @example
+     * // Delete a few MealPlans
+     * const { count } = await prisma.mealPlan.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MealPlanDeleteManyArgs>(args?: SelectSubset<T, MealPlanDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MealPlans.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MealPlanUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MealPlans
+     * const mealPlan = await prisma.mealPlan.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MealPlanUpdateManyArgs>(args: SelectSubset<T, MealPlanUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MealPlans and returns the data updated in the database.
+     * @param {MealPlanUpdateManyAndReturnArgs} args - Arguments to update many MealPlans.
+     * @example
+     * // Update many MealPlans
+     * const mealPlan = await prisma.mealPlan.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MealPlans and only return the `id`
+     * const mealPlanWithIdOnly = await prisma.mealPlan.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MealPlanUpdateManyAndReturnArgs>(args: SelectSubset<T, MealPlanUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MealPlan.
+     * @param {MealPlanUpsertArgs} args - Arguments to update or create a MealPlan.
+     * @example
+     * // Update or create a MealPlan
+     * const mealPlan = await prisma.mealPlan.upsert({
+     *   create: {
+     *     // ... data to create a MealPlan
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MealPlan we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MealPlanUpsertArgs>(args: SelectSubset<T, MealPlanUpsertArgs<ExtArgs>>): Prisma__MealPlanClient<$Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MealPlans.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MealPlanCountArgs} args - Arguments to filter MealPlans to count.
+     * @example
+     * // Count the number of MealPlans
+     * const count = await prisma.mealPlan.count({
+     *   where: {
+     *     // ... the filter for the MealPlans we want to count
+     *   }
+     * })
+    **/
+    count<T extends MealPlanCountArgs>(
+      args?: Subset<T, MealPlanCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MealPlanCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MealPlan.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MealPlanAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MealPlanAggregateArgs>(args: Subset<T, MealPlanAggregateArgs>): Prisma.PrismaPromise<GetMealPlanAggregateType<T>>
+
+    /**
+     * Group by MealPlan.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MealPlanGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MealPlanGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MealPlanGroupByArgs['orderBy'] }
+        : { orderBy?: MealPlanGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MealPlanGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMealPlanGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MealPlan model
+   */
+  readonly fields: MealPlanFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MealPlan.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MealPlanClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    patient<T extends PatientDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PatientDefaultArgs<ExtArgs>>): Prisma__PatientClient<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    appointment<T extends AppointmentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AppointmentDefaultArgs<ExtArgs>>): Prisma__AppointmentClient<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MealPlan model
+   */
+  interface MealPlanFieldRefs {
+    readonly id: FieldRef<"MealPlan", 'String'>
+    readonly patientId: FieldRef<"MealPlan", 'String'>
+    readonly appointmentId: FieldRef<"MealPlan", 'String'>
+    readonly content: FieldRef<"MealPlan", 'String'>
+    readonly fileUrl: FieldRef<"MealPlan", 'String'>
+    readonly fileName: FieldRef<"MealPlan", 'String'>
+    readonly createdAt: FieldRef<"MealPlan", 'DateTime'>
+    readonly updatedAt: FieldRef<"MealPlan", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MealPlan findUnique
+   */
+  export type MealPlanFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * Filter, which MealPlan to fetch.
+     */
+    where: MealPlanWhereUniqueInput
+  }
+
+  /**
+   * MealPlan findUniqueOrThrow
+   */
+  export type MealPlanFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * Filter, which MealPlan to fetch.
+     */
+    where: MealPlanWhereUniqueInput
+  }
+
+  /**
+   * MealPlan findFirst
+   */
+  export type MealPlanFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * Filter, which MealPlan to fetch.
+     */
+    where?: MealPlanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MealPlans to fetch.
+     */
+    orderBy?: MealPlanOrderByWithRelationInput | MealPlanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MealPlans.
+     */
+    cursor?: MealPlanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MealPlans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MealPlans.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MealPlans.
+     */
+    distinct?: MealPlanScalarFieldEnum | MealPlanScalarFieldEnum[]
+  }
+
+  /**
+   * MealPlan findFirstOrThrow
+   */
+  export type MealPlanFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * Filter, which MealPlan to fetch.
+     */
+    where?: MealPlanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MealPlans to fetch.
+     */
+    orderBy?: MealPlanOrderByWithRelationInput | MealPlanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MealPlans.
+     */
+    cursor?: MealPlanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MealPlans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MealPlans.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MealPlans.
+     */
+    distinct?: MealPlanScalarFieldEnum | MealPlanScalarFieldEnum[]
+  }
+
+  /**
+   * MealPlan findMany
+   */
+  export type MealPlanFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * Filter, which MealPlans to fetch.
+     */
+    where?: MealPlanWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MealPlans to fetch.
+     */
+    orderBy?: MealPlanOrderByWithRelationInput | MealPlanOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MealPlans.
+     */
+    cursor?: MealPlanWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MealPlans from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MealPlans.
+     */
+    skip?: number
+    distinct?: MealPlanScalarFieldEnum | MealPlanScalarFieldEnum[]
+  }
+
+  /**
+   * MealPlan create
+   */
+  export type MealPlanCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MealPlan.
+     */
+    data: XOR<MealPlanCreateInput, MealPlanUncheckedCreateInput>
+  }
+
+  /**
+   * MealPlan createMany
+   */
+  export type MealPlanCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MealPlans.
+     */
+    data: MealPlanCreateManyInput | MealPlanCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MealPlan createManyAndReturn
+   */
+  export type MealPlanCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * The data used to create many MealPlans.
+     */
+    data: MealPlanCreateManyInput | MealPlanCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MealPlan update
+   */
+  export type MealPlanUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MealPlan.
+     */
+    data: XOR<MealPlanUpdateInput, MealPlanUncheckedUpdateInput>
+    /**
+     * Choose, which MealPlan to update.
+     */
+    where: MealPlanWhereUniqueInput
+  }
+
+  /**
+   * MealPlan updateMany
+   */
+  export type MealPlanUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MealPlans.
+     */
+    data: XOR<MealPlanUpdateManyMutationInput, MealPlanUncheckedUpdateManyInput>
+    /**
+     * Filter which MealPlans to update
+     */
+    where?: MealPlanWhereInput
+    /**
+     * Limit how many MealPlans to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MealPlan updateManyAndReturn
+   */
+  export type MealPlanUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * The data used to update MealPlans.
+     */
+    data: XOR<MealPlanUpdateManyMutationInput, MealPlanUncheckedUpdateManyInput>
+    /**
+     * Filter which MealPlans to update
+     */
+    where?: MealPlanWhereInput
+    /**
+     * Limit how many MealPlans to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MealPlan upsert
+   */
+  export type MealPlanUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MealPlan to update in case it exists.
+     */
+    where: MealPlanWhereUniqueInput
+    /**
+     * In case the MealPlan found by the `where` argument doesn't exist, create a new MealPlan with this data.
+     */
+    create: XOR<MealPlanCreateInput, MealPlanUncheckedCreateInput>
+    /**
+     * In case the MealPlan was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MealPlanUpdateInput, MealPlanUncheckedUpdateInput>
+  }
+
+  /**
+   * MealPlan delete
+   */
+  export type MealPlanDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+    /**
+     * Filter which MealPlan to delete.
+     */
+    where: MealPlanWhereUniqueInput
+  }
+
+  /**
+   * MealPlan deleteMany
+   */
+  export type MealPlanDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MealPlans to delete
+     */
+    where?: MealPlanWhereInput
+    /**
+     * Limit how many MealPlans to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MealPlan without action
+   */
+  export type MealPlanDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MealPlan
+     */
+    select?: MealPlanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MealPlan
+     */
+    omit?: MealPlanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MealPlanInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ClinicalScale
+   */
+
+  export type AggregateClinicalScale = {
+    _count: ClinicalScaleCountAggregateOutputType | null
+    _avg: ClinicalScaleAvgAggregateOutputType | null
+    _sum: ClinicalScaleSumAggregateOutputType | null
+    _min: ClinicalScaleMinAggregateOutputType | null
+    _max: ClinicalScaleMaxAggregateOutputType | null
+  }
+
+  export type ClinicalScaleAvgAggregateOutputType = {
+    scores: number | null
+    totalScore: number | null
+  }
+
+  export type ClinicalScaleSumAggregateOutputType = {
+    scores: number[]
+    totalScore: number | null
+  }
+
+  export type ClinicalScaleMinAggregateOutputType = {
+    id: string | null
+    patientId: string | null
+    appointmentId: string | null
+    scaleType: $Enums.ScaleType | null
+    totalScore: number | null
+    riskLevel: $Enums.ScaleRiskLevel | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ClinicalScaleMaxAggregateOutputType = {
+    id: string | null
+    patientId: string | null
+    appointmentId: string | null
+    scaleType: $Enums.ScaleType | null
+    totalScore: number | null
+    riskLevel: $Enums.ScaleRiskLevel | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ClinicalScaleCountAggregateOutputType = {
+    id: number
+    patientId: number
+    appointmentId: number
+    scaleType: number
+    scores: number
+    totalScore: number
+    riskLevel: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ClinicalScaleAvgAggregateInputType = {
+    scores?: true
+    totalScore?: true
+  }
+
+  export type ClinicalScaleSumAggregateInputType = {
+    scores?: true
+    totalScore?: true
+  }
+
+  export type ClinicalScaleMinAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    scaleType?: true
+    totalScore?: true
+    riskLevel?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ClinicalScaleMaxAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    scaleType?: true
+    totalScore?: true
+    riskLevel?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ClinicalScaleCountAggregateInputType = {
+    id?: true
+    patientId?: true
+    appointmentId?: true
+    scaleType?: true
+    scores?: true
+    totalScore?: true
+    riskLevel?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ClinicalScaleAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ClinicalScale to aggregate.
+     */
+    where?: ClinicalScaleWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ClinicalScales to fetch.
+     */
+    orderBy?: ClinicalScaleOrderByWithRelationInput | ClinicalScaleOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ClinicalScaleWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ClinicalScales from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ClinicalScales.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ClinicalScales
+    **/
+    _count?: true | ClinicalScaleCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ClinicalScaleAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ClinicalScaleSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ClinicalScaleMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ClinicalScaleMaxAggregateInputType
+  }
+
+  export type GetClinicalScaleAggregateType<T extends ClinicalScaleAggregateArgs> = {
+        [P in keyof T & keyof AggregateClinicalScale]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateClinicalScale[P]>
+      : GetScalarType<T[P], AggregateClinicalScale[P]>
+  }
+
+
+
+
+  export type ClinicalScaleGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ClinicalScaleWhereInput
+    orderBy?: ClinicalScaleOrderByWithAggregationInput | ClinicalScaleOrderByWithAggregationInput[]
+    by: ClinicalScaleScalarFieldEnum[] | ClinicalScaleScalarFieldEnum
+    having?: ClinicalScaleScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ClinicalScaleCountAggregateInputType | true
+    _avg?: ClinicalScaleAvgAggregateInputType
+    _sum?: ClinicalScaleSumAggregateInputType
+    _min?: ClinicalScaleMinAggregateInputType
+    _max?: ClinicalScaleMaxAggregateInputType
+  }
+
+  export type ClinicalScaleGroupByOutputType = {
+    id: string
+    patientId: string
+    appointmentId: string
+    scaleType: $Enums.ScaleType
+    scores: number[]
+    totalScore: number
+    riskLevel: $Enums.ScaleRiskLevel
+    createdAt: Date
+    updatedAt: Date
+    _count: ClinicalScaleCountAggregateOutputType | null
+    _avg: ClinicalScaleAvgAggregateOutputType | null
+    _sum: ClinicalScaleSumAggregateOutputType | null
+    _min: ClinicalScaleMinAggregateOutputType | null
+    _max: ClinicalScaleMaxAggregateOutputType | null
+  }
+
+  type GetClinicalScaleGroupByPayload<T extends ClinicalScaleGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ClinicalScaleGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ClinicalScaleGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ClinicalScaleGroupByOutputType[P]>
+            : GetScalarType<T[P], ClinicalScaleGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ClinicalScaleSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    scaleType?: boolean
+    scores?: boolean
+    totalScore?: boolean
+    riskLevel?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["clinicalScale"]>
+
+  export type ClinicalScaleSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    scaleType?: boolean
+    scores?: boolean
+    totalScore?: boolean
+    riskLevel?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["clinicalScale"]>
+
+  export type ClinicalScaleSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    scaleType?: boolean
+    scores?: boolean
+    totalScore?: boolean
+    riskLevel?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["clinicalScale"]>
+
+  export type ClinicalScaleSelectScalar = {
+    id?: boolean
+    patientId?: boolean
+    appointmentId?: boolean
+    scaleType?: boolean
+    scores?: boolean
+    totalScore?: boolean
+    riskLevel?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ClinicalScaleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "appointmentId" | "scaleType" | "scores" | "totalScore" | "riskLevel" | "createdAt" | "updatedAt", ExtArgs["result"]["clinicalScale"]>
+  export type ClinicalScaleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+  export type ClinicalScaleIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+  export type ClinicalScaleIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
+  }
+
+  export type $ClinicalScalePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ClinicalScale"
+    objects: {
+      patient: Prisma.$PatientPayload<ExtArgs>
+      appointment: Prisma.$AppointmentPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      patientId: string
+      appointmentId: string
+      scaleType: $Enums.ScaleType
+      scores: number[]
+      totalScore: number
+      riskLevel: $Enums.ScaleRiskLevel
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["clinicalScale"]>
+    composites: {}
+  }
+
+  type ClinicalScaleGetPayload<S extends boolean | null | undefined | ClinicalScaleDefaultArgs> = $Result.GetResult<Prisma.$ClinicalScalePayload, S>
+
+  type ClinicalScaleCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ClinicalScaleFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ClinicalScaleCountAggregateInputType | true
+    }
+
+  export interface ClinicalScaleDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ClinicalScale'], meta: { name: 'ClinicalScale' } }
+    /**
+     * Find zero or one ClinicalScale that matches the filter.
+     * @param {ClinicalScaleFindUniqueArgs} args - Arguments to find a ClinicalScale
+     * @example
+     * // Get one ClinicalScale
+     * const clinicalScale = await prisma.clinicalScale.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ClinicalScaleFindUniqueArgs>(args: SelectSubset<T, ClinicalScaleFindUniqueArgs<ExtArgs>>): Prisma__ClinicalScaleClient<$Result.GetResult<Prisma.$ClinicalScalePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ClinicalScale that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ClinicalScaleFindUniqueOrThrowArgs} args - Arguments to find a ClinicalScale
+     * @example
+     * // Get one ClinicalScale
+     * const clinicalScale = await prisma.clinicalScale.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ClinicalScaleFindUniqueOrThrowArgs>(args: SelectSubset<T, ClinicalScaleFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ClinicalScaleClient<$Result.GetResult<Prisma.$ClinicalScalePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ClinicalScale that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClinicalScaleFindFirstArgs} args - Arguments to find a ClinicalScale
+     * @example
+     * // Get one ClinicalScale
+     * const clinicalScale = await prisma.clinicalScale.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ClinicalScaleFindFirstArgs>(args?: SelectSubset<T, ClinicalScaleFindFirstArgs<ExtArgs>>): Prisma__ClinicalScaleClient<$Result.GetResult<Prisma.$ClinicalScalePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ClinicalScale that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClinicalScaleFindFirstOrThrowArgs} args - Arguments to find a ClinicalScale
+     * @example
+     * // Get one ClinicalScale
+     * const clinicalScale = await prisma.clinicalScale.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ClinicalScaleFindFirstOrThrowArgs>(args?: SelectSubset<T, ClinicalScaleFindFirstOrThrowArgs<ExtArgs>>): Prisma__ClinicalScaleClient<$Result.GetResult<Prisma.$ClinicalScalePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ClinicalScales that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClinicalScaleFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ClinicalScales
+     * const clinicalScales = await prisma.clinicalScale.findMany()
+     * 
+     * // Get first 10 ClinicalScales
+     * const clinicalScales = await prisma.clinicalScale.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const clinicalScaleWithIdOnly = await prisma.clinicalScale.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ClinicalScaleFindManyArgs>(args?: SelectSubset<T, ClinicalScaleFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClinicalScalePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ClinicalScale.
+     * @param {ClinicalScaleCreateArgs} args - Arguments to create a ClinicalScale.
+     * @example
+     * // Create one ClinicalScale
+     * const ClinicalScale = await prisma.clinicalScale.create({
+     *   data: {
+     *     // ... data to create a ClinicalScale
+     *   }
+     * })
+     * 
+     */
+    create<T extends ClinicalScaleCreateArgs>(args: SelectSubset<T, ClinicalScaleCreateArgs<ExtArgs>>): Prisma__ClinicalScaleClient<$Result.GetResult<Prisma.$ClinicalScalePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ClinicalScales.
+     * @param {ClinicalScaleCreateManyArgs} args - Arguments to create many ClinicalScales.
+     * @example
+     * // Create many ClinicalScales
+     * const clinicalScale = await prisma.clinicalScale.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ClinicalScaleCreateManyArgs>(args?: SelectSubset<T, ClinicalScaleCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ClinicalScales and returns the data saved in the database.
+     * @param {ClinicalScaleCreateManyAndReturnArgs} args - Arguments to create many ClinicalScales.
+     * @example
+     * // Create many ClinicalScales
+     * const clinicalScale = await prisma.clinicalScale.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ClinicalScales and only return the `id`
+     * const clinicalScaleWithIdOnly = await prisma.clinicalScale.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ClinicalScaleCreateManyAndReturnArgs>(args?: SelectSubset<T, ClinicalScaleCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClinicalScalePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ClinicalScale.
+     * @param {ClinicalScaleDeleteArgs} args - Arguments to delete one ClinicalScale.
+     * @example
+     * // Delete one ClinicalScale
+     * const ClinicalScale = await prisma.clinicalScale.delete({
+     *   where: {
+     *     // ... filter to delete one ClinicalScale
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ClinicalScaleDeleteArgs>(args: SelectSubset<T, ClinicalScaleDeleteArgs<ExtArgs>>): Prisma__ClinicalScaleClient<$Result.GetResult<Prisma.$ClinicalScalePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ClinicalScale.
+     * @param {ClinicalScaleUpdateArgs} args - Arguments to update one ClinicalScale.
+     * @example
+     * // Update one ClinicalScale
+     * const clinicalScale = await prisma.clinicalScale.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ClinicalScaleUpdateArgs>(args: SelectSubset<T, ClinicalScaleUpdateArgs<ExtArgs>>): Prisma__ClinicalScaleClient<$Result.GetResult<Prisma.$ClinicalScalePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ClinicalScales.
+     * @param {ClinicalScaleDeleteManyArgs} args - Arguments to filter ClinicalScales to delete.
+     * @example
+     * // Delete a few ClinicalScales
+     * const { count } = await prisma.clinicalScale.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ClinicalScaleDeleteManyArgs>(args?: SelectSubset<T, ClinicalScaleDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ClinicalScales.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClinicalScaleUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ClinicalScales
+     * const clinicalScale = await prisma.clinicalScale.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ClinicalScaleUpdateManyArgs>(args: SelectSubset<T, ClinicalScaleUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ClinicalScales and returns the data updated in the database.
+     * @param {ClinicalScaleUpdateManyAndReturnArgs} args - Arguments to update many ClinicalScales.
+     * @example
+     * // Update many ClinicalScales
+     * const clinicalScale = await prisma.clinicalScale.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ClinicalScales and only return the `id`
+     * const clinicalScaleWithIdOnly = await prisma.clinicalScale.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ClinicalScaleUpdateManyAndReturnArgs>(args: SelectSubset<T, ClinicalScaleUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClinicalScalePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ClinicalScale.
+     * @param {ClinicalScaleUpsertArgs} args - Arguments to update or create a ClinicalScale.
+     * @example
+     * // Update or create a ClinicalScale
+     * const clinicalScale = await prisma.clinicalScale.upsert({
+     *   create: {
+     *     // ... data to create a ClinicalScale
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ClinicalScale we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ClinicalScaleUpsertArgs>(args: SelectSubset<T, ClinicalScaleUpsertArgs<ExtArgs>>): Prisma__ClinicalScaleClient<$Result.GetResult<Prisma.$ClinicalScalePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ClinicalScales.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClinicalScaleCountArgs} args - Arguments to filter ClinicalScales to count.
+     * @example
+     * // Count the number of ClinicalScales
+     * const count = await prisma.clinicalScale.count({
+     *   where: {
+     *     // ... the filter for the ClinicalScales we want to count
+     *   }
+     * })
+    **/
+    count<T extends ClinicalScaleCountArgs>(
+      args?: Subset<T, ClinicalScaleCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ClinicalScaleCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ClinicalScale.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClinicalScaleAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ClinicalScaleAggregateArgs>(args: Subset<T, ClinicalScaleAggregateArgs>): Prisma.PrismaPromise<GetClinicalScaleAggregateType<T>>
+
+    /**
+     * Group by ClinicalScale.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClinicalScaleGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ClinicalScaleGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ClinicalScaleGroupByArgs['orderBy'] }
+        : { orderBy?: ClinicalScaleGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ClinicalScaleGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetClinicalScaleGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ClinicalScale model
+   */
+  readonly fields: ClinicalScaleFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ClinicalScale.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ClinicalScaleClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    patient<T extends PatientDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PatientDefaultArgs<ExtArgs>>): Prisma__PatientClient<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    appointment<T extends AppointmentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AppointmentDefaultArgs<ExtArgs>>): Prisma__AppointmentClient<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ClinicalScale model
+   */
+  interface ClinicalScaleFieldRefs {
+    readonly id: FieldRef<"ClinicalScale", 'String'>
+    readonly patientId: FieldRef<"ClinicalScale", 'String'>
+    readonly appointmentId: FieldRef<"ClinicalScale", 'String'>
+    readonly scaleType: FieldRef<"ClinicalScale", 'ScaleType'>
+    readonly scores: FieldRef<"ClinicalScale", 'Int[]'>
+    readonly totalScore: FieldRef<"ClinicalScale", 'Int'>
+    readonly riskLevel: FieldRef<"ClinicalScale", 'ScaleRiskLevel'>
+    readonly createdAt: FieldRef<"ClinicalScale", 'DateTime'>
+    readonly updatedAt: FieldRef<"ClinicalScale", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ClinicalScale findUnique
+   */
+  export type ClinicalScaleFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalScale
+     */
+    select?: ClinicalScaleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalScale
+     */
+    omit?: ClinicalScaleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalScaleInclude<ExtArgs> | null
+    /**
+     * Filter, which ClinicalScale to fetch.
+     */
+    where: ClinicalScaleWhereUniqueInput
+  }
+
+  /**
+   * ClinicalScale findUniqueOrThrow
+   */
+  export type ClinicalScaleFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalScale
+     */
+    select?: ClinicalScaleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalScale
+     */
+    omit?: ClinicalScaleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalScaleInclude<ExtArgs> | null
+    /**
+     * Filter, which ClinicalScale to fetch.
+     */
+    where: ClinicalScaleWhereUniqueInput
+  }
+
+  /**
+   * ClinicalScale findFirst
+   */
+  export type ClinicalScaleFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalScale
+     */
+    select?: ClinicalScaleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalScale
+     */
+    omit?: ClinicalScaleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalScaleInclude<ExtArgs> | null
+    /**
+     * Filter, which ClinicalScale to fetch.
+     */
+    where?: ClinicalScaleWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ClinicalScales to fetch.
+     */
+    orderBy?: ClinicalScaleOrderByWithRelationInput | ClinicalScaleOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ClinicalScales.
+     */
+    cursor?: ClinicalScaleWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ClinicalScales from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ClinicalScales.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ClinicalScales.
+     */
+    distinct?: ClinicalScaleScalarFieldEnum | ClinicalScaleScalarFieldEnum[]
+  }
+
+  /**
+   * ClinicalScale findFirstOrThrow
+   */
+  export type ClinicalScaleFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalScale
+     */
+    select?: ClinicalScaleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalScale
+     */
+    omit?: ClinicalScaleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalScaleInclude<ExtArgs> | null
+    /**
+     * Filter, which ClinicalScale to fetch.
+     */
+    where?: ClinicalScaleWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ClinicalScales to fetch.
+     */
+    orderBy?: ClinicalScaleOrderByWithRelationInput | ClinicalScaleOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ClinicalScales.
+     */
+    cursor?: ClinicalScaleWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ClinicalScales from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ClinicalScales.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ClinicalScales.
+     */
+    distinct?: ClinicalScaleScalarFieldEnum | ClinicalScaleScalarFieldEnum[]
+  }
+
+  /**
+   * ClinicalScale findMany
+   */
+  export type ClinicalScaleFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalScale
+     */
+    select?: ClinicalScaleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalScale
+     */
+    omit?: ClinicalScaleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalScaleInclude<ExtArgs> | null
+    /**
+     * Filter, which ClinicalScales to fetch.
+     */
+    where?: ClinicalScaleWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ClinicalScales to fetch.
+     */
+    orderBy?: ClinicalScaleOrderByWithRelationInput | ClinicalScaleOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ClinicalScales.
+     */
+    cursor?: ClinicalScaleWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ClinicalScales from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ClinicalScales.
+     */
+    skip?: number
+    distinct?: ClinicalScaleScalarFieldEnum | ClinicalScaleScalarFieldEnum[]
+  }
+
+  /**
+   * ClinicalScale create
+   */
+  export type ClinicalScaleCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalScale
+     */
+    select?: ClinicalScaleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalScale
+     */
+    omit?: ClinicalScaleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalScaleInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ClinicalScale.
+     */
+    data: XOR<ClinicalScaleCreateInput, ClinicalScaleUncheckedCreateInput>
+  }
+
+  /**
+   * ClinicalScale createMany
+   */
+  export type ClinicalScaleCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ClinicalScales.
+     */
+    data: ClinicalScaleCreateManyInput | ClinicalScaleCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ClinicalScale createManyAndReturn
+   */
+  export type ClinicalScaleCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalScale
+     */
+    select?: ClinicalScaleSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalScale
+     */
+    omit?: ClinicalScaleOmit<ExtArgs> | null
+    /**
+     * The data used to create many ClinicalScales.
+     */
+    data: ClinicalScaleCreateManyInput | ClinicalScaleCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalScaleIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ClinicalScale update
+   */
+  export type ClinicalScaleUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalScale
+     */
+    select?: ClinicalScaleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalScale
+     */
+    omit?: ClinicalScaleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalScaleInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ClinicalScale.
+     */
+    data: XOR<ClinicalScaleUpdateInput, ClinicalScaleUncheckedUpdateInput>
+    /**
+     * Choose, which ClinicalScale to update.
+     */
+    where: ClinicalScaleWhereUniqueInput
+  }
+
+  /**
+   * ClinicalScale updateMany
+   */
+  export type ClinicalScaleUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ClinicalScales.
+     */
+    data: XOR<ClinicalScaleUpdateManyMutationInput, ClinicalScaleUncheckedUpdateManyInput>
+    /**
+     * Filter which ClinicalScales to update
+     */
+    where?: ClinicalScaleWhereInput
+    /**
+     * Limit how many ClinicalScales to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ClinicalScale updateManyAndReturn
+   */
+  export type ClinicalScaleUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalScale
+     */
+    select?: ClinicalScaleSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalScale
+     */
+    omit?: ClinicalScaleOmit<ExtArgs> | null
+    /**
+     * The data used to update ClinicalScales.
+     */
+    data: XOR<ClinicalScaleUpdateManyMutationInput, ClinicalScaleUncheckedUpdateManyInput>
+    /**
+     * Filter which ClinicalScales to update
+     */
+    where?: ClinicalScaleWhereInput
+    /**
+     * Limit how many ClinicalScales to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalScaleIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ClinicalScale upsert
+   */
+  export type ClinicalScaleUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalScale
+     */
+    select?: ClinicalScaleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalScale
+     */
+    omit?: ClinicalScaleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalScaleInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ClinicalScale to update in case it exists.
+     */
+    where: ClinicalScaleWhereUniqueInput
+    /**
+     * In case the ClinicalScale found by the `where` argument doesn't exist, create a new ClinicalScale with this data.
+     */
+    create: XOR<ClinicalScaleCreateInput, ClinicalScaleUncheckedCreateInput>
+    /**
+     * In case the ClinicalScale was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ClinicalScaleUpdateInput, ClinicalScaleUncheckedUpdateInput>
+  }
+
+  /**
+   * ClinicalScale delete
+   */
+  export type ClinicalScaleDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalScale
+     */
+    select?: ClinicalScaleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalScale
+     */
+    omit?: ClinicalScaleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalScaleInclude<ExtArgs> | null
+    /**
+     * Filter which ClinicalScale to delete.
+     */
+    where: ClinicalScaleWhereUniqueInput
+  }
+
+  /**
+   * ClinicalScale deleteMany
+   */
+  export type ClinicalScaleDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ClinicalScales to delete
+     */
+    where?: ClinicalScaleWhereInput
+    /**
+     * Limit how many ClinicalScales to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ClinicalScale without action
+   */
+  export type ClinicalScaleDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalScale
+     */
+    select?: ClinicalScaleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalScale
+     */
+    omit?: ClinicalScaleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalScaleInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -11204,6 +16358,17 @@ export namespace Prisma {
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+  export const RefreshTokenScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    tokenHash: 'tokenHash',
+    expiresAt: 'expiresAt',
+    createdAt: 'createdAt'
+  };
+
+  export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
 
 
   export const ClinicianProfileScalarFieldEnum: {
@@ -11231,6 +16396,7 @@ export namespace Prisma {
     status: 'status',
     contactPhone: 'contactPhone',
     emergencyContact: 'emergencyContact',
+    treatmentGoals: 'treatmentGoals',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -11319,20 +16485,57 @@ export namespace Prisma {
   export type FinanceTransactionScalarFieldEnum = (typeof FinanceTransactionScalarFieldEnum)[keyof typeof FinanceTransactionScalarFieldEnum]
 
 
+  export const AnthropometryScalarFieldEnum: {
+    id: 'id',
+    patientId: 'patientId',
+    appointmentId: 'appointmentId',
+    weight: 'weight',
+    height: 'height',
+    bodyFat: 'bodyFat',
+    waist: 'waist',
+    hip: 'hip',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AnthropometryScalarFieldEnum = (typeof AnthropometryScalarFieldEnum)[keyof typeof AnthropometryScalarFieldEnum]
+
+
+  export const MealPlanScalarFieldEnum: {
+    id: 'id',
+    patientId: 'patientId',
+    appointmentId: 'appointmentId',
+    content: 'content',
+    fileUrl: 'fileUrl',
+    fileName: 'fileName',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MealPlanScalarFieldEnum = (typeof MealPlanScalarFieldEnum)[keyof typeof MealPlanScalarFieldEnum]
+
+
+  export const ClinicalScaleScalarFieldEnum: {
+    id: 'id',
+    patientId: 'patientId',
+    appointmentId: 'appointmentId',
+    scaleType: 'scaleType',
+    scores: 'scores',
+    totalScore: 'totalScore',
+    riskLevel: 'riskLevel',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ClinicalScaleScalarFieldEnum = (typeof ClinicalScaleScalarFieldEnum)[keyof typeof ClinicalScaleScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
-
-
-  export const NullableJsonNullValueInput: {
-    DbNull: typeof DbNull,
-    JsonNull: typeof JsonNull
-  };
-
-  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
   export const JsonNullValueInput: {
@@ -11471,20 +16674,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Json'
-   */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-  /**
-   * Reference to a field of type 'QueryMode'
-   */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-  /**
    * Reference to a field of type 'AppointmentType'
    */
   export type EnumAppointmentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppointmentType'>
@@ -11555,6 +16744,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
@@ -11572,6 +16775,34 @@ export namespace Prisma {
    * Reference to a field of type 'TransactionType[]'
    */
   export type ListEnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ScaleType'
+   */
+  export type EnumScaleTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ScaleType'>
+    
+
+
+  /**
+   * Reference to a field of type 'ScaleType[]'
+   */
+  export type ListEnumScaleTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ScaleType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ScaleRiskLevel'
+   */
+  export type EnumScaleRiskLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ScaleRiskLevel'>
+    
+
+
+  /**
+   * Reference to a field of type 'ScaleRiskLevel[]'
+   */
+  export type ListEnumScaleRiskLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ScaleRiskLevel[]'>
     
 
 
@@ -11604,6 +16835,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     profile?: XOR<ClinicianProfileNullableScalarRelationFilter, ClinicianProfileWhereInput> | null
     accessLogs?: AccessLogListRelationFilter
+    refreshTokens?: RefreshTokenListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -11615,6 +16847,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     profile?: ClinicianProfileOrderByWithRelationInput
     accessLogs?: AccessLogOrderByRelationAggregateInput
+    refreshTokens?: RefreshTokenOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -11629,6 +16862,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     profile?: XOR<ClinicianProfileNullableScalarRelationFilter, ClinicianProfileWhereInput> | null
     accessLogs?: AccessLogListRelationFilter
+    refreshTokens?: RefreshTokenListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -11653,6 +16887,61 @@ export namespace Prisma {
     role?: EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+  }
+
+  export type RefreshTokenWhereInput = {
+    AND?: RefreshTokenWhereInput | RefreshTokenWhereInput[]
+    OR?: RefreshTokenWhereInput[]
+    NOT?: RefreshTokenWhereInput | RefreshTokenWhereInput[]
+    id?: UuidFilter<"RefreshToken"> | string
+    userId?: UuidFilter<"RefreshToken"> | string
+    tokenHash?: StringFilter<"RefreshToken"> | string
+    expiresAt?: DateTimeFilter<"RefreshToken"> | Date | string
+    createdAt?: DateTimeFilter<"RefreshToken"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type RefreshTokenOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tokenHash?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type RefreshTokenWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    tokenHash?: string
+    AND?: RefreshTokenWhereInput | RefreshTokenWhereInput[]
+    OR?: RefreshTokenWhereInput[]
+    NOT?: RefreshTokenWhereInput | RefreshTokenWhereInput[]
+    userId?: UuidFilter<"RefreshToken"> | string
+    expiresAt?: DateTimeFilter<"RefreshToken"> | Date | string
+    createdAt?: DateTimeFilter<"RefreshToken"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "tokenHash">
+
+  export type RefreshTokenOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tokenHash?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+    _count?: RefreshTokenCountOrderByAggregateInput
+    _max?: RefreshTokenMaxOrderByAggregateInput
+    _min?: RefreshTokenMinOrderByAggregateInput
+  }
+
+  export type RefreshTokenScalarWhereWithAggregatesInput = {
+    AND?: RefreshTokenScalarWhereWithAggregatesInput | RefreshTokenScalarWhereWithAggregatesInput[]
+    OR?: RefreshTokenScalarWhereWithAggregatesInput[]
+    NOT?: RefreshTokenScalarWhereWithAggregatesInput | RefreshTokenScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"RefreshToken"> | string
+    userId?: UuidWithAggregatesFilter<"RefreshToken"> | string
+    tokenHash?: StringWithAggregatesFilter<"RefreshToken"> | string
+    expiresAt?: DateTimeWithAggregatesFilter<"RefreshToken"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"RefreshToken"> | Date | string
   }
 
   export type ClinicianProfileWhereInput = {
@@ -11753,7 +17042,8 @@ export namespace Prisma {
     clinicalContext?: StringNullableFilter<"Patient"> | string | null
     status?: EnumPatientStatusFilter<"Patient"> | $Enums.PatientStatus
     contactPhone?: StringNullableFilter<"Patient"> | string | null
-    emergencyContact?: JsonNullableFilter<"Patient">
+    emergencyContact?: StringNullableFilter<"Patient"> | string | null
+    treatmentGoals?: StringNullableListFilter<"Patient">
     createdAt?: DateTimeFilter<"Patient"> | Date | string
     updatedAt?: DateTimeFilter<"Patient"> | Date | string
     clinician?: XOR<ClinicianProfileScalarRelationFilter, ClinicianProfileWhereInput>
@@ -11761,6 +17051,9 @@ export namespace Prisma {
     psychNotes?: PsychNoteListRelationFilter
     accessLogs?: AccessLogListRelationFilter
     tasks?: TaskListRelationFilter
+    anthropometries?: AnthropometryListRelationFilter
+    mealPlans?: MealPlanListRelationFilter
+    clinicalScales?: ClinicalScaleListRelationFilter
   }
 
   export type PatientOrderByWithRelationInput = {
@@ -11773,6 +17066,7 @@ export namespace Prisma {
     status?: SortOrder
     contactPhone?: SortOrderInput | SortOrder
     emergencyContact?: SortOrderInput | SortOrder
+    treatmentGoals?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     clinician?: ClinicianProfileOrderByWithRelationInput
@@ -11780,6 +17074,9 @@ export namespace Prisma {
     psychNotes?: PsychNoteOrderByRelationAggregateInput
     accessLogs?: AccessLogOrderByRelationAggregateInput
     tasks?: TaskOrderByRelationAggregateInput
+    anthropometries?: AnthropometryOrderByRelationAggregateInput
+    mealPlans?: MealPlanOrderByRelationAggregateInput
+    clinicalScales?: ClinicalScaleOrderByRelationAggregateInput
   }
 
   export type PatientWhereUniqueInput = Prisma.AtLeast<{
@@ -11794,7 +17091,8 @@ export namespace Prisma {
     clinicalContext?: StringNullableFilter<"Patient"> | string | null
     status?: EnumPatientStatusFilter<"Patient"> | $Enums.PatientStatus
     contactPhone?: StringNullableFilter<"Patient"> | string | null
-    emergencyContact?: JsonNullableFilter<"Patient">
+    emergencyContact?: StringNullableFilter<"Patient"> | string | null
+    treatmentGoals?: StringNullableListFilter<"Patient">
     createdAt?: DateTimeFilter<"Patient"> | Date | string
     updatedAt?: DateTimeFilter<"Patient"> | Date | string
     clinician?: XOR<ClinicianProfileScalarRelationFilter, ClinicianProfileWhereInput>
@@ -11802,6 +17100,9 @@ export namespace Prisma {
     psychNotes?: PsychNoteListRelationFilter
     accessLogs?: AccessLogListRelationFilter
     tasks?: TaskListRelationFilter
+    anthropometries?: AnthropometryListRelationFilter
+    mealPlans?: MealPlanListRelationFilter
+    clinicalScales?: ClinicalScaleListRelationFilter
   }, "id">
 
   export type PatientOrderByWithAggregationInput = {
@@ -11814,6 +17115,7 @@ export namespace Prisma {
     status?: SortOrder
     contactPhone?: SortOrderInput | SortOrder
     emergencyContact?: SortOrderInput | SortOrder
+    treatmentGoals?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: PatientCountOrderByAggregateInput
@@ -11833,7 +17135,8 @@ export namespace Prisma {
     clinicalContext?: StringNullableWithAggregatesFilter<"Patient"> | string | null
     status?: EnumPatientStatusWithAggregatesFilter<"Patient"> | $Enums.PatientStatus
     contactPhone?: StringNullableWithAggregatesFilter<"Patient"> | string | null
-    emergencyContact?: JsonNullableWithAggregatesFilter<"Patient">
+    emergencyContact?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    treatmentGoals?: StringNullableListFilter<"Patient">
     createdAt?: DateTimeWithAggregatesFilter<"Patient"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Patient"> | Date | string
   }
@@ -11860,6 +17163,9 @@ export namespace Prisma {
     clinician?: XOR<ClinicianProfileScalarRelationFilter, ClinicianProfileWhereInput>
     psychNote?: XOR<PsychNoteNullableScalarRelationFilter, PsychNoteWhereInput> | null
     transaction?: XOR<FinanceTransactionNullableScalarRelationFilter, FinanceTransactionWhereInput> | null
+    anthropometry?: XOR<AnthropometryNullableScalarRelationFilter, AnthropometryWhereInput> | null
+    mealPlan?: XOR<MealPlanNullableScalarRelationFilter, MealPlanWhereInput> | null
+    clinicalScales?: ClinicalScaleListRelationFilter
   }
 
   export type AppointmentOrderByWithRelationInput = {
@@ -11881,6 +17187,9 @@ export namespace Prisma {
     clinician?: ClinicianProfileOrderByWithRelationInput
     psychNote?: PsychNoteOrderByWithRelationInput
     transaction?: FinanceTransactionOrderByWithRelationInput
+    anthropometry?: AnthropometryOrderByWithRelationInput
+    mealPlan?: MealPlanOrderByWithRelationInput
+    clinicalScales?: ClinicalScaleOrderByRelationAggregateInput
   }
 
   export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
@@ -11905,6 +17214,9 @@ export namespace Prisma {
     clinician?: XOR<ClinicianProfileScalarRelationFilter, ClinicianProfileWhereInput>
     psychNote?: XOR<PsychNoteNullableScalarRelationFilter, PsychNoteWhereInput> | null
     transaction?: XOR<FinanceTransactionNullableScalarRelationFilter, FinanceTransactionWhereInput> | null
+    anthropometry?: XOR<AnthropometryNullableScalarRelationFilter, AnthropometryWhereInput> | null
+    mealPlan?: XOR<MealPlanNullableScalarRelationFilter, MealPlanWhereInput> | null
+    clinicalScales?: ClinicalScaleListRelationFilter
   }, "id">
 
   export type AppointmentOrderByWithAggregationInput = {
@@ -12267,6 +17579,245 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"FinanceTransaction"> | Date | string
   }
 
+  export type AnthropometryWhereInput = {
+    AND?: AnthropometryWhereInput | AnthropometryWhereInput[]
+    OR?: AnthropometryWhereInput[]
+    NOT?: AnthropometryWhereInput | AnthropometryWhereInput[]
+    id?: UuidFilter<"Anthropometry"> | string
+    patientId?: UuidFilter<"Anthropometry"> | string
+    appointmentId?: UuidFilter<"Anthropometry"> | string
+    weight?: DecimalFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    height?: DecimalFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    bodyFat?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    waist?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    hip?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFilter<"Anthropometry"> | Date | string
+    updatedAt?: DateTimeFilter<"Anthropometry"> | Date | string
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
+  }
+
+  export type AnthropometryOrderByWithRelationInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    weight?: SortOrder
+    height?: SortOrder
+    bodyFat?: SortOrderInput | SortOrder
+    waist?: SortOrderInput | SortOrder
+    hip?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    patient?: PatientOrderByWithRelationInput
+    appointment?: AppointmentOrderByWithRelationInput
+  }
+
+  export type AnthropometryWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    appointmentId?: string
+    AND?: AnthropometryWhereInput | AnthropometryWhereInput[]
+    OR?: AnthropometryWhereInput[]
+    NOT?: AnthropometryWhereInput | AnthropometryWhereInput[]
+    patientId?: UuidFilter<"Anthropometry"> | string
+    weight?: DecimalFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    height?: DecimalFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    bodyFat?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    waist?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    hip?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFilter<"Anthropometry"> | Date | string
+    updatedAt?: DateTimeFilter<"Anthropometry"> | Date | string
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
+  }, "id" | "appointmentId">
+
+  export type AnthropometryOrderByWithAggregationInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    weight?: SortOrder
+    height?: SortOrder
+    bodyFat?: SortOrderInput | SortOrder
+    waist?: SortOrderInput | SortOrder
+    hip?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AnthropometryCountOrderByAggregateInput
+    _avg?: AnthropometryAvgOrderByAggregateInput
+    _max?: AnthropometryMaxOrderByAggregateInput
+    _min?: AnthropometryMinOrderByAggregateInput
+    _sum?: AnthropometrySumOrderByAggregateInput
+  }
+
+  export type AnthropometryScalarWhereWithAggregatesInput = {
+    AND?: AnthropometryScalarWhereWithAggregatesInput | AnthropometryScalarWhereWithAggregatesInput[]
+    OR?: AnthropometryScalarWhereWithAggregatesInput[]
+    NOT?: AnthropometryScalarWhereWithAggregatesInput | AnthropometryScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"Anthropometry"> | string
+    patientId?: UuidWithAggregatesFilter<"Anthropometry"> | string
+    appointmentId?: UuidWithAggregatesFilter<"Anthropometry"> | string
+    weight?: DecimalWithAggregatesFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    height?: DecimalWithAggregatesFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    bodyFat?: DecimalNullableWithAggregatesFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    waist?: DecimalNullableWithAggregatesFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    hip?: DecimalNullableWithAggregatesFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Anthropometry"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Anthropometry"> | Date | string
+  }
+
+  export type MealPlanWhereInput = {
+    AND?: MealPlanWhereInput | MealPlanWhereInput[]
+    OR?: MealPlanWhereInput[]
+    NOT?: MealPlanWhereInput | MealPlanWhereInput[]
+    id?: UuidFilter<"MealPlan"> | string
+    patientId?: UuidFilter<"MealPlan"> | string
+    appointmentId?: UuidFilter<"MealPlan"> | string
+    content?: StringNullableFilter<"MealPlan"> | string | null
+    fileUrl?: StringNullableFilter<"MealPlan"> | string | null
+    fileName?: StringNullableFilter<"MealPlan"> | string | null
+    createdAt?: DateTimeFilter<"MealPlan"> | Date | string
+    updatedAt?: DateTimeFilter<"MealPlan"> | Date | string
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
+  }
+
+  export type MealPlanOrderByWithRelationInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    content?: SortOrderInput | SortOrder
+    fileUrl?: SortOrderInput | SortOrder
+    fileName?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    patient?: PatientOrderByWithRelationInput
+    appointment?: AppointmentOrderByWithRelationInput
+  }
+
+  export type MealPlanWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    appointmentId?: string
+    AND?: MealPlanWhereInput | MealPlanWhereInput[]
+    OR?: MealPlanWhereInput[]
+    NOT?: MealPlanWhereInput | MealPlanWhereInput[]
+    patientId?: UuidFilter<"MealPlan"> | string
+    content?: StringNullableFilter<"MealPlan"> | string | null
+    fileUrl?: StringNullableFilter<"MealPlan"> | string | null
+    fileName?: StringNullableFilter<"MealPlan"> | string | null
+    createdAt?: DateTimeFilter<"MealPlan"> | Date | string
+    updatedAt?: DateTimeFilter<"MealPlan"> | Date | string
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
+  }, "id" | "appointmentId">
+
+  export type MealPlanOrderByWithAggregationInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    content?: SortOrderInput | SortOrder
+    fileUrl?: SortOrderInput | SortOrder
+    fileName?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: MealPlanCountOrderByAggregateInput
+    _max?: MealPlanMaxOrderByAggregateInput
+    _min?: MealPlanMinOrderByAggregateInput
+  }
+
+  export type MealPlanScalarWhereWithAggregatesInput = {
+    AND?: MealPlanScalarWhereWithAggregatesInput | MealPlanScalarWhereWithAggregatesInput[]
+    OR?: MealPlanScalarWhereWithAggregatesInput[]
+    NOT?: MealPlanScalarWhereWithAggregatesInput | MealPlanScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"MealPlan"> | string
+    patientId?: UuidWithAggregatesFilter<"MealPlan"> | string
+    appointmentId?: UuidWithAggregatesFilter<"MealPlan"> | string
+    content?: StringNullableWithAggregatesFilter<"MealPlan"> | string | null
+    fileUrl?: StringNullableWithAggregatesFilter<"MealPlan"> | string | null
+    fileName?: StringNullableWithAggregatesFilter<"MealPlan"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"MealPlan"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"MealPlan"> | Date | string
+  }
+
+  export type ClinicalScaleWhereInput = {
+    AND?: ClinicalScaleWhereInput | ClinicalScaleWhereInput[]
+    OR?: ClinicalScaleWhereInput[]
+    NOT?: ClinicalScaleWhereInput | ClinicalScaleWhereInput[]
+    id?: UuidFilter<"ClinicalScale"> | string
+    patientId?: UuidFilter<"ClinicalScale"> | string
+    appointmentId?: UuidFilter<"ClinicalScale"> | string
+    scaleType?: EnumScaleTypeFilter<"ClinicalScale"> | $Enums.ScaleType
+    scores?: IntNullableListFilter<"ClinicalScale">
+    totalScore?: IntFilter<"ClinicalScale"> | number
+    riskLevel?: EnumScaleRiskLevelFilter<"ClinicalScale"> | $Enums.ScaleRiskLevel
+    createdAt?: DateTimeFilter<"ClinicalScale"> | Date | string
+    updatedAt?: DateTimeFilter<"ClinicalScale"> | Date | string
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
+  }
+
+  export type ClinicalScaleOrderByWithRelationInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    scaleType?: SortOrder
+    scores?: SortOrder
+    totalScore?: SortOrder
+    riskLevel?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    patient?: PatientOrderByWithRelationInput
+    appointment?: AppointmentOrderByWithRelationInput
+  }
+
+  export type ClinicalScaleWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    appointmentId_scaleType?: ClinicalScaleAppointmentIdScaleTypeCompoundUniqueInput
+    AND?: ClinicalScaleWhereInput | ClinicalScaleWhereInput[]
+    OR?: ClinicalScaleWhereInput[]
+    NOT?: ClinicalScaleWhereInput | ClinicalScaleWhereInput[]
+    patientId?: UuidFilter<"ClinicalScale"> | string
+    appointmentId?: UuidFilter<"ClinicalScale"> | string
+    scaleType?: EnumScaleTypeFilter<"ClinicalScale"> | $Enums.ScaleType
+    scores?: IntNullableListFilter<"ClinicalScale">
+    totalScore?: IntFilter<"ClinicalScale"> | number
+    riskLevel?: EnumScaleRiskLevelFilter<"ClinicalScale"> | $Enums.ScaleRiskLevel
+    createdAt?: DateTimeFilter<"ClinicalScale"> | Date | string
+    updatedAt?: DateTimeFilter<"ClinicalScale"> | Date | string
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
+  }, "id" | "appointmentId_scaleType">
+
+  export type ClinicalScaleOrderByWithAggregationInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    scaleType?: SortOrder
+    scores?: SortOrder
+    totalScore?: SortOrder
+    riskLevel?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ClinicalScaleCountOrderByAggregateInput
+    _avg?: ClinicalScaleAvgOrderByAggregateInput
+    _max?: ClinicalScaleMaxOrderByAggregateInput
+    _min?: ClinicalScaleMinOrderByAggregateInput
+    _sum?: ClinicalScaleSumOrderByAggregateInput
+  }
+
+  export type ClinicalScaleScalarWhereWithAggregatesInput = {
+    AND?: ClinicalScaleScalarWhereWithAggregatesInput | ClinicalScaleScalarWhereWithAggregatesInput[]
+    OR?: ClinicalScaleScalarWhereWithAggregatesInput[]
+    NOT?: ClinicalScaleScalarWhereWithAggregatesInput | ClinicalScaleScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"ClinicalScale"> | string
+    patientId?: UuidWithAggregatesFilter<"ClinicalScale"> | string
+    appointmentId?: UuidWithAggregatesFilter<"ClinicalScale"> | string
+    scaleType?: EnumScaleTypeWithAggregatesFilter<"ClinicalScale"> | $Enums.ScaleType
+    scores?: IntNullableListFilter<"ClinicalScale">
+    totalScore?: IntWithAggregatesFilter<"ClinicalScale"> | number
+    riskLevel?: EnumScaleRiskLevelWithAggregatesFilter<"ClinicalScale"> | $Enums.ScaleRiskLevel
+    createdAt?: DateTimeWithAggregatesFilter<"ClinicalScale"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ClinicalScale"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     email: string
@@ -12276,6 +17827,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     profile?: ClinicianProfileCreateNestedOneWithoutUserInput
     accessLogs?: AccessLogCreateNestedManyWithoutUserInput
+    refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -12287,6 +17839,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     profile?: ClinicianProfileUncheckedCreateNestedOneWithoutUserInput
     accessLogs?: AccessLogUncheckedCreateNestedManyWithoutUserInput
+    refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -12298,6 +17851,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     profile?: ClinicianProfileUpdateOneWithoutUserNestedInput
     accessLogs?: AccessLogUpdateManyWithoutUserNestedInput
+    refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -12309,6 +17863,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     profile?: ClinicianProfileUncheckedUpdateOneWithoutUserNestedInput
     accessLogs?: AccessLogUncheckedUpdateManyWithoutUserNestedInput
+    refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -12336,6 +17891,61 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RefreshTokenCreateInput = {
+    id?: string
+    tokenHash: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutRefreshTokensInput
+  }
+
+  export type RefreshTokenUncheckedCreateInput = {
+    id?: string
+    userId: string
+    tokenHash: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type RefreshTokenUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutRefreshTokensNestedInput
+  }
+
+  export type RefreshTokenUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RefreshTokenCreateManyInput = {
+    id?: string
+    userId: string
+    tokenHash: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type RefreshTokenUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RefreshTokenUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ClinicianProfileCreateInput = {
@@ -12441,7 +18051,8 @@ export namespace Prisma {
     clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
@@ -12449,6 +18060,9 @@ export namespace Prisma {
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
     tasks?: TaskCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateInput = {
@@ -12460,13 +18074,17 @@ export namespace Prisma {
     clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
     tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUpdateInput = {
@@ -12477,7 +18095,8 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
@@ -12485,6 +18104,9 @@ export namespace Prisma {
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
     tasks?: TaskUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateInput = {
@@ -12496,13 +18118,17 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
     tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientCreateManyInput = {
@@ -12514,7 +18140,8 @@ export namespace Prisma {
     clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -12527,7 +18154,8 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12541,7 +18169,8 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12563,6 +18192,9 @@ export namespace Prisma {
     clinician: ClinicianProfileCreateNestedOneWithoutAppointmentsInput
     psychNote?: PsychNoteCreateNestedOneWithoutAppointmentInput
     transaction?: FinanceTransactionCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanCreateNestedOneWithoutAppointmentInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutAppointmentInput
   }
 
   export type AppointmentUncheckedCreateInput = {
@@ -12582,6 +18214,9 @@ export namespace Prisma {
     updatedAt?: Date | string
     psychNote?: PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput
     transaction?: FinanceTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanUncheckedCreateNestedOneWithoutAppointmentInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutAppointmentInput
   }
 
   export type AppointmentUpdateInput = {
@@ -12601,6 +18236,9 @@ export namespace Prisma {
     clinician?: ClinicianProfileUpdateOneRequiredWithoutAppointmentsNestedInput
     psychNote?: PsychNoteUpdateOneWithoutAppointmentNestedInput
     transaction?: FinanceTransactionUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUpdateOneWithoutAppointmentNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateInput = {
@@ -12620,6 +18258,9 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     psychNote?: PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput
     transaction?: FinanceTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutAppointmentNestedInput
   }
 
   export type AppointmentCreateManyInput = {
@@ -13007,6 +18648,252 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AnthropometryCreateInput = {
+    id?: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutAnthropometriesInput
+    appointment: AppointmentCreateNestedOneWithoutAnthropometryInput
+  }
+
+  export type AnthropometryUncheckedCreateInput = {
+    id?: string
+    patientId: string
+    appointmentId: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AnthropometryUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutAnthropometriesNestedInput
+    appointment?: AppointmentUpdateOneRequiredWithoutAnthropometryNestedInput
+  }
+
+  export type AnthropometryUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AnthropometryCreateManyInput = {
+    id?: string
+    patientId: string
+    appointmentId: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AnthropometryUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AnthropometryUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MealPlanCreateInput = {
+    id?: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutMealPlansInput
+    appointment: AppointmentCreateNestedOneWithoutMealPlanInput
+  }
+
+  export type MealPlanUncheckedCreateInput = {
+    id?: string
+    patientId: string
+    appointmentId: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MealPlanUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutMealPlansNestedInput
+    appointment?: AppointmentUpdateOneRequiredWithoutMealPlanNestedInput
+  }
+
+  export type MealPlanUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MealPlanCreateManyInput = {
+    id?: string
+    patientId: string
+    appointmentId: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MealPlanUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MealPlanUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ClinicalScaleCreateInput = {
+    id?: string
+    scaleType: $Enums.ScaleType
+    scores?: ClinicalScaleCreatescoresInput | number[]
+    totalScore: number
+    riskLevel: $Enums.ScaleRiskLevel
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutClinicalScalesInput
+    appointment: AppointmentCreateNestedOneWithoutClinicalScalesInput
+  }
+
+  export type ClinicalScaleUncheckedCreateInput = {
+    id?: string
+    patientId: string
+    appointmentId: string
+    scaleType: $Enums.ScaleType
+    scores?: ClinicalScaleCreatescoresInput | number[]
+    totalScore: number
+    riskLevel: $Enums.ScaleRiskLevel
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ClinicalScaleUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scaleType?: EnumScaleTypeFieldUpdateOperationsInput | $Enums.ScaleType
+    scores?: ClinicalScaleUpdatescoresInput | number[]
+    totalScore?: IntFieldUpdateOperationsInput | number
+    riskLevel?: EnumScaleRiskLevelFieldUpdateOperationsInput | $Enums.ScaleRiskLevel
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutClinicalScalesNestedInput
+    appointment?: AppointmentUpdateOneRequiredWithoutClinicalScalesNestedInput
+  }
+
+  export type ClinicalScaleUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    scaleType?: EnumScaleTypeFieldUpdateOperationsInput | $Enums.ScaleType
+    scores?: ClinicalScaleUpdatescoresInput | number[]
+    totalScore?: IntFieldUpdateOperationsInput | number
+    riskLevel?: EnumScaleRiskLevelFieldUpdateOperationsInput | $Enums.ScaleRiskLevel
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ClinicalScaleCreateManyInput = {
+    id?: string
+    patientId: string
+    appointmentId: string
+    scaleType: $Enums.ScaleType
+    scores?: ClinicalScaleCreatescoresInput | number[]
+    totalScore: number
+    riskLevel: $Enums.ScaleRiskLevel
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ClinicalScaleUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scaleType?: EnumScaleTypeFieldUpdateOperationsInput | $Enums.ScaleType
+    scores?: ClinicalScaleUpdatescoresInput | number[]
+    totalScore?: IntFieldUpdateOperationsInput | number
+    riskLevel?: EnumScaleRiskLevelFieldUpdateOperationsInput | $Enums.ScaleRiskLevel
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ClinicalScaleUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    scaleType?: EnumScaleTypeFieldUpdateOperationsInput | $Enums.ScaleType
+    scores?: ClinicalScaleUpdatescoresInput | number[]
+    totalScore?: IntFieldUpdateOperationsInput | number
+    riskLevel?: EnumScaleRiskLevelFieldUpdateOperationsInput | $Enums.ScaleRiskLevel
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UuidFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -13063,7 +18950,17 @@ export namespace Prisma {
     none?: AccessLogWhereInput
   }
 
+  export type RefreshTokenListRelationFilter = {
+    every?: RefreshTokenWhereInput
+    some?: RefreshTokenWhereInput
+    none?: RefreshTokenWhereInput
+  }
+
   export type AccessLogOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type RefreshTokenOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -13151,6 +19048,35 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
+  }
+
+  export type RefreshTokenCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tokenHash?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type RefreshTokenMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tokenHash?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type RefreshTokenMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tokenHash?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
   export type EnumClinicianTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.ClinicianType | EnumClinicianTypeFieldRefInput<$PrismaModel>
     in?: $Enums.ClinicianType[] | ListEnumClinicianTypeFieldRefInput<$PrismaModel>
@@ -13193,11 +19119,6 @@ export namespace Prisma {
     gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-  }
-
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
   }
 
   export type PatientListRelationFilter = {
@@ -13358,28 +19279,13 @@ export namespace Prisma {
     notIn?: $Enums.PatientStatus[] | ListEnumPatientStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumPatientStatusFilter<$PrismaModel> | $Enums.PatientStatus
   }
-  export type JsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
 
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
   }
 
   export type ClinicianProfileScalarRelationFilter = {
@@ -13399,11 +19305,41 @@ export namespace Prisma {
     none?: TaskWhereInput
   }
 
+  export type AnthropometryListRelationFilter = {
+    every?: AnthropometryWhereInput
+    some?: AnthropometryWhereInput
+    none?: AnthropometryWhereInput
+  }
+
+  export type MealPlanListRelationFilter = {
+    every?: MealPlanWhereInput
+    some?: MealPlanWhereInput
+    none?: MealPlanWhereInput
+  }
+
+  export type ClinicalScaleListRelationFilter = {
+    every?: ClinicalScaleWhereInput
+    some?: ClinicalScaleWhereInput
+    none?: ClinicalScaleWhereInput
+  }
+
   export type PsychNoteOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type TaskOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AnthropometryOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MealPlanOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ClinicalScaleOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -13417,6 +19353,7 @@ export namespace Prisma {
     status?: SortOrder
     contactPhone?: SortOrder
     emergencyContact?: SortOrder
+    treatmentGoals?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -13430,6 +19367,7 @@ export namespace Prisma {
     clinicalContext?: SortOrder
     status?: SortOrder
     contactPhone?: SortOrder
+    emergencyContact?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -13443,6 +19381,7 @@ export namespace Prisma {
     clinicalContext?: SortOrder
     status?: SortOrder
     contactPhone?: SortOrder
+    emergencyContact?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -13469,32 +19408,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPatientStatusFilter<$PrismaModel>
     _max?: NestedEnumPatientStatusFilter<$PrismaModel>
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type EnumAppointmentTypeFilter<$PrismaModel = never> = {
@@ -13538,6 +19451,16 @@ export namespace Prisma {
   export type FinanceTransactionNullableScalarRelationFilter = {
     is?: FinanceTransactionWhereInput | null
     isNot?: FinanceTransactionWhereInput | null
+  }
+
+  export type AnthropometryNullableScalarRelationFilter = {
+    is?: AnthropometryWhereInput | null
+    isNot?: AnthropometryWhereInput | null
+  }
+
+  export type MealPlanNullableScalarRelationFilter = {
+    is?: MealPlanWhereInput | null
+    isNot?: MealPlanWhereInput | null
   }
 
   export type AppointmentCountOrderByAggregateInput = {
@@ -13683,14 +19606,6 @@ export namespace Prisma {
   export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type StringNullableListFilter<$PrismaModel = never> = {
-    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    has?: string | StringFieldRefInput<$PrismaModel> | null
-    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
-    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
-    isEmpty?: boolean
   }
 
   export type AppointmentScalarRelationFilter = {
@@ -13971,6 +19886,212 @@ export namespace Prisma {
     _max?: NestedEnumTransactionTypeFilter<$PrismaModel>
   }
 
+  export type DecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type AnthropometryCountOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    weight?: SortOrder
+    height?: SortOrder
+    bodyFat?: SortOrder
+    waist?: SortOrder
+    hip?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AnthropometryAvgOrderByAggregateInput = {
+    weight?: SortOrder
+    height?: SortOrder
+    bodyFat?: SortOrder
+    waist?: SortOrder
+    hip?: SortOrder
+  }
+
+  export type AnthropometryMaxOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    weight?: SortOrder
+    height?: SortOrder
+    bodyFat?: SortOrder
+    waist?: SortOrder
+    hip?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AnthropometryMinOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    weight?: SortOrder
+    height?: SortOrder
+    bodyFat?: SortOrder
+    waist?: SortOrder
+    hip?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AnthropometrySumOrderByAggregateInput = {
+    weight?: SortOrder
+    height?: SortOrder
+    bodyFat?: SortOrder
+    waist?: SortOrder
+    hip?: SortOrder
+  }
+
+  export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type MealPlanCountOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    content?: SortOrder
+    fileUrl?: SortOrder
+    fileName?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MealPlanMaxOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    content?: SortOrder
+    fileUrl?: SortOrder
+    fileName?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MealPlanMinOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    content?: SortOrder
+    fileUrl?: SortOrder
+    fileName?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumScaleTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.ScaleType | EnumScaleTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ScaleType[] | ListEnumScaleTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ScaleType[] | ListEnumScaleTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumScaleTypeFilter<$PrismaModel> | $Enums.ScaleType
+  }
+
+  export type IntNullableListFilter<$PrismaModel = never> = {
+    equals?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    has?: number | IntFieldRefInput<$PrismaModel> | null
+    hasEvery?: number[] | ListIntFieldRefInput<$PrismaModel>
+    hasSome?: number[] | ListIntFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
+  export type EnumScaleRiskLevelFilter<$PrismaModel = never> = {
+    equals?: $Enums.ScaleRiskLevel | EnumScaleRiskLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.ScaleRiskLevel[] | ListEnumScaleRiskLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ScaleRiskLevel[] | ListEnumScaleRiskLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumScaleRiskLevelFilter<$PrismaModel> | $Enums.ScaleRiskLevel
+  }
+
+  export type ClinicalScaleAppointmentIdScaleTypeCompoundUniqueInput = {
+    appointmentId: string
+    scaleType: $Enums.ScaleType
+  }
+
+  export type ClinicalScaleCountOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    scaleType?: SortOrder
+    scores?: SortOrder
+    totalScore?: SortOrder
+    riskLevel?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ClinicalScaleAvgOrderByAggregateInput = {
+    scores?: SortOrder
+    totalScore?: SortOrder
+  }
+
+  export type ClinicalScaleMaxOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    scaleType?: SortOrder
+    totalScore?: SortOrder
+    riskLevel?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ClinicalScaleMinOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    appointmentId?: SortOrder
+    scaleType?: SortOrder
+    totalScore?: SortOrder
+    riskLevel?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ClinicalScaleSumOrderByAggregateInput = {
+    scores?: SortOrder
+    totalScore?: SortOrder
+  }
+
+  export type EnumScaleTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ScaleType | EnumScaleTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ScaleType[] | ListEnumScaleTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ScaleType[] | ListEnumScaleTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumScaleTypeWithAggregatesFilter<$PrismaModel> | $Enums.ScaleType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumScaleTypeFilter<$PrismaModel>
+    _max?: NestedEnumScaleTypeFilter<$PrismaModel>
+  }
+
+  export type EnumScaleRiskLevelWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ScaleRiskLevel | EnumScaleRiskLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.ScaleRiskLevel[] | ListEnumScaleRiskLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ScaleRiskLevel[] | ListEnumScaleRiskLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumScaleRiskLevelWithAggregatesFilter<$PrismaModel> | $Enums.ScaleRiskLevel
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumScaleRiskLevelFilter<$PrismaModel>
+    _max?: NestedEnumScaleRiskLevelFilter<$PrismaModel>
+  }
+
   export type ClinicianProfileCreateNestedOneWithoutUserInput = {
     create?: XOR<ClinicianProfileCreateWithoutUserInput, ClinicianProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: ClinicianProfileCreateOrConnectWithoutUserInput
@@ -13984,6 +20105,13 @@ export namespace Prisma {
     connect?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
   }
 
+  export type RefreshTokenCreateNestedManyWithoutUserInput = {
+    create?: XOR<RefreshTokenCreateWithoutUserInput, RefreshTokenUncheckedCreateWithoutUserInput> | RefreshTokenCreateWithoutUserInput[] | RefreshTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: RefreshTokenCreateOrConnectWithoutUserInput | RefreshTokenCreateOrConnectWithoutUserInput[]
+    createMany?: RefreshTokenCreateManyUserInputEnvelope
+    connect?: RefreshTokenWhereUniqueInput | RefreshTokenWhereUniqueInput[]
+  }
+
   export type ClinicianProfileUncheckedCreateNestedOneWithoutUserInput = {
     create?: XOR<ClinicianProfileCreateWithoutUserInput, ClinicianProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: ClinicianProfileCreateOrConnectWithoutUserInput
@@ -13995,6 +20123,13 @@ export namespace Prisma {
     connectOrCreate?: AccessLogCreateOrConnectWithoutUserInput | AccessLogCreateOrConnectWithoutUserInput[]
     createMany?: AccessLogCreateManyUserInputEnvelope
     connect?: AccessLogWhereUniqueInput | AccessLogWhereUniqueInput[]
+  }
+
+  export type RefreshTokenUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<RefreshTokenCreateWithoutUserInput, RefreshTokenUncheckedCreateWithoutUserInput> | RefreshTokenCreateWithoutUserInput[] | RefreshTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: RefreshTokenCreateOrConnectWithoutUserInput | RefreshTokenCreateOrConnectWithoutUserInput[]
+    createMany?: RefreshTokenCreateManyUserInputEnvelope
+    connect?: RefreshTokenWhereUniqueInput | RefreshTokenWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -14033,6 +20168,20 @@ export namespace Prisma {
     deleteMany?: AccessLogScalarWhereInput | AccessLogScalarWhereInput[]
   }
 
+  export type RefreshTokenUpdateManyWithoutUserNestedInput = {
+    create?: XOR<RefreshTokenCreateWithoutUserInput, RefreshTokenUncheckedCreateWithoutUserInput> | RefreshTokenCreateWithoutUserInput[] | RefreshTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: RefreshTokenCreateOrConnectWithoutUserInput | RefreshTokenCreateOrConnectWithoutUserInput[]
+    upsert?: RefreshTokenUpsertWithWhereUniqueWithoutUserInput | RefreshTokenUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: RefreshTokenCreateManyUserInputEnvelope
+    set?: RefreshTokenWhereUniqueInput | RefreshTokenWhereUniqueInput[]
+    disconnect?: RefreshTokenWhereUniqueInput | RefreshTokenWhereUniqueInput[]
+    delete?: RefreshTokenWhereUniqueInput | RefreshTokenWhereUniqueInput[]
+    connect?: RefreshTokenWhereUniqueInput | RefreshTokenWhereUniqueInput[]
+    update?: RefreshTokenUpdateWithWhereUniqueWithoutUserInput | RefreshTokenUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: RefreshTokenUpdateManyWithWhereWithoutUserInput | RefreshTokenUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: RefreshTokenScalarWhereInput | RefreshTokenScalarWhereInput[]
+  }
+
   export type ClinicianProfileUncheckedUpdateOneWithoutUserNestedInput = {
     create?: XOR<ClinicianProfileCreateWithoutUserInput, ClinicianProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: ClinicianProfileCreateOrConnectWithoutUserInput
@@ -14055,6 +20204,34 @@ export namespace Prisma {
     update?: AccessLogUpdateWithWhereUniqueWithoutUserInput | AccessLogUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: AccessLogUpdateManyWithWhereWithoutUserInput | AccessLogUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: AccessLogScalarWhereInput | AccessLogScalarWhereInput[]
+  }
+
+  export type RefreshTokenUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<RefreshTokenCreateWithoutUserInput, RefreshTokenUncheckedCreateWithoutUserInput> | RefreshTokenCreateWithoutUserInput[] | RefreshTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: RefreshTokenCreateOrConnectWithoutUserInput | RefreshTokenCreateOrConnectWithoutUserInput[]
+    upsert?: RefreshTokenUpsertWithWhereUniqueWithoutUserInput | RefreshTokenUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: RefreshTokenCreateManyUserInputEnvelope
+    set?: RefreshTokenWhereUniqueInput | RefreshTokenWhereUniqueInput[]
+    disconnect?: RefreshTokenWhereUniqueInput | RefreshTokenWhereUniqueInput[]
+    delete?: RefreshTokenWhereUniqueInput | RefreshTokenWhereUniqueInput[]
+    connect?: RefreshTokenWhereUniqueInput | RefreshTokenWhereUniqueInput[]
+    update?: RefreshTokenUpdateWithWhereUniqueWithoutUserInput | RefreshTokenUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: RefreshTokenUpdateManyWithWhereWithoutUserInput | RefreshTokenUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: RefreshTokenScalarWhereInput | RefreshTokenScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutRefreshTokensInput = {
+    create?: XOR<UserCreateWithoutRefreshTokensInput, UserUncheckedCreateWithoutRefreshTokensInput>
+    connectOrCreate?: UserCreateOrConnectWithoutRefreshTokensInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutRefreshTokensNestedInput = {
+    create?: XOR<UserCreateWithoutRefreshTokensInput, UserUncheckedCreateWithoutRefreshTokensInput>
+    connectOrCreate?: UserCreateOrConnectWithoutRefreshTokensInput
+    upsert?: UserUpsertWithoutRefreshTokensInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutRefreshTokensInput, UserUpdateWithoutRefreshTokensInput>, UserUncheckedUpdateWithoutRefreshTokensInput>
   }
 
   export type UserCreateNestedOneWithoutProfileInput = {
@@ -14221,6 +20398,10 @@ export namespace Prisma {
     deleteMany?: FinanceTransactionScalarWhereInput | FinanceTransactionScalarWhereInput[]
   }
 
+  export type PatientCreatetreatmentGoalsInput = {
+    set: string[]
+  }
+
   export type ClinicianProfileCreateNestedOneWithoutPatientsInput = {
     create?: XOR<ClinicianProfileCreateWithoutPatientsInput, ClinicianProfileUncheckedCreateWithoutPatientsInput>
     connectOrCreate?: ClinicianProfileCreateOrConnectWithoutPatientsInput
@@ -14255,6 +20436,27 @@ export namespace Prisma {
     connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
   }
 
+  export type AnthropometryCreateNestedManyWithoutPatientInput = {
+    create?: XOR<AnthropometryCreateWithoutPatientInput, AnthropometryUncheckedCreateWithoutPatientInput> | AnthropometryCreateWithoutPatientInput[] | AnthropometryUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutPatientInput | AnthropometryCreateOrConnectWithoutPatientInput[]
+    createMany?: AnthropometryCreateManyPatientInputEnvelope
+    connect?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+  }
+
+  export type MealPlanCreateNestedManyWithoutPatientInput = {
+    create?: XOR<MealPlanCreateWithoutPatientInput, MealPlanUncheckedCreateWithoutPatientInput> | MealPlanCreateWithoutPatientInput[] | MealPlanUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: MealPlanCreateOrConnectWithoutPatientInput | MealPlanCreateOrConnectWithoutPatientInput[]
+    createMany?: MealPlanCreateManyPatientInputEnvelope
+    connect?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+  }
+
+  export type ClinicalScaleCreateNestedManyWithoutPatientInput = {
+    create?: XOR<ClinicalScaleCreateWithoutPatientInput, ClinicalScaleUncheckedCreateWithoutPatientInput> | ClinicalScaleCreateWithoutPatientInput[] | ClinicalScaleUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: ClinicalScaleCreateOrConnectWithoutPatientInput | ClinicalScaleCreateOrConnectWithoutPatientInput[]
+    createMany?: ClinicalScaleCreateManyPatientInputEnvelope
+    connect?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+  }
+
   export type AppointmentUncheckedCreateNestedManyWithoutPatientInput = {
     create?: XOR<AppointmentCreateWithoutPatientInput, AppointmentUncheckedCreateWithoutPatientInput> | AppointmentCreateWithoutPatientInput[] | AppointmentUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: AppointmentCreateOrConnectWithoutPatientInput | AppointmentCreateOrConnectWithoutPatientInput[]
@@ -14283,12 +20485,38 @@ export namespace Prisma {
     connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
   }
 
+  export type AnthropometryUncheckedCreateNestedManyWithoutPatientInput = {
+    create?: XOR<AnthropometryCreateWithoutPatientInput, AnthropometryUncheckedCreateWithoutPatientInput> | AnthropometryCreateWithoutPatientInput[] | AnthropometryUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutPatientInput | AnthropometryCreateOrConnectWithoutPatientInput[]
+    createMany?: AnthropometryCreateManyPatientInputEnvelope
+    connect?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+  }
+
+  export type MealPlanUncheckedCreateNestedManyWithoutPatientInput = {
+    create?: XOR<MealPlanCreateWithoutPatientInput, MealPlanUncheckedCreateWithoutPatientInput> | MealPlanCreateWithoutPatientInput[] | MealPlanUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: MealPlanCreateOrConnectWithoutPatientInput | MealPlanCreateOrConnectWithoutPatientInput[]
+    createMany?: MealPlanCreateManyPatientInputEnvelope
+    connect?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+  }
+
+  export type ClinicalScaleUncheckedCreateNestedManyWithoutPatientInput = {
+    create?: XOR<ClinicalScaleCreateWithoutPatientInput, ClinicalScaleUncheckedCreateWithoutPatientInput> | ClinicalScaleCreateWithoutPatientInput[] | ClinicalScaleUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: ClinicalScaleCreateOrConnectWithoutPatientInput | ClinicalScaleCreateOrConnectWithoutPatientInput[]
+    createMany?: ClinicalScaleCreateManyPatientInputEnvelope
+    connect?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+  }
+
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
   }
 
   export type EnumPatientStatusFieldUpdateOperationsInput = {
     set?: $Enums.PatientStatus
+  }
+
+  export type PatientUpdatetreatmentGoalsInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput = {
@@ -14355,6 +20583,48 @@ export namespace Prisma {
     deleteMany?: TaskScalarWhereInput | TaskScalarWhereInput[]
   }
 
+  export type AnthropometryUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<AnthropometryCreateWithoutPatientInput, AnthropometryUncheckedCreateWithoutPatientInput> | AnthropometryCreateWithoutPatientInput[] | AnthropometryUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutPatientInput | AnthropometryCreateOrConnectWithoutPatientInput[]
+    upsert?: AnthropometryUpsertWithWhereUniqueWithoutPatientInput | AnthropometryUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: AnthropometryCreateManyPatientInputEnvelope
+    set?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    disconnect?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    delete?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    connect?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    update?: AnthropometryUpdateWithWhereUniqueWithoutPatientInput | AnthropometryUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: AnthropometryUpdateManyWithWhereWithoutPatientInput | AnthropometryUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: AnthropometryScalarWhereInput | AnthropometryScalarWhereInput[]
+  }
+
+  export type MealPlanUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<MealPlanCreateWithoutPatientInput, MealPlanUncheckedCreateWithoutPatientInput> | MealPlanCreateWithoutPatientInput[] | MealPlanUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: MealPlanCreateOrConnectWithoutPatientInput | MealPlanCreateOrConnectWithoutPatientInput[]
+    upsert?: MealPlanUpsertWithWhereUniqueWithoutPatientInput | MealPlanUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: MealPlanCreateManyPatientInputEnvelope
+    set?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    disconnect?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    delete?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    connect?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    update?: MealPlanUpdateWithWhereUniqueWithoutPatientInput | MealPlanUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: MealPlanUpdateManyWithWhereWithoutPatientInput | MealPlanUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: MealPlanScalarWhereInput | MealPlanScalarWhereInput[]
+  }
+
+  export type ClinicalScaleUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<ClinicalScaleCreateWithoutPatientInput, ClinicalScaleUncheckedCreateWithoutPatientInput> | ClinicalScaleCreateWithoutPatientInput[] | ClinicalScaleUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: ClinicalScaleCreateOrConnectWithoutPatientInput | ClinicalScaleCreateOrConnectWithoutPatientInput[]
+    upsert?: ClinicalScaleUpsertWithWhereUniqueWithoutPatientInput | ClinicalScaleUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: ClinicalScaleCreateManyPatientInputEnvelope
+    set?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    disconnect?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    delete?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    connect?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    update?: ClinicalScaleUpdateWithWhereUniqueWithoutPatientInput | ClinicalScaleUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: ClinicalScaleUpdateManyWithWhereWithoutPatientInput | ClinicalScaleUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: ClinicalScaleScalarWhereInput | ClinicalScaleScalarWhereInput[]
+  }
+
   export type AppointmentUncheckedUpdateManyWithoutPatientNestedInput = {
     create?: XOR<AppointmentCreateWithoutPatientInput, AppointmentUncheckedCreateWithoutPatientInput> | AppointmentCreateWithoutPatientInput[] | AppointmentUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: AppointmentCreateOrConnectWithoutPatientInput | AppointmentCreateOrConnectWithoutPatientInput[]
@@ -14411,6 +20681,48 @@ export namespace Prisma {
     deleteMany?: TaskScalarWhereInput | TaskScalarWhereInput[]
   }
 
+  export type AnthropometryUncheckedUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<AnthropometryCreateWithoutPatientInput, AnthropometryUncheckedCreateWithoutPatientInput> | AnthropometryCreateWithoutPatientInput[] | AnthropometryUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutPatientInput | AnthropometryCreateOrConnectWithoutPatientInput[]
+    upsert?: AnthropometryUpsertWithWhereUniqueWithoutPatientInput | AnthropometryUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: AnthropometryCreateManyPatientInputEnvelope
+    set?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    disconnect?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    delete?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    connect?: AnthropometryWhereUniqueInput | AnthropometryWhereUniqueInput[]
+    update?: AnthropometryUpdateWithWhereUniqueWithoutPatientInput | AnthropometryUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: AnthropometryUpdateManyWithWhereWithoutPatientInput | AnthropometryUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: AnthropometryScalarWhereInput | AnthropometryScalarWhereInput[]
+  }
+
+  export type MealPlanUncheckedUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<MealPlanCreateWithoutPatientInput, MealPlanUncheckedCreateWithoutPatientInput> | MealPlanCreateWithoutPatientInput[] | MealPlanUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: MealPlanCreateOrConnectWithoutPatientInput | MealPlanCreateOrConnectWithoutPatientInput[]
+    upsert?: MealPlanUpsertWithWhereUniqueWithoutPatientInput | MealPlanUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: MealPlanCreateManyPatientInputEnvelope
+    set?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    disconnect?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    delete?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    connect?: MealPlanWhereUniqueInput | MealPlanWhereUniqueInput[]
+    update?: MealPlanUpdateWithWhereUniqueWithoutPatientInput | MealPlanUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: MealPlanUpdateManyWithWhereWithoutPatientInput | MealPlanUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: MealPlanScalarWhereInput | MealPlanScalarWhereInput[]
+  }
+
+  export type ClinicalScaleUncheckedUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<ClinicalScaleCreateWithoutPatientInput, ClinicalScaleUncheckedCreateWithoutPatientInput> | ClinicalScaleCreateWithoutPatientInput[] | ClinicalScaleUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: ClinicalScaleCreateOrConnectWithoutPatientInput | ClinicalScaleCreateOrConnectWithoutPatientInput[]
+    upsert?: ClinicalScaleUpsertWithWhereUniqueWithoutPatientInput | ClinicalScaleUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: ClinicalScaleCreateManyPatientInputEnvelope
+    set?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    disconnect?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    delete?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    connect?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    update?: ClinicalScaleUpdateWithWhereUniqueWithoutPatientInput | ClinicalScaleUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: ClinicalScaleUpdateManyWithWhereWithoutPatientInput | ClinicalScaleUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: ClinicalScaleScalarWhereInput | ClinicalScaleScalarWhereInput[]
+  }
+
   export type PatientCreateNestedOneWithoutAppointmentsInput = {
     create?: XOR<PatientCreateWithoutAppointmentsInput, PatientUncheckedCreateWithoutAppointmentsInput>
     connectOrCreate?: PatientCreateOrConnectWithoutAppointmentsInput
@@ -14435,6 +20747,25 @@ export namespace Prisma {
     connect?: FinanceTransactionWhereUniqueInput
   }
 
+  export type AnthropometryCreateNestedOneWithoutAppointmentInput = {
+    create?: XOR<AnthropometryCreateWithoutAppointmentInput, AnthropometryUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutAppointmentInput
+    connect?: AnthropometryWhereUniqueInput
+  }
+
+  export type MealPlanCreateNestedOneWithoutAppointmentInput = {
+    create?: XOR<MealPlanCreateWithoutAppointmentInput, MealPlanUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: MealPlanCreateOrConnectWithoutAppointmentInput
+    connect?: MealPlanWhereUniqueInput
+  }
+
+  export type ClinicalScaleCreateNestedManyWithoutAppointmentInput = {
+    create?: XOR<ClinicalScaleCreateWithoutAppointmentInput, ClinicalScaleUncheckedCreateWithoutAppointmentInput> | ClinicalScaleCreateWithoutAppointmentInput[] | ClinicalScaleUncheckedCreateWithoutAppointmentInput[]
+    connectOrCreate?: ClinicalScaleCreateOrConnectWithoutAppointmentInput | ClinicalScaleCreateOrConnectWithoutAppointmentInput[]
+    createMany?: ClinicalScaleCreateManyAppointmentInputEnvelope
+    connect?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+  }
+
   export type PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput = {
     create?: XOR<PsychNoteCreateWithoutAppointmentInput, PsychNoteUncheckedCreateWithoutAppointmentInput>
     connectOrCreate?: PsychNoteCreateOrConnectWithoutAppointmentInput
@@ -14445,6 +20776,25 @@ export namespace Prisma {
     create?: XOR<FinanceTransactionCreateWithoutAppointmentInput, FinanceTransactionUncheckedCreateWithoutAppointmentInput>
     connectOrCreate?: FinanceTransactionCreateOrConnectWithoutAppointmentInput
     connect?: FinanceTransactionWhereUniqueInput
+  }
+
+  export type AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput = {
+    create?: XOR<AnthropometryCreateWithoutAppointmentInput, AnthropometryUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutAppointmentInput
+    connect?: AnthropometryWhereUniqueInput
+  }
+
+  export type MealPlanUncheckedCreateNestedOneWithoutAppointmentInput = {
+    create?: XOR<MealPlanCreateWithoutAppointmentInput, MealPlanUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: MealPlanCreateOrConnectWithoutAppointmentInput
+    connect?: MealPlanWhereUniqueInput
+  }
+
+  export type ClinicalScaleUncheckedCreateNestedManyWithoutAppointmentInput = {
+    create?: XOR<ClinicalScaleCreateWithoutAppointmentInput, ClinicalScaleUncheckedCreateWithoutAppointmentInput> | ClinicalScaleCreateWithoutAppointmentInput[] | ClinicalScaleUncheckedCreateWithoutAppointmentInput[]
+    connectOrCreate?: ClinicalScaleCreateOrConnectWithoutAppointmentInput | ClinicalScaleCreateOrConnectWithoutAppointmentInput[]
+    createMany?: ClinicalScaleCreateManyAppointmentInputEnvelope
+    connect?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
   }
 
   export type EnumAppointmentTypeFieldUpdateOperationsInput = {
@@ -14499,6 +20849,40 @@ export namespace Prisma {
     update?: XOR<XOR<FinanceTransactionUpdateToOneWithWhereWithoutAppointmentInput, FinanceTransactionUpdateWithoutAppointmentInput>, FinanceTransactionUncheckedUpdateWithoutAppointmentInput>
   }
 
+  export type AnthropometryUpdateOneWithoutAppointmentNestedInput = {
+    create?: XOR<AnthropometryCreateWithoutAppointmentInput, AnthropometryUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutAppointmentInput
+    upsert?: AnthropometryUpsertWithoutAppointmentInput
+    disconnect?: AnthropometryWhereInput | boolean
+    delete?: AnthropometryWhereInput | boolean
+    connect?: AnthropometryWhereUniqueInput
+    update?: XOR<XOR<AnthropometryUpdateToOneWithWhereWithoutAppointmentInput, AnthropometryUpdateWithoutAppointmentInput>, AnthropometryUncheckedUpdateWithoutAppointmentInput>
+  }
+
+  export type MealPlanUpdateOneWithoutAppointmentNestedInput = {
+    create?: XOR<MealPlanCreateWithoutAppointmentInput, MealPlanUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: MealPlanCreateOrConnectWithoutAppointmentInput
+    upsert?: MealPlanUpsertWithoutAppointmentInput
+    disconnect?: MealPlanWhereInput | boolean
+    delete?: MealPlanWhereInput | boolean
+    connect?: MealPlanWhereUniqueInput
+    update?: XOR<XOR<MealPlanUpdateToOneWithWhereWithoutAppointmentInput, MealPlanUpdateWithoutAppointmentInput>, MealPlanUncheckedUpdateWithoutAppointmentInput>
+  }
+
+  export type ClinicalScaleUpdateManyWithoutAppointmentNestedInput = {
+    create?: XOR<ClinicalScaleCreateWithoutAppointmentInput, ClinicalScaleUncheckedCreateWithoutAppointmentInput> | ClinicalScaleCreateWithoutAppointmentInput[] | ClinicalScaleUncheckedCreateWithoutAppointmentInput[]
+    connectOrCreate?: ClinicalScaleCreateOrConnectWithoutAppointmentInput | ClinicalScaleCreateOrConnectWithoutAppointmentInput[]
+    upsert?: ClinicalScaleUpsertWithWhereUniqueWithoutAppointmentInput | ClinicalScaleUpsertWithWhereUniqueWithoutAppointmentInput[]
+    createMany?: ClinicalScaleCreateManyAppointmentInputEnvelope
+    set?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    disconnect?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    delete?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    connect?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    update?: ClinicalScaleUpdateWithWhereUniqueWithoutAppointmentInput | ClinicalScaleUpdateWithWhereUniqueWithoutAppointmentInput[]
+    updateMany?: ClinicalScaleUpdateManyWithWhereWithoutAppointmentInput | ClinicalScaleUpdateManyWithWhereWithoutAppointmentInput[]
+    deleteMany?: ClinicalScaleScalarWhereInput | ClinicalScaleScalarWhereInput[]
+  }
+
   export type PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput = {
     create?: XOR<PsychNoteCreateWithoutAppointmentInput, PsychNoteUncheckedCreateWithoutAppointmentInput>
     connectOrCreate?: PsychNoteCreateOrConnectWithoutAppointmentInput
@@ -14517,6 +20901,40 @@ export namespace Prisma {
     delete?: FinanceTransactionWhereInput | boolean
     connect?: FinanceTransactionWhereUniqueInput
     update?: XOR<XOR<FinanceTransactionUpdateToOneWithWhereWithoutAppointmentInput, FinanceTransactionUpdateWithoutAppointmentInput>, FinanceTransactionUncheckedUpdateWithoutAppointmentInput>
+  }
+
+  export type AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput = {
+    create?: XOR<AnthropometryCreateWithoutAppointmentInput, AnthropometryUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: AnthropometryCreateOrConnectWithoutAppointmentInput
+    upsert?: AnthropometryUpsertWithoutAppointmentInput
+    disconnect?: AnthropometryWhereInput | boolean
+    delete?: AnthropometryWhereInput | boolean
+    connect?: AnthropometryWhereUniqueInput
+    update?: XOR<XOR<AnthropometryUpdateToOneWithWhereWithoutAppointmentInput, AnthropometryUpdateWithoutAppointmentInput>, AnthropometryUncheckedUpdateWithoutAppointmentInput>
+  }
+
+  export type MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput = {
+    create?: XOR<MealPlanCreateWithoutAppointmentInput, MealPlanUncheckedCreateWithoutAppointmentInput>
+    connectOrCreate?: MealPlanCreateOrConnectWithoutAppointmentInput
+    upsert?: MealPlanUpsertWithoutAppointmentInput
+    disconnect?: MealPlanWhereInput | boolean
+    delete?: MealPlanWhereInput | boolean
+    connect?: MealPlanWhereUniqueInput
+    update?: XOR<XOR<MealPlanUpdateToOneWithWhereWithoutAppointmentInput, MealPlanUpdateWithoutAppointmentInput>, MealPlanUncheckedUpdateWithoutAppointmentInput>
+  }
+
+  export type ClinicalScaleUncheckedUpdateManyWithoutAppointmentNestedInput = {
+    create?: XOR<ClinicalScaleCreateWithoutAppointmentInput, ClinicalScaleUncheckedCreateWithoutAppointmentInput> | ClinicalScaleCreateWithoutAppointmentInput[] | ClinicalScaleUncheckedCreateWithoutAppointmentInput[]
+    connectOrCreate?: ClinicalScaleCreateOrConnectWithoutAppointmentInput | ClinicalScaleCreateOrConnectWithoutAppointmentInput[]
+    upsert?: ClinicalScaleUpsertWithWhereUniqueWithoutAppointmentInput | ClinicalScaleUpsertWithWhereUniqueWithoutAppointmentInput[]
+    createMany?: ClinicalScaleCreateManyAppointmentInputEnvelope
+    set?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    disconnect?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    delete?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    connect?: ClinicalScaleWhereUniqueInput | ClinicalScaleWhereUniqueInput[]
+    update?: ClinicalScaleUpdateWithWhereUniqueWithoutAppointmentInput | ClinicalScaleUpdateWithWhereUniqueWithoutAppointmentInput[]
+    updateMany?: ClinicalScaleUpdateManyWithWhereWithoutAppointmentInput | ClinicalScaleUpdateManyWithWhereWithoutAppointmentInput[]
+    deleteMany?: ClinicalScaleScalarWhereInput | ClinicalScaleScalarWhereInput[]
   }
 
   export type PsychNoteCreatetagsInput = {
@@ -14648,6 +21066,115 @@ export namespace Prisma {
     delete?: AppointmentWhereInput | boolean
     connect?: AppointmentWhereUniqueInput
     update?: XOR<XOR<AppointmentUpdateToOneWithWhereWithoutTransactionInput, AppointmentUpdateWithoutTransactionInput>, AppointmentUncheckedUpdateWithoutTransactionInput>
+  }
+
+  export type PatientCreateNestedOneWithoutAnthropometriesInput = {
+    create?: XOR<PatientCreateWithoutAnthropometriesInput, PatientUncheckedCreateWithoutAnthropometriesInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutAnthropometriesInput
+    connect?: PatientWhereUniqueInput
+  }
+
+  export type AppointmentCreateNestedOneWithoutAnthropometryInput = {
+    create?: XOR<AppointmentCreateWithoutAnthropometryInput, AppointmentUncheckedCreateWithoutAnthropometryInput>
+    connectOrCreate?: AppointmentCreateOrConnectWithoutAnthropometryInput
+    connect?: AppointmentWhereUniqueInput
+  }
+
+  export type NullableDecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string | null
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type PatientUpdateOneRequiredWithoutAnthropometriesNestedInput = {
+    create?: XOR<PatientCreateWithoutAnthropometriesInput, PatientUncheckedCreateWithoutAnthropometriesInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutAnthropometriesInput
+    upsert?: PatientUpsertWithoutAnthropometriesInput
+    connect?: PatientWhereUniqueInput
+    update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutAnthropometriesInput, PatientUpdateWithoutAnthropometriesInput>, PatientUncheckedUpdateWithoutAnthropometriesInput>
+  }
+
+  export type AppointmentUpdateOneRequiredWithoutAnthropometryNestedInput = {
+    create?: XOR<AppointmentCreateWithoutAnthropometryInput, AppointmentUncheckedCreateWithoutAnthropometryInput>
+    connectOrCreate?: AppointmentCreateOrConnectWithoutAnthropometryInput
+    upsert?: AppointmentUpsertWithoutAnthropometryInput
+    connect?: AppointmentWhereUniqueInput
+    update?: XOR<XOR<AppointmentUpdateToOneWithWhereWithoutAnthropometryInput, AppointmentUpdateWithoutAnthropometryInput>, AppointmentUncheckedUpdateWithoutAnthropometryInput>
+  }
+
+  export type PatientCreateNestedOneWithoutMealPlansInput = {
+    create?: XOR<PatientCreateWithoutMealPlansInput, PatientUncheckedCreateWithoutMealPlansInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutMealPlansInput
+    connect?: PatientWhereUniqueInput
+  }
+
+  export type AppointmentCreateNestedOneWithoutMealPlanInput = {
+    create?: XOR<AppointmentCreateWithoutMealPlanInput, AppointmentUncheckedCreateWithoutMealPlanInput>
+    connectOrCreate?: AppointmentCreateOrConnectWithoutMealPlanInput
+    connect?: AppointmentWhereUniqueInput
+  }
+
+  export type PatientUpdateOneRequiredWithoutMealPlansNestedInput = {
+    create?: XOR<PatientCreateWithoutMealPlansInput, PatientUncheckedCreateWithoutMealPlansInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutMealPlansInput
+    upsert?: PatientUpsertWithoutMealPlansInput
+    connect?: PatientWhereUniqueInput
+    update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutMealPlansInput, PatientUpdateWithoutMealPlansInput>, PatientUncheckedUpdateWithoutMealPlansInput>
+  }
+
+  export type AppointmentUpdateOneRequiredWithoutMealPlanNestedInput = {
+    create?: XOR<AppointmentCreateWithoutMealPlanInput, AppointmentUncheckedCreateWithoutMealPlanInput>
+    connectOrCreate?: AppointmentCreateOrConnectWithoutMealPlanInput
+    upsert?: AppointmentUpsertWithoutMealPlanInput
+    connect?: AppointmentWhereUniqueInput
+    update?: XOR<XOR<AppointmentUpdateToOneWithWhereWithoutMealPlanInput, AppointmentUpdateWithoutMealPlanInput>, AppointmentUncheckedUpdateWithoutMealPlanInput>
+  }
+
+  export type ClinicalScaleCreatescoresInput = {
+    set: number[]
+  }
+
+  export type PatientCreateNestedOneWithoutClinicalScalesInput = {
+    create?: XOR<PatientCreateWithoutClinicalScalesInput, PatientUncheckedCreateWithoutClinicalScalesInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutClinicalScalesInput
+    connect?: PatientWhereUniqueInput
+  }
+
+  export type AppointmentCreateNestedOneWithoutClinicalScalesInput = {
+    create?: XOR<AppointmentCreateWithoutClinicalScalesInput, AppointmentUncheckedCreateWithoutClinicalScalesInput>
+    connectOrCreate?: AppointmentCreateOrConnectWithoutClinicalScalesInput
+    connect?: AppointmentWhereUniqueInput
+  }
+
+  export type EnumScaleTypeFieldUpdateOperationsInput = {
+    set?: $Enums.ScaleType
+  }
+
+  export type ClinicalScaleUpdatescoresInput = {
+    set?: number[]
+    push?: number | number[]
+  }
+
+  export type EnumScaleRiskLevelFieldUpdateOperationsInput = {
+    set?: $Enums.ScaleRiskLevel
+  }
+
+  export type PatientUpdateOneRequiredWithoutClinicalScalesNestedInput = {
+    create?: XOR<PatientCreateWithoutClinicalScalesInput, PatientUncheckedCreateWithoutClinicalScalesInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutClinicalScalesInput
+    upsert?: PatientUpsertWithoutClinicalScalesInput
+    connect?: PatientWhereUniqueInput
+    update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutClinicalScalesInput, PatientUpdateWithoutClinicalScalesInput>, PatientUncheckedUpdateWithoutClinicalScalesInput>
+  }
+
+  export type AppointmentUpdateOneRequiredWithoutClinicalScalesNestedInput = {
+    create?: XOR<AppointmentCreateWithoutClinicalScalesInput, AppointmentUncheckedCreateWithoutClinicalScalesInput>
+    connectOrCreate?: AppointmentCreateOrConnectWithoutClinicalScalesInput
+    upsert?: AppointmentUpsertWithoutClinicalScalesInput
+    connect?: AppointmentWhereUniqueInput
+    update?: XOR<XOR<AppointmentUpdateToOneWithWhereWithoutClinicalScalesInput, AppointmentUpdateWithoutClinicalScalesInput>, AppointmentUncheckedUpdateWithoutClinicalScalesInput>
   }
 
   export type NestedUuidFilter<$PrismaModel = never> = {
@@ -14913,29 +21440,6 @@ export namespace Prisma {
     _min?: NestedEnumPatientStatusFilter<$PrismaModel>
     _max?: NestedEnumPatientStatusFilter<$PrismaModel>
   }
-  export type NestedJsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type NestedEnumAppointmentTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.AppointmentType | EnumAppointmentTypeFieldRefInput<$PrismaModel>
@@ -15127,6 +21631,67 @@ export namespace Prisma {
     _max?: NestedEnumTransactionTypeFilter<$PrismaModel>
   }
 
+  export type NestedDecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumScaleTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.ScaleType | EnumScaleTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ScaleType[] | ListEnumScaleTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ScaleType[] | ListEnumScaleTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumScaleTypeFilter<$PrismaModel> | $Enums.ScaleType
+  }
+
+  export type NestedEnumScaleRiskLevelFilter<$PrismaModel = never> = {
+    equals?: $Enums.ScaleRiskLevel | EnumScaleRiskLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.ScaleRiskLevel[] | ListEnumScaleRiskLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ScaleRiskLevel[] | ListEnumScaleRiskLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumScaleRiskLevelFilter<$PrismaModel> | $Enums.ScaleRiskLevel
+  }
+
+  export type NestedEnumScaleTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ScaleType | EnumScaleTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ScaleType[] | ListEnumScaleTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ScaleType[] | ListEnumScaleTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumScaleTypeWithAggregatesFilter<$PrismaModel> | $Enums.ScaleType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumScaleTypeFilter<$PrismaModel>
+    _max?: NestedEnumScaleTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumScaleRiskLevelWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ScaleRiskLevel | EnumScaleRiskLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.ScaleRiskLevel[] | ListEnumScaleRiskLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ScaleRiskLevel[] | ListEnumScaleRiskLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumScaleRiskLevelWithAggregatesFilter<$PrismaModel> | $Enums.ScaleRiskLevel
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumScaleRiskLevelFilter<$PrismaModel>
+    _max?: NestedEnumScaleRiskLevelFilter<$PrismaModel>
+  }
+
   export type ClinicianProfileCreateWithoutUserInput = {
     id?: string
     type: $Enums.ClinicianType
@@ -15189,6 +21754,30 @@ export namespace Prisma {
 
   export type AccessLogCreateManyUserInputEnvelope = {
     data: AccessLogCreateManyUserInput | AccessLogCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type RefreshTokenCreateWithoutUserInput = {
+    id?: string
+    tokenHash: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type RefreshTokenUncheckedCreateWithoutUserInput = {
+    id?: string
+    tokenHash: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type RefreshTokenCreateOrConnectWithoutUserInput = {
+    where: RefreshTokenWhereUniqueInput
+    create: XOR<RefreshTokenCreateWithoutUserInput, RefreshTokenUncheckedCreateWithoutUserInput>
+  }
+
+  export type RefreshTokenCreateManyUserInputEnvelope = {
+    data: RefreshTokenCreateManyUserInput | RefreshTokenCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -15262,6 +21851,93 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"AccessLog"> | Date | string
   }
 
+  export type RefreshTokenUpsertWithWhereUniqueWithoutUserInput = {
+    where: RefreshTokenWhereUniqueInput
+    update: XOR<RefreshTokenUpdateWithoutUserInput, RefreshTokenUncheckedUpdateWithoutUserInput>
+    create: XOR<RefreshTokenCreateWithoutUserInput, RefreshTokenUncheckedCreateWithoutUserInput>
+  }
+
+  export type RefreshTokenUpdateWithWhereUniqueWithoutUserInput = {
+    where: RefreshTokenWhereUniqueInput
+    data: XOR<RefreshTokenUpdateWithoutUserInput, RefreshTokenUncheckedUpdateWithoutUserInput>
+  }
+
+  export type RefreshTokenUpdateManyWithWhereWithoutUserInput = {
+    where: RefreshTokenScalarWhereInput
+    data: XOR<RefreshTokenUpdateManyMutationInput, RefreshTokenUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type RefreshTokenScalarWhereInput = {
+    AND?: RefreshTokenScalarWhereInput | RefreshTokenScalarWhereInput[]
+    OR?: RefreshTokenScalarWhereInput[]
+    NOT?: RefreshTokenScalarWhereInput | RefreshTokenScalarWhereInput[]
+    id?: UuidFilter<"RefreshToken"> | string
+    userId?: UuidFilter<"RefreshToken"> | string
+    tokenHash?: StringFilter<"RefreshToken"> | string
+    expiresAt?: DateTimeFilter<"RefreshToken"> | Date | string
+    createdAt?: DateTimeFilter<"RefreshToken"> | Date | string
+  }
+
+  export type UserCreateWithoutRefreshTokensInput = {
+    id?: string
+    email: string
+    passwordHash: string
+    role: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    profile?: ClinicianProfileCreateNestedOneWithoutUserInput
+    accessLogs?: AccessLogCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutRefreshTokensInput = {
+    id?: string
+    email: string
+    passwordHash: string
+    role: $Enums.UserRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    profile?: ClinicianProfileUncheckedCreateNestedOneWithoutUserInput
+    accessLogs?: AccessLogUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutRefreshTokensInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutRefreshTokensInput, UserUncheckedCreateWithoutRefreshTokensInput>
+  }
+
+  export type UserUpsertWithoutRefreshTokensInput = {
+    update: XOR<UserUpdateWithoutRefreshTokensInput, UserUncheckedUpdateWithoutRefreshTokensInput>
+    create: XOR<UserCreateWithoutRefreshTokensInput, UserUncheckedCreateWithoutRefreshTokensInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutRefreshTokensInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutRefreshTokensInput, UserUncheckedUpdateWithoutRefreshTokensInput>
+  }
+
+  export type UserUpdateWithoutRefreshTokensInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: ClinicianProfileUpdateOneWithoutUserNestedInput
+    accessLogs?: AccessLogUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutRefreshTokensInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: ClinicianProfileUncheckedUpdateOneWithoutUserNestedInput
+    accessLogs?: AccessLogUncheckedUpdateManyWithoutUserNestedInput
+  }
+
   export type UserCreateWithoutProfileInput = {
     id?: string
     email: string
@@ -15270,6 +21946,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accessLogs?: AccessLogCreateNestedManyWithoutUserInput
+    refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutProfileInput = {
@@ -15280,6 +21957,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accessLogs?: AccessLogUncheckedCreateNestedManyWithoutUserInput
+    refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutProfileInput = {
@@ -15295,13 +21973,17 @@ export namespace Prisma {
     clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
     tasks?: TaskCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutClinicianInput = {
@@ -15312,13 +21994,17 @@ export namespace Prisma {
     clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
     tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutClinicianInput = {
@@ -15347,6 +22033,9 @@ export namespace Prisma {
     patient: PatientCreateNestedOneWithoutAppointmentsInput
     psychNote?: PsychNoteCreateNestedOneWithoutAppointmentInput
     transaction?: FinanceTransactionCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanCreateNestedOneWithoutAppointmentInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutClinicianInput = {
@@ -15365,6 +22054,9 @@ export namespace Prisma {
     updatedAt?: Date | string
     psychNote?: PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput
     transaction?: FinanceTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanUncheckedCreateNestedOneWithoutAppointmentInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutClinicianInput = {
@@ -15430,6 +22122,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accessLogs?: AccessLogUpdateManyWithoutUserNestedInput
+    refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProfileInput = {
@@ -15440,6 +22133,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accessLogs?: AccessLogUncheckedUpdateManyWithoutUserNestedInput
+    refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type PatientUpsertWithWhereUniqueWithoutClinicianInput = {
@@ -15470,7 +22164,8 @@ export namespace Prisma {
     clinicalContext?: StringNullableFilter<"Patient"> | string | null
     status?: EnumPatientStatusFilter<"Patient"> | $Enums.PatientStatus
     contactPhone?: StringNullableFilter<"Patient"> | string | null
-    emergencyContact?: JsonNullableFilter<"Patient">
+    emergencyContact?: StringNullableFilter<"Patient"> | string | null
+    treatmentGoals?: StringNullableListFilter<"Patient">
     createdAt?: DateTimeFilter<"Patient"> | Date | string
     updatedAt?: DateTimeFilter<"Patient"> | Date | string
   }
@@ -15592,6 +22287,9 @@ export namespace Prisma {
     clinician: ClinicianProfileCreateNestedOneWithoutAppointmentsInput
     psychNote?: PsychNoteCreateNestedOneWithoutAppointmentInput
     transaction?: FinanceTransactionCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanCreateNestedOneWithoutAppointmentInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutPatientInput = {
@@ -15610,6 +22308,9 @@ export namespace Prisma {
     updatedAt?: Date | string
     psychNote?: PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput
     transaction?: FinanceTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanUncheckedCreateNestedOneWithoutAppointmentInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutPatientInput = {
@@ -15715,6 +22416,102 @@ export namespace Prisma {
 
   export type TaskCreateManyPatientInputEnvelope = {
     data: TaskCreateManyPatientInput | TaskCreateManyPatientInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AnthropometryCreateWithoutPatientInput = {
+    id?: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointment: AppointmentCreateNestedOneWithoutAnthropometryInput
+  }
+
+  export type AnthropometryUncheckedCreateWithoutPatientInput = {
+    id?: string
+    appointmentId: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AnthropometryCreateOrConnectWithoutPatientInput = {
+    where: AnthropometryWhereUniqueInput
+    create: XOR<AnthropometryCreateWithoutPatientInput, AnthropometryUncheckedCreateWithoutPatientInput>
+  }
+
+  export type AnthropometryCreateManyPatientInputEnvelope = {
+    data: AnthropometryCreateManyPatientInput | AnthropometryCreateManyPatientInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MealPlanCreateWithoutPatientInput = {
+    id?: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointment: AppointmentCreateNestedOneWithoutMealPlanInput
+  }
+
+  export type MealPlanUncheckedCreateWithoutPatientInput = {
+    id?: string
+    appointmentId: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MealPlanCreateOrConnectWithoutPatientInput = {
+    where: MealPlanWhereUniqueInput
+    create: XOR<MealPlanCreateWithoutPatientInput, MealPlanUncheckedCreateWithoutPatientInput>
+  }
+
+  export type MealPlanCreateManyPatientInputEnvelope = {
+    data: MealPlanCreateManyPatientInput | MealPlanCreateManyPatientInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ClinicalScaleCreateWithoutPatientInput = {
+    id?: string
+    scaleType: $Enums.ScaleType
+    scores?: ClinicalScaleCreatescoresInput | number[]
+    totalScore: number
+    riskLevel: $Enums.ScaleRiskLevel
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointment: AppointmentCreateNestedOneWithoutClinicalScalesInput
+  }
+
+  export type ClinicalScaleUncheckedCreateWithoutPatientInput = {
+    id?: string
+    appointmentId: string
+    scaleType: $Enums.ScaleType
+    scores?: ClinicalScaleCreatescoresInput | number[]
+    totalScore: number
+    riskLevel: $Enums.ScaleRiskLevel
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ClinicalScaleCreateOrConnectWithoutPatientInput = {
+    where: ClinicalScaleWhereUniqueInput
+    create: XOR<ClinicalScaleCreateWithoutPatientInput, ClinicalScaleUncheckedCreateWithoutPatientInput>
+  }
+
+  export type ClinicalScaleCreateManyPatientInputEnvelope = {
+    data: ClinicalScaleCreateManyPatientInput | ClinicalScaleCreateManyPatientInput[]
     skipDuplicates?: boolean
   }
 
@@ -15851,6 +22648,99 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Task"> | Date | string
   }
 
+  export type AnthropometryUpsertWithWhereUniqueWithoutPatientInput = {
+    where: AnthropometryWhereUniqueInput
+    update: XOR<AnthropometryUpdateWithoutPatientInput, AnthropometryUncheckedUpdateWithoutPatientInput>
+    create: XOR<AnthropometryCreateWithoutPatientInput, AnthropometryUncheckedCreateWithoutPatientInput>
+  }
+
+  export type AnthropometryUpdateWithWhereUniqueWithoutPatientInput = {
+    where: AnthropometryWhereUniqueInput
+    data: XOR<AnthropometryUpdateWithoutPatientInput, AnthropometryUncheckedUpdateWithoutPatientInput>
+  }
+
+  export type AnthropometryUpdateManyWithWhereWithoutPatientInput = {
+    where: AnthropometryScalarWhereInput
+    data: XOR<AnthropometryUpdateManyMutationInput, AnthropometryUncheckedUpdateManyWithoutPatientInput>
+  }
+
+  export type AnthropometryScalarWhereInput = {
+    AND?: AnthropometryScalarWhereInput | AnthropometryScalarWhereInput[]
+    OR?: AnthropometryScalarWhereInput[]
+    NOT?: AnthropometryScalarWhereInput | AnthropometryScalarWhereInput[]
+    id?: UuidFilter<"Anthropometry"> | string
+    patientId?: UuidFilter<"Anthropometry"> | string
+    appointmentId?: UuidFilter<"Anthropometry"> | string
+    weight?: DecimalFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    height?: DecimalFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string
+    bodyFat?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    waist?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    hip?: DecimalNullableFilter<"Anthropometry"> | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFilter<"Anthropometry"> | Date | string
+    updatedAt?: DateTimeFilter<"Anthropometry"> | Date | string
+  }
+
+  export type MealPlanUpsertWithWhereUniqueWithoutPatientInput = {
+    where: MealPlanWhereUniqueInput
+    update: XOR<MealPlanUpdateWithoutPatientInput, MealPlanUncheckedUpdateWithoutPatientInput>
+    create: XOR<MealPlanCreateWithoutPatientInput, MealPlanUncheckedCreateWithoutPatientInput>
+  }
+
+  export type MealPlanUpdateWithWhereUniqueWithoutPatientInput = {
+    where: MealPlanWhereUniqueInput
+    data: XOR<MealPlanUpdateWithoutPatientInput, MealPlanUncheckedUpdateWithoutPatientInput>
+  }
+
+  export type MealPlanUpdateManyWithWhereWithoutPatientInput = {
+    where: MealPlanScalarWhereInput
+    data: XOR<MealPlanUpdateManyMutationInput, MealPlanUncheckedUpdateManyWithoutPatientInput>
+  }
+
+  export type MealPlanScalarWhereInput = {
+    AND?: MealPlanScalarWhereInput | MealPlanScalarWhereInput[]
+    OR?: MealPlanScalarWhereInput[]
+    NOT?: MealPlanScalarWhereInput | MealPlanScalarWhereInput[]
+    id?: UuidFilter<"MealPlan"> | string
+    patientId?: UuidFilter<"MealPlan"> | string
+    appointmentId?: UuidFilter<"MealPlan"> | string
+    content?: StringNullableFilter<"MealPlan"> | string | null
+    fileUrl?: StringNullableFilter<"MealPlan"> | string | null
+    fileName?: StringNullableFilter<"MealPlan"> | string | null
+    createdAt?: DateTimeFilter<"MealPlan"> | Date | string
+    updatedAt?: DateTimeFilter<"MealPlan"> | Date | string
+  }
+
+  export type ClinicalScaleUpsertWithWhereUniqueWithoutPatientInput = {
+    where: ClinicalScaleWhereUniqueInput
+    update: XOR<ClinicalScaleUpdateWithoutPatientInput, ClinicalScaleUncheckedUpdateWithoutPatientInput>
+    create: XOR<ClinicalScaleCreateWithoutPatientInput, ClinicalScaleUncheckedCreateWithoutPatientInput>
+  }
+
+  export type ClinicalScaleUpdateWithWhereUniqueWithoutPatientInput = {
+    where: ClinicalScaleWhereUniqueInput
+    data: XOR<ClinicalScaleUpdateWithoutPatientInput, ClinicalScaleUncheckedUpdateWithoutPatientInput>
+  }
+
+  export type ClinicalScaleUpdateManyWithWhereWithoutPatientInput = {
+    where: ClinicalScaleScalarWhereInput
+    data: XOR<ClinicalScaleUpdateManyMutationInput, ClinicalScaleUncheckedUpdateManyWithoutPatientInput>
+  }
+
+  export type ClinicalScaleScalarWhereInput = {
+    AND?: ClinicalScaleScalarWhereInput | ClinicalScaleScalarWhereInput[]
+    OR?: ClinicalScaleScalarWhereInput[]
+    NOT?: ClinicalScaleScalarWhereInput | ClinicalScaleScalarWhereInput[]
+    id?: UuidFilter<"ClinicalScale"> | string
+    patientId?: UuidFilter<"ClinicalScale"> | string
+    appointmentId?: UuidFilter<"ClinicalScale"> | string
+    scaleType?: EnumScaleTypeFilter<"ClinicalScale"> | $Enums.ScaleType
+    scores?: IntNullableListFilter<"ClinicalScale">
+    totalScore?: IntFilter<"ClinicalScale"> | number
+    riskLevel?: EnumScaleRiskLevelFilter<"ClinicalScale"> | $Enums.ScaleRiskLevel
+    createdAt?: DateTimeFilter<"ClinicalScale"> | Date | string
+    updatedAt?: DateTimeFilter<"ClinicalScale"> | Date | string
+  }
+
   export type PatientCreateWithoutAppointmentsInput = {
     id?: string
     fullName: string
@@ -15859,13 +22749,17 @@ export namespace Prisma {
     clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
     tasks?: TaskCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutAppointmentsInput = {
@@ -15877,12 +22771,16 @@ export namespace Prisma {
     clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
     tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutAppointmentsInput = {
@@ -15983,6 +22881,92 @@ export namespace Prisma {
     create: XOR<FinanceTransactionCreateWithoutAppointmentInput, FinanceTransactionUncheckedCreateWithoutAppointmentInput>
   }
 
+  export type AnthropometryCreateWithoutAppointmentInput = {
+    id?: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutAnthropometriesInput
+  }
+
+  export type AnthropometryUncheckedCreateWithoutAppointmentInput = {
+    id?: string
+    patientId: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AnthropometryCreateOrConnectWithoutAppointmentInput = {
+    where: AnthropometryWhereUniqueInput
+    create: XOR<AnthropometryCreateWithoutAppointmentInput, AnthropometryUncheckedCreateWithoutAppointmentInput>
+  }
+
+  export type MealPlanCreateWithoutAppointmentInput = {
+    id?: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutMealPlansInput
+  }
+
+  export type MealPlanUncheckedCreateWithoutAppointmentInput = {
+    id?: string
+    patientId: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MealPlanCreateOrConnectWithoutAppointmentInput = {
+    where: MealPlanWhereUniqueInput
+    create: XOR<MealPlanCreateWithoutAppointmentInput, MealPlanUncheckedCreateWithoutAppointmentInput>
+  }
+
+  export type ClinicalScaleCreateWithoutAppointmentInput = {
+    id?: string
+    scaleType: $Enums.ScaleType
+    scores?: ClinicalScaleCreatescoresInput | number[]
+    totalScore: number
+    riskLevel: $Enums.ScaleRiskLevel
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutClinicalScalesInput
+  }
+
+  export type ClinicalScaleUncheckedCreateWithoutAppointmentInput = {
+    id?: string
+    patientId: string
+    scaleType: $Enums.ScaleType
+    scores?: ClinicalScaleCreatescoresInput | number[]
+    totalScore: number
+    riskLevel: $Enums.ScaleRiskLevel
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ClinicalScaleCreateOrConnectWithoutAppointmentInput = {
+    where: ClinicalScaleWhereUniqueInput
+    create: XOR<ClinicalScaleCreateWithoutAppointmentInput, ClinicalScaleUncheckedCreateWithoutAppointmentInput>
+  }
+
+  export type ClinicalScaleCreateManyAppointmentInputEnvelope = {
+    data: ClinicalScaleCreateManyAppointmentInput | ClinicalScaleCreateManyAppointmentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type PatientUpsertWithoutAppointmentsInput = {
     update: XOR<PatientUpdateWithoutAppointmentsInput, PatientUncheckedUpdateWithoutAppointmentsInput>
     create: XOR<PatientCreateWithoutAppointmentsInput, PatientUncheckedCreateWithoutAppointmentsInput>
@@ -16002,13 +22986,17 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
     tasks?: TaskUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutAppointmentsInput = {
@@ -16020,12 +23008,16 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
     tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type ClinicianProfileUpsertWithoutAppointmentsInput = {
@@ -16139,6 +23131,88 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AnthropometryUpsertWithoutAppointmentInput = {
+    update: XOR<AnthropometryUpdateWithoutAppointmentInput, AnthropometryUncheckedUpdateWithoutAppointmentInput>
+    create: XOR<AnthropometryCreateWithoutAppointmentInput, AnthropometryUncheckedCreateWithoutAppointmentInput>
+    where?: AnthropometryWhereInput
+  }
+
+  export type AnthropometryUpdateToOneWithWhereWithoutAppointmentInput = {
+    where?: AnthropometryWhereInput
+    data: XOR<AnthropometryUpdateWithoutAppointmentInput, AnthropometryUncheckedUpdateWithoutAppointmentInput>
+  }
+
+  export type AnthropometryUpdateWithoutAppointmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutAnthropometriesNestedInput
+  }
+
+  export type AnthropometryUncheckedUpdateWithoutAppointmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MealPlanUpsertWithoutAppointmentInput = {
+    update: XOR<MealPlanUpdateWithoutAppointmentInput, MealPlanUncheckedUpdateWithoutAppointmentInput>
+    create: XOR<MealPlanCreateWithoutAppointmentInput, MealPlanUncheckedCreateWithoutAppointmentInput>
+    where?: MealPlanWhereInput
+  }
+
+  export type MealPlanUpdateToOneWithWhereWithoutAppointmentInput = {
+    where?: MealPlanWhereInput
+    data: XOR<MealPlanUpdateWithoutAppointmentInput, MealPlanUncheckedUpdateWithoutAppointmentInput>
+  }
+
+  export type MealPlanUpdateWithoutAppointmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutMealPlansNestedInput
+  }
+
+  export type MealPlanUncheckedUpdateWithoutAppointmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ClinicalScaleUpsertWithWhereUniqueWithoutAppointmentInput = {
+    where: ClinicalScaleWhereUniqueInput
+    update: XOR<ClinicalScaleUpdateWithoutAppointmentInput, ClinicalScaleUncheckedUpdateWithoutAppointmentInput>
+    create: XOR<ClinicalScaleCreateWithoutAppointmentInput, ClinicalScaleUncheckedCreateWithoutAppointmentInput>
+  }
+
+  export type ClinicalScaleUpdateWithWhereUniqueWithoutAppointmentInput = {
+    where: ClinicalScaleWhereUniqueInput
+    data: XOR<ClinicalScaleUpdateWithoutAppointmentInput, ClinicalScaleUncheckedUpdateWithoutAppointmentInput>
+  }
+
+  export type ClinicalScaleUpdateManyWithWhereWithoutAppointmentInput = {
+    where: ClinicalScaleScalarWhereInput
+    data: XOR<ClinicalScaleUpdateManyMutationInput, ClinicalScaleUncheckedUpdateManyWithoutAppointmentInput>
+  }
+
   export type AppointmentCreateWithoutPsychNoteInput = {
     id?: string
     startTime: Date | string
@@ -16155,6 +23229,9 @@ export namespace Prisma {
     patient: PatientCreateNestedOneWithoutAppointmentsInput
     clinician: ClinicianProfileCreateNestedOneWithoutAppointmentsInput
     transaction?: FinanceTransactionCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanCreateNestedOneWithoutAppointmentInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutPsychNoteInput = {
@@ -16173,6 +23250,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     transaction?: FinanceTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanUncheckedCreateNestedOneWithoutAppointmentInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutPsychNoteInput = {
@@ -16188,13 +23268,17 @@ export namespace Prisma {
     clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
     tasks?: TaskCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutPsychNotesInput = {
@@ -16206,12 +23290,16 @@ export namespace Prisma {
     clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
     tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutPsychNotesInput = {
@@ -16246,6 +23334,9 @@ export namespace Prisma {
     patient?: PatientUpdateOneRequiredWithoutAppointmentsNestedInput
     clinician?: ClinicianProfileUpdateOneRequiredWithoutAppointmentsNestedInput
     transaction?: FinanceTransactionUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUpdateOneWithoutAppointmentNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutPsychNoteInput = {
@@ -16264,6 +23355,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transaction?: FinanceTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutAppointmentNestedInput
   }
 
   export type PatientUpsertWithoutPsychNotesInput = {
@@ -16285,13 +23379,17 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
     tasks?: TaskUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutPsychNotesInput = {
@@ -16303,12 +23401,16 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
     tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientCreateWithoutTasksInput = {
@@ -16319,13 +23421,17 @@ export namespace Prisma {
     clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutTasksInput = {
@@ -16337,12 +23443,16 @@ export namespace Prisma {
     clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
     accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutTasksInput = {
@@ -16369,13 +23479,17 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutTasksInput = {
@@ -16387,12 +23501,16 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type UserCreateWithoutAccessLogsInput = {
@@ -16403,6 +23521,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     profile?: ClinicianProfileCreateNestedOneWithoutUserInput
+    refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAccessLogsInput = {
@@ -16413,6 +23532,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     profile?: ClinicianProfileUncheckedCreateNestedOneWithoutUserInput
+    refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAccessLogsInput = {
@@ -16428,13 +23548,17 @@ export namespace Prisma {
     clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
     tasks?: TaskCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutAccessLogsInput = {
@@ -16446,12 +23570,16 @@ export namespace Prisma {
     clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
     psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
     tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutAccessLogsInput = {
@@ -16478,6 +23606,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     profile?: ClinicianProfileUpdateOneWithoutUserNestedInput
+    refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccessLogsInput = {
@@ -16488,6 +23617,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     profile?: ClinicianProfileUncheckedUpdateOneWithoutUserNestedInput
+    refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type PatientUpsertWithoutAccessLogsInput = {
@@ -16509,13 +23639,17 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
     tasks?: TaskUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutAccessLogsInput = {
@@ -16527,12 +23661,16 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
     tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type ClinicianProfileCreateWithoutTransactionsInput = {
@@ -16584,6 +23722,9 @@ export namespace Prisma {
     patient: PatientCreateNestedOneWithoutAppointmentsInput
     clinician: ClinicianProfileCreateNestedOneWithoutAppointmentsInput
     psychNote?: PsychNoteCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanCreateNestedOneWithoutAppointmentInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutTransactionInput = {
@@ -16602,6 +23743,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     psychNote?: PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanUncheckedCreateNestedOneWithoutAppointmentInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutTransactionInput = {
@@ -16675,6 +23819,9 @@ export namespace Prisma {
     patient?: PatientUpdateOneRequiredWithoutAppointmentsNestedInput
     clinician?: ClinicianProfileUpdateOneRequiredWithoutAppointmentsNestedInput
     psychNote?: PsychNoteUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUpdateOneWithoutAppointmentNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutTransactionInput = {
@@ -16693,6 +23840,609 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     psychNote?: PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutAppointmentNestedInput
+  }
+
+  export type PatientCreateWithoutAnthropometriesInput = {
+    id?: string
+    fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
+    status?: $Enums.PatientStatus
+    contactPhone?: string | null
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
+    appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
+    tasks?: TaskCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientUncheckedCreateWithoutAnthropometriesInput = {
+    id?: string
+    clinicianId: string
+    fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
+    status?: $Enums.PatientStatus
+    contactPhone?: string | null
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
+    tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientCreateOrConnectWithoutAnthropometriesInput = {
+    where: PatientWhereUniqueInput
+    create: XOR<PatientCreateWithoutAnthropometriesInput, PatientUncheckedCreateWithoutAnthropometriesInput>
+  }
+
+  export type AppointmentCreateWithoutAnthropometryInput = {
+    id?: string
+    startTime: Date | string
+    endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
+    status?: $Enums.AppointmentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
+    price: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutAppointmentsInput
+    clinician: ClinicianProfileCreateNestedOneWithoutAppointmentsInput
+    psychNote?: PsychNoteCreateNestedOneWithoutAppointmentInput
+    transaction?: FinanceTransactionCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanCreateNestedOneWithoutAppointmentInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutAppointmentInput
+  }
+
+  export type AppointmentUncheckedCreateWithoutAnthropometryInput = {
+    id?: string
+    patientId: string
+    clinicianId: string
+    startTime: Date | string
+    endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
+    status?: $Enums.AppointmentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
+    price: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    psychNote?: PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput
+    transaction?: FinanceTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanUncheckedCreateNestedOneWithoutAppointmentInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutAppointmentInput
+  }
+
+  export type AppointmentCreateOrConnectWithoutAnthropometryInput = {
+    where: AppointmentWhereUniqueInput
+    create: XOR<AppointmentCreateWithoutAnthropometryInput, AppointmentUncheckedCreateWithoutAnthropometryInput>
+  }
+
+  export type PatientUpsertWithoutAnthropometriesInput = {
+    update: XOR<PatientUpdateWithoutAnthropometriesInput, PatientUncheckedUpdateWithoutAnthropometriesInput>
+    create: XOR<PatientCreateWithoutAnthropometriesInput, PatientUncheckedCreateWithoutAnthropometriesInput>
+    where?: PatientWhereInput
+  }
+
+  export type PatientUpdateToOneWithWhereWithoutAnthropometriesInput = {
+    where?: PatientWhereInput
+    data: XOR<PatientUpdateWithoutAnthropometriesInput, PatientUncheckedUpdateWithoutAnthropometriesInput>
+  }
+
+  export type PatientUpdateWithoutAnthropometriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
+    appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateWithoutAnthropometriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clinicianId?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutPatientNestedInput
+  }
+
+  export type AppointmentUpsertWithoutAnthropometryInput = {
+    update: XOR<AppointmentUpdateWithoutAnthropometryInput, AppointmentUncheckedUpdateWithoutAnthropometryInput>
+    create: XOR<AppointmentCreateWithoutAnthropometryInput, AppointmentUncheckedCreateWithoutAnthropometryInput>
+    where?: AppointmentWhereInput
+  }
+
+  export type AppointmentUpdateToOneWithWhereWithoutAnthropometryInput = {
+    where?: AppointmentWhereInput
+    data: XOR<AppointmentUpdateWithoutAnthropometryInput, AppointmentUncheckedUpdateWithoutAnthropometryInput>
+  }
+
+  export type AppointmentUpdateWithoutAnthropometryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutAppointmentsNestedInput
+    clinician?: ClinicianProfileUpdateOneRequiredWithoutAppointmentsNestedInput
+    psychNote?: PsychNoteUpdateOneWithoutAppointmentNestedInput
+    transaction?: FinanceTransactionUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUpdateOneWithoutAppointmentNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutAppointmentNestedInput
+  }
+
+  export type AppointmentUncheckedUpdateWithoutAnthropometryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    clinicianId?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    psychNote?: PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput
+    transaction?: FinanceTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutAppointmentNestedInput
+  }
+
+  export type PatientCreateWithoutMealPlansInput = {
+    id?: string
+    fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
+    status?: $Enums.PatientStatus
+    contactPhone?: string | null
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
+    appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
+    tasks?: TaskCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientUncheckedCreateWithoutMealPlansInput = {
+    id?: string
+    clinicianId: string
+    fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
+    status?: $Enums.PatientStatus
+    contactPhone?: string | null
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
+    tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientCreateOrConnectWithoutMealPlansInput = {
+    where: PatientWhereUniqueInput
+    create: XOR<PatientCreateWithoutMealPlansInput, PatientUncheckedCreateWithoutMealPlansInput>
+  }
+
+  export type AppointmentCreateWithoutMealPlanInput = {
+    id?: string
+    startTime: Date | string
+    endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
+    status?: $Enums.AppointmentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
+    price: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutAppointmentsInput
+    clinician: ClinicianProfileCreateNestedOneWithoutAppointmentsInput
+    psychNote?: PsychNoteCreateNestedOneWithoutAppointmentInput
+    transaction?: FinanceTransactionCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryCreateNestedOneWithoutAppointmentInput
+    clinicalScales?: ClinicalScaleCreateNestedManyWithoutAppointmentInput
+  }
+
+  export type AppointmentUncheckedCreateWithoutMealPlanInput = {
+    id?: string
+    patientId: string
+    clinicianId: string
+    startTime: Date | string
+    endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
+    status?: $Enums.AppointmentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
+    price: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    psychNote?: PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput
+    transaction?: FinanceTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput
+    clinicalScales?: ClinicalScaleUncheckedCreateNestedManyWithoutAppointmentInput
+  }
+
+  export type AppointmentCreateOrConnectWithoutMealPlanInput = {
+    where: AppointmentWhereUniqueInput
+    create: XOR<AppointmentCreateWithoutMealPlanInput, AppointmentUncheckedCreateWithoutMealPlanInput>
+  }
+
+  export type PatientUpsertWithoutMealPlansInput = {
+    update: XOR<PatientUpdateWithoutMealPlansInput, PatientUncheckedUpdateWithoutMealPlansInput>
+    create: XOR<PatientCreateWithoutMealPlansInput, PatientUncheckedCreateWithoutMealPlansInput>
+    where?: PatientWhereInput
+  }
+
+  export type PatientUpdateToOneWithWhereWithoutMealPlansInput = {
+    where?: PatientWhereInput
+    data: XOR<PatientUpdateWithoutMealPlansInput, PatientUncheckedUpdateWithoutMealPlansInput>
+  }
+
+  export type PatientUpdateWithoutMealPlansInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
+    appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateWithoutMealPlansInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clinicianId?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutPatientNestedInput
+  }
+
+  export type AppointmentUpsertWithoutMealPlanInput = {
+    update: XOR<AppointmentUpdateWithoutMealPlanInput, AppointmentUncheckedUpdateWithoutMealPlanInput>
+    create: XOR<AppointmentCreateWithoutMealPlanInput, AppointmentUncheckedCreateWithoutMealPlanInput>
+    where?: AppointmentWhereInput
+  }
+
+  export type AppointmentUpdateToOneWithWhereWithoutMealPlanInput = {
+    where?: AppointmentWhereInput
+    data: XOR<AppointmentUpdateWithoutMealPlanInput, AppointmentUncheckedUpdateWithoutMealPlanInput>
+  }
+
+  export type AppointmentUpdateWithoutMealPlanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutAppointmentsNestedInput
+    clinician?: ClinicianProfileUpdateOneRequiredWithoutAppointmentsNestedInput
+    psychNote?: PsychNoteUpdateOneWithoutAppointmentNestedInput
+    transaction?: FinanceTransactionUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUpdateOneWithoutAppointmentNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutAppointmentNestedInput
+  }
+
+  export type AppointmentUncheckedUpdateWithoutMealPlanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    clinicianId?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    psychNote?: PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput
+    transaction?: FinanceTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutAppointmentNestedInput
+  }
+
+  export type PatientCreateWithoutClinicalScalesInput = {
+    id?: string
+    fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
+    status?: $Enums.PatientStatus
+    contactPhone?: string | null
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clinician: ClinicianProfileCreateNestedOneWithoutPatientsInput
+    appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    psychNotes?: PsychNoteCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogCreateNestedManyWithoutPatientInput
+    tasks?: TaskCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientUncheckedCreateWithoutClinicalScalesInput = {
+    id?: string
+    clinicianId: string
+    fullName: string
+    dateOfBirth?: Date | string | null
+    diagnosis?: string | null
+    clinicalContext?: string | null
+    status?: $Enums.PatientStatus
+    contactPhone?: string | null
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    psychNotes?: PsychNoteUncheckedCreateNestedManyWithoutPatientInput
+    accessLogs?: AccessLogUncheckedCreateNestedManyWithoutPatientInput
+    tasks?: TaskUncheckedCreateNestedManyWithoutPatientInput
+    anthropometries?: AnthropometryUncheckedCreateNestedManyWithoutPatientInput
+    mealPlans?: MealPlanUncheckedCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientCreateOrConnectWithoutClinicalScalesInput = {
+    where: PatientWhereUniqueInput
+    create: XOR<PatientCreateWithoutClinicalScalesInput, PatientUncheckedCreateWithoutClinicalScalesInput>
+  }
+
+  export type AppointmentCreateWithoutClinicalScalesInput = {
+    id?: string
+    startTime: Date | string
+    endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
+    status?: $Enums.AppointmentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
+    price: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutAppointmentsInput
+    clinician: ClinicianProfileCreateNestedOneWithoutAppointmentsInput
+    psychNote?: PsychNoteCreateNestedOneWithoutAppointmentInput
+    transaction?: FinanceTransactionCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanCreateNestedOneWithoutAppointmentInput
+  }
+
+  export type AppointmentUncheckedCreateWithoutClinicalScalesInput = {
+    id?: string
+    patientId: string
+    clinicianId: string
+    startTime: Date | string
+    endTime: Date | string
+    type?: $Enums.AppointmentType
+    reason?: string | null
+    status?: $Enums.AppointmentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentMethod | null
+    price: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    psychNote?: PsychNoteUncheckedCreateNestedOneWithoutAppointmentInput
+    transaction?: FinanceTransactionUncheckedCreateNestedOneWithoutAppointmentInput
+    anthropometry?: AnthropometryUncheckedCreateNestedOneWithoutAppointmentInput
+    mealPlan?: MealPlanUncheckedCreateNestedOneWithoutAppointmentInput
+  }
+
+  export type AppointmentCreateOrConnectWithoutClinicalScalesInput = {
+    where: AppointmentWhereUniqueInput
+    create: XOR<AppointmentCreateWithoutClinicalScalesInput, AppointmentUncheckedCreateWithoutClinicalScalesInput>
+  }
+
+  export type PatientUpsertWithoutClinicalScalesInput = {
+    update: XOR<PatientUpdateWithoutClinicalScalesInput, PatientUncheckedUpdateWithoutClinicalScalesInput>
+    create: XOR<PatientCreateWithoutClinicalScalesInput, PatientUncheckedCreateWithoutClinicalScalesInput>
+    where?: PatientWhereInput
+  }
+
+  export type PatientUpdateToOneWithWhereWithoutClinicalScalesInput = {
+    where?: PatientWhereInput
+    data: XOR<PatientUpdateWithoutClinicalScalesInput, PatientUncheckedUpdateWithoutClinicalScalesInput>
+  }
+
+  export type PatientUpdateWithoutClinicalScalesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clinician?: ClinicianProfileUpdateOneRequiredWithoutPatientsNestedInput
+    appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateWithoutClinicalScalesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clinicianId?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    dateOfBirth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
+    contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
+    accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
+    tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
+  }
+
+  export type AppointmentUpsertWithoutClinicalScalesInput = {
+    update: XOR<AppointmentUpdateWithoutClinicalScalesInput, AppointmentUncheckedUpdateWithoutClinicalScalesInput>
+    create: XOR<AppointmentCreateWithoutClinicalScalesInput, AppointmentUncheckedCreateWithoutClinicalScalesInput>
+    where?: AppointmentWhereInput
+  }
+
+  export type AppointmentUpdateToOneWithWhereWithoutClinicalScalesInput = {
+    where?: AppointmentWhereInput
+    data: XOR<AppointmentUpdateWithoutClinicalScalesInput, AppointmentUncheckedUpdateWithoutClinicalScalesInput>
+  }
+
+  export type AppointmentUpdateWithoutClinicalScalesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutAppointmentsNestedInput
+    clinician?: ClinicianProfileUpdateOneRequiredWithoutAppointmentsNestedInput
+    psychNote?: PsychNoteUpdateOneWithoutAppointmentNestedInput
+    transaction?: FinanceTransactionUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUpdateOneWithoutAppointmentNestedInput
+  }
+
+  export type AppointmentUncheckedUpdateWithoutClinicalScalesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    clinicianId?: StringFieldUpdateOperationsInput | string
+    startTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    endTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumAppointmentTypeFieldUpdateOperationsInput | $Enums.AppointmentType
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    psychNote?: PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput
+    transaction?: FinanceTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput
   }
 
   export type AccessLogCreateManyUserInput = {
@@ -16703,6 +24453,13 @@ export namespace Prisma {
     details?: string | null
     ipAddress?: string | null
     userAgent?: string | null
+    createdAt?: Date | string
+  }
+
+  export type RefreshTokenCreateManyUserInput = {
+    id?: string
+    tokenHash: string
+    expiresAt: Date | string
     createdAt?: Date | string
   }
 
@@ -16739,6 +24496,27 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type RefreshTokenUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RefreshTokenUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RefreshTokenUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type PatientCreateManyClinicianInput = {
     id?: string
     fullName: string
@@ -16747,7 +24525,8 @@ export namespace Prisma {
     clinicalContext?: string | null
     status?: $Enums.PatientStatus
     contactPhone?: string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: string | null
+    treatmentGoals?: PatientCreatetreatmentGoalsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -16788,13 +24567,17 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUpdateManyWithoutPatientNestedInput
     tasks?: TaskUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutClinicianInput = {
@@ -16805,13 +24588,17 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
     psychNotes?: PsychNoteUncheckedUpdateManyWithoutPatientNestedInput
     accessLogs?: AccessLogUncheckedUpdateManyWithoutPatientNestedInput
     tasks?: TaskUncheckedUpdateManyWithoutPatientNestedInput
+    anthropometries?: AnthropometryUncheckedUpdateManyWithoutPatientNestedInput
+    mealPlans?: MealPlanUncheckedUpdateManyWithoutPatientNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateManyWithoutClinicianInput = {
@@ -16822,7 +24609,8 @@ export namespace Prisma {
     clinicalContext?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumPatientStatusFieldUpdateOperationsInput | $Enums.PatientStatus
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
-    emergencyContact?: NullableJsonNullValueInput | InputJsonValue
+    emergencyContact?: NullableStringFieldUpdateOperationsInput | string | null
+    treatmentGoals?: PatientUpdatetreatmentGoalsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -16843,6 +24631,9 @@ export namespace Prisma {
     patient?: PatientUpdateOneRequiredWithoutAppointmentsNestedInput
     psychNote?: PsychNoteUpdateOneWithoutAppointmentNestedInput
     transaction?: FinanceTransactionUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUpdateOneWithoutAppointmentNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutClinicianInput = {
@@ -16861,6 +24652,9 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     psychNote?: PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput
     transaction?: FinanceTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateManyWithoutClinicianInput = {
@@ -16964,6 +24758,39 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type AnthropometryCreateManyPatientInput = {
+    id?: string
+    appointmentId: string
+    weight: Decimal | DecimalJsLike | number | string
+    height: Decimal | DecimalJsLike | number | string
+    bodyFat?: Decimal | DecimalJsLike | number | string | null
+    waist?: Decimal | DecimalJsLike | number | string | null
+    hip?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MealPlanCreateManyPatientInput = {
+    id?: string
+    appointmentId: string
+    content?: string | null
+    fileUrl?: string | null
+    fileName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ClinicalScaleCreateManyPatientInput = {
+    id?: string
+    appointmentId: string
+    scaleType: $Enums.ScaleType
+    scores?: ClinicalScaleCreatescoresInput | number[]
+    totalScore: number
+    riskLevel: $Enums.ScaleRiskLevel
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type AppointmentUpdateWithoutPatientInput = {
     id?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16980,6 +24807,9 @@ export namespace Prisma {
     clinician?: ClinicianProfileUpdateOneRequiredWithoutAppointmentsNestedInput
     psychNote?: PsychNoteUpdateOneWithoutAppointmentNestedInput
     transaction?: FinanceTransactionUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUpdateOneWithoutAppointmentNestedInput
+    clinicalScales?: ClinicalScaleUpdateManyWithoutAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutPatientInput = {
@@ -16998,6 +24828,9 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     psychNote?: PsychNoteUncheckedUpdateOneWithoutAppointmentNestedInput
     transaction?: FinanceTransactionUncheckedUpdateOneWithoutAppointmentNestedInput
+    anthropometry?: AnthropometryUncheckedUpdateOneWithoutAppointmentNestedInput
+    mealPlan?: MealPlanUncheckedUpdateOneWithoutAppointmentNestedInput
+    clinicalScales?: ClinicalScaleUncheckedUpdateManyWithoutAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
@@ -17111,6 +24944,149 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     isCompleted?: BoolFieldUpdateOperationsInput | boolean
     dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AnthropometryUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointment?: AppointmentUpdateOneRequiredWithoutAnthropometryNestedInput
+  }
+
+  export type AnthropometryUncheckedUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AnthropometryUncheckedUpdateManyWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    weight?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    height?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bodyFat?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    waist?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    hip?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MealPlanUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointment?: AppointmentUpdateOneRequiredWithoutMealPlanNestedInput
+  }
+
+  export type MealPlanUncheckedUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MealPlanUncheckedUpdateManyWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    content?: NullableStringFieldUpdateOperationsInput | string | null
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ClinicalScaleUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scaleType?: EnumScaleTypeFieldUpdateOperationsInput | $Enums.ScaleType
+    scores?: ClinicalScaleUpdatescoresInput | number[]
+    totalScore?: IntFieldUpdateOperationsInput | number
+    riskLevel?: EnumScaleRiskLevelFieldUpdateOperationsInput | $Enums.ScaleRiskLevel
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointment?: AppointmentUpdateOneRequiredWithoutClinicalScalesNestedInput
+  }
+
+  export type ClinicalScaleUncheckedUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    scaleType?: EnumScaleTypeFieldUpdateOperationsInput | $Enums.ScaleType
+    scores?: ClinicalScaleUpdatescoresInput | number[]
+    totalScore?: IntFieldUpdateOperationsInput | number
+    riskLevel?: EnumScaleRiskLevelFieldUpdateOperationsInput | $Enums.ScaleRiskLevel
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ClinicalScaleUncheckedUpdateManyWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    scaleType?: EnumScaleTypeFieldUpdateOperationsInput | $Enums.ScaleType
+    scores?: ClinicalScaleUpdatescoresInput | number[]
+    totalScore?: IntFieldUpdateOperationsInput | number
+    riskLevel?: EnumScaleRiskLevelFieldUpdateOperationsInput | $Enums.ScaleRiskLevel
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ClinicalScaleCreateManyAppointmentInput = {
+    id?: string
+    patientId: string
+    scaleType: $Enums.ScaleType
+    scores?: ClinicalScaleCreatescoresInput | number[]
+    totalScore: number
+    riskLevel: $Enums.ScaleRiskLevel
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ClinicalScaleUpdateWithoutAppointmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scaleType?: EnumScaleTypeFieldUpdateOperationsInput | $Enums.ScaleType
+    scores?: ClinicalScaleUpdatescoresInput | number[]
+    totalScore?: IntFieldUpdateOperationsInput | number
+    riskLevel?: EnumScaleRiskLevelFieldUpdateOperationsInput | $Enums.ScaleRiskLevel
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutClinicalScalesNestedInput
+  }
+
+  export type ClinicalScaleUncheckedUpdateWithoutAppointmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    scaleType?: EnumScaleTypeFieldUpdateOperationsInput | $Enums.ScaleType
+    scores?: ClinicalScaleUpdatescoresInput | number[]
+    totalScore?: IntFieldUpdateOperationsInput | number
+    riskLevel?: EnumScaleRiskLevelFieldUpdateOperationsInput | $Enums.ScaleRiskLevel
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ClinicalScaleUncheckedUpdateManyWithoutAppointmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    scaleType?: EnumScaleTypeFieldUpdateOperationsInput | $Enums.ScaleType
+    scores?: ClinicalScaleUpdatescoresInput | number[]
+    totalScore?: IntFieldUpdateOperationsInput | number
+    riskLevel?: EnumScaleRiskLevelFieldUpdateOperationsInput | $Enums.ScaleRiskLevel
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

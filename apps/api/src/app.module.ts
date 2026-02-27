@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -13,9 +15,14 @@ import { TasksModule } from './tasks/tasks.module';
 import { FinanceModule } from './finance/finance.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SearchModule } from './search/search.module';
+import { EncryptionModule } from './lib/encryption.module';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{
+      ttl: 60000, // 1 minute
+      limit: 100, // 100 requests per minute
+    }]),
     PrismaModule,
     AuthModule,
     AppointmentsModule,
@@ -26,10 +33,17 @@ import { SearchModule } from './search/search.module';
     TasksModule,
     FinanceModule,
     SearchModule,
+    EncryptionModule,
     EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
 

@@ -41,7 +41,7 @@ export function LoginPage() {
       const message =
         error instanceof Error
           ? error.message
-          : 'Invalid credentials. Please try again.';
+          : 'Credenciales inválidas. Por favor intenta de nuevo.';
       setServerError(message);
     }
   };
@@ -54,8 +54,8 @@ export function LoginPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-kio rounded-2xl mb-4 shadow-lg shadow-kio/20">
             <span className="text-2xl font-bold text-white">K</span>
           </div>
-          <h1 className="text-3xl font-bold text-kanji dark:text-white">Welcome to Kio</h1>
-          <p className="text-text/60 dark:text-slate-400 mt-2">Sign in to your account</p>
+          <h1 className="text-3xl font-bold text-kanji dark:text-white">Bienvenido a Kio</h1>
+          <p className="text-text/60 dark:text-slate-400 mt-2">Inicia sesión en tu cuenta</p>
         </div>
 
         {/* Login Form */}
@@ -76,7 +76,7 @@ export function LoginPage() {
               htmlFor="email"
               className="block text-sm font-medium text-kanji dark:text-slate-200 mb-2"
             >
-              Email
+              Correo Electrónico
             </label>
             <input
               {...register('email')}
@@ -102,7 +102,7 @@ export function LoginPage() {
               htmlFor="password"
               className="block text-sm font-medium text-kanji dark:text-slate-200 mb-2"
             >
-              Password
+              Contraseña
             </label>
             <input
               {...register('password')}
@@ -140,17 +140,17 @@ export function LoginPage() {
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Signing in...
+                Iniciando sesión...
               </span>
             ) : (
-              'Sign In'
+              'Iniciar Sesión'
             )}
           </button>
         </form>
 
         {/* Footer */}
         <p className="text-center text-text/50 dark:text-slate-500 text-sm mt-6">
-          Test credentials: <strong>psych@kio.com</strong> /{' '}
+          Credenciales de prueba: <strong>psych@kio.com</strong> /{' '}
           <strong>123456</strong>
         </p>
       </div>

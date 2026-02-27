@@ -55,7 +55,7 @@ export function DashboardPage() {
 
         {/* LIQUID COMMAND DECK (Hero + Calendar + Attention) */}
         <div className="px-4 relative z-0">
-          <div className="bg-white dark:bg-slate-900 rounded-[40px] rounded-br-none relative overflow-hidden transition-colors duration-200">
+          <div className="bg-surface dark:bg-slate-900 rounded-[40px] rounded-br-none relative overflow-hidden transition-colors duration-200">
             {/* Liquid Fill Animation */}
             <motion.div
               initial={{ height: "0%" }}

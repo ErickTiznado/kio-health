@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import PDFDocument from 'pdfkit';
-import { Appointment, Patient, PsychNote, ClinicianProfile, User } from '../../prisma/generated/client';
+import { Appointment, Patient, PsychNote, ClinicianProfile, User } from '#generated/prisma';
 
 @Injectable()
 export class ExportService {

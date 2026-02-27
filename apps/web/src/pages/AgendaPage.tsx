@@ -1,14 +1,16 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { startOfWeek, addWeeks, subWeeks, addDays, subDays, format } from 'date-fns';
+import { startOfWeek, addWeeks, subWeeks, addDays, subDays, format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Calendar, CalendarDays, Loader2, Plus, CheckCircle2, XCircle, Banknote } from 'lucide-react';
+
+import { ChevronLeft, ChevronRight, Calendar, CalendarDays, Loader2, Plus, CheckCircle2, XCircle } from 'lucide-react';
 import { useIsMobile } from '../hooks/use-is-mobile';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { WeeklyCalendarGrid } from '../features/calendar/components/WeeklyCalendarGrid';
 import { DailyCalendarGrid } from '../features/calendar/components/DailyCalendarGrid';
 import { AppointmentDrawer } from '../features/calendar/components/AppointmentDrawer';
 import { ScheduleAppointmentModal } from '../features/calendar/components/ScheduleAppointmentModal';
+import { PaymentModal } from '../features/calendar/components/PaymentModal';
 import { fetchAppointmentsByRange, rescheduleAppointment, cancelAppointment } from '../lib/appointments.api';
 import type { Appointment } from '../types/appointments.types';
 import type { CalendarView } from '../types/agenda.types';
@@ -31,8 +33,11 @@ export function AgendaPage() {
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [scheduleSlot, setScheduleSlot] = useState<Date | null>(null);
+  const [rescheduleAppointmentInfo, setRescheduleAppointmentInfo] = useState<Appointment | null>(null);
+  const [paymentAppointment, setPaymentAppointment] = useState<Appointment | null>(null);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const queryClient = useQueryClient();
+
 
   /* ── Data fetching ── */
 
@@ -63,13 +68,7 @@ export function AgendaPage() {
   const filteredAppointments = useMemo(() => {
     if (activeFilters.length === 0) return appointments;
 
-    return appointments.filter((apt) => {
-      // "OR" Logic: Match any selected filter
-      const matchesStatus = activeFilters.includes(apt.status);
-      const matchesUnpaid = activeFilters.includes('UNPAID') && apt.paymentStatus === 'PENDING';
-      
-      return matchesStatus || matchesUnpaid;
-    });
+    return appointments.filter((apt) => activeFilters.includes(apt.status));
   }, [appointments, activeFilters]);
 
   /* ── Mobile Logic ── */
@@ -129,6 +128,14 @@ export function AgendaPage() {
     setIsDrawerOpen(false);
   }, []);
 
+  const handleQuickPay = useCallback((appointment: Appointment) => {
+    setPaymentAppointment(appointment);
+  }, []);
+
+  const handleQuickReschedule = useCallback((appointment: Appointment) => {
+    setRescheduleAppointmentInfo(appointment);
+  }, []);
+
   /* ── Scheduling handlers ── */
 
   const handleSlotClick = useCallback((date: Date) => {
@@ -153,8 +160,8 @@ export function AgendaPage() {
   }, []);
 
   const rescheduleMutation = useMutation({
-    mutationFn: ({ id, startTime }: { id: string; startTime: string }) =>
-      rescheduleAppointment(id, { startTime }),
+    mutationFn: ({ id, ...payload }: { id: string; startTime: string; duration?: number }) =>
+      rescheduleAppointment(id, payload),
     onSuccess: () => {
       toast.success('Cita reagendada correctamente');
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
@@ -165,10 +172,11 @@ export function AgendaPage() {
     },
   });
 
-  const handleReschedule = useCallback((appointmentId: string, newStartTime: Date) => {
+  const handleReschedule = useCallback((appointmentId: string, newStartTime: Date, duration?: number) => {
     rescheduleMutation.mutate({
       id: appointmentId,
       startTime: newStartTime.toISOString(),
+      duration,
     });
   }, [rescheduleMutation]);
 
@@ -208,7 +216,7 @@ export function AgendaPage() {
     <DashboardLayout>
       <div className="flex flex-col h-[calc(100vh-64px)] -m-6">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 pt-4 pb-3 bg-white dark:bg-slate-900 sticky z-30">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 pt-4 pb-3 border-b border-gray-200 dark:border-slate-800 bg-surface dark:bg-slate-900 sticky  z-30">
           <div>
             <h1 className="text-2xl font-bold text-kanji dark:text-kio tracking-tight">Mi Agenda</h1>
             <p className="text-sm text-gray-500 dark:text-slate-400 opacity-60 mt-0.5 capitalize">{dateLabel}</p>
@@ -216,12 +224,11 @@ export function AgendaPage() {
 
           <div className="flex items-center gap-3">
             {/* Legend - Using Interactive Filters */}
-            <div className="hidden xl:flex items-center gap-2 mr-4 text-[11px] font-bold text-kanji/80 dark:text-kio/80 uppercase tracking-wider pr-4">
+            <div className="hidden xl:flex items-center gap-2 mr-4 text-[10px] font-bold text-kanji/60 dark:text-kio/60 uppercase tracking-widest border-r border-gray-200 dark:border-slate-800 pr-4">
               {[
                 { key: 'COMPLETED', label: 'Completada', icon: CheckCircle2, color: 'text-emerald-500', activeBg: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-200' },
                 { key: 'SCHEDULED', label: 'Agendada', icon: Calendar, color: 'text-blue-500', activeBg: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-200' },
                 { key: 'CANCELLED', label: 'Cancelada', icon: XCircle, color: 'text-red-500', activeBg: 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-200' },
-                { key: 'UNPAID', label: 'Deuda', icon: Banknote, color: 'text-amber-500', activeBg: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-200' },
               ].map((filter) => {
                 const isActive = activeFilters.includes(filter.key);
                 const Icon = filter.icon;
@@ -229,13 +236,12 @@ export function AgendaPage() {
                   <button
                     key={filter.key}
                     onClick={() => toggleFilter(filter.key)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all border ${
-                      isActive 
-                        ? `${filter.activeBg} border-current/20 shadow-sm` 
-                        : 'bg-gray-50/50 dark:bg-slate-800/40 border-gray-100 dark:border-slate-800/60 text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:border-gray-200 dark:hover:border-slate-700'
-                    }`}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all border border-transparent ${isActive
+                      ? `${filter.activeBg} border-current/10 shadow-sm`
+                      : 'hover:bg-gray-100 dark:hover:bg-slate-800 opacity-60 hover:opacity-100'
+                      }`}
                   >
-                    <Icon size={12} className={isActive ? 'text-current' : filter.color} /> 
+                    <Icon size={12} className={isActive ? 'text-current' : filter.color} />
                     {filter.label}
                   </button>
                 );
@@ -248,7 +254,7 @@ export function AgendaPage() {
             )}
 
             {/* Navigation */}
-            <div className="flex items-center gap-1 bg-gray-50 dark:bg-slate-800/50 rounded-[24px] shadow-sm p-1">
+            <div className="flex items-center gap-1 bg-surface dark:bg-slate-800 rounded-[24px] border border-gray-200 dark:border-slate-700 shadow-sm p-1">
               <button
                 type="button"
                 onClick={navigatePrevious}
@@ -276,7 +282,7 @@ export function AgendaPage() {
 
             {/* View Toggle */}
             {!isMobile && (
-              <div className="flex items-center bg-gray-50 dark:bg-slate-800/50 rounded-[24px] shadow-sm p-1">
+              <div className="flex items-center bg-surface dark:bg-slate-800 rounded-[24px] border border-gray-200 dark:border-slate-700 shadow-sm p-1">
                 <button
                   type="button"
                   onClick={switchToWeekView}
@@ -302,8 +308,6 @@ export function AgendaPage() {
               </div>
             )}
 
-
-
             {/* Primary CTA */}
             <button
               type="button"
@@ -326,6 +330,8 @@ export function AgendaPage() {
                 onSelectAppointment={handleSelectAppointment}
                 onSlotClick={handleSlotClick}
                 onReschedule={handleReschedule}
+                onQuickPay={handleQuickPay}
+                onQuickReschedule={handleQuickReschedule}
               />
             ) : (
               <DailyCalendarGrid
@@ -333,11 +339,11 @@ export function AgendaPage() {
                 appointments={filteredAppointments}
                 onSelectAppointment={handleSelectAppointment}
                 onSlotClick={handleSlotClick}
-                onReschedule={handleReschedule}
+                onQuickPay={handleQuickPay}
+                onQuickReschedule={handleQuickReschedule}
               />
             )}
           </div>
-
 
         </div>
       </div>
@@ -356,6 +362,28 @@ export function AgendaPage() {
         isOpen={!!scheduleSlot}
         onClose={handleCloseSchedule}
         initialDate={scheduleSlot}
+      />
+
+      {/* Quick Reschedule Modal */}
+      <ScheduleAppointmentModal
+        isOpen={!!rescheduleAppointmentInfo}
+        onClose={() => setRescheduleAppointmentInfo(null)}
+        initialDate={rescheduleAppointmentInfo ? parseISO(rescheduleAppointmentInfo.startTime.replace(' ', 'T')) : null}
+        onConfirm={(newDate, duration) => {
+          if (rescheduleAppointmentInfo) {
+            handleReschedule(rescheduleAppointmentInfo.id, newDate, duration);
+            setRescheduleAppointmentInfo(null);
+          }
+        }}
+        isRescheduleMode={true}
+      />
+
+      {/* Quick Pay Modal */}
+      <PaymentModal
+        isOpen={!!paymentAppointment}
+        onClose={() => setPaymentAppointment(null)}
+        appointment={paymentAppointment}
+        defaultStatus="PAID"
       />
     </DashboardLayout>
   );

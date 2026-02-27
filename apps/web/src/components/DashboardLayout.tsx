@@ -34,16 +34,16 @@ interface NavItem {
 
 const PSYCHOLOGIST_NAV: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-  { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} /> },
   { to: '/patients', label: 'Pacientes', icon: <Users size={20} /> },
+  { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} /> },
   { to: '/bitacora', label: 'Bitácora', icon: <BookOpen size={20} /> },
   { to: '/finance', label: 'Finanzas', icon: <DollarSign size={20} /> },
 ];
 
 const NUTRITIONIST_NAV: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-  { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} /> },
   { to: '/patients', label: 'Pacientes', icon: <Users size={20} /> },
+  { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} /> },
   { to: '/measurements', label: 'Mediciones', icon: <Ruler size={20} /> },
   { to: '/finance', label: 'Finanzas', icon: <DollarSign size={20} /> },
 ];
@@ -66,9 +66,9 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
   const clinicianType = user?.profile?.type;
   const navItems = clinicianType === 'NUTRITIONIST' ? NUTRITIONIST_NAV : PSYCHOLOGIST_NAV;
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setSidebarOpen(false);
-    logout();
+    await logout();
     navigate('/login', { replace: true });
   };
   
@@ -94,14 +94,14 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/30 z-20 lg:hidden"
+          className="fixed inset-0 bg-black/30 z-30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`w-64 lg:w-60 xl:w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex flex-col fixed h-full z-30 transition-all duration-200 ${
+        className={`w-64 lg:w-60 xl:w-64 bg-surface dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex flex-col fixed h-full z-40 transition-all duration-200 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0`}
       >
@@ -137,7 +137,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                     `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative ${
                       isActive
                         ? 'bg-kio-light dark:bg-kio/10 text-kio'
-                        : 'text-gray-600 dark:text-kio hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-kanji dark:hover:text-kio'
+                        : 'text-gray-600 dark:text-kio hover:bg-surface/80 dark:hover:bg-slate-800 hover:text-kanji dark:hover:text-kio'
                     }`
                   }
                 >
@@ -168,7 +168,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
               `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative ${
                 isActive
                   ? 'bg-kio-light dark:bg-kio/10 text-kio'
-                  : 'text-gray-600 dark:text-kio hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-kanji dark:hover:text-kio'
+                  : 'text-gray-600 dark:text-kio hover:bg-surface/80 dark:hover:bg-slate-800 hover:text-kanji dark:hover:text-kio'
               }`
             }
           >
@@ -196,7 +196,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col lg:ml-60 xl:ml-64 transition-all duration-200">
         {/* Top Header */}
-        <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-6 sticky top-0 z-10 transition-colors duration-200">
+        <header className="h-16 bg-surface dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-6 sticky top-0 z-20 transition-colors duration-200">
           {/* Hamburger + Breadcrumb */}
           <div className="flex items-center gap-3 text-sm">
             <button
@@ -217,14 +217,14 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
             <div className="flex items-center gap-1 mr-2">
               <button
                 onClick={() => setIsPatientModalOpen(true)}
-                className="p-2 rounded-full transition-all bg-gray-50 dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-kanji dark:hover:text-kio"
+                className="p-2 rounded-full transition-all bg-surface dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-kanji dark:hover:text-kio"
                 title="Nuevo Paciente"
               >
                 <UserPlus size={20} />
               </button>
               <button
                 onClick={() => setIsAppointmentModalOpen(true)}
-                className="p-2 rounded-full transition-all bg-gray-50 dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400"
+                className="p-2 rounded-full transition-all bg-surface dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400"
                 title="Agendar Cita"
               >
                 <CalendarPlus size={20} />
@@ -241,7 +241,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                 {clinicianType === 'PSYCHOLOGIST' ? 'Psicólogo' : 'Nutricionista'}
               </p>
             </div>
-            <div className="w-10 h-10 bg-gradient-to-br from-kio to-kanji rounded-full flex items-center justify-center shadow-sm ring-2 ring-white dark:ring-slate-800">
+            <div className="w-10 h-10 bg-gradient-to-br from-kio to-kanji rounded-full flex items-center justify-center shadow-sm ring-2 ring-surface dark:ring-slate-800">
               <span className="text-white font-semibold text-sm">{initials}</span>
             </div>
           </div>

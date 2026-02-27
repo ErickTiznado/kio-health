@@ -14,17 +14,17 @@ export function PendingNotesWidget({ count }: PendingNotesWidgetProps) {
     bg: 'bg-amber-50 dark:bg-amber-950/20',
     title: 'text-amber-950 dark:text-amber-100',
     subtitle: 'text-amber-800/60 dark:text-amber-200/60',
-    iconBg: 'bg-white dark:bg-amber-900/40 text-amber-500 dark:text-amber-400',
+    iconBg: 'bg-surface dark:bg-amber-900/40 text-amber-500 dark:text-amber-400',
     number: 'text-amber-950 dark:text-amber-50',
-    button: 'bg-white dark:bg-amber-900/40 text-amber-950 dark:text-amber-100 hover:bg-amber-100 dark:hover:bg-amber-900/60',
+    button: 'bg-surface dark:bg-amber-900/40 text-amber-950 dark:text-amber-100 hover:bg-amber-100 dark:hover:bg-amber-900/60',
     accent: 'bg-amber-100/50 dark:bg-amber-600/10'
   } : {
     bg: 'bg-emerald-50 dark:bg-emerald-950/20',
     title: 'text-emerald-950 dark:text-emerald-100',
     subtitle: 'text-emerald-800/60 dark:text-emerald-200/60',
-    iconBg: 'bg-white dark:bg-emerald-900/40 text-emerald-500 dark:text-emerald-400',
+    iconBg: 'bg-surface dark:bg-emerald-900/40 text-emerald-500 dark:text-emerald-400',
     number: 'text-emerald-950 dark:text-emerald-50',
-    button: 'bg-white dark:bg-emerald-900/40 text-emerald-950 dark:text-emerald-100 hover:bg-emerald-100 dark:hover:bg-emerald-900/60',
+    button: 'bg-surface dark:bg-emerald-900/40 text-emerald-950 dark:text-emerald-100 hover:bg-emerald-100 dark:hover:bg-emerald-900/60',
     accent: 'bg-emerald-100/50 dark:bg-emerald-600/10'
   };
 

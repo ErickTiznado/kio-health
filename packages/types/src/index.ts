@@ -30,3 +30,16 @@ export enum TransactionType {
   INCOME = 'INCOME',
   EXPENSE = 'EXPENSE',
 }
+
+export enum ScaleType {
+  PHQ9 = 'PHQ9',
+  GAD7 = 'GAD7',
+}
+
+export enum ScaleRiskLevel {
+  MINIMAL = 'MINIMAL',
+  MILD = 'MILD',
+  MODERATE = 'MODERATE',
+  MODERATELY_SEVERE = 'MODERATELY_SEVERE',
+  SEVERE = 'SEVERE',
+}

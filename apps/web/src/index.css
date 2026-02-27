@@ -6,9 +6,9 @@
   :root {
     color-scheme: light;
     /* Light Mode Variables */
-    --bg-primary: #ffffff;
-    --bg-surface: #ffffff;
-    --bg-secondary: #f8fafc;
+    --bg-primary: #f5f3ef;
+    --bg-surface: #f5f3ef;
+    --bg-secondary: #ece9e3;
 
     --text-primary: #213547;
     --text-secondary: #64748b;
@@ -55,6 +55,12 @@
   /* Force native calendar accent color */
   [type="date"] {
     accent-color: var(--color-kio);
+  }
+
+  html,
+  body {
+    height: 100%;
+    margin: 0;
   }
 
   body {

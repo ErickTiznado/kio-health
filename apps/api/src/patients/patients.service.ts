@@ -1,15 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { QueryPatientsDto } from './dto/query-patients.dto';
 import { QueryTimelineDto } from './dto/query-timeline.dto';
-import { Patient, Prisma } from '../../prisma/generated/client';
-import { EncryptionService } from '../lib/encryption';
+import { Patient, Prisma } from '#generated/prisma';
+import { EncryptionService } from '../lib/encryption.service';
 
 @Injectable()
 export class PatientsService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly encryptionService: EncryptionService,
+  ) {}
 
   async getClinicianId(userId: string): Promise<string> {
     const profile = await this.prisma.clinicianProfile.findUnique({
@@ -18,25 +21,41 @@ export class PatientsService {
     });
 
     if (!profile) {
-      throw new NotFoundException('Clinician profile not found for this user');
+      throw new NotFoundException('Perfil de clínico no encontrado para este usuario');
     }
 
     return profile.id;
   }
 
   async create(clinicianId: string, createPatientDto: CreatePatientDto) {
-    const { emergencyContact, ...data } = createPatientDto;
+    const { emergencyContact, diagnosis, clinicalContext, contactPhone, ...data } =
+      createPatientDto;
 
-    // Convert DTO to Prisma input format
-    const emergencyContactJson = emergencyContact ? (emergencyContact as any) : undefined;
+    const encryptedDiagnosis = diagnosis
+      ? this.encryptionService.encrypt(diagnosis)
+      : undefined;
+    const encryptedClinicalContext = clinicalContext
+      ? this.encryptionService.encrypt(clinicalContext)
+      : undefined;
+    const encryptedContactPhone = contactPhone
+      ? this.encryptionService.encrypt(contactPhone)
+      : undefined;
+    const encryptedEmergencyContact = emergencyContact
+      ? this.encryptionService.encrypt(JSON.stringify(emergencyContact))
+      : undefined;
 
-    return this.prisma.patient.create({
+    const createdPatient = await this.prisma.patient.create({
       data: {
         ...data,
-        emergencyContact: emergencyContactJson,
-        clinician: { connect: { id: clinicianId } }, // Assuming clinician profile exists
+        diagnosis: encryptedDiagnosis,
+        clinicalContext: encryptedClinicalContext,
+        contactPhone: encryptedContactPhone,
+        emergencyContact: encryptedEmergencyContact,
+        clinician: { connect: { id: clinicianId } },
       },
     });
+
+    return this.decryptPatient(createdPatient);
   }
 
   async findAll(
@@ -46,67 +65,31 @@ export class PatientsService {
     const { page = 1, limit = 10, search, status } = query;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.PatientWhereInput = {
-      clinicianId,
-    };
+    const where: Prisma.PatientWhereInput = { clinicianId };
 
-    // Apply Status Filter
     if (status) {
       where.status = status;
     } else {
-      // Default: Exclude archived if no specific status requested
       where.status = { not: 'ARCHIVED' };
     }
 
+    // Note: contactPhone is now encrypted — DB-level phone search is not possible.
+    // Search is restricted to fullName only.
     if (search) {
-      where.OR = [
-        { fullName: { contains: search, mode: 'insensitive' } },
-        { contactPhone: { contains: search, mode: 'insensitive' } },
-      ];
+      where.OR = [{ fullName: { contains: search, mode: 'insensitive' } }];
     }
 
-    // Determine sorting: FIFO for Waitlist, LIFO (created) for others
-    const orderBy: Prisma.PatientOrderByWithRelationInput = 
-      status === 'WAITLIST' 
-        ? { updatedAt: 'asc' } 
-        : { createdAt: 'desc' };
+    const orderBy: Prisma.PatientOrderByWithRelationInput =
+      status === 'WAITLIST' ? { updatedAt: 'asc' } : { createdAt: 'desc' };
 
     const [data, total] = await Promise.all([
-      this.prisma.patient.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy,
-        include: {
-          appointments: {
-            where: {
-              paymentStatus: 'PENDING',
-              status: { notIn: ['CANCELLED', 'NO_SHOW'] }
-            },
-            select: { price: true },
-          },
-        },
-      }),
+      this.prisma.patient.findMany({ where, skip, take: limit, orderBy }),
       this.prisma.patient.count({ where }),
     ]);
 
-    const patientsWithDebt = data.map((patient) => {
-      const totalDebt = patient.appointments.reduce(
-        (sum, app) => sum + Number(app.price),
-        0,
-      );
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { appointments, ...rest } = patient;
-      return { ...rest, totalDebt };
-    });
-
     return {
-      data: patientsWithDebt,
-      meta: {
-        total,
-        page,
-        lastPage: Math.ceil(total / limit),
-      },
+      data: data.map((p) => this.decryptPatient(p)),
+      meta: { total, page, lastPage: Math.ceil(total / limit) },
     };
   }
 
@@ -129,42 +112,28 @@ export class PatientsService {
     });
 
     if (!patient) {
-      throw new NotFoundException(`Patient with ID ${id} not found`);
+      throw new NotFoundException(`Paciente con ID ${id} no encontrado`);
     }
 
-    const totalDebt = patient.appointments
-      .filter(app => app.paymentStatus === 'PENDING' && !['CANCELLED', 'NO_SHOW'].includes(app.status))
-      .reduce((sum, app) => sum + Number(app.price), 0);
-
-    return { ...patient, totalDebt };
+    return this.decryptPatient(patient);
   }
 
-  async getTimeline(
-    id: string,
-    clinicianId: string,
-    query: QueryTimelineDto,
-  ) {
+  async getTimeline(id: string, clinicianId: string, query: QueryTimelineDto) {
     const { page = 1, limit = 10, search } = query;
     const skip = (page - 1) * limit;
 
-    // Check patient existence/access
     await this.findOne(id, clinicianId);
 
     const where: Prisma.AppointmentWhereInput = {
       patientId: id,
       clinicianId,
-      status: 'COMPLETED', // Only completed appointments have history? Or maybe all? "Citas pasadas" implies completed or past.
-      // Usually timeline is about clinical history, so COMPLETED.
-      // But maybe we want to see future ones too? "Trae todas las notas + citas pasadas".
-      // Let's assume past/completed for now.
+      status: 'COMPLETED',
     };
 
     if (search) {
       where.OR = [
         { reason: { contains: search, mode: 'insensitive' } },
         { notes: { contains: search, mode: 'insensitive' } },
-        // Searching inside PsychNote content JSON is complex via Prisma API directly without Raw.
-        // We'll skip deep JSON search for this MVP iteration or rely on client filtering for loaded items.
       ];
     }
 
@@ -174,38 +143,31 @@ export class PatientsService {
         skip,
         take: limit,
         orderBy: { startTime: 'desc' },
-        include: {
-          psychNote: true,
-        },
+        include: { psychNote: true },
       }),
       this.prisma.appointment.count({ where }),
     ]);
 
-    // Process appointments to decrypt private notes
     const data = appointments.map((apt) => {
-      if (apt.psychNote && apt.psychNote.privateNotes) {
-        try {
-          const decrypted = EncryptionService.decrypt(apt.psychNote.privateNotes);
-          return {
-            ...apt,
-            psychNote: { ...apt.psychNote, privateNotes: decrypted },
-          };
-        } catch (e) {
-          console.error(`Failed to decrypt note for appointment ${apt.id}`, e);
-          return apt;
-        }
+      if (!apt.psychNote) return apt;
+
+      const decryptedPrivateNotes = apt.psychNote.privateNotes
+        ? this.encryptionService.decrypt(apt.psychNote.privateNotes)
+        : apt.psychNote.privateNotes;
+
+      let decryptedContent = apt.psychNote.content;
+      if (typeof decryptedContent === 'string') {
+        const raw = this.encryptionService.decrypt(decryptedContent);
+        decryptedContent = JSON.parse(raw);
       }
-      return apt;
+
+      return {
+        ...apt,
+        psychNote: { ...apt.psychNote, privateNotes: decryptedPrivateNotes, content: decryptedContent },
+      };
     });
 
-    return {
-      data,
-      meta: {
-        total,
-        page,
-        lastPage: Math.ceil(total / limit),
-      },
-    };
+    return { data, meta: { total, page, lastPage: Math.ceil(total / limit) } };
   }
 
   async getMoodHistory(id: string, clinicianId: string) {
@@ -214,67 +176,112 @@ export class PatientsService {
     const notes = await this.prisma.psychNote.findMany({
       where: {
         patientId: id,
-        appointment: { clinicianId }, // Redundant but safe
+        appointment: { clinicianId },
         moodRating: { not: null },
       },
-      select: {
-        moodRating: true,
-        appointment: {
-          select: { startTime: true },
-        },
-      },
+      select: { moodRating: true, appointment: { select: { startTime: true } } },
       orderBy: { appointment: { startTime: 'asc' } },
     });
 
-    return notes.map(n => ({
-      date: n.appointment.startTime,
-      mood: n.moodRating,
-    }));
+    return notes.map((n) => ({ date: n.appointment.startTime, mood: n.moodRating }));
   }
 
   async getLastNote(id: string, clinicianId: string) {
     await this.findOne(id, clinicianId);
 
     const lastNote = await this.prisma.psychNote.findFirst({
-      where: {
-        patientId: id,
-        appointment: { clinicianId },
-      },
+      where: { patientId: id, appointment: { clinicianId } },
       orderBy: { createdAt: 'desc' },
     });
 
-    if (lastNote && lastNote.privateNotes) {
-      try {
-        lastNote.privateNotes = EncryptionService.decrypt(lastNote.privateNotes);
-      } catch (e) {
-        lastNote.privateNotes = null;
-      }
+    if (lastNote?.privateNotes) {
+      lastNote.privateNotes = this.encryptionService.decrypt(lastNote.privateNotes);
     }
 
     return lastNote;
   }
 
   async update(id: string, clinicianId: string, updatePatientDto: UpdatePatientDto) {
-    await this.findOne(id, clinicianId); // Ensure existence and ownership
+    await this.findOne(id, clinicianId);
 
-    const { emergencyContact, ...data } = updatePatientDto;
-    const emergencyContactJson = emergencyContact ? (emergencyContact as any) : undefined;
+    const { emergencyContact, diagnosis, clinicalContext, contactPhone, ...data } =
+      updatePatientDto;
 
-    return this.prisma.patient.update({
+    const encryptedDiagnosis =
+      diagnosis !== undefined ? (diagnosis ? this.encryptionService.encrypt(diagnosis) : null) : undefined;
+    const encryptedClinicalContext =
+      clinicalContext !== undefined
+        ? clinicalContext
+          ? this.encryptionService.encrypt(clinicalContext)
+          : null
+        : undefined;
+    const encryptedContactPhone =
+      contactPhone !== undefined
+        ? contactPhone
+          ? this.encryptionService.encrypt(contactPhone)
+          : null
+        : undefined;
+    const encryptedEmergencyContact =
+      emergencyContact !== undefined
+        ? emergencyContact
+          ? this.encryptionService.encrypt(JSON.stringify(emergencyContact))
+          : null
+        : undefined;
+
+    const updatedPatient = await this.prisma.patient.update({
       where: { id },
       data: {
         ...data,
-        ...(emergencyContactJson !== undefined && { emergencyContact: emergencyContactJson }),
+        ...(encryptedDiagnosis !== undefined && { diagnosis: encryptedDiagnosis }),
+        ...(encryptedClinicalContext !== undefined && { clinicalContext: encryptedClinicalContext }),
+        ...(encryptedContactPhone !== undefined && { contactPhone: encryptedContactPhone }),
+        ...(encryptedEmergencyContact !== undefined && { emergencyContact: encryptedEmergencyContact }),
       },
     });
+
+    return this.decryptPatient(updatedPatient);
   }
 
   async archive(id: string, clinicianId: string) {
     await this.findOne(id, clinicianId);
+    return this.prisma.patient.update({ where: { id }, data: { status: 'ARCHIVED' } });
+  }
 
-    return this.prisma.patient.update({
-      where: { id },
-      data: { status: 'ARCHIVED' },
+  async getScalesHistory(patientId: string, clinicianId: string) {
+    await this.findOne(patientId, clinicianId);
+    return this.prisma.clinicalScale.findMany({
+      where: { patientId },
+      orderBy: { createdAt: 'asc' },
+      select: {
+        id: true,
+        scaleType: true,
+        totalScore: true,
+        riskLevel: true,
+        createdAt: true,
+        appointment: { select: { startTime: true } },
+      },
     });
+  }
+
+  // ── Private helpers ─────────────────────────────────────────────────────────
+
+  private decryptPatient(patient: Patient & { appointments?: unknown[] }): typeof patient {
+    const result = { ...patient } as any;
+
+    if (result.diagnosis) {
+      result.diagnosis = this.encryptionService.decrypt(result.diagnosis);
+    }
+    if (result.clinicalContext) {
+      result.clinicalContext = this.encryptionService.decrypt(result.clinicalContext);
+    }
+    if (result.contactPhone) {
+      result.contactPhone = this.encryptionService.decrypt(result.contactPhone);
+    }
+    if (result.emergencyContact) {
+      const raw = this.encryptionService.decrypt(result.emergencyContact as string);
+      result.emergencyContact = JSON.parse(raw);
+    }
+
+    return result;
   }
 }

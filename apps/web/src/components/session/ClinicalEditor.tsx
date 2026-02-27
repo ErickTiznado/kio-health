@@ -21,7 +21,7 @@ export const ClinicalEditor: FC = () => {
   ] as const;
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-slate-900 shadow-[-4px_0_24px_rgba(0,0,0,0.04)] dark:shadow-[-4px_0_24px_rgba(0,0,0,0.2)] relative">
+    <div className="h-full flex flex-col bg-surface dark:bg-slate-900 shadow-[-4px_0_24px_rgba(0,0,0,0.04)] dark:shadow-[-4px_0_24px_rgba(0,0,0,0.2)] relative">
       {/* ── Writing Canvas ── */}
       <div className="flex-1 overflow-y-auto px-10 py-8">
         {/* Editable Title */}
@@ -54,7 +54,7 @@ export const ClinicalEditor: FC = () => {
 
       {/* ── Floating Toolbar ── */}
       <div className="sticky bottom-0 px-10 pb-5 pt-3">
-        <div className="flex items-center gap-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-gray-200/60 dark:border-slate-700/60 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 px-3 py-2 w-fit">
+        <div className="flex items-center gap-1 bg-surface/80 dark:bg-slate-800/80 backdrop-blur-xl border border-gray-200/60 dark:border-slate-700/60 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 px-3 py-2 w-fit">
           {TOOLBAR_BUTTONS.map((button) => (
             <button
               key={button.label}

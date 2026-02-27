@@ -7,10 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 const {
   Decimal,
-  DbNull,
-  JsonNull,
-  AnyNull,
-  NullTypes,
+  objectEnumValues,
   makeStrictEnum,
   Public,
   getRuntime,
@@ -24,12 +21,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 7.3.0
- * Query Engine version: 9d6ad21cbbceab97458517b147a6a09ff43aa735
+ * Prisma Client JS version: 6.19.2
+ * Query Engine version: c2990dca591cba766e3b7ef5d9e8a84796e47ab7
  */
 Prisma.prismaVersion = {
-  client: "7.3.0",
-  engine: "9d6ad21cbbceab97458517b147a6a09ff43aa735"
+  client: "6.19.2",
+  engine: "c2990dca591cba766e3b7ef5d9e8a84796e47ab7"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -101,11 +98,15 @@ In case this error is unexpected for you, please report it in https://pris.ly/pr
 /**
  * Shorthand utilities for JSON filtering
  */
-Prisma.DbNull = DbNull
-Prisma.JsonNull = JsonNull
-Prisma.AnyNull = AnyNull
+Prisma.DbNull = objectEnumValues.instances.DbNull
+Prisma.JsonNull = objectEnumValues.instances.JsonNull
+Prisma.AnyNull = objectEnumValues.instances.AnyNull
 
-Prisma.NullTypes = NullTypes
+Prisma.NullTypes = {
+  DbNull: objectEnumValues.classes.DbNull,
+  JsonNull: objectEnumValues.classes.JsonNull,
+  AnyNull: objectEnumValues.classes.AnyNull
+}
 
 
 
@@ -127,6 +128,14 @@ exports.Prisma.UserScalarFieldEnum = {
   role: 'role',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RefreshTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.ClinicianProfileScalarFieldEnum = {
@@ -151,6 +160,7 @@ exports.Prisma.PatientScalarFieldEnum = {
   status: 'status',
   contactPhone: 'contactPhone',
   emergencyContact: 'emergencyContact',
+  treatmentGoals: 'treatmentGoals',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -221,14 +231,45 @@ exports.Prisma.FinanceTransactionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.AnthropometryScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  appointmentId: 'appointmentId',
+  weight: 'weight',
+  height: 'height',
+  bodyFat: 'bodyFat',
+  waist: 'waist',
+  hip: 'hip',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MealPlanScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  appointmentId: 'appointmentId',
+  content: 'content',
+  fileUrl: 'fileUrl',
+  fileName: 'fileName',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ClinicalScaleScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  appointmentId: 'appointmentId',
+  scaleType: 'scaleType',
+  scores: 'scores',
+  totalScore: 'totalScore',
+  riskLevel: 'riskLevel',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
-};
-
-exports.Prisma.NullableJsonNullValueInput = {
-  DbNull: Prisma.DbNull,
-  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.JsonNullValueInput = {
@@ -302,15 +343,32 @@ exports.TransactionType = exports.$Enums.TransactionType = {
   EXPENSE: 'EXPENSE'
 };
 
+exports.ScaleType = exports.$Enums.ScaleType = {
+  PHQ9: 'PHQ9',
+  GAD7: 'GAD7'
+};
+
+exports.ScaleRiskLevel = exports.$Enums.ScaleRiskLevel = {
+  MINIMAL: 'MINIMAL',
+  MILD: 'MILD',
+  MODERATE: 'MODERATE',
+  MODERATELY_SEVERE: 'MODERATELY_SEVERE',
+  SEVERE: 'SEVERE'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
+  RefreshToken: 'RefreshToken',
   ClinicianProfile: 'ClinicianProfile',
   Patient: 'Patient',
   Appointment: 'Appointment',
   PsychNote: 'PsychNote',
   Task: 'Task',
   AccessLog: 'AccessLog',
-  FinanceTransaction: 'FinanceTransaction'
+  FinanceTransaction: 'FinanceTransaction',
+  Anthropometry: 'Anthropometry',
+  MealPlan: 'MealPlan',
+  ClinicalScale: 'ClinicalScale'
 };
 
 /**

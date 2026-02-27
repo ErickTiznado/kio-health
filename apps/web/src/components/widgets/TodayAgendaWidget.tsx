@@ -2,7 +2,7 @@ import { CalendarClock, Coffee, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format, isWithinInterval, parseISO, differenceInMinutes } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Skeleton } from '../ui/Skeleton';
+import { Skeleton } from '@repo/ui/skeleton';
 import type { Appointment } from '../../types/appointments.types';
 
 interface TodayAgendaWidgetProps {
@@ -48,7 +48,7 @@ export function TodayAgendaWidget({
 
   return (
     <div className="w-full h-full">
-      <div className="bg-white dark:bg-slate-900 rounded-[40px] p-5 shadow-sm border border-gray-100 dark:border-slate-800 h-full flex flex-col transition-colors duration-200">
+      <div className="bg-surface dark:bg-slate-900 rounded-[40px] p-5 shadow-sm border border-gray-100 dark:border-slate-800 h-full flex flex-col transition-colors duration-200">
         {/* Header */}
         <div className="flex items-center justify-between mb-4 shrink-0">
           <div className="flex flex-col gap-0.5">
@@ -87,8 +87,8 @@ export function TodayAgendaWidget({
 
         {/* Empty */}
         {!isLoading && sorted.length === 0 && (
-          <div className="flex flex-col items-center justify-center flex-1 text-center bg-gray-50/50 dark:bg-slate-800/50 rounded-3xl border border-dashed border-gray-200 dark:border-slate-700 p-8 transition-colors">
-            <div className="w-12 h-12 bg-white dark:bg-slate-700 rounded-2xl shadow-sm flex items-center justify-center mb-3 transition-colors">
+          <div className="flex flex-col items-center justify-center flex-1 text-center bg-surface/60 dark:bg-slate-800/50 rounded-3xl border border-dashed border-gray-200 dark:border-slate-700 p-8 transition-colors">
+            <div className="w-12 h-12 bg-surface dark:bg-slate-700 rounded-2xl shadow-sm flex items-center justify-center mb-3 transition-colors">
               <Coffee size={20} className="text-kio/60" />
             </div>
             <p className="font-bold text-gray-900 dark:text-white text-sm mb-1">
@@ -108,7 +108,6 @@ export function TodayAgendaWidget({
 
             <div className="space-y-px">
               {sorted.map((apt) => {
-                const isPaid = apt.paymentStatus === 'PAID';
                 const startTime = parseISO(apt.startTime);
                 const endTime = parseISO(apt.endTime);
                 const duration = differenceInMinutes(endTime, startTime);
@@ -127,11 +126,11 @@ export function TodayAgendaWidget({
                     to={`/session/${apt.id}`}
                     className={`group relative flex items-center gap-2.5 py-2 px-2 rounded-xl transition-all ${isNow
                       ? 'bg-kio/5 dark:bg-kio/10'
-                      : 'hover:bg-gray-50 dark:hover:bg-slate-800/50'
+                      : 'hover:bg-surface dark:hover:bg-slate-800/50'
                       } ${isCancelled ? 'opacity-40' : ''}`}
                   >
                     {/* Time */}
-                    <div className={`w-[2.2rem] text-right shrink-0 ${isPast && !isNow ? 'opacity-50' : ''}`}>
+                    <div className={`w-[2.2rem] text-right shrink-0 pr-3 ${isPast && !isNow ? 'opacity-50' : ''}`}>
                       <span className={`text-[11px] font-bold tabular-nums leading-none ${isNow ? 'text-kio' : 'text-gray-900 dark:text-white'
                         }`}>
                         {format(startTime, 'HH:mm')}
@@ -164,12 +163,8 @@ export function TodayAgendaWidget({
 
                     {/* Right meta */}
                     <div className={`flex items-center gap-1.5 shrink-0 ${isPast && !isNow ? 'opacity-50' : ''}`}>
-                      {/* Payment indicator */}
-                      {!isPaid && !isCancelled && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" title="Pago pendiente" />
-                      )}
                       {/* Type tag */}
-                      <span className="text-[9px] font-bold text-gray-400 dark:text-kanji bg-gray-50 dark:bg-slate-800 px-1.5 py-0.5 rounded-md">
+                      <span className="text-[9px] font-bold text-gray-400 dark:text-kanji bg-surface dark:bg-slate-800 px-1.5 py-0.5 rounded-md">
                         {TYPE_SHORT[apt.type]}
                       </span>
                       {/* Duration */}

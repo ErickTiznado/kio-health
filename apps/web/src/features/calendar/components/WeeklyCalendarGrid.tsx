@@ -14,6 +14,8 @@ interface WeeklyCalendarGridProps {
   onSelectAppointment: (appointment: Appointment) => void;
   onSlotClick: (date: Date) => void;
   onReschedule: (appointmentId: string, newStartTime: Date) => void;
+  onQuickPay?: (appointment: Appointment) => void;
+  onQuickReschedule?: (appointment: Appointment) => void;
 }
 
 const GRID_START_HOUR = 8;
@@ -33,7 +35,15 @@ function formatHourLabel(hour: number): string {
  * Weekly calendar CSS grid with hour rows, day columns,
  * positioned appointment pills, and a live current-time indicator.
  */
-export function WeeklyCalendarGrid({ weekStart, appointments, onSelectAppointment, onSlotClick, onReschedule }: WeeklyCalendarGridProps) {
+export function WeeklyCalendarGrid({
+  weekStart,
+  appointments,
+  onSelectAppointment,
+  onSlotClick,
+  onReschedule,
+  onQuickPay,
+  onQuickReschedule
+}: WeeklyCalendarGridProps) {
   const { user } = useAuthStore();
   const defaultDuration = user?.profile?.sessionDefaultDuration || 50;
 
@@ -137,7 +147,7 @@ export function WeeklyCalendarGrid({ weekStart, appointments, onSelectAppointmen
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 overflow-hidden h-full flex flex-col">
+    <div className="bg-surface dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 overflow-hidden h-full flex flex-col">
       {/* Day Headers */}
       <div
         className="grid border-b border-gray-200 dark:border-slate-800"
@@ -260,6 +270,8 @@ export function WeeklyCalendarGrid({ weekStart, appointments, onSelectAppointmen
                     key={appointment.id}
                     appointment={appointment}
                     onSelect={onSelectAppointment}
+                    onQuickPay={onQuickPay}
+                    onQuickReschedule={onQuickReschedule}
                   />
                 ))}
               </div>

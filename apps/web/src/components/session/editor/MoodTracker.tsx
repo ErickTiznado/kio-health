@@ -3,9 +3,10 @@ import { Smile, Frown, Meh } from 'lucide-react';
 interface MoodTrackerProps {
   value: number; // 1-10
   onChange: (val: number) => void;
+  label?: string;
 }
 
-export function MoodTracker({ value, onChange }: MoodTrackerProps) {
+export function MoodTracker({ value, onChange, label = "Percepción Inicial de Ánimo" }: MoodTrackerProps) {
   // Helper to get color based on value
   const getColor = (val: number) => {
     if (val >= 8) return 'text-emerald-500';
@@ -16,8 +17,8 @@ export function MoodTracker({ value, onChange }: MoodTrackerProps) {
   const Icon = value >= 8 ? Smile : value >= 5 ? Meh : Frown;
 
   return (
-    <div className="flex items-center gap-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-full px-4 py-1.5 shadow-sm">
-      <span className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">Ánimo</span>
+    <div className="flex items-center gap-3 bg-surface dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-full px-4 py-1.5 shadow-sm">
+      <span className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{label}</span>
 
       <div className="flex items-center gap-2">
         <input

@@ -43,13 +43,6 @@ export interface PendingNotesCount {
   count: number;
 }
 
-export interface SessionContext {
-  appointment: Appointment;
-  patient: Patient & { appointments?: any[] };
-  totalBalance: number;
-  lastVisit: string | null;
-  sessionNumber: number;
-}
 
 /** Map of date string (YYYY-MM-DD) -> detailed summary */
 export type DaySummary = Record<
@@ -86,12 +79,13 @@ export interface CreateAppointmentPayload {
   type?: AppointmentType;
   reason?: string;
   price?: number;
-  duration?: number;
+  duration?: number; // In minutes
 }
 
 /** Payload sent to PATCH /appointments/:id/reschedule */
 export interface ReschedulePayload {
   startTime: string; // ISO
+  duration?: number; // In minutes
 }
 
 export const NoteTemplateType = {
@@ -124,3 +118,72 @@ export interface CreatePsychNoteDto {
   privateNotes?: string;
   tags?: string[];
 }
+
+export interface Anthropometry {
+  id: string;
+  patientId: string;
+  appointmentId: string;
+  weight: string;
+  height: string;
+  bodyFat?: string;
+  waist?: string;
+  hip?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MealPlan {
+  id: string;
+  patientId: string;
+  appointmentId: string;
+  content?: string;
+  fileUrl?: string;
+  fileName?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SessionContext {
+  appointment: Appointment;
+  patient: Patient;
+  lastVisit: string | null;
+  sessionNumber: number;
+  anthropometry?: Anthropometry | null;
+  mealPlan?: MealPlan | null;
+  clinicalScales?: ClinicalScale[];
+}
+
+export interface CreateAnthropometryPayload {
+  weight: number;
+  height: number;
+  bodyFat?: number;
+  waist?: number;
+  hip?: number;
+}
+
+export interface CreateMealPlanPayload {
+  content?: string;
+  fileUrl?: string;
+  fileName?: string;
+}
+
+export type ScaleType = 'PHQ9' | 'GAD7';
+export type ScaleRiskLevel = 'MINIMAL' | 'MILD' | 'MODERATE' | 'MODERATELY_SEVERE' | 'SEVERE';
+
+export interface ClinicalScale {
+  id: string;
+  patientId: string;
+  appointmentId: string;
+  scaleType: ScaleType;
+  scores: number[];
+  totalScore: number;
+  riskLevel: ScaleRiskLevel;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateClinicalScalePayload {
+  scaleType: ScaleType;
+  scores: number[];
+}
+

@@ -11,7 +11,11 @@ import { RescheduleAppointmentDto } from './dto/reschedule-appointment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { CompleteCheckoutDto } from './dto/complete-checkout.dto';
 import { CreatePsychNoteDto, NoteTemplateType } from './dto/create-psych-note.dto';
-import { EncryptionService } from '../lib/encryption';
+import { CreateAnthropometryDto } from './dto/create-anthropometry.dto';
+import { CreateMealPlanDto } from './dto/create-meal-plan.dto';
+import { CreateClinicalScaleDto } from './dto/create-clinical-scale.dto';
+import { EncryptionService } from '../lib/encryption.service';
+import { ScaleType, ScaleRiskLevel } from '#generated/prisma';
 import { ExportService } from '../export/export.service';
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -24,17 +28,17 @@ export class AppointmentsService {
     private readonly prisma: PrismaService,
     private readonly exportService: ExportService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly encryptionService: EncryptionService,
   ) { }
 
-  async getMonthDensity(userId: string, date: Date | string) {
-    const profile = await this.resolveClinicianProfile(userId);
+  async getMonthDensity(clinicianId: string, date: Date | string) {
     const targetDate = new Date(date);
     const start = startOfMonth(targetDate);
     const end = endOfMonth(targetDate);
 
     const appointments = await this.prisma.appointment.findMany({
       where: {
-        clinicianId: profile.id,
+        clinicianId: clinicianId,
         startTime: { gte: start, lte: end },
         status: { not: 'CANCELLED' },
       },
@@ -55,8 +59,7 @@ export class AppointmentsService {
    * Find appointments for a specific clinician.
    * Supports single date (date) or range (from/to).
    */
-  async findByDate(userId: string, dateString?: string, from?: string, to?: string) {
-    const profile = await this.resolveClinicianProfile(userId);
+  async findByDate(clinicianId: string, dateString?: string, from?: string, to?: string) {
 
     let startOfRange: Date;
     let endOfRange: Date;
@@ -76,14 +79,9 @@ export class AppointmentsService {
       endOfRange.setHours(23, 59, 59, 999);
     }
 
-    console.log('--- DEBUG FIND BY DATE ---');
-    console.log('Clinician:', profile.id);
-    console.log('Range Input:', from, to);
-    console.log('Range Object:', startOfRange.toISOString(), '->', endOfRange.toISOString());
-
     const results = await this.prisma.appointment.findMany({
       where: {
-        clinicianId: profile.id,
+        clinicianId: clinicianId,
         startTime: { gte: startOfRange, lte: endOfRange },
       },
       include: {
@@ -92,10 +90,6 @@ export class AppointmentsService {
       orderBy: { startTime: 'asc' },
     });
 
-    console.log('Found:', results.length, 'appointments');
-    results.forEach(r => console.log(`- ID: ${r.id} | Start: ${r.startTime.toISOString()} | Status: ${r.status}`));
-    console.log('--------------------------');
-
     return results;
   }
 
@@ -103,12 +97,11 @@ export class AppointmentsService {
    * Get recent unique patients from the clinician's completed appointments.
    * Returns the last 6 unique patients with their most recent appointment info.
    */
-  async getRecentPatients(userId: string) {
-    const profile = await this.resolveClinicianProfile(userId);
+  async getRecentPatients(clinicianId: string) {
 
     const recentAppointments = await this.prisma.appointment.findMany({
       where: {
-        clinicianId: profile.id,
+        clinicianId: clinicianId,
         status: { in: ['COMPLETED', 'SCHEDULED'] },
       },
       include: {
@@ -146,8 +139,7 @@ export class AppointmentsService {
    * Get a count of appointments per day for a given date range.
    * Used for the availability calendar widget.
    */
-  async getDaySummary(userId: string, from: string, to: string) {
-    const profile = await this.resolveClinicianProfile(userId);
+  async getDaySummary(clinicianId: string, from: string, to: string) {
 
     const startOfRange = new Date(from);
     startOfRange.setHours(0, 0, 0, 0);
@@ -156,7 +148,7 @@ export class AppointmentsService {
 
     const appointments = await this.prisma.appointment.findMany({
       where: {
-        clinicianId: profile.id,
+        clinicianId: clinicianId,
         startTime: { gte: startOfRange, lte: endOfRange },
         status: { not: 'CANCELLED' },
       },
@@ -204,12 +196,11 @@ export class AppointmentsService {
    * Includes expanded patient clinical data and the count of previous sessions.
    * Returns null if there are no future appointments.
    */
-  async getNextUpcoming(userId: string) {
-    const profile = await this.resolveClinicianProfile(userId);
+  async getNextUpcoming(clinicianId: string) {
 
     const appointment = await this.prisma.appointment.findFirst({
       where: {
-        clinicianId: profile.id,
+        clinicianId: clinicianId,
         status: 'SCHEDULED',
         endTime: { gt: new Date() },
       },
@@ -229,17 +220,29 @@ export class AppointmentsService {
 
     if (!appointment) return null;
 
+    // Decrypt sensitive patient fields before returning
+    const decryptedPatient = {
+      ...appointment.patient,
+      diagnosis: appointment.patient.diagnosis
+        ? this.encryptionService.decrypt(appointment.patient.diagnosis)
+        : null,
+      clinicalContext: appointment.patient.clinicalContext
+        ? this.encryptionService.decrypt(appointment.patient.clinicalContext)
+        : null,
+    };
+
     // Count previously completed sessions for context ("Sesión #N")
     const completedSessions = await this.prisma.appointment.count({
       where: {
         patientId: appointment.patientId,
-        clinicianId: profile.id,
+        clinicianId: clinicianId,
         status: 'COMPLETED',
       },
     });
 
     return {
       ...appointment,
+      patient: decryptedPatient,
       sessionNumber: completedSessions + 1,
     };
   }
@@ -248,12 +251,11 @@ export class AppointmentsService {
    * Count completed appointments that don't have an associated psych note yet.
    * Used by the PendingNotesWidget on the dashboard.
    */
-  async getPendingNotesCount(userId: string): Promise<{ count: number }> {
-    const profile = await this.resolveClinicianProfile(userId);
+  async getPendingNotesCount(clinicianId: string): Promise<{ count: number }> {
 
     const count = await this.prisma.appointment.count({
       where: {
-        clinicianId: profile.id,
+        clinicianId: clinicianId,
         status: 'COMPLETED',
         psychNote: null,
       },
@@ -270,34 +272,18 @@ export class AppointmentsService {
    * - Patient's total outstanding balance
    * - Last completed appointment date
    */
-  async getSessionContext(userId: string, appointmentId: string) {
-    const profile = await this.resolveClinicianProfile(userId);
-    const appointment = await this.findAppointmentOrFail(appointmentId);
-    this.assertOwnership(appointment.clinicianId, profile.id);
+  async getSessionContext(clinicianId: string, appointmentId: string) {
+    const appointment = await this.findAppointmentOrFail(appointmentId, clinicianId);
+
 
     // Get patient with extended details
     const patient = await this.prisma.patient.findUnique({
       where: { id: appointment.patientId },
-      include: {
-        appointments: {
-          where: {
-            status: 'COMPLETED',
-            paymentStatus: 'PENDING',
-          },
-          select: { price: true },
-        },
-      },
     });
 
     if (!patient) {
-      throw new NotFoundException('Patient not found');
+      throw new NotFoundException('Paciente no encontrado');
     }
-
-    // Calculate total pending balance
-    const totalBalance = patient.appointments.reduce(
-      (sum, apt) => sum + Number(apt.price),
-      0,
-    );
 
     // Get last completed appointment (visit)
     const lastVisit = await this.prisma.appointment.findFirst({
@@ -313,22 +299,48 @@ export class AppointmentsService {
     const sessionNumber = await this.prisma.appointment.count({
       where: {
         patientId: appointment.patientId,
-        clinicianId: profile.id,
+        clinicianId: clinicianId,
         status: { in: ['COMPLETED', 'IN_PROGRESS', 'SCHEDULED'] },
         startTime: { lte: appointment.startTime },
       },
     });
 
-    // Remove the appointments array from patient object to keep response clean
-    const { appointments: _appointments, ...patientData } = patient;
+    const anthropometry = await this.prisma.anthropometry.findUnique({
+      where: { appointmentId },
+    });
+
+    const mealPlan = await this.prisma.mealPlan.findUnique({
+      where: { appointmentId },
+    });
+
+    const clinicalScales = await this.prisma.clinicalScale.findMany({
+      where: { appointmentId },
+      orderBy: { createdAt: 'asc' },
+    });
 
     return {
-      appointment,
-      patient: patientData,
-      totalBalance,
-      lastVisit: lastVisit?.startTime || null,
-      sessionNumber,
-    };
+    appointment,
+    patient: {
+      ...patient,
+      diagnosis: patient.diagnosis
+        ? this.encryptionService.decrypt(patient.diagnosis)
+        : null,
+      clinicalContext: patient.clinicalContext
+        ? this.encryptionService.decrypt(patient.clinicalContext)
+        : null,
+      contactPhone: patient.contactPhone
+        ? this.encryptionService.decrypt(patient.contactPhone)
+        : null,
+      emergencyContact: patient.emergencyContact
+        ? JSON.parse(this.encryptionService.decrypt(patient.emergencyContact))
+        : null,
+    },
+    lastVisit: lastVisit?.startTime || null,
+    sessionNumber,
+    anthropometry,
+    mealPlan,
+    clinicalScales,
+  };
   }
 
   /* ── Psych Notes ─────────────────────────────── */
@@ -337,10 +349,9 @@ export class AppointmentsService {
    * Get the clinical note for an appointment.
    * Decrypts private notes before returning.
    */
-  async getPsychNote(userId: string, appointmentId: string) {
-    const profile = await this.resolveClinicianProfile(userId);
-    const appointment = await this.findAppointmentOrFail(appointmentId);
-    this.assertOwnership(appointment.clinicianId, profile.id);
+  async getPsychNote(clinicianId: string, appointmentId: string) {
+    const appointment = await this.findAppointmentOrFail(appointmentId, clinicianId);
+
 
     const note = await this.prisma.psychNote.findUnique({
       where: { appointmentId },
@@ -348,21 +359,16 @@ export class AppointmentsService {
 
     if (!note) return null;
 
+    // Decrypt content — throws if ciphertext is tampered (GCM auth tag mismatch)
+    if (typeof note.content === 'string') {
+      const decryptedContentStr = this.encryptionService.decrypt(note.content as string);
+      note.content = JSON.parse(decryptedContentStr);
+    }
+
     // Decrypt private notes if present
     if (note.privateNotes) {
-      try {
-        // We need to handle cases where decryption might fail (e.g. old data or bad key)
-        // But here we assume it's valid if present.
-        // Actually, let's wrap in try-catch to be safe, though EncryptionService throws.
-        const decrypted = EncryptionService.decrypt(note.privateNotes);
-        return { ...note, privateNotes: decrypted };
-      } catch (error) {
-        console.error('Failed to decrypt private notes:', error);
-        // Return as is or empty? Let's return as is to show something is wrong or maybe undefined?
-        // Better to return empty string or error?
-        // Let's return generic error message in field
-        return { ...note, privateNotes: '[Error decrypting notes]' };
-      }
+      const decrypted = this.encryptionService.decrypt(note.privateNotes);
+      return { ...note, privateNotes: decrypted };
     }
 
     return note;
@@ -373,13 +379,12 @@ export class AppointmentsService {
    * Encrypts private notes before saving.
    */
   async upsertPsychNote(
-    userId: string,
+    clinicianId: string,
     appointmentId: string,
     dto: CreatePsychNoteDto,
   ) {
-    const profile = await this.resolveClinicianProfile(userId);
-    const appointment = await this.findAppointmentOrFail(appointmentId);
-    this.assertOwnership(appointment.clinicianId, profile.id);
+    const appointment = await this.findAppointmentOrFail(appointmentId, clinicianId);
+
 
     // Check 24h edit rule (Integridad Clínica)
     const now = new Date();
@@ -387,77 +392,82 @@ export class AppointmentsService {
     deadline.setHours(deadline.getHours() + 24);
 
     if (now > deadline) {
-      // Allow creation if note doesn't exist? Usually "Edición de Historial" implies modification.
-      // If creating a note for an old appointment, maybe it's okay? "Backfilling".
-      // But modifying an *existing* note after 24h is disallowed.
-      // The prompt says: "Edición de Historial: Solo permitir editar notas de las últimas 24 horas".
-      
       const existing = await this.prisma.psychNote.findUnique({ where: { appointmentId } });
       if (existing) {
-        throw new ForbiddenException('Edición bloqueada: Han pasado más de 24 horas desde la sesión.');
+        throw new ForbiddenException('Edición bloqueada: Han pasado más de 24 horas desde la sesión y la nota clínica no puede ser alterada por motivos de integridad legal.');
       }
     }
 
     // Validate content structure based on templateType
     this.validateNoteContent(dto.templateType, dto.content);
 
+    // Encrypt content — throws on failure; never store plaintext
+    const contentStr = JSON.stringify(dto.content);
+    const encryptedContent = this.encryptionService.encrypt(contentStr);
+
     // Encrypt private notes if present
     let encryptedPrivateNotes: string | null = null;
     if (dto.privateNotes) {
-      encryptedPrivateNotes = EncryptionService.encrypt(dto.privateNotes);
+      encryptedPrivateNotes = this.encryptionService.encrypt(dto.privateNotes);
     }
 
-    // Check if note exists
-    const existingNote = await this.prisma.psychNote.findUnique({
-      where: { appointmentId },
+    // Check if note exists and update or create atomically
+    return this.prisma.$transaction(async (tx) => {
+      const existingNote = await tx.psychNote.findUnique({
+        where: { appointmentId },
+      });
+
+      if (existingNote) {
+        // Update
+        return tx.psychNote.update({
+          where: { id: existingNote.id },
+          data: {
+            templateType: dto.templateType,
+            content: encryptedContent,
+            moodRating: dto.moodRating,
+            privateNotes: encryptedPrivateNotes ?? existingNote.privateNotes,
+            tags: dto.tags,
+          },
+        });
+      } else {
+        // Create
+        return tx.psychNote.create({
+          data: {
+            appointmentId,
+            patientId: appointment.patientId,
+            templateType: dto.templateType,
+            content: encryptedContent,
+            moodRating: dto.moodRating,
+            privateNotes: encryptedPrivateNotes,
+            tags: dto.tags,
+          },
+        });
+      }
     });
-
-    if (existingNote) {
-      // Update
-      return this.prisma.psychNote.update({
-        where: { id: existingNote.id },
-        data: {
-          templateType: dto.templateType,
-          content: dto.content,
-          moodRating: dto.moodRating,
-          privateNotes: encryptedPrivateNotes ?? existingNote.privateNotes,
-          tags: dto.tags,
-        },
-      });
-    } else {
-      // Create
-      return this.prisma.psychNote.create({
-        data: {
-          appointmentId,
-          patientId: appointment.patientId,
-          templateType: dto.templateType,
-          content: dto.content,
-          moodRating: dto.moodRating,
-          privateNotes: encryptedPrivateNotes,
-          tags: dto.tags,
-        },
-      });
-    }
   }
 
   private validateNoteContent(type: NoteTemplateType, content: any) {
-    // Simple validation logic
     if (type === NoteTemplateType.SOAP) {
-      if (!content.s || !content.o || !content.a || !content.p) {
-        throw new BadRequestException('SOAP note must contain s, o, a, p fields');
+      if (!content || typeof content !== 'object') {
+        throw new BadRequestException('El contenido de la nota SOAP debe ser un objeto');
+      }
+      // Allow empty strings during auto-save — keys just need to exist
+      const requiredKeys = ['s', 'o', 'a', 'p'];
+      for (const key of requiredKeys) {
+        if (!(key in content)) {
+          throw new BadRequestException(`La nota SOAP debe contener el campo '${key}'`);
+        }
       }
     } else if (type === NoteTemplateType.FREE) {
-      if (!content.body) {
-        throw new BadRequestException('Free note must contain body field');
+      if (!content || !('body' in content)) {
+        throw new BadRequestException('La nota libre debe contener el campo de cuerpo (body)');
       }
     }
-    // Add other types as needed
   }
 
-  async togglePin(userId: string, appointmentId: string) {
-    const profile = await this.resolveClinicianProfile(userId);
-    const appointment = await this.findAppointmentOrFail(appointmentId);
-    this.assertOwnership(appointment.clinicianId, profile.id);
+  async togglePin(clinicianId: string, appointmentId: string) {
+    const appointment = await this.findAppointmentOrFail(appointmentId, clinicianId);
+
 
     const note = await this.prisma.psychNote.findUnique({
       where: { appointmentId },
@@ -473,8 +483,7 @@ export class AppointmentsService {
     });
   }
 
-  async exportPdf(userId: string, appointmentId: string, includePrivate: boolean) {
-    const profile = await this.resolveClinicianProfile(userId);
+  async exportPdf(clinicianId: string, appointmentId: string, includePrivate: boolean) {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: appointmentId },
       include: {
@@ -484,23 +493,120 @@ export class AppointmentsService {
       },
     });
 
-    if (!appointment) throw new NotFoundException('Appointment not found');
-    this.assertOwnership(appointment.clinicianId, profile.id);
+    if (!appointment) throw new NotFoundException('Cita no encontrada');
 
-    // Decrypt private notes if requested and present
+
+    // Decrypt private notes if requested and present — throws on tampered ciphertext
     if (includePrivate && appointment.psychNote?.privateNotes) {
-      try {
-        appointment.psychNote.privateNotes = EncryptionService.decrypt(appointment.psychNote.privateNotes);
-      } catch (e) {
-        console.error('Failed to decrypt for export', e);
-        appointment.psychNote.privateNotes = '[Error decrypting]';
-      }
+      appointment.psychNote.privateNotes = this.encryptionService.decrypt(
+        appointment.psychNote.privateNotes,
+      );
     } else if (appointment.psychNote) {
-      // Ensure strictly stripped if not requested (though service logic handles conditional rendering too)
       appointment.psychNote.privateNotes = null;
     }
 
-    return this.exportService.generateSessionPdf(appointment, includePrivate);
+    // Decrypt content — throws on tampered ciphertext
+    if (appointment.psychNote && typeof appointment.psychNote.content === 'string') {
+      const decContentStr = this.encryptionService.decrypt(appointment.psychNote.content);
+      appointment.psychNote.content = JSON.parse(decContentStr);
+    }
+
+    const buffer = await this.exportService.generateSessionPdf(appointment, includePrivate);
+    return { buffer, patientId: appointment.patientId };
+  }
+
+  async upsertAnthropometry(
+    clinicianId: string,
+    appointmentId: string,
+    dto: CreateAnthropometryDto,
+  ) {
+    const appointment = await this.findAppointmentOrFail(appointmentId, clinicianId);
+
+
+    return this.prisma.anthropometry.upsert({
+      where: { appointmentId },
+      update: dto,
+      create: {
+        appointmentId,
+        patientId: appointment.patientId,
+        ...dto,
+      },
+    });
+  }
+
+  async upsertMealPlan(
+    clinicianId: string,
+    appointmentId: string,
+    dto: CreateMealPlanDto,
+  ) {
+    const appointment = await this.findAppointmentOrFail(appointmentId, clinicianId);
+
+
+    return this.prisma.mealPlan.upsert({
+      where: { appointmentId },
+      update: dto,
+      create: {
+        appointmentId,
+        patientId: appointment.patientId,
+        ...dto,
+      },
+    });
+  }
+
+  async upsertClinicalScale(
+    clinicianId: string,
+    appointmentId: string,
+    dto: CreateClinicalScaleDto,
+  ) {
+    const appointment = await this.findAppointmentOrFail(appointmentId, clinicianId);
+
+    const expectedLength = dto.scaleType === ScaleType.PHQ9 ? 9 : 7;
+    if (dto.scores.length !== expectedLength) {
+      throw new BadRequestException(
+        `${dto.scaleType} requires exactly ${expectedLength} scores, got ${dto.scores.length}`,
+      );
+    }
+
+    const totalScore = dto.scores.reduce((a, b) => a + b, 0);
+    const riskLevel = this.calculateScaleRiskLevel(dto.scaleType, totalScore);
+
+    return this.prisma.clinicalScale.upsert({
+      where: {
+        appointmentId_scaleType: {
+          appointmentId,
+          scaleType: dto.scaleType,
+        },
+      },
+      update: {
+        scores: dto.scores,
+        totalScore,
+        riskLevel,
+      },
+      create: {
+        appointmentId,
+        patientId: appointment.patientId,
+        scaleType: dto.scaleType,
+        scores: dto.scores,
+        totalScore,
+        riskLevel,
+      },
+    });
+  }
+
+  private calculateScaleRiskLevel(scaleType: ScaleType, total: number): ScaleRiskLevel {
+    if (scaleType === ScaleType.PHQ9) {
+      if (total <= 4) return ScaleRiskLevel.MINIMAL;
+      if (total <= 9) return ScaleRiskLevel.MILD;
+      if (total <= 14) return ScaleRiskLevel.MODERATE;
+      if (total <= 19) return ScaleRiskLevel.MODERATELY_SEVERE;
+      return ScaleRiskLevel.SEVERE;
+    } else {
+      // GAD-7
+      if (total <= 4) return ScaleRiskLevel.MINIMAL;
+      if (total <= 9) return ScaleRiskLevel.MILD;
+      if (total <= 14) return ScaleRiskLevel.MODERATE;
+      return ScaleRiskLevel.SEVERE;
+    }
   }
 
   /* ── Status transition methods ─────────────────── */
@@ -509,24 +615,22 @@ export class AppointmentsService {
 
   /**
    * Create a new appointment.
-   * - Resolves default duration/price from profile.
+   * - Resolves default duration/price from profile if not provided in DTO.
    * - Validates time slot overlap.
    */
-  async create(userId: string, dto: CreateAppointmentDto) {
-    const profile = await this.resolveClinicianProfile(userId);
-
-    // Calculate end time based on provided duration or profile duration
+  async create(clinicianId: string, dto: CreateAppointmentDto) {
+    const profile = await this.resolveClinicianProfile(clinicianId);
     const startTime = new Date(dto.startTime);
     const durationMinutes = dto.duration ?? profile.sessionDefaultDuration;
     const durationMs = durationMinutes * 60 * 1000;
     const endTime = new Date(startTime.getTime() + durationMs);
 
     // Validate overlap
-    await this.validateOverlap(profile.id, startTime, endTime);
+    await this.validateOverlap(clinicianId, startTime, endTime);
 
     return this.prisma.appointment.create({
       data: {
-        clinicianId: profile.id,
+        clinicianId: clinicianId,
         patientId: dto.patientId,
         startTime,
         endTime,
@@ -544,21 +648,21 @@ export class AppointmentsService {
 
   /**
    * Reschedule an existing appointment.
-   * - Keeps the same duration.
+   * - Keeps the same duration unless a new one is provided.
    * - Validates time slot overlap (excluding itself).
    */
-  async reschedule(userId: string, appointmentId: string, dto: RescheduleAppointmentDto) {
-    const profile = await this.resolveClinicianProfile(userId);
-    const appointment = await this.findAppointmentOrFail(appointmentId);
-    this.assertOwnership(appointment.clinicianId, profile.id);
+  async reschedule(clinicianId: string, appointmentId: string, dto: RescheduleAppointmentDto) {
+    const appointment = await this.findAppointmentOrFail(appointmentId, clinicianId);
 
-    // Calculate new end time maintaining original duration
+
     const originalDurationMs = appointment.endTime.getTime() - appointment.startTime.getTime();
+    const newDurationMs = dto.duration ? dto.duration * 60 * 1000 : originalDurationMs;
+
     const newStartTime = new Date(dto.startTime);
-    const newEndTime = new Date(newStartTime.getTime() + originalDurationMs);
+    const newEndTime = new Date(newStartTime.getTime() + newDurationMs);
 
     // Validate overlap excluding this appointment
-    await this.validateOverlap(profile.id, newStartTime, newEndTime, appointmentId);
+    await this.validateOverlap(clinicianId, newStartTime, newEndTime, appointmentId);
 
     return this.prisma.appointment.update({
       where: { id: appointmentId },
@@ -604,10 +708,9 @@ export class AppointmentsService {
   /**
    * Start a scheduled session → IN_PROGRESS.
    */
-  async startSession(userId: string, appointmentId: string) {
-    const profile = await this.resolveClinicianProfile(userId);
-    const appointment = await this.findAppointmentOrFail(appointmentId);
-    this.assertOwnership(appointment.clinicianId, profile.id);
+  async startSession(clinicianId: string, appointmentId: string) {
+    const appointment = await this.findAppointmentOrFail(appointmentId, clinicianId);
+
 
     if (appointment.status !== 'SCHEDULED') {
       throw new BadRequestException(
@@ -625,10 +728,9 @@ export class AppointmentsService {
   /**
    * Cancel a scheduled appointment → CANCELLED.
    */
-  async cancelAppointment(userId: string, appointmentId: string) {
-    const profile = await this.resolveClinicianProfile(userId);
-    const appointment = await this.findAppointmentOrFail(appointmentId);
-    this.assertOwnership(appointment.clinicianId, profile.id);
+  async cancelAppointment(clinicianId: string, appointmentId: string) {
+    const appointment = await this.findAppointmentOrFail(appointmentId, clinicianId);
+
 
     if (appointment.status !== 'SCHEDULED') {
       throw new BadRequestException(
@@ -646,10 +748,9 @@ export class AppointmentsService {
   /**
    * Mark a scheduled appointment as NO_SHOW.
    */
-  async markNoShow(userId: string, appointmentId: string) {
-    const profile = await this.resolveClinicianProfile(userId);
-    const appointment = await this.findAppointmentOrFail(appointmentId);
-    this.assertOwnership(appointment.clinicianId, profile.id);
+  async markNoShow(clinicianId: string, appointmentId: string) {
+    const appointment = await this.findAppointmentOrFail(appointmentId, clinicianId);
+
 
     if (appointment.status !== 'SCHEDULED') {
       throw new BadRequestException(
@@ -667,10 +768,9 @@ export class AppointmentsService {
   /**
    * Update administrative/simple notes for an appointment.
    */
-  async updateNotes(userId: string, appointmentId: string, notes: string) {
-    const profile = await this.resolveClinicianProfile(userId);
-    const appointment = await this.findAppointmentOrFail(appointmentId);
-    this.assertOwnership(appointment.clinicianId, profile.id);
+  async updateNotes(clinicianId: string, appointmentId: string, notes: string) {
+    const appointment = await this.findAppointmentOrFail(appointmentId, clinicianId);
+
 
     return this.prisma.appointment.update({
       where: { id: appointmentId },
@@ -682,10 +782,9 @@ export class AppointmentsService {
    * Update payment status for an appointment.
    * If status is PAID, emit appointment.paid event.
    */
-  async updatePayment(userId: string, appointmentId: string, dto: UpdatePaymentDto) {
-    const profile = await this.resolveClinicianProfile(userId);
-    const appointment = await this.findAppointmentOrFail(appointmentId);
-    this.assertOwnership(appointment.clinicianId, profile.id);
+  async updatePayment(clinicianId: string, appointmentId: string, dto: UpdatePaymentDto) {
+    const appointment = await this.findAppointmentOrFail(appointmentId, clinicianId);
+
 
     const result = await this.prisma.$transaction(async (tx) => {
       // 1. Update Appointment
@@ -726,17 +825,16 @@ export class AppointmentsService {
    * schedule the next appointment.
    */
   async completeCheckout(
-    userId: string,
+    clinicianId: string,
     appointmentId: string,
     dto: CompleteCheckoutDto,
   ) {
-    const profile = await this.resolveClinicianProfile(userId);
-    const appointment = await this.findAppointmentOrFail(appointmentId);
+    const appointment = await this.findAppointmentOrFail(appointmentId, clinicianId);
 
-    this.assertOwnership(appointment.clinicianId, profile.id);
+
 
     return this.prisma.$transaction(async (tx) => {
-      // 1. Mark appointment as completed with payment info and update endTime if overtime
+      // 1. Mark appointment as completed with payment info
       const updatedAppointment = await tx.appointment.update({
         where: { id: appointmentId },
         data: {
@@ -744,7 +842,6 @@ export class AppointmentsService {
           paymentStatus: dto.paymentStatus,
           paymentMethod: dto.paymentMethod,
           price: dto.amount,
-          endTime: new Date() > appointment.endTime ? new Date() : undefined,
         },
         include: {
           patient: { select: { id: true, fullName: true } },
@@ -754,7 +851,7 @@ export class AppointmentsService {
       // 2. Create finance transaction linked to appointment
       await tx.financeTransaction.create({
         data: {
-          clinicianId: profile.id,
+          clinicianId: clinicianId,
           appointmentId,
           type: 'INCOME',
           amount: dto.amount,
@@ -781,7 +878,7 @@ export class AppointmentsService {
         nextAppointment = await tx.appointment.create({
           data: {
             patientId: appointment.patientId,
-            clinicianId: profile.id,
+            clinicianId: clinicianId,
             startTime: nextStart,
             endTime: nextEnd,
             status: 'SCHEDULED',
@@ -800,21 +897,21 @@ export class AppointmentsService {
 
   /* ── Private helpers (SRP) ─────────────────────── */
 
-  private async resolveClinicianProfile(userId: string) {
+  private async resolveClinicianProfile(clinicianId: string) {
     const profile = await this.prisma.clinicianProfile.findUnique({
-      where: { userId },
+      where: { id: clinicianId },
     });
 
     if (!profile) {
-      throw new NotFoundException('Clinician profile not found');
+      throw new NotFoundException('Perfil de clínico no encontrado');
     }
 
     return profile;
   }
 
-  private async findAppointmentOrFail(appointmentId: string) {
-    const appointment = await this.prisma.appointment.findUnique({
-      where: { id: appointmentId },
+  private async findAppointmentOrFail(appointmentId: string, clinicianId: string) {
+    const appointment = await this.prisma.appointment.findFirst({
+      where: { id: appointmentId, clinicianId },
       include: {
         patient: {
           select: {
@@ -826,20 +923,11 @@ export class AppointmentsService {
     });
 
     if (!appointment) {
-      throw new NotFoundException('Appointment not found');
+      throw new ForbiddenException('Cita no encontrada o acceso denegado');
     }
 
     return appointment;
   }
 
-  private assertOwnership(
-    appointmentClinicianId: string,
-    profileId: string,
-  ): void {
-    if (appointmentClinicianId !== profileId) {
-      throw new ForbiddenException(
-        'You do not have permission to modify this appointment',
-      );
-    }
-  }
+
 }

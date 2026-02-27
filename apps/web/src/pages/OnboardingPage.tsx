@@ -5,8 +5,8 @@ export function OnboardingPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/login', { replace: true });
   };
 
@@ -20,11 +20,11 @@ export function OnboardingPage() {
 
         {/* Title */}
         <h1 className="text-3xl font-bold text-kanji dark:text-white mb-3">
-          Complete Your Profile
+          Completa tu perfil
         </h1>
         <p className="text-text/60 dark:text-slate-400 mb-8">
-          Welcome, <strong>{user?.email}</strong>! Before you can start using
-          Kio Health, we need a few more details about your practice.
+          ¡Bienvenido, <strong>{user?.email}</strong>! Antes de que puedas empezar a usar
+          Kio Health, necesitamos algunos detalles más sobre tu práctica.
         </p>
 
         {/* Placeholder Card */}
@@ -33,12 +33,12 @@ export function OnboardingPage() {
             <span className="text-3xl">🛠️</span>
           </div>
           <h2 className="text-xl font-semibold text-kanji dark:text-white mb-2">
-            Coming Soon
+            Próximamente
           </h2>
           <p className="text-text/60 dark:text-slate-400">
-            The onboarding flow is under construction. This page will guide you
-            through setting up your clinician profile, practice details, and
-            preferences.
+            El flujo de inicio está en construcción. Esta página te guiará
+            a través de la configuración de tu perfil clínico, detalles de práctica y
+            preferencias.
           </p>
         </div>
 
@@ -47,7 +47,7 @@ export function OnboardingPage() {
           onClick={handleLogout}
           className="text-text/50 dark:text-slate-500 hover:text-kanji dark:hover:text-white text-sm font-medium transition-colors"
         >
-          Logout and return to login
+          Cerrar sesión y volver al inicio
         </button>
       </div>
     </div>

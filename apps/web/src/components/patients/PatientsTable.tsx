@@ -89,7 +89,7 @@ function ActionMenu({ patient, onEdit, onArchive, onView }: {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -5 }}
             transition={{ duration: 0.1, ease: "easeOut" }}
-            className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-gray-100 dark:border-slate-800 z-50 py-2 overflow-hidden ring-1 ring-black/5"
+            className="absolute right-0 top-full mt-2 w-48 bg-surface dark:bg-slate-900 rounded-xl shadow-xl border border-gray-100 dark:border-slate-800 z-50 py-2 overflow-hidden ring-1 ring-black/5"
           >
             <button
               onClick={(e) => {
@@ -137,7 +137,7 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
     return (
       <div className="space-y-4">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-20 bg-white dark:bg-slate-900 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-800"></div>
+          <div key={i} className="h-20 bg-surface dark:bg-slate-900 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-800"></div>
         ))}
       </div>
     );
@@ -180,7 +180,7 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.4, delay: index * 0.05, ease: "easeOut" }}
-            className="group bg-white dark:bg-slate-900 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all border border-transparent dark:border-slate-800 hover:border-kio/40 dark:hover:border-kio/40 cursor-pointer flex items-center justify-between"
+            className="group bg-surface dark:bg-slate-900 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all border border-transparent dark:border-slate-800 hover:border-kio/40 dark:hover:border-kio/40 cursor-pointer flex items-center justify-between"
             onClick={() => onView(patient)}
           >
             {/* Columns Grid */}
@@ -200,11 +200,6 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
                     <span className="text-sm text-gray-500 dark:text-slate-400 font-medium">
                       {patient.contactPhone || 'Sin contacto'}
                     </span>
-                    {Number(patient.totalDebt) > 0 && (
-                      <span className="text-[10px] font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-1.5 py-0.5 rounded-md border border-red-100 dark:border-red-900/30 flex items-center gap-1">
-                        Deuda: ${Number(patient.totalDebt)}
-                      </span>
-                    )}
                   </div>
                 </div>
               </div>

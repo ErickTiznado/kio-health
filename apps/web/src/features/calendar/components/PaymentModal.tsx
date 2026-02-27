@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuthStore } from '../../../stores/auth.store';
 import { X, DollarSign, CreditCard, Banknote, ArrowLeftRight, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { updatePayment, type UpdatePaymentPayload } from '../../../lib/appointments.api';
@@ -9,10 +10,12 @@ interface PaymentModalProps {
     isOpen: boolean;
     onClose: () => void;
     appointment: Appointment | null;
+    defaultStatus?: 'PENDING' | 'PAID';
 }
 
-export function PaymentModal({ isOpen, onClose, appointment }: PaymentModalProps) {
+export function PaymentModal({ isOpen, onClose, appointment, defaultStatus }: PaymentModalProps) {
     const queryClient = useQueryClient();
+    const currency = useAuthStore((s) => s.user?.profile?.currency ?? 'USD');
     const [amount, setAmount] = useState<string>('');
     const [status, setStatus] = useState<'PENDING' | 'PAID'>('PENDING');
     const [method, setMethod] = useState<'CASH' | 'CARD' | 'TRANSFER'>('CASH');
@@ -20,10 +23,11 @@ export function PaymentModal({ isOpen, onClose, appointment }: PaymentModalProps
     useEffect(() => {
         if (isOpen && appointment) {
             setAmount(appointment.price.toString());
-            setStatus(appointment.paymentStatus || 'PENDING');
+            // Use defaultStatus if provided and appointment is not already paid
+            setStatus(appointment.paymentStatus === 'PAID' ? 'PAID' : (defaultStatus || appointment.paymentStatus || 'PENDING'));
             setMethod(appointment.paymentMethod || 'CASH');
         }
-    }, [isOpen, appointment]);
+    }, [isOpen, appointment, defaultStatus]);
 
     const mutation = useMutation({
         mutationFn: (payload: UpdatePaymentPayload) =>
@@ -157,7 +161,7 @@ export function PaymentModal({ isOpen, onClose, appointment }: PaymentModalProps
                                     min="0"
                                     step="0.01"
                                 />
-                                <span className="absolute right-4 top-3.5 text-xs font-bold text-gray-400 dark:text-slate-500">USD</span>
+                                <span className="absolute right-4 top-3.5 text-xs font-bold text-gray-400 dark:text-slate-500">{currency}</span>
                             </div>
                         </div>
 

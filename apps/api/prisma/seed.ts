@@ -3,7 +3,7 @@ import { PrismaClient, AppointmentStatus, PaymentStatus, AppointmentType, NoteTe
 import { PrismaPg } from '@prisma/adapter-pg';
 import { faker } from '@faker-js/faker';
 import * as bcrypt from 'bcrypt';
-import { EncryptionService } from '../src/lib/encryption';
+import { EncryptionService } from '../src/lib/encryption.service';
 
 // ============================================
 // PRISMA 7.x CONFIGURATION
@@ -14,12 +14,17 @@ const adapter = new PrismaPg({
 });
 
 const prisma = new PrismaClient({ adapter });
+const encryptionService = new EncryptionService();
 
 // ============================================
 // CONFIGURATION
 // ============================================
 
-const FIXED_PASSWORD = '123456';
+const FIXED_PASSWORD = process.env.SEED_PASSWORD;
+if (!FIXED_PASSWORD) {
+  throw new Error('SEED_PASSWORD environment variable is required to run the seed.');
+}
+const SEED_PASSWORD: string = FIXED_PASSWORD;
 const SALT_ROUNDS = 10;
 
 const CLINICIANS_CONFIG = [
@@ -107,6 +112,47 @@ const FREE_NOTE_BODIES = [
   'Se realizó ejercicio de relajación muscular progresiva de Jacobson (versión abreviada, 7 grupos musculares). Paciente logró alcanzar niveles de relajación satisfactorios. Se le proporcionó audio guiado para práctica en casa.',
 ];
 
+const CLINICAL_CONTEXTS = [
+  'Paciente con antecedentes de ansiedad desde la adolescencia. Actualmente en tratamiento TCC. Ha mostrado buena respuesta a técnicas de reestructuración cognitiva. Sin medicación actual.',
+  'Paciente referido por médico de cabecera por sintomatología depresiva de 3 meses de evolución. Antecedentes familiares de depresión (madre). Primera vez en terapia psicológica.',
+  'Paciente con diagnóstico previo de TDAH. Busca apoyo para manejo de organización y productividad laboral. Utiliza medicación prescrita por psiquiatra (metilfenidato 20mg).',
+  'Paciente en proceso de duelo por fallecimiento de padre hace 4 meses. Presenta dificultades para retomar rutina diaria. Red de apoyo limitada.',
+  'Paciente con historial de relaciones interpersonales conflictivas. Patrón de dependencia emocional identificado. En proceso de establecer límites saludables.',
+  'Paciente con estrés laboral crónico. Trabaja más de 60 horas semanales. Presenta insomnio de conciliación y bruxismo nocturno. Sin antecedentes psiquiátricos.',
+  'Paciente con fobia social que interfiere con su desarrollo profesional. Evita presentaciones y reuniones. Inicio de exposición gradual en curso.',
+  'Paciente con trauma infantil no resuelto. Se trabaja con enfoque integrativo (TCC + EMDR). Progreso lento pero sostenido. Maneja bien la regulación emocional.',
+  'Paciente con crisis de identidad post-divorcio. Presenta ansiedad situacional y baja autoestima. Ha respondido bien a técnicas de activación conductual.',
+  'Paciente adolescente (17 años) con dificultades académicas y conflictos familiares. Padres divorciados. Se trabaja con enfoque sistémico. Sesiones alternas con padres.',
+];
+
+const APPOINTMENT_REASONS = [
+  'Sesión de seguimiento semanal — continuar trabajo de reestructuración cognitiva',
+  'Revisión de tareas terapéuticas y ajuste de plan de tratamiento',
+  'Sesión de crisis — episodio de ansiedad aguda reportado por teléfono',
+  'Evaluación inicial — primera consulta, historia clínica completa',
+  'Sesión de seguimiento — revisar progreso en exposición gradual',
+  'Aplicación de pruebas psicométricas (BDI-II, BAI)',
+  'Sesión de cierre de fase terapéutica — evaluación de objetivos alcanzados',
+  'Sesión familiar — trabajo con dinámica familiar y comunicación',
+  'Revisión de medicación con informe para psiquiatra tratante',
+  'Sesión de seguimiento — técnicas de manejo de estrés laboral',
+  'Sesión de psicoeducación — modelo cognitivo-conductual',
+  'Trabajo de procesamiento emocional — duelo y pérdida',
+];
+
+const ACCESS_LOG_DETAILS = [
+  'Consulta de expediente clínico para preparar sesión programada',
+  'Revisión de historial de notas clínicas del paciente',
+  'Actualización de datos de contacto del paciente',
+  'Registro de nueva cita desde el calendario de agenda',
+  'Consulta de línea de tiempo para evaluar progreso terapéutico',
+  'Creación de nota clínica post-sesión',
+  'Revisión de estado de pagos pendientes del paciente',
+  'Actualización de diagnóstico en el expediente',
+  'Descarga de resumen clínico para referencia externa',
+  'Verificación de disponibilidad para reprogramar cita',
+];
+
 const PRIVATE_NOTES = [
   'Monitorear posible ideación suicida pasiva. No hay plan ni intención, pero menciona "a veces no le ve sentido a nada." Mantener vigilancia.',
   'Nota: Posible conflicto con la madre no resuelto que interfiere con el proceso. Explorar con cuidado en próximas sesiones.',
@@ -139,6 +185,14 @@ function randomStatus(): 'ACTIVE' | 'WAITLIST' {
   return Math.random() > 0.2 ? 'ACTIVE' : 'WAITLIST';
 }
 
+function generateMexicanPhone(): string {
+  const areaCodes = ['55', '33', '81', '442', '222', '614', '656', '664', '998', '999'];
+  const areaCode = faker.helpers.arrayElement(areaCodes);
+  const remaining = 10 - areaCode.length;
+  const digits = Array.from({ length: remaining }, () => faker.number.int({ min: 0, max: 9 })).join('');
+  return `+52 ${areaCode} ${digits.slice(0, 4)} ${digits.slice(4)}`;
+}
+
 function generateEmergencyContact(): object {
   return {
     name: faker.person.fullName(),
@@ -149,7 +203,7 @@ function generateEmergencyContact(): object {
       'Amigo/a',
       'Hijo/a',
     ]),
-    phone: faker.phone.number(),
+    phone: generateMexicanPhone(),
   };
 }
 
@@ -189,6 +243,7 @@ function generateFreeContent() {
 async function clearDatabase(): Promise<void> {
   console.log('🗑️  Clearing existing data...');
 
+  await prisma.refreshToken.deleteMany();
   await prisma.accessLog.deleteMany();
   await prisma.task.deleteMany();
   await prisma.financeTransaction.deleteMany();
@@ -247,10 +302,10 @@ async function createPatientsForClinician(
         clinicianId,
         fullName: faker.person.fullName(),
         status: randomStatus(),
-        contactPhone: faker.phone.number(),
-        emergencyContact: generateEmergencyContact(),
-        diagnosis: faker.helpers.arrayElement(DIAGNOSES),
-        clinicalContext: faker.lorem.paragraph(),
+        contactPhone: encryptionService.encrypt(generateMexicanPhone()),
+        emergencyContact: encryptionService.encrypt(JSON.stringify(generateEmergencyContact())),
+        diagnosis: (() => { const d = faker.helpers.arrayElement(DIAGNOSES); return d ? encryptionService.encrypt(d) : null; })(),
+        clinicalContext: encryptionService.encrypt(faker.helpers.arrayElement(CLINICAL_CONTEXTS)),
         dateOfBirth: faker.date.birthdate({ min: 18, max: 65, mode: 'age' }),
       },
     });
@@ -324,9 +379,9 @@ async function createClinicalHistory(
           paymentStatus,
           paymentMethod,
           price: defaultPrice,
-          reason: faker.lorem.sentence(),
+          reason: faker.helpers.arrayElement(APPOINTMENT_REASONS),
           notes: status === AppointmentStatus.COMPLETED
-            ? faker.helpers.maybe(() => faker.lorem.sentence(), { probability: 0.3 }) ?? null
+            ? faker.helpers.maybe(() => faker.helpers.arrayElement(APPOINTMENT_REASONS), { probability: 0.3 }) ?? null
             : null,
         },
       });
@@ -356,7 +411,7 @@ async function createClinicalHistory(
         // Private notes (encrypted) — ~30% of sessions
         const rawPrivateNote = faker.helpers.arrayElement(PRIVATE_NOTES);
         const encryptedPrivateNote = rawPrivateNote
-          ? EncryptionService.encrypt(rawPrivateNote)
+          ? encryptionService.encrypt(rawPrivateNote)
           : null;
 
         // Tags — ~60% of sessions have tags
@@ -452,7 +507,7 @@ async function createFutureAppointments(
           status,
           paymentStatus,
           price: defaultPrice,
-          reason: faker.lorem.sentence(),
+          reason: faker.helpers.arrayElement(APPOINTMENT_REASONS),
           notes: null,
         },
       });
@@ -526,7 +581,7 @@ async function createAccessLogs(userId: string, patientIds: string[]): Promise<v
           'VIEW_PATIENT',
         ]),
         resource: 'patient',
-        details: faker.lorem.sentence(),
+        details: faker.helpers.arrayElement(ACCESS_LOG_DETAILS),
         ipAddress: faker.internet.ipv4(),
         userAgent: faker.internet.userAgent(),
         createdAt: logDate,
@@ -578,7 +633,7 @@ async function main(): Promise<void> {
 
   await clearDatabase();
 
-  const passwordHash = await bcrypt.hash(FIXED_PASSWORD, SALT_ROUNDS);
+  const passwordHash = await bcrypt.hash(SEED_PASSWORD, SALT_ROUNDS);
   const clinicians = await createClinicians(passwordHash);
 
   console.log('\n👥 Creating patients, clinical history, and agenda...');
@@ -613,8 +668,7 @@ async function main(): Promise<void> {
   console.log(`  • Finance Transactions: ${await prisma.financeTransaction.count()}`);
 
   console.log('\n✅ Seed completed successfully!');
-  console.log('\n📌 Test Credentials:');
-  console.log('  • Psychologist: psych@kio.com / 123456');
+  console.log('  • Psychologist: psych@kio.com (password from SEED_PASSWORD env var)');
 }
 
 main()

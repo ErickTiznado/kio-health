@@ -1,30 +1,22 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueries } from '@tanstack/react-query';
 import { addDays, format, startOfMonth } from 'date-fns';
 import {
     fetchNextAppointment,
-    fetchRecentPatients,
     fetchDaySummary,
     fetchPendingNotesCount,
     fetchAppointmentsByDate,
     getTodayDateString,
 } from '../lib/appointments.api';
+import { getPatient } from '../lib/patients.api';
+import { getRecentPatientsFromStorage } from '../lib/recent-patients.storage';
 import {
     mapRecentPatients,
     buildCalendarDays,
 } from '../lib/dashboard.helpers';
-import type { Appointment } from '../types/appointments.types';
+import type { Appointment, RecentPatient } from '../types/appointments.types';
 import type { CalendarDay, MappedRecentPatient } from '../lib/dashboard.helpers';
-
-/* ── Query keys (colocation) ────────────────────── */
-
-const QUERY_KEYS = {
-    nextAppointment: ['next-appointment'] as const,
-    recentPatients: ['recent-patients'] as const,
-    daySummary: (from: string, to: string) => ['day-summary', from, to] as const,
-    pendingNotes: ['pending-notes-count'] as const,
-    todayAppointments: ['today-appointments'] as const,
-} as const;
+import { appointmentKeys, patientKeys } from '../lib/query-keys';
 
 /* ── Return type ─────────────────────────────────── */
 
@@ -50,23 +42,43 @@ export interface DashboardData {
 /**
  * Single entry-point for all Dashboard data.
  *
- * Encapsulates four parallel queries and all data transformations.
+ * Encapsulates parallel queries and all data transformations.
  * The page component only receives ready-to-render values (ISP).
  */
 export function useDashboardData(): DashboardData {
     /* 1. Next upcoming appointment (any future date) */
     const { data: nextAppointment = null, isLoading } = useQuery({
-        queryKey: QUERY_KEYS.nextAppointment,
+        queryKey: appointmentKeys.next(),
         queryFn: fetchNextAppointment,
         staleTime: 1000 * 60 * 5,
     });
 
-    /* 2. Recent patients */
-    const { data: rawPatients } = useQuery({
-        queryKey: QUERY_KEYS.recentPatients,
-        queryFn: fetchRecentPatients,
-        staleTime: 1000 * 60 * 5,
+    /* 2. Recent patients (from LocalStorage + API hydration) */
+    const storedRecentPatients = useMemo(() => getRecentPatientsFromStorage(), []);
+
+    const recentPatientQueries = useQueries({
+        queries: storedRecentPatients.map((entry) => ({
+            queryKey: patientKeys.detail(entry.id),
+            queryFn: () => getPatient(entry.id),
+            staleTime: 1000 * 60 * 5,
+        })),
     });
+
+    const rawPatients: RecentPatient[] = useMemo(() => {
+        return storedRecentPatients
+            .map((entry, index) => {
+                const query = recentPatientQueries[index];
+                if (!query?.data) return null;
+                const patient: RecentPatient = {
+                    id: entry.id,
+                    name: query.data.fullName,
+                    reason: query.data.diagnosis ?? null,
+                    lastAppointmentTime: new Date(entry.timestamp).toISOString(),
+                };
+                return patient;
+            })
+            .filter((p): p is RecentPatient => p !== null);
+    }, [storedRecentPatients, recentPatientQueries]);
 
     /* 3. Availability calendar */
     const calendarRange = useMemo(() => {
@@ -79,21 +91,21 @@ export function useDashboardData(): DashboardData {
     }, []);
 
     const { data: rawDaySummary } = useQuery({
-        queryKey: QUERY_KEYS.daySummary(calendarRange.from, calendarRange.to),
+        queryKey: appointmentKeys.daySummary(`${calendarRange.from}-${calendarRange.to}`),
         queryFn: () => fetchDaySummary(calendarRange.from, calendarRange.to),
         staleTime: 1000 * 60 * 10,
     });
 
     /* 4. Pending notes count */
     const { data: pendingNotesData } = useQuery({
-        queryKey: QUERY_KEYS.pendingNotes,
+        queryKey: appointmentKeys.pendingNotes(),
         queryFn: fetchPendingNotesCount,
         staleTime: 1000 * 60 * 5,
     });
 
     /* 5. Today's appointments (full list) */
     const { data: todayAppointments = [], isLoading: isTodayLoading } = useQuery({
-        queryKey: QUERY_KEYS.todayAppointments,
+        queryKey: appointmentKeys.list({ date: getTodayDateString() }),
         queryFn: () => fetchAppointmentsByDate(getTodayDateString()),
         staleTime: 1000 * 60 * 5,
     });

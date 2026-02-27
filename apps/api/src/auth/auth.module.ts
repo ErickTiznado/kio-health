@@ -6,12 +6,19 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret || jwtSecret.length < 32) {
+  throw new Error(
+    'JWT_SECRET must be defined and at least 32 characters long.',
+  );
+}
+
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'fallback_secret',
-      signOptions: { expiresIn: '7d' },
+      secret: jwtSecret,
+      signOptions: { expiresIn: '15m' },
     }),
   ],
   controllers: [AuthController],

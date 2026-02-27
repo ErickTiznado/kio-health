@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
+import { taskKeys } from '../lib/query-keys';
 
 export interface Task {
   id: string;
@@ -11,7 +12,7 @@ export interface Task {
 
 export const useTasks = (patientId: string) => {
   return useQuery({
-    queryKey: ['tasks', patientId],
+    queryKey: taskKeys.list(patientId),
     queryFn: async () => {
       const { data } = await api.get<Task[]>(`/patients/${patientId}/tasks`);
       return data;
@@ -28,7 +29,7 @@ export const useCreateTask = () => {
       return data;
     },
     onSuccess: (_, { patientId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', patientId] });
+      queryClient.invalidateQueries({ queryKey: taskKeys.list(patientId) });
     },
   });
 };
@@ -41,7 +42,7 @@ export const useUpdateTask = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: taskKeys.all });
     },
   });
 };
@@ -53,7 +54,7 @@ export const useDeleteTask = () => {
       await api.delete(`/tasks/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: taskKeys.all });
     },
   });
 };

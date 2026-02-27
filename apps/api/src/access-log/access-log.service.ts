@@ -14,16 +14,22 @@ export class AccessLogService {
     ipAddress?: string,
     userAgent?: string,
   ) {
-    return this.prisma.accessLog.create({
-      data: {
-        userId,
-        action,
-        resource,
-        patientId,
-        details,
-        ipAddress,
-        userAgent,
-      },
-    });
+    try {
+      return await this.prisma.accessLog.create({
+        data: {
+          userId,
+          action,
+          resource,
+          patientId,
+          details,
+          ipAddress,
+          userAgent,
+        },
+      });
+    } catch (error) {
+      // Non-critical: access logging should never crash the main request
+      console.warn(`[AccessLog] Failed to log access for user ${userId}:`, (error as Error).message);
+      return null;
+    }
   }
 }

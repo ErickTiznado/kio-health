@@ -1,4 +1,4 @@
-import { History, ExternalLink } from 'lucide-react';
+import { History } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Patient {
@@ -18,7 +18,7 @@ export function RecentPatientsWidget({ patients }: RecentPatientsWidgetProps) {
 
   return (
     <div className="col-span-12 lg:col-span-7 h-full">
-      <div className="bg-white dark:bg-slate-900 rounded-[40px] p-6 lg:p-8 shadow-sm border border-gray-100 dark:border-slate-800 h-full flex flex-col transition-colors duration-200">
+      <div className="bg-surface dark:bg-slate-900 rounded-[40px] p-6 lg:p-8 shadow-sm border border-gray-100 dark:border-slate-800 h-full flex flex-col transition-colors duration-200">
         <div className="flex items-center justify-between mb-6 shrink-0">
           <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-3 text-lg transition-colors">
             <History size={24} className="text-gray-300 dark:text-kanji" /> Vistos Recientemente
@@ -26,8 +26,8 @@ export function RecentPatientsWidget({ patients }: RecentPatientsWidgetProps) {
         </div>
 
         {patients.length === 0 ? (
-          <div className="flex flex-col items-center justify-center flex-1 text-center bg-gray-50/50 dark:bg-slate-800/50 rounded-3xl border border-dashed border-gray-200 dark:border-slate-700 p-8 transition-colors">
-            <div className="w-12 h-12 bg-gray-100 dark:bg-slate-700 rounded-2xl flex items-center justify-center mb-3 transition-colors">
+          <div className="flex flex-col items-center justify-center flex-1 text-center bg-surface/60 dark:bg-slate-800/50 rounded-3xl border border-dashed border-gray-200 dark:border-slate-700 p-8 transition-colors">
+            <div className="w-12 h-12 bg-surface dark:bg-slate-700 rounded-2xl flex items-center justify-center mb-3 transition-colors">
               <History size={20} className="text-gray-400 dark:text-kanji" />
             </div>
             <p className="text-gray-500 dark:text-kio font-bold text-sm">No hay actividad reciente</p>
@@ -39,7 +39,7 @@ export function RecentPatientsWidget({ patients }: RecentPatientsWidgetProps) {
               <div 
                 key={p.id} 
                 onClick={() => navigate(`/patients/${p.id}`)}
-                className="group relative p-5 rounded-3xl bg-gray-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-gray-100 dark:hover:border-slate-700 hover:shadow-lg dark:hover:shadow-none hover:shadow-gray-100/50 transition-all duration-300 cursor-pointer"
+                className="group relative p-5 rounded-3xl bg-surface/80 dark:bg-slate-800/50 hover:bg-surface dark:hover:bg-slate-800 border border-transparent hover:border-gray-100 dark:hover:border-slate-700 hover:shadow-lg dark:hover:shadow-none hover:shadow-gray-100/50 transition-all duration-300 cursor-pointer"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
@@ -56,7 +56,7 @@ export function RecentPatientsWidget({ patients }: RecentPatientsWidgetProps) {
                   </div>
                   
                   {/* Time Badge */}
-                  <span className="text-[10px] font-bold text-gray-400 dark:text-kio bg-white dark:bg-slate-900 px-2.5 py-1 rounded-full shadow-sm border border-gray-100/50 dark:border-slate-700 whitespace-nowrap transition-colors">
+                  <span className="text-[10px] font-bold text-gray-400 dark:text-kio bg-surface dark:bg-slate-900 px-2.5 py-1 rounded-full shadow-sm border border-gray-100/50 dark:border-slate-700 whitespace-nowrap transition-colors">
                     {p.time}
                   </span>
                 </div>
@@ -71,10 +71,7 @@ export function RecentPatientsWidget({ patients }: RecentPatientsWidgetProps) {
                   </p>
                 </div>
 
-                {/* Hover Action Icon */}
-                <div className="absolute top-5 right-5 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-0 translate-x-2 text-gray-300 dark:text-kanji">
-                  <ExternalLink size={16} />
-                </div>
+
               </div>
             ))}
           </div>

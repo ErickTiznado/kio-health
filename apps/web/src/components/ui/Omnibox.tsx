@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, User, Calendar, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import axios from 'axios'; // Or use your configured api client
+import { api } from '../../lib/api';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 
 // Minimal debounce hook implementation if not exists
@@ -46,11 +46,7 @@ export function Omnibox() {
     const fetchResults = async () => {
       setLoading(true);
       try {
-        // Replace with your actual API call
-        const token = localStorage.getItem('accessToken'); // Simplistic auth
-        const { data } = await axios.get(`http://localhost:3000/search?q=${debouncedSearch}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const { data } = await api.get('/search', { params: { q: debouncedSearch } });
         setResults(data);
       } catch (error) {
         console.error('Search failed', error);
@@ -68,7 +64,7 @@ export function Omnibox() {
       open={open}
       onOpenChange={setOpen}
       label="Global Search"
-      className="fixed top-[20%] left-1/2 -translate-x-1/2 w-full max-w-[640px] bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-[100] animate-in fade-in zoom-in-95 duration-200"
+      className="fixed top-[20%] left-1/2 -translate-x-1/2 w-full max-w-[640px] bg-surface dark:bg-slate-900 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-[100] animate-in fade-in zoom-in-95 duration-200"
       overlayClassName="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm z-[90] animate-in fade-in duration-200"
     >
       <div className="flex items-center border-b border-gray-100 dark:border-slate-800 px-4">

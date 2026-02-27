@@ -1,5 +1,5 @@
 import { MoreHorizontal } from 'lucide-react';
-import { Tooltip } from '../ui/Tooltip';
+import { Tooltip } from '@repo/ui/tooltip';
 
 interface AvailabilityWidgetProps {
   days: Array<{

@@ -38,7 +38,7 @@ export const useNoteStore = create<NoteState>((set) => ({
     try {
       const note = await upsertPsychNote(appointmentId, data);
       set({ currentNote: note, status: 'saved', lastSaved: new Date() });
-      toast.success('Nota guardada');
+      setTimeout(() => set((s) => s.status === 'saved' ? { status: 'idle' } : {}), 3000);
     } catch (error) {
       console.error('Failed to save note:', error);
       toast.error('Error al guardar la nota');

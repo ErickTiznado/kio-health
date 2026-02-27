@@ -75,7 +75,7 @@ export function SettingsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Settings Form */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-cruz dark:border-slate-800 shadow-sm overflow-hidden">
+            <div className="bg-surface dark:bg-slate-900 rounded-2xl border border-cruz dark:border-slate-800 shadow-sm overflow-hidden">
               <div className="border-b border-cruz dark:border-slate-800 px-6 py-5">
                 <h2 className="text-lg font-semibold text-kanji dark:text-white">
                   Preferencias de Sesión
@@ -219,7 +219,7 @@ export function SettingsPage() {
 
           {/* Account Info Sidebar */}
           <div className="space-y-6">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-cruz dark:border-slate-800 shadow-sm overflow-hidden sticky top-6">
+            <div className="bg-surface dark:bg-slate-900 rounded-2xl border border-cruz dark:border-slate-800 shadow-sm overflow-hidden sticky top-6">
               <div className="border-b border-cruz dark:border-slate-800 px-6 py-5 bg-bg/50 dark:bg-slate-800/50">
                 <h2 className="text-lg font-semibold text-kanji dark:text-white">
                   Información de Cuenta

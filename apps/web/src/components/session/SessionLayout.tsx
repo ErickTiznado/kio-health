@@ -11,7 +11,6 @@ interface SessionLayoutProps {
   sessionNumber?: number;
   elapsedTime: string;
   isOvertime?: boolean;
-  totalBalance: number;
   lastVisit: string | null;
   status: 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
   onStartSession?: () => void;
@@ -27,7 +26,6 @@ export const SessionLayout: FC<SessionLayoutProps> = ({
   sessionNumber,
   elapsedTime,
   isOvertime,
-  totalBalance,
   lastVisit,
   status,
   onStartSession,
@@ -39,9 +37,9 @@ export const SessionLayout: FC<SessionLayoutProps> = ({
   const handleGoBack = () => navigate('/agenda');
 
   return (
-    <div className="min-h-screen bg-bg dark:bg-slate-950 flex flex-col">
+    <div className="h-screen overflow-hidden bg-bg dark:bg-slate-950 flex flex-col">
       {/* ── Minimal Header ── */}
-      <header className="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
+      <header className="h-16 bg-surface/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
         {/* Left — Back + Patient Info */}
         <div className="flex items-center gap-4">
           <button
@@ -59,9 +57,6 @@ export const SessionLayout: FC<SessionLayoutProps> = ({
             </h1>
             <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-slate-400">
               {patientAge !== undefined && <span>{patientAge} años</span>}
-              <span className={`font-semibold ${totalBalance > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
-                Saldo: ${totalBalance.toFixed(2)}
-              </span>
               <span>
                 Última vez: {lastVisit ? format(new Date(lastVisit), 'dd MMM') : 'N/A'}
               </span>

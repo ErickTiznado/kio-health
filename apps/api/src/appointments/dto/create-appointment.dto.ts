@@ -32,5 +32,5 @@ export class CreateAppointmentDto {
     @IsNumber()
     @Min(1)
     @IsOptional()
-    duration?: number;
+    duration?: number; // In minutes
 }

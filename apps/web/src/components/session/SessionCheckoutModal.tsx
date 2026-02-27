@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { completeCheckout } from '../../lib/appointments.api';
+import { useAuthStore } from '../../stores/auth.store';
 import type { CheckoutPayload } from '../../types/appointments.types';
 
 interface SessionCheckoutModalProps {
@@ -46,6 +47,7 @@ export const SessionCheckoutModal = ({
 }: SessionCheckoutModalProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const currency = useAuthStore((s) => s.user?.profile?.currency ?? 'USD');
 
   const [amount, setAmount] = useState('');
   const [paymentStatus, setPaymentStatus] = useState<'PENDING' | 'PAID'>('PAID');
@@ -171,7 +173,7 @@ export const SessionCheckoutModal = ({
                   min="0"
                   step="0.01"
                 />
-                <span className="absolute right-4 top-3.5 text-xs font-bold text-gray-400 dark:text-slate-500">USD</span>
+                <span className="absolute right-4 top-3.5 text-xs font-bold text-gray-400 dark:text-slate-500">{currency}</span>
               </div>
             </div>
 

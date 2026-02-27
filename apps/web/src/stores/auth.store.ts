@@ -1,11 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { api } from '../lib/api';
-import type { User, LoginResponse } from '../types/auth.types';
+import type { User } from '../types/auth.types';
 
 interface AuthState {
   user: User | null;
-  accessToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -13,7 +12,7 @@ interface AuthState {
 
 interface AuthActions {
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   fetchCurrentUser: () => Promise<void>;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
@@ -23,10 +22,9 @@ type AuthStore = AuthState & AuthActions;
 
 export const useAuthStore = create<AuthStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       // State
       user: null,
-      accessToken: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -36,19 +34,11 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true, error: null });
 
         try {
-          const response = await api.post<LoginResponse>('/auth/login', {
-            email,
-            password,
-          });
-
-          const { accessToken, user } = response.data;
-
-          // Store token in localStorage for API interceptor
-          localStorage.setItem('accessToken', accessToken);
+          // Backend sets httpOnly cookies; response body contains only user info
+          const response = await api.post<{ user: User }>('/auth/login', { email, password });
 
           set({
-            user,
-            accessToken,
+            user: response.data.user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -61,7 +51,6 @@ export const useAuthStore = create<AuthStore>()(
 
           set({
             user: null,
-            accessToken: null,
             isAuthenticated: false,
             isLoading: false,
             error: errorMessage,
@@ -71,28 +60,28 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      logout: () => {
-        localStorage.removeItem('accessToken');
-        set({
-          user: null,
-          accessToken: null,
-          isAuthenticated: false,
-          isLoading: false,
-          error: null,
-        });
+      logout: async () => {
+        try {
+          // Revoke refresh token on server and clear cookies
+          await api.post('/auth/logout');
+        } catch {
+          // Best-effort: clear local state regardless
+        } finally {
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: null,
+          });
+        }
       },
 
       fetchCurrentUser: async () => {
-        const { accessToken } = get();
-
-        if (!accessToken) {
-          set({ isAuthenticated: false, user: null });
-          return;
-        }
-
         set({ isLoading: true });
 
         try {
+          // Relies on httpOnly cookie being sent automatically.
+          // The api interceptor will attempt token refresh on 401 before rejecting.
           const response = await api.get<User>('/auth/me');
           set({
             user: response.data,
@@ -100,11 +89,8 @@ export const useAuthStore = create<AuthStore>()(
             isLoading: false,
           });
         } catch {
-          // Token is invalid, clear auth state
-          localStorage.removeItem('accessToken');
           set({
             user: null,
-            accessToken: null,
             isAuthenticated: false,
             isLoading: false,
           });
@@ -112,14 +98,13 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       clearError: () => set({ error: null }),
-
       setLoading: (loading: boolean) => set({ isLoading: loading }),
     }),
     {
       name: 'kio-auth-storage',
+      // Only persist non-sensitive UI state. Auth validity is determined by httpOnly cookie.
       partialize: (state) => ({
         user: state.user,
-        accessToken: state.accessToken,
         isAuthenticated: state.isAuthenticated,
       }),
     },

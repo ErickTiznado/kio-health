@@ -11,6 +11,12 @@ import type {
   SessionContext,
   PsychNote,
   CreatePsychNoteDto,
+  Anthropometry,
+  MealPlan,
+  CreateAnthropometryPayload,
+  CreateMealPlanPayload,
+  ClinicalScale,
+  CreateClinicalScalePayload,
 } from '../types/appointments.types';
 
 /**
@@ -173,3 +179,31 @@ export async function upsertPsychNote(
   const response = await api.post<PsychNote>(`/appointments/${appointmentId}/notes`, payload);
   return response.data;
 }
+
+export async function upsertAnthropometry(
+  appointmentId: string,
+  payload: CreateAnthropometryPayload,
+): Promise<Anthropometry> {
+  const response = await api.post<Anthropometry>(`/appointments/${appointmentId}/anthropometry`, payload);
+  return response.data;
+}
+
+export async function upsertMealPlan(
+  appointmentId: string,
+  payload: CreateMealPlanPayload,
+): Promise<MealPlan> {
+  const response = await api.post<MealPlan>(`/appointments/${appointmentId}/meal-plan`, payload);
+  return response.data;
+}
+
+export async function upsertClinicalScale(
+  appointmentId: string,
+  payload: CreateClinicalScalePayload,
+): Promise<ClinicalScale> {
+  const response = await api.post<ClinicalScale>(
+    `/appointments/${appointmentId}/clinical-scale`,
+    payload,
+  );
+  return response.data;
+}
+

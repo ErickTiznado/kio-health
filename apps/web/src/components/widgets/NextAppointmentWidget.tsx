@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, Play, UserPlus, Brain, Calendar, Hash, Radio, FileText } from 'lucide-react';
-import { Skeleton } from '../ui/Skeleton';
+import { Skeleton } from '@repo/ui/skeleton';
 import type { Appointment } from '../../types/appointments.types';
 
 interface NextAppointmentProps {

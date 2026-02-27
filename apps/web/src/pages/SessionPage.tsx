@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SessionLayout } from '../components/session/SessionLayout';
-import { PatientContextPanel } from '../components/session/PatientContextPanel';
+
 import { EditorContainer } from '../components/session/editor/EditorContainer';
 import { SessionCheckoutModal } from '../components/session/SessionCheckoutModal';
 import { useSessionSnapshot, useStartSession, useMarkNoShow } from '../hooks/use-session';
 import { toast } from 'sonner';
+import { confirmAction } from '../lib/confirm-action';
 
 /**
  * Clinical Session Page — Deep Work environment.
@@ -63,7 +64,7 @@ export function SessionPage() {
     );
   }
 
-  const { appointment, patient, totalBalance, lastVisit, sessionNumber } = sessionContext;
+  const { appointment, patient, lastVisit, sessionNumber } = sessionContext;
 
   const handleStartSession = () => {
     if (appointmentId) {
@@ -76,8 +77,15 @@ export function SessionPage() {
     setIsCheckoutOpen(true);
   };
 
-  const handleNoShow = () => {
-    if (confirm('¿Marcar cita como No Asistió?')) {
+  const handleNoShow = async () => {
+    const confirmed = await confirmAction({
+      title: '¿Marcar como No Asistió?',
+      description: 'Esta acción cambiará el estado de la cita permanentemente.',
+      confirmLabel: 'Sí, marcar',
+      cancelLabel: 'No, volver',
+      variant: 'warning',
+    });
+    if (confirmed) {
       markNoShow(appointmentId!, {
         onSuccess: () => {
           toast.success('Cita marcada como No Asistió');
@@ -95,12 +103,12 @@ export function SessionPage() {
     ? new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()
     : undefined;
 
-  // Mock data for panels until we implement full history fetching
-  const mockPsychContext = {
+  // Real data derived from session context
+  const psychContext = {
     diagnosis: patient.diagnosis || 'Sin diagnóstico',
     clinicalContext: patient.clinicalContext || 'Sin contexto registrado',
-    treatmentGoals: [],
-    totalSessions: 0,
+    treatmentGoals: (patient as any).treatmentGoals || [],
+    totalSessions: sessionNumber,
   };
 
   return (
@@ -112,29 +120,20 @@ export function SessionPage() {
         sessionNumber={sessionNumber}
         elapsedTime={elapsedTime}
         isOvertime={isOvertime}
-        totalBalance={totalBalance}
         lastVisit={lastVisit}
         status={appointment.status}
         onStartSession={handleStartSession}
         onFinishSession={handleFinishSession}
         onNoShow={handleNoShow}
       >
-        <div className="grid grid-cols-[30%_70%] h-full">
-          {/* Left — Patient Context */}
-          <PatientContextPanel
-            patientId={patient.id}
-            patientName={patient.fullName}
-            patientAge={age || 0}
-            clinicianType="PSYCHOLOGIST" // Dynamic later
-            psychContext={mockPsychContext}
-            sessionHistory={[]} // Fetch real history later
-          />
-
-          {/* Right — Role-specific panel */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden h-full">
-            <EditorContainer appointmentId={appointment.id} patientId={patient.id} />
-          </div>
-        </div>
+        <EditorContainer
+          appointmentId={appointment.id}
+          patientId={patient.id}
+          patientName={patient.fullName}
+          patientAge={age}
+          psychContext={psychContext}
+          clinicalScales={sessionContext.clinicalScales}
+        />
       </SessionLayout>
 
       <SessionCheckoutModal

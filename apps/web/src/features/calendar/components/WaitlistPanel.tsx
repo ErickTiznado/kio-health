@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import { User, Loader2, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 import { toast } from 'sonner';
+import { api } from '../../../lib/api';
 
 interface WaitlistPatient {
   id: string;
@@ -13,15 +13,12 @@ interface WaitlistPatient {
   updatedAt: string;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
 export function WaitlistPanel() {
   const { data: waitlist = [], isLoading } = useQuery({
     queryKey: ['patients', 'waitlist'],
     queryFn: async () => {
-      const { data } = await axios.get(`${API_URL}/patients`, {
+      const { data } = await api.get('/patients', {
         params: { status: 'WAITLIST', limit: 5 },
-        headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
       });
       return data.data; // Assuming paginated response
     },
@@ -29,7 +26,7 @@ export function WaitlistPanel() {
   });
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden flex flex-col h-full max-h-[400px]">
+    <div className="bg-surface dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden flex flex-col h-full max-h-[400px]">
       <div className="p-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-amber-50/50 dark:bg-amber-900/10">
         <h3 className="font-bold text-gray-800 dark:text-white flex items-center gap-2 text-sm">
           <User size={16} className="text-amber-500" />

@@ -4,6 +4,7 @@ import { NoteTemplateType } from '../../../types/appointments.types';
 import { useTogglePin } from '../../../hooks/use-patients';
 import { MoodIndicator } from './MoodIndicator';
 import { useSettingsStore } from '../../../stores/settings.store';
+import { MarkdownPreview } from '../../ui/MarkdownPreview';
 
 interface NoteCardProps {
   item: TimelineItem;
@@ -52,37 +53,35 @@ export function NoteCard({ item }: NoteCardProps) {
 
       {/* Content */}
       <div className={`p-4 text-sm text-gray-700 dark:text-slate-300 leading-relaxed ${isDiscreteMode ? 'blur-sm select-none' : ''}`}>
-        {note.templateType === NoteTemplateType.SOAP ? (
+      {note.templateType === NoteTemplateType.SOAP ? (
           <div className="grid gap-3">
             {content.s && (
               <div>
                 <span className="font-bold text-[var(--color-kanji)] dark:text-kio mr-1">S:</span>
-                {content.s}
+                <MarkdownPreview content={content.s} className="inline-block" />
               </div>
             )}
             {content.o && (
               <div>
                 <span className="font-bold text-[var(--color-kanji)] dark:text-kio mr-1">O:</span>
-                {content.o}
+                <MarkdownPreview content={content.o} className="inline-block" />
               </div>
             )}
             {content.a && (
               <div>
                 <span className="font-bold text-[var(--color-kanji)] dark:text-kio mr-1">A:</span>
-                {content.a}
+                <MarkdownPreview content={content.a} className="inline-block" />
               </div>
             )}
             {content.p && (
               <div>
                 <span className="font-bold text-[var(--color-kanji)] dark:text-kio mr-1">P:</span>
-                {content.p}
+                <MarkdownPreview content={content.p} className="inline-block" />
               </div>
             )}
           </div>
         ) : (
-          <div className="whitespace-pre-wrap font-sans">
-            {content.body || content.notes || 'Contenido vacío.'}
-          </div>
+          <MarkdownPreview content={content.body || content.notes || 'Contenido vacío.'} />
         )}
       </div>
 

@@ -1,9 +1,14 @@
-import { useState, useMemo, type FC } from 'react';
-import { TrendingDown, TrendingUp, Minus, Activity, Ruler } from 'lucide-react';
+import { useState, useMemo, useEffect, type FC } from 'react';
+import { TrendingDown, TrendingUp, Minus, Activity, Ruler, Save } from 'lucide-react';
+import { useUpsertAnthropometry } from '../../hooks/use-session';
+import { toast } from 'sonner';
 
-/** Mock previous appointment data — will come from API later. */
-const PREVIOUS_WEIGHT_KG = 72;
-const DEFAULT_HEIGHT_M = 1.65;
+interface AnthropometryTabProps {
+  appointmentId: string;
+  initialData?: any;
+}
+
+const DEFAULT_HEIGHT_M = 1.65; // Keeping as fallback or should come from patient profile? Left as constant for now.
 
 interface AnthropometryField {
   readonly id: string;
@@ -17,14 +22,6 @@ interface AnthropometryField {
 
 const FIELDS: readonly AnthropometryField[] = [
   { id: 'currentWeight', label: 'Peso Actual', unit: 'kg', placeholder: '0.0' },
-  {
-    id: 'previousWeight',
-    label: 'Peso Anterior',
-    unit: 'kg',
-    placeholder: '—',
-    isReadonly: true,
-    defaultValue: String(PREVIOUS_WEIGHT_KG),
-  },
   { id: 'bodyFat', label: '% Grasa Corporal', unit: '%', placeholder: '0.0' },
   { id: 'waist', label: 'Cintura', unit: 'cm', placeholder: '0.0' },
   { id: 'hip', label: 'Cadera', unit: 'cm', placeholder: '0.0' },
@@ -34,19 +31,43 @@ const FIELDS: readonly AnthropometryField[] = [
  * Bento-grid of anthropometric input cards.
  * Calculates BMI in real-time and shows weight-trend feedback.
  */
-export const AnthropometryTab: FC = () => {
-  const [values, setValues] = useState<Record<string, string>>({
-    previousWeight: String(PREVIOUS_WEIGHT_KG),
-  });
+export const AnthropometryTab: FC<AnthropometryTabProps> = ({ appointmentId, initialData }) => {
+  const [values, setValues] = useState<Record<string, string>>({});
+  const { mutate: save, isPending } = useUpsertAnthropometry();
+
+  useEffect(() => {
+    if (initialData) {
+      setValues({
+        currentWeight: initialData.weight ? String(initialData.weight) : '',
+        bodyFat: initialData.bodyFat ? String(initialData.bodyFat) : '',
+        waist: initialData.waist ? String(initialData.waist) : '',
+        hip: initialData.hip ? String(initialData.hip) : '',
+      });
+    }
+  }, [initialData]);
 
   const handleFieldChange = (fieldId: string, rawValue: string) => {
     const sanitized = rawValue.replace(/[^0-9.]/g, '');
     setValues((prev) => ({ ...prev, [fieldId]: sanitized }));
   };
 
+  const handleSave = () => {
+    const payload = {
+      weight: parseFloat(values.currentWeight || '0'),
+      height: DEFAULT_HEIGHT_M, // TODO: Make editable
+      bodyFat: values.bodyFat ? parseFloat(values.bodyFat) : undefined,
+      waist: values.waist ? parseFloat(values.waist) : undefined,
+      hip: values.hip ? parseFloat(values.hip) : undefined,
+    };
+    
+    save({ appointmentId, data: payload }, {
+       onSuccess: () => toast.success('Antropometría guardada')
+    });
+  };
+
   /* ── Derived calculations ── */
   const currentWeight = parseFloat(values.currentWeight ?? '');
-  const previousWeight = PREVIOUS_WEIGHT_KG;
+  const previousWeight = 0; // TODO: Fetch from previous appointment
 
   const bmiValue = useMemo(() => {
     if (!currentWeight || currentWeight <= 0) return null;
@@ -72,11 +93,21 @@ export const AnthropometryTab: FC = () => {
     <div className="h-full overflow-y-auto p-6">
       {/* ── Bento Grid ── */}
       <div className="grid grid-cols-2 gap-4">
+         <div className="col-span-2 flex justify-end">
+             <button 
+                onClick={handleSave}
+                disabled={isPending}
+                className="flex items-center gap-2 bg-kio hover:bg-kanji text-white px-4 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50"
+             >
+                <Save size={16} />
+                {isPending ? 'Guardando...' : 'Guardar Medidas'}
+             </button>
+         </div>
         {FIELDS.map((field) => (
           <div
             key={field.id}
             className={`
-              bg-white dark:bg-slate-900 rounded-3xl p-5 border border-gray-100/60 dark:border-slate-800
+              bg-surface dark:bg-slate-900 rounded-3xl p-5 border border-gray-100/60 dark:border-slate-800
               shadow-sm hover:shadow-md transition-shadow duration-200
               ${field.colSpan === 2 ? 'col-span-2' : ''}
               ${field.isReadonly ? 'opacity-70' : ''}

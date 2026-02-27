@@ -16,7 +16,7 @@ export class UsersService {
     });
 
     if (!profile) {
-      throw new NotFoundException('Clinician profile not found');
+      throw new NotFoundException('Perfil de clínico no encontrado');
     }
 
     // Build update data with proper Decimal conversion
@@ -54,7 +54,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Usuario no encontrado');
     }
 
     return user;

@@ -17,6 +17,7 @@ import { QueryPatientsDto } from './dto/query-patients.dto';
 import { QueryTimelineDto } from './dto/query-timeline.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CurrentClinician } from '../auth/decorators/current-clinician.decorator';
 import { AccessLogService } from '../access-log/access-log.service';
 import { Request } from 'express';
 
@@ -31,29 +32,56 @@ export class PatientsController {
   @Post()
   async create(
     @CurrentUser() user: any,
+    @CurrentClinician() clinicianId: string,
     @Body() createPatientDto: CreatePatientDto,
+    @Req() req: any,
   ) {
-    const clinicianId = await this.patientsService.getClinicianId(user.userId);
-    return this.patientsService.create(clinicianId, createPatientDto);
+    const result = await this.patientsService.create(clinicianId, createPatientDto);
+    
+    // Log access
+    await this.accessLogService.logAccess(
+      user.userId,
+      'CREATE_PATIENT',
+      `Patient`,
+      result.id,
+      undefined,
+      req.ip,
+      req.headers['user-agent'],
+    );
+    
+    return result;
   }
 
   @Get()
   async findAll(
     @CurrentUser() user: any,
+    @CurrentClinician() clinicianId: string,
     @Query() query: QueryPatientsDto,
+    @Req() req: any,
   ) {
-    const clinicianId = await this.patientsService.getClinicianId(user.userId);
+    
+    // Log access
+    await this.accessLogService.logAccess(
+      user.userId,
+      'LIST_PATIENTS',
+      'Patients',
+      undefined,
+      `Query: ${JSON.stringify(query)}`,
+      req.ip,
+      req.headers['user-agent'],
+    );
+    
     return this.patientsService.findAll(clinicianId, query);
   }
 
   @Get(':id/timeline')
   async getTimeline(
     @CurrentUser() user: any,
+    @CurrentClinician() clinicianId: string,
     @Param('id') id: string,
     @Query() query: QueryTimelineDto,
     @Req() req: any,
   ) {
-    const clinicianId = await this.patientsService.getClinicianId(user.userId);
     
     // Log access
     await this.accessLogService.logAccess(
@@ -72,28 +100,62 @@ export class PatientsController {
   @Get(':id/mood-history')
   async getMoodHistory(
     @CurrentUser() user: any,
+    @CurrentClinician() clinicianId: string,
     @Param('id') id: string,
+    @Req() req: any,
   ) {
-    const clinicianId = await this.patientsService.getClinicianId(user.userId);
+    
+    // Log access
+    await this.accessLogService.logAccess(
+      user.userId,
+      'VIEW_MOOD_HISTORY',
+      `Patient:${id}`,
+      id,
+      undefined,
+      req.ip,
+      req.headers['user-agent'],
+    );
+    
     return this.patientsService.getMoodHistory(id, clinicianId);
   }
 
   @Get(':id/last-note')
   async getLastNote(
     @CurrentUser() user: any,
+    @CurrentClinician() clinicianId: string,
+    @Param('id') id: string,
+    @Req() req: any,
+  ) {
+    
+    // Log access
+    await this.accessLogService.logAccess(
+      user.userId,
+      'VIEW_LAST_NOTE',
+      `Patient:${id}`,
+      id,
+      undefined,
+      req.ip,
+      req.headers['user-agent'],
+    );
+    
+    return this.patientsService.getLastNote(id, clinicianId);
+  }
+
+  @Get(':id/scales')
+  async getScalesHistory(
+    @CurrentClinician() clinicianId: string,
     @Param('id') id: string,
   ) {
-    const clinicianId = await this.patientsService.getClinicianId(user.userId);
-    return this.patientsService.getLastNote(id, clinicianId);
+    return this.patientsService.getScalesHistory(id, clinicianId);
   }
 
   @Get(':id')
   async findOne(
     @CurrentUser() user: any,
+    @CurrentClinician() clinicianId: string,
     @Param('id') id: string,
     @Req() req: any,
   ) {
-    const clinicianId = await this.patientsService.getClinicianId(user.userId);
     
     // Log access
     await this.accessLogService.logAccess(
@@ -112,16 +174,47 @@ export class PatientsController {
   @Patch(':id')
   async update(
     @CurrentUser() user: any,
+    @CurrentClinician() clinicianId: string,
     @Param('id') id: string,
     @Body() updatePatientDto: UpdatePatientDto,
+    @Req() req: any,
   ) {
-    const clinicianId = await this.patientsService.getClinicianId(user.userId);
-    return this.patientsService.update(id, clinicianId, updatePatientDto);
+    const result = await this.patientsService.update(id, clinicianId, updatePatientDto);
+    
+    // Log access
+    await this.accessLogService.logAccess(
+      user.userId,
+      'UPDATE_PATIENT',
+      `Patient:${id}`,
+      id,
+      `Fields updated: ${Object.keys(updatePatientDto).join(', ')}`,
+      req.ip,
+      req.headers['user-agent'],
+    );
+    
+    return result;
   }
 
   @Patch(':id/archive')
-  async archive(@CurrentUser() user: any, @Param('id') id: string) {
-    const clinicianId = await this.patientsService.getClinicianId(user.userId);
-    return this.patientsService.archive(id, clinicianId);
+  async archive(
+    @CurrentUser() user: any,
+    @CurrentClinician() clinicianId: string, 
+    @Param('id') id: string,
+    @Req() req: any,
+  ) {
+    const result = await this.patientsService.archive(id, clinicianId);
+    
+    // Log access
+    await this.accessLogService.logAccess(
+      user.userId,
+      'ARCHIVE_PATIENT',
+      `Patient:${id}`,
+      id,
+      undefined,
+      req.ip,
+      req.headers['user-agent'],
+    );
+    
+    return result;
   }
 }

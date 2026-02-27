@@ -36,7 +36,7 @@ export function useAutoSave(
     const currentStr = JSON.stringify(debouncedDto);
     if (currentStr === lastSavedStr.current) return;
 
-    if (appointmentId) {
+    if (appointmentId && debouncedDto.content && typeof debouncedDto.content === 'object') {
       saveNote(appointmentId, debouncedDto);
       lastSavedStr.current = currentStr;
     }

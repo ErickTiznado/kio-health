@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type { CreatePatientDto, UpdatePatientDto, QueryPatientsDto, Patient, PatientsResponse, TimelineResponse } from '../types/patients.types';
+import { patientKeys, appointmentKeys } from '../lib/query-keys';
 
 const fetchPatients = async (params: QueryPatientsDto): Promise<PatientsResponse> => {
   const { data } = await api.get<PatientsResponse>('/patients', { params });
@@ -29,7 +30,7 @@ const archivePatient = async (id: string): Promise<Patient> => {
 
 export const usePatients = (page: number = 1, search: string = '', limit: number = 10) => {
   return useQuery({
-    queryKey: ['patients', page, search, limit],
+    queryKey: patientKeys.list({ page, search, limit }),
     queryFn: () => fetchPatients({ page, search, limit }),
     placeholderData: (previousData) => previousData, // Keep previous data while fetching new page
   });
@@ -37,7 +38,7 @@ export const usePatients = (page: number = 1, search: string = '', limit: number
 
 export const usePatient = (id: string) => {
   return useQuery({
-    queryKey: ['patient', id],
+    queryKey: patientKeys.detail(id),
     queryFn: () => fetchPatient(id),
     enabled: !!id,
   });
@@ -48,7 +49,7 @@ export const useCreatePatient = () => {
   return useMutation({
     mutationFn: createPatient,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['patients'] });
+      queryClient.invalidateQueries({ queryKey: patientKeys.lists() });
     },
   });
 };
@@ -58,8 +59,8 @@ export const useUpdatePatient = () => {
   return useMutation({
     mutationFn: updatePatient,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['patients'] });
-      queryClient.invalidateQueries({ queryKey: ['patient', data.id] });
+      queryClient.invalidateQueries({ queryKey: patientKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: patientKeys.detail(data.id) });
     },
   });
 };
@@ -69,15 +70,15 @@ export const useArchivePatient = () => {
   return useMutation({
     mutationFn: archivePatient,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['patients'] });
-      queryClient.invalidateQueries({ queryKey: ['patient', data.id] });
+      queryClient.invalidateQueries({ queryKey: patientKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: patientKeys.detail(data.id) });
     },
   });
 };
 
 export const usePatientTimeline = (patientId: string, search: string = '') => {
   return useInfiniteQuery({
-    queryKey: ['timeline', patientId, search],
+    queryKey: [...patientKeys.timeline(patientId), { search }],
     queryFn: async ({ pageParam = 1 }) => {
       const { data } = await api.get<TimelineResponse>(`/patients/${patientId}/timeline`, {
         params: { page: pageParam, limit: 10, search },
@@ -95,6 +96,26 @@ export const usePatientTimeline = (patientId: string, search: string = '') => {
   });
 };
 
+export interface ScaleHistoryPoint {
+  id: string;
+  scaleType: 'PHQ9' | 'GAD7';
+  totalScore: number;
+  riskLevel: 'MINIMAL' | 'MILD' | 'MODERATE' | 'MODERATELY_SEVERE' | 'SEVERE';
+  createdAt: string;
+  appointment: { startTime: string };
+}
+
+export const usePatientScales = (patientId: string) => {
+  return useQuery({
+    queryKey: patientKeys.scales(patientId),
+    queryFn: async () => {
+      const { data } = await api.get<ScaleHistoryPoint[]>(`/patients/${patientId}/scales`);
+      return data;
+    },
+    enabled: !!patientId,
+  });
+};
+
 export const useTogglePin = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -103,7 +124,7 @@ export const useTogglePin = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['timeline'] });
+      queryClient.invalidateQueries({ queryKey: patientKeys.all });
     },
   });
 };

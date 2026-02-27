@@ -9,6 +9,7 @@ import type { PatientFormValues } from '../schemas/patients.schema';
 import { Plus, Search } from 'lucide-react';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { motion } from 'framer-motion';
+import { confirmAction } from '../lib/confirm-action';
 
 const TABS = [
   { id: 'ALL', label: 'Todos' },
@@ -59,8 +60,15 @@ export default function PatientsPage() {
      }
   };
 
-  const handleArchive = (patient: Patient) => {
-    if (confirm('¿Estás seguro de que deseas archivar a este paciente?')) {
+  const handleArchive = async (patient: Patient) => {
+    const confirmed = await confirmAction({
+      title: '¿Archivar paciente?',
+      description: 'El paciente será movido a la lista de archivados. Podrás restaurarlo después.',
+      confirmLabel: 'Sí, archivar',
+      cancelLabel: 'Cancelar',
+      variant: 'warning',
+    });
+    if (confirmed) {
       archivePatientMutation.mutate(patient.id);
     }
   };
@@ -95,7 +103,7 @@ export default function PatientsPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 shadow-sm"
+          className="relative z-30 bg-surface/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 shadow-sm"
         >
           {/* Top Bar: Título y Acciones */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-8 pt-6 pb-4">
@@ -106,7 +114,7 @@ export default function PatientsPage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-4 w-full sm:w-auto bg-white dark:bg-slate-800 p-1.5 rounded-full shadow-sm border border-gray-200 dark:border-slate-700">
+            <div className="flex items-center gap-4 w-full sm:w-auto bg-surface dark:bg-slate-800 p-1.5 rounded-full shadow-sm border border-gray-200 dark:border-slate-700">
                {/* Search Bar Integrada */}
                <div className="relative flex-1 sm:w-64">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">

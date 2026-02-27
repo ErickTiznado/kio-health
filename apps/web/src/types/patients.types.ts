@@ -16,17 +16,14 @@ export interface Patient {
   status: 'ACTIVE' | 'ARCHIVED' | 'WAITLIST';
   contactPhone?: string;
   emergencyContact?: EmergencyContact;
+  treatmentGoals?: string[];
   createdAt: string;
   updatedAt: string;
   appointments?: {
     id: string;
     startTime: string;
     status: 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
-    paymentStatus: 'PENDING' | 'PAID';
-    paymentMethod: 'CASH' | 'CARD' | 'TRANSFER' | null;
-    price: string;
   }[];
-  totalDebt?: number;
 }
 
 export interface CreatePatientDto {
@@ -36,6 +33,7 @@ export interface CreatePatientDto {
   clinicalContext?: string;
   contactPhone?: string;
   emergencyContact?: EmergencyContact;
+  treatmentGoals?: string[];
 }
 
 export type UpdatePatientDto = Partial<CreatePatientDto>;
