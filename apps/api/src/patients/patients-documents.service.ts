@@ -15,18 +15,25 @@ const SIGNED_URL_EXPIRY = 60 * 60; // 1 hour
 
 @Injectable()
 export class PatientDocumentsService {
-  private readonly storage: StorageClient;
+  private _storage: StorageClient | null = null;
 
-  constructor(private readonly prisma: PrismaService) {
-    const url = process.env.SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!url || !key) {
-      throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required');
+  constructor(private readonly prisma: PrismaService) {}
+
+  private get storage(): StorageClient {
+    if (!this._storage) {
+      const url = process.env.SUPABASE_URL;
+      const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!url || !key) {
+        throw new InternalServerErrorException(
+          'SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for document storage',
+        );
+      }
+      this._storage = new StorageClient(`${url}/storage/v1`, {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      });
     }
-    this.storage = new StorageClient(`${url}/storage/v1`, {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-    });
+    return this._storage;
   }
 
   async uploadDocument(
