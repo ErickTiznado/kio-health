@@ -31,7 +31,7 @@ function setAuthCookies(
   res.cookie(ACCESS_TOKEN_COOKIE, accessToken, {
     httpOnly: true,
     secure: IS_PROD,
-    sameSite: 'strict',
+    sameSite: IS_PROD ? 'none' : 'lax',
     maxAge: 15 * 60 * 1000, // 15 minutes
     path: '/',
   });
@@ -39,15 +39,23 @@ function setAuthCookies(
   res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, {
     httpOnly: true,
     secure: IS_PROD,
-    sameSite: 'strict',
+    sameSite: IS_PROD ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
   });
 }
 
 function clearAuthCookies(res: Response) {
-  res.clearCookie(ACCESS_TOKEN_COOKIE, { path: '/' });
-  res.clearCookie(REFRESH_TOKEN_COOKIE, { path: '/' });
+  res.clearCookie(ACCESS_TOKEN_COOKIE, {
+    path: '/',
+    secure: IS_PROD,
+    sameSite: IS_PROD ? 'none' : 'lax',
+  });
+  res.clearCookie(REFRESH_TOKEN_COOKIE, {
+    path: '/',
+    secure: IS_PROD,
+    sameSite: IS_PROD ? 'none' : 'lax',
+  });
 }
 
 @Controller('auth')
