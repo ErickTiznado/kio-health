@@ -19,6 +19,14 @@ export class ClinicsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createClinic(clinicianId: string, dto: CreateClinicDto) {
+    const profile = await this.prisma.clinicianProfile.findUnique({
+      where: { id: clinicianId },
+      select: { plan: true },
+    });
+    if (profile?.plan !== 'CLINIC') {
+      throw new ForbiddenException('Tu plan no incluye creación de clínicas.');
+    }
+
     const existing = await this.prisma.clinicMember.findFirst({
       where: { clinicianId },
     });

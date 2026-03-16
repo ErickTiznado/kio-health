@@ -14,7 +14,4 @@ export class SignupDto {
   @IsNotEmpty({ message: 'El nombre completo es requerido' })
   fullName!: string;
 
-  @IsString({ message: 'El nombre de la clínica debe ser una cadena de texto' })
-  @IsNotEmpty({ message: 'El nombre de la clínica es requerido' })
-  clinicName!: string;
 }

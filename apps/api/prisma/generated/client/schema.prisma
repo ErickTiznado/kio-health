@@ -71,6 +71,11 @@ enum ClinicRole {
   MEMBER
 }
 
+enum ClinicianPlan {
+  INDIVIDUAL
+  CLINIC
+}
+
 enum SubscriptionStatus {
   TRIALING
   ACTIVE
@@ -131,6 +136,7 @@ model ClinicianProfile {
   currency               String        @default("USD")
   sessionDefaultDuration Int           @default(50) @map("session_default_duration")
   sessionDefaultPrice    Decimal       @default(0.00) @map("session_default_price") @db.Decimal(10, 2)
+  plan                   ClinicianPlan @default(INDIVIDUAL) @map("plan")
   createdAt              DateTime      @default(now()) @map("created_at")
   updatedAt              DateTime      @updatedAt @map("updated_at")
 

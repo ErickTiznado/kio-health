@@ -19,9 +19,6 @@ export const signupSchema = z.object({
   fullName: z
     .string()
     .min(1, 'El nombre completo es requerido'),
-  clinicName: z
-    .string()
-    .min(1, 'El nombre de la clínica es requerido'),
 });
 
 export type LoginFormData = z.infer<typeof loginSchema>;

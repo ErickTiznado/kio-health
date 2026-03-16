@@ -12,7 +12,7 @@ interface AuthState {
 
 interface AuthActions {
   login: (email: string, password: string) => Promise<void>;
-  signup: (data: { email: string; password: string; fullName: string; clinicName: string }) => Promise<void>;
+  signup: (data: { email: string; password: string; fullName: string }) => Promise<void>;
   logout: () => Promise<void>;
   fetchCurrentUser: () => Promise<void>;
   clearError: () => void;
@@ -31,7 +31,7 @@ export const useAuthStore = create<AuthStore>()(
       error: null,
 
       // Actions
-      signup: async (data: { email: string; password: string; fullName: string; clinicName: string }) => {
+      signup: async (data: { email: string; password: string; fullName: string }) => {
         set({ isLoading: true, error: null });
 
         try {

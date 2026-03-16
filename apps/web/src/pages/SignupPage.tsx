@@ -20,7 +20,6 @@ export function SignupPage() {
       email: '',
       password: '',
       fullName: '',
-      clinicName: '',
     },
   });
 
@@ -58,7 +57,7 @@ export function SignupPage() {
             <img src="/logo.png" alt="Kio Health" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-3xl font-bold text-kanji dark:text-white">Únete a Kio</h1>
-          <p className="text-text/60 dark:text-slate-400 mt-2">Crea tu cuenta de clínica</p>
+          <p className="text-text/60 dark:text-slate-400 mt-2">Crea tu cuenta</p>
         </div>
 
         {/* Signup Form */}
@@ -95,31 +94,6 @@ export function SignupPage() {
             />
             {errors.fullName && (
               <p className="mt-2 text-sm text-red-500">{errors.fullName.message}</p>
-            )}
-          </div>
-
-          {/* Clinic Name Field */}
-          <div className="mb-5">
-            <label
-              htmlFor="clinicName"
-              className="block text-sm font-medium text-kanji dark:text-slate-200 mb-2"
-            >
-              Nombre de la Clínica
-            </label>
-            <input
-              {...register('clinicName')}
-              type="text"
-              id="clinicName"
-              placeholder="Centro de Bienestar Kio"
-              className={`
-                w-full px-4 py-3 rounded-xl border transition-all duration-200
-                bg-bg dark:bg-slate-800 text-kanji dark:text-white placeholder:text-text/40 dark:placeholder:text-slate-500
-                focus:outline-none focus:ring-2 focus:ring-kio/30 focus:border-kio
-                ${errors.clinicName ? 'border-red-400' : 'border-cruz dark:border-slate-700'}
-              `}
-            />
-            {errors.clinicName && (
-              <p className="mt-2 text-sm text-red-500">{errors.clinicName.message}</p>
             )}
           </div>
 

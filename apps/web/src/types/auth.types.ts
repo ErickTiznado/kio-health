@@ -6,6 +6,7 @@ export interface ClinicianProfile {
   sessionDefaultDuration: number;
   sessionDefaultPrice: number;
   googleIntegration?: { id: string } | null;
+  plan: 'INDIVIDUAL' | 'CLINIC';
 }
 
 export interface User {

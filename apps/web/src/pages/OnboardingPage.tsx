@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useAuthStore } from '../stores/auth.store';
 import { completeProfile } from '../lib/auth.api';
 import { toast } from 'sonner';
-import { BrainCircuit, BadgeCheck, Settings2, ChevronRight, ChevronLeft, Loader2 } from 'lucide-react';
+import { BrainCircuit, BadgeCheck, Settings2, ChevronRight, ChevronLeft, Loader2, User, Building2 } from 'lucide-react';
 
 const CURRENCIES = [
   { code: 'USD', label: 'USD — Dólar estadounidense' },
@@ -24,12 +24,14 @@ type FormData = {
   currency: string;
   sessionDefaultDuration: number;
   sessionDefaultPrice: number;
+  plan: 'INDIVIDUAL' | 'CLINIC';
 };
 
 const STEPS = [
   { id: 1, label: 'Especialidad', icon: BrainCircuit },
-  { id: 2, label: 'Práctica', icon: BadgeCheck },
-  { id: 3, label: 'Sesiones', icon: Settings2 },
+  { id: 2, label: 'Plan', icon: User },
+  { id: 3, label: 'Práctica', icon: BadgeCheck },
+  { id: 4, label: 'Sesiones', icon: Settings2 },
 ];
 
 export function OnboardingPage() {
@@ -38,12 +40,13 @@ export function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
     defaultValues: {
       licenseNumber: '',
       currency: 'USD',
       sessionDefaultDuration: 50,
       sessionDefaultPrice: 0,
+      plan: 'INDIVIDUAL',
     },
   });
 
@@ -57,6 +60,7 @@ export function OnboardingPage() {
     try {
       await completeProfile({
         type: 'PSYCHOLOGIST',
+        plan: data.plan,
         licenseNumber: data.licenseNumber || undefined,
         currency: data.currency,
         sessionDefaultDuration: Number(data.sessionDefaultDuration),
@@ -161,8 +165,70 @@ export function OnboardingPage() {
               </div>
             )}
 
-            {/* Step 2: Datos de práctica */}
+            {/* Step 2: Plan */}
             {step === 2 && (
+              <div className="space-y-5">
+                <div>
+                  <h2 className="text-lg font-semibold text-kanji dark:text-white mb-1">¿Cómo trabajas?</h2>
+                  <p className="text-sm text-text/60 dark:text-slate-400">
+                    Elige el plan que describe tu práctica.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setValue('plan', 'INDIVIDUAL')}
+                  className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all ${
+                    watch('plan') === 'INDIVIDUAL'
+                      ? 'border-kio bg-kio/5 dark:bg-kio/10'
+                      : 'border-cruz dark:border-slate-700 hover:border-kio/50'
+                  }`}
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-kio to-kanji rounded-xl flex items-center justify-center shrink-0">
+                    <User size={22} className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-kanji dark:text-white">Práctica individual</p>
+                    <p className="text-xs text-text/60 dark:text-slate-400 mt-0.5">
+                      Gestiona tus pacientes y agenda de forma independiente.
+                    </p>
+                  </div>
+                  <div className="shrink-0">
+                    <div className="w-5 h-5 rounded-full border-2 border-kio flex items-center justify-center">
+                      {watch('plan') === 'INDIVIDUAL' && <div className="w-2.5 h-2.5 rounded-full bg-kio" />}
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setValue('plan', 'CLINIC')}
+                  className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all ${
+                    watch('plan') === 'CLINIC'
+                      ? 'border-kio bg-kio/5 dark:bg-kio/10'
+                      : 'border-cruz dark:border-slate-700 hover:border-kio/50'
+                  }`}
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-kio to-kanji rounded-xl flex items-center justify-center shrink-0">
+                    <Building2 size={22} className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-kanji dark:text-white">Clínica / Equipo</p>
+                    <p className="text-xs text-text/60 dark:text-slate-400 mt-0.5">
+                      Invita colaboradores y gestiona pacientes en conjunto.
+                    </p>
+                  </div>
+                  <div className="shrink-0">
+                    <div className="w-5 h-5 rounded-full border-2 border-kio flex items-center justify-center">
+                      {watch('plan') === 'CLINIC' && <div className="w-2.5 h-2.5 rounded-full bg-kio" />}
+                    </div>
+                  </div>
+                </button>
+              </div>
+            )}
+
+            {/* Step 3: Datos de práctica */}
+            {step === 3 && (
               <div className="space-y-5">
                 <div>
                   <h2 className="text-lg font-semibold text-kanji dark:text-white mb-1">Datos de tu práctica</h2>
@@ -202,8 +268,8 @@ export function OnboardingPage() {
               </div>
             )}
 
-            {/* Step 3: Configuración de sesiones */}
-            {step === 3 && (
+            {/* Step 4: Configuración de sesiones */}
+            {step === 4 && (
               <div className="space-y-5">
                 <div>
                   <h2 className="text-lg font-semibold text-kanji dark:text-white mb-1">Configuración de sesiones</h2>
@@ -280,7 +346,7 @@ export function OnboardingPage() {
                 <div />
               )}
 
-              {step < 3 ? (
+              {step < 4 ? (
                 <button
                   type="button"
                   onClick={() => setStep((s) => s + 1)}

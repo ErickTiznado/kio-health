@@ -7,11 +7,14 @@ import {
   Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ClinicianType } from '#generated/prisma';
+import { ClinicianType, ClinicianPlan } from '#generated/prisma';
 
 export class CompleteProfileDto {
   @IsEnum(ClinicianType)
   type: ClinicianType;
+
+  @IsEnum(ClinicianPlan)
+  plan: ClinicianPlan;
 
   @IsOptional()
   @IsString()

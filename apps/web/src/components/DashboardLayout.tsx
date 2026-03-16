@@ -65,7 +65,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
 
   const clinicianType = user?.profile?.type;
   const baseNav = (clinicianType as string) === 'NUTRITIONIST' ? NUTRITIONIST_NAV : PSYCHOLOGIST_NAV;
-  const clinicNavItem: NavItem[] = ['OWNER', 'ADMIN'].includes(user?.clinicRole ?? '')
+  const clinicNavItem: NavItem[] = user?.profile?.plan === 'CLINIC'
     ? [{ to: '/clinic', label: 'Clínica', icon: <Building2 size={20} /> }]
     : [];
   const navItems = [...baseNav, ...clinicNavItem];

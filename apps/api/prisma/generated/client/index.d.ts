@@ -191,6 +191,14 @@ export const ClinicRole: {
 export type ClinicRole = (typeof ClinicRole)[keyof typeof ClinicRole]
 
 
+export const ClinicianPlan: {
+  INDIVIDUAL: 'INDIVIDUAL',
+  CLINIC: 'CLINIC'
+};
+
+export type ClinicianPlan = (typeof ClinicianPlan)[keyof typeof ClinicianPlan]
+
+
 export const SubscriptionStatus: {
   TRIALING: 'TRIALING',
   ACTIVE: 'ACTIVE',
@@ -261,6 +269,10 @@ export const NoteTemplateType: typeof $Enums.NoteTemplateType
 export type ClinicRole = $Enums.ClinicRole
 
 export const ClinicRole: typeof $Enums.ClinicRole
+
+export type ClinicianPlan = $Enums.ClinicianPlan
+
+export const ClinicianPlan: typeof $Enums.ClinicianPlan
 
 export type SubscriptionStatus = $Enums.SubscriptionStatus
 
@@ -5020,6 +5032,7 @@ export namespace Prisma {
     currency: string | null
     sessionDefaultDuration: number | null
     sessionDefaultPrice: Decimal | null
+    plan: $Enums.ClinicianPlan | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5032,6 +5045,7 @@ export namespace Prisma {
     currency: string | null
     sessionDefaultDuration: number | null
     sessionDefaultPrice: Decimal | null
+    plan: $Enums.ClinicianPlan | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5044,6 +5058,7 @@ export namespace Prisma {
     currency: number
     sessionDefaultDuration: number
     sessionDefaultPrice: number
+    plan: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -5068,6 +5083,7 @@ export namespace Prisma {
     currency?: true
     sessionDefaultDuration?: true
     sessionDefaultPrice?: true
+    plan?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -5080,6 +5096,7 @@ export namespace Prisma {
     currency?: true
     sessionDefaultDuration?: true
     sessionDefaultPrice?: true
+    plan?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -5092,6 +5109,7 @@ export namespace Prisma {
     currency?: true
     sessionDefaultDuration?: true
     sessionDefaultPrice?: true
+    plan?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -5191,6 +5209,7 @@ export namespace Prisma {
     currency: string
     sessionDefaultDuration: number
     sessionDefaultPrice: Decimal
+    plan: $Enums.ClinicianPlan
     createdAt: Date
     updatedAt: Date
     _count: ClinicianProfileCountAggregateOutputType | null
@@ -5222,6 +5241,7 @@ export namespace Prisma {
     currency?: boolean
     sessionDefaultDuration?: boolean
     sessionDefaultPrice?: boolean
+    plan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -5243,6 +5263,7 @@ export namespace Prisma {
     currency?: boolean
     sessionDefaultDuration?: boolean
     sessionDefaultPrice?: boolean
+    plan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -5256,6 +5277,7 @@ export namespace Prisma {
     currency?: boolean
     sessionDefaultDuration?: boolean
     sessionDefaultPrice?: boolean
+    plan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -5269,11 +5291,12 @@ export namespace Prisma {
     currency?: boolean
     sessionDefaultDuration?: boolean
     sessionDefaultPrice?: boolean
+    plan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ClinicianProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "type" | "licenseNumber" | "currency" | "sessionDefaultDuration" | "sessionDefaultPrice" | "createdAt" | "updatedAt", ExtArgs["result"]["clinicianProfile"]>
+  export type ClinicianProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "type" | "licenseNumber" | "currency" | "sessionDefaultDuration" | "sessionDefaultPrice" | "plan" | "createdAt" | "updatedAt", ExtArgs["result"]["clinicianProfile"]>
   export type ClinicianProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     patients?: boolean | ClinicianProfile$patientsArgs<ExtArgs>
@@ -5312,6 +5335,7 @@ export namespace Prisma {
       currency: string
       sessionDefaultDuration: number
       sessionDefaultPrice: Prisma.Decimal
+      plan: $Enums.ClinicianPlan
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["clinicianProfile"]>
@@ -5752,6 +5776,7 @@ export namespace Prisma {
     readonly currency: FieldRef<"ClinicianProfile", 'String'>
     readonly sessionDefaultDuration: FieldRef<"ClinicianProfile", 'Int'>
     readonly sessionDefaultPrice: FieldRef<"ClinicianProfile", 'Decimal'>
+    readonly plan: FieldRef<"ClinicianProfile", 'ClinicianPlan'>
     readonly createdAt: FieldRef<"ClinicianProfile", 'DateTime'>
     readonly updatedAt: FieldRef<"ClinicianProfile", 'DateTime'>
   }
@@ -22619,6 +22644,7 @@ export namespace Prisma {
     currency: 'currency',
     sessionDefaultDuration: 'sessionDefaultDuration',
     sessionDefaultPrice: 'sessionDefaultPrice',
+    plan: 'plan',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -22975,6 +23001,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'ClinicianPlan'
+   */
+  export type EnumClinicianPlanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ClinicianPlan'>
+    
+
+
+  /**
+   * Reference to a field of type 'ClinicianPlan[]'
+   */
+  export type ListEnumClinicianPlanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ClinicianPlan[]'>
+    
+
+
+  /**
    * Reference to a field of type 'PatientStatus'
    */
   export type EnumPatientStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PatientStatus'>
@@ -23310,6 +23350,7 @@ export namespace Prisma {
     currency?: StringFilter<"ClinicianProfile"> | string
     sessionDefaultDuration?: IntFilter<"ClinicianProfile"> | number
     sessionDefaultPrice?: DecimalFilter<"ClinicianProfile"> | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFilter<"ClinicianProfile"> | $Enums.ClinicianPlan
     createdAt?: DateTimeFilter<"ClinicianProfile"> | Date | string
     updatedAt?: DateTimeFilter<"ClinicianProfile"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -23330,6 +23371,7 @@ export namespace Prisma {
     currency?: SortOrder
     sessionDefaultDuration?: SortOrder
     sessionDefaultPrice?: SortOrder
+    plan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -23353,6 +23395,7 @@ export namespace Prisma {
     currency?: StringFilter<"ClinicianProfile"> | string
     sessionDefaultDuration?: IntFilter<"ClinicianProfile"> | number
     sessionDefaultPrice?: DecimalFilter<"ClinicianProfile"> | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFilter<"ClinicianProfile"> | $Enums.ClinicianPlan
     createdAt?: DateTimeFilter<"ClinicianProfile"> | Date | string
     updatedAt?: DateTimeFilter<"ClinicianProfile"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -23373,6 +23416,7 @@ export namespace Prisma {
     currency?: SortOrder
     sessionDefaultDuration?: SortOrder
     sessionDefaultPrice?: SortOrder
+    plan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ClinicianProfileCountOrderByAggregateInput
@@ -23393,6 +23437,7 @@ export namespace Prisma {
     currency?: StringWithAggregatesFilter<"ClinicianProfile"> | string
     sessionDefaultDuration?: IntWithAggregatesFilter<"ClinicianProfile"> | number
     sessionDefaultPrice?: DecimalWithAggregatesFilter<"ClinicianProfile"> | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanWithAggregatesFilter<"ClinicianProfile"> | $Enums.ClinicianPlan
     createdAt?: DateTimeWithAggregatesFilter<"ClinicianProfile"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ClinicianProfile"> | Date | string
   }
@@ -24677,6 +24722,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProfileInput
@@ -24697,6 +24743,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     patients?: PatientUncheckedCreateNestedManyWithoutClinicianInput
@@ -24715,6 +24762,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProfileNestedInput
@@ -24735,6 +24783,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patients?: PatientUncheckedUpdateManyWithoutClinicianNestedInput
@@ -24754,6 +24803,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -24765,6 +24815,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -24777,6 +24828,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26245,6 +26297,13 @@ export namespace Prisma {
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
   }
 
+  export type EnumClinicianPlanFilter<$PrismaModel = never> = {
+    equals?: $Enums.ClinicianPlan | EnumClinicianPlanFieldRefInput<$PrismaModel>
+    in?: $Enums.ClinicianPlan[] | ListEnumClinicianPlanFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ClinicianPlan[] | ListEnumClinicianPlanFieldRefInput<$PrismaModel>
+    not?: NestedEnumClinicianPlanFilter<$PrismaModel> | $Enums.ClinicianPlan
+  }
+
   export type PatientListRelationFilter = {
     every?: PatientWhereInput
     some?: PatientWhereInput
@@ -26323,6 +26382,7 @@ export namespace Prisma {
     currency?: SortOrder
     sessionDefaultDuration?: SortOrder
     sessionDefaultPrice?: SortOrder
+    plan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -26340,6 +26400,7 @@ export namespace Prisma {
     currency?: SortOrder
     sessionDefaultDuration?: SortOrder
     sessionDefaultPrice?: SortOrder
+    plan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -26352,6 +26413,7 @@ export namespace Prisma {
     currency?: SortOrder
     sessionDefaultDuration?: SortOrder
     sessionDefaultPrice?: SortOrder
+    plan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -26419,6 +26481,16 @@ export namespace Prisma {
     _sum?: NestedDecimalFilter<$PrismaModel>
     _min?: NestedDecimalFilter<$PrismaModel>
     _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
+  export type EnumClinicianPlanWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ClinicianPlan | EnumClinicianPlanFieldRefInput<$PrismaModel>
+    in?: $Enums.ClinicianPlan[] | ListEnumClinicianPlanFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ClinicianPlan[] | ListEnumClinicianPlanFieldRefInput<$PrismaModel>
+    not?: NestedEnumClinicianPlanWithAggregatesFilter<$PrismaModel> | $Enums.ClinicianPlan
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumClinicianPlanFilter<$PrismaModel>
+    _max?: NestedEnumClinicianPlanFilter<$PrismaModel>
   }
 
   export type DateTimeNullableFilter<$PrismaModel = never> = {
@@ -27738,6 +27810,10 @@ export namespace Prisma {
     divide?: Decimal | DecimalJsLike | number | string
   }
 
+  export type EnumClinicianPlanFieldUpdateOperationsInput = {
+    set?: $Enums.ClinicianPlan
+  }
+
   export type UserUpdateOneRequiredWithoutProfileNestedInput = {
     create?: XOR<UserCreateWithoutProfileInput, UserUncheckedCreateWithoutProfileInput>
     connectOrCreate?: UserCreateOrConnectWithoutProfileInput
@@ -29012,6 +29088,13 @@ export namespace Prisma {
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
   }
 
+  export type NestedEnumClinicianPlanFilter<$PrismaModel = never> = {
+    equals?: $Enums.ClinicianPlan | EnumClinicianPlanFieldRefInput<$PrismaModel>
+    in?: $Enums.ClinicianPlan[] | ListEnumClinicianPlanFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ClinicianPlan[] | ListEnumClinicianPlanFieldRefInput<$PrismaModel>
+    not?: NestedEnumClinicianPlanFilter<$PrismaModel> | $Enums.ClinicianPlan
+  }
+
   export type NestedEnumClinicianTypeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.ClinicianType | EnumClinicianTypeFieldRefInput<$PrismaModel>
     in?: $Enums.ClinicianType[] | ListEnumClinicianTypeFieldRefInput<$PrismaModel>
@@ -29091,6 +29174,16 @@ export namespace Prisma {
     _sum?: NestedDecimalFilter<$PrismaModel>
     _min?: NestedDecimalFilter<$PrismaModel>
     _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
+  export type NestedEnumClinicianPlanWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ClinicianPlan | EnumClinicianPlanFieldRefInput<$PrismaModel>
+    in?: $Enums.ClinicianPlan[] | ListEnumClinicianPlanFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ClinicianPlan[] | ListEnumClinicianPlanFieldRefInput<$PrismaModel>
+    not?: NestedEnumClinicianPlanWithAggregatesFilter<$PrismaModel> | $Enums.ClinicianPlan
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumClinicianPlanFilter<$PrismaModel>
+    _max?: NestedEnumClinicianPlanFilter<$PrismaModel>
   }
 
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
@@ -29441,6 +29534,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     patients?: PatientCreateNestedManyWithoutClinicianInput
@@ -29459,6 +29553,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     patients?: PatientUncheckedCreateNestedManyWithoutClinicianInput
@@ -29549,6 +29644,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patients?: PatientUpdateManyWithoutClinicianNestedInput
@@ -29567,6 +29663,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patients?: PatientUncheckedUpdateManyWithoutClinicianNestedInput
@@ -30257,6 +30354,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProfileInput
@@ -30276,6 +30374,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutClinicianInput
@@ -30519,6 +30618,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProfileNestedInput
@@ -30538,6 +30638,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutClinicianNestedInput
@@ -30741,6 +30842,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProfileInput
@@ -30760,6 +30862,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     patients?: PatientUncheckedCreateNestedManyWithoutClinicianInput
@@ -30936,6 +31039,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProfileNestedInput
@@ -30955,6 +31059,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patients?: PatientUncheckedUpdateManyWithoutClinicianNestedInput
@@ -31508,6 +31613,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProfileInput
@@ -31527,6 +31633,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     patients?: PatientUncheckedCreateNestedManyWithoutClinicianInput
@@ -31605,6 +31712,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProfileNestedInput
@@ -31624,6 +31732,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patients?: PatientUncheckedUpdateManyWithoutClinicianNestedInput
@@ -31929,6 +32038,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProfileInput
@@ -31948,6 +32058,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     patients?: PatientUncheckedCreateNestedManyWithoutClinicianInput
@@ -32032,6 +32143,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProfileNestedInput
@@ -32051,6 +32163,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patients?: PatientUncheckedUpdateManyWithoutClinicianNestedInput
@@ -32239,6 +32352,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProfileInput
@@ -32258,6 +32372,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     patients?: PatientUncheckedCreateNestedManyWithoutClinicianInput
@@ -32320,6 +32435,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProfileNestedInput
@@ -32339,6 +32455,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patients?: PatientUncheckedUpdateManyWithoutClinicianNestedInput
@@ -32379,6 +32496,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProfileInput
@@ -32398,6 +32516,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     patients?: PatientUncheckedCreateNestedManyWithoutClinicianInput
@@ -32460,6 +32579,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProfileNestedInput
@@ -32479,6 +32599,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patients?: PatientUncheckedUpdateManyWithoutClinicianNestedInput
@@ -32667,6 +32788,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutProfileInput
@@ -32686,6 +32808,7 @@ export namespace Prisma {
     currency?: string
     sessionDefaultDuration?: number
     sessionDefaultPrice?: Decimal | DecimalJsLike | number | string
+    plan?: $Enums.ClinicianPlan
     createdAt?: Date | string
     updatedAt?: Date | string
     patients?: PatientUncheckedCreateNestedManyWithoutClinicianInput
@@ -32719,6 +32842,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutProfileNestedInput
@@ -32738,6 +32862,7 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     sessionDefaultDuration?: IntFieldUpdateOperationsInput | number
     sessionDefaultPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    plan?: EnumClinicianPlanFieldUpdateOperationsInput | $Enums.ClinicianPlan
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patients?: PatientUncheckedUpdateManyWithoutClinicianNestedInput

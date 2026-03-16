@@ -235,7 +235,27 @@ export function SettingsPage() {
                 </h2>
               </div>
               <div className="p-6">
-                {!user?.clinicId ? (
+                {user?.profile?.plan === 'INDIVIDUAL' ? (
+                  <div className="flex items-start gap-4 p-4 rounded-xl border border-cruz dark:border-slate-700 bg-bg/50 dark:bg-slate-800/50">
+                    <div className="p-2.5 bg-slate-100 dark:bg-slate-700 rounded-lg shrink-0">
+                      <Building2 size={18} className="text-text/40 dark:text-slate-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-sm font-semibold text-kanji dark:text-white">Plan Clínica</p>
+                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-text/50 dark:text-slate-400">
+                          Bloqueado
+                        </span>
+                      </div>
+                      <p className="text-sm text-text/60 dark:text-slate-400">
+                        La gestión de clínicas y equipos está disponible en el plan Clínica.
+                      </p>
+                      <p className="text-xs text-text/40 dark:text-slate-500 mt-2">
+                        Contacta a soporte para cambiar tu plan.
+                      </p>
+                    </div>
+                  </div>
+                ) : !user?.clinicId ? (
                   <div className="space-y-3">
                     <p className="text-sm text-text/60 dark:text-slate-400">
                       No perteneces a ninguna clínica. Crea una para gestionar tu equipo.

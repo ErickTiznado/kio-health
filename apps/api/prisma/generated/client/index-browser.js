@@ -147,6 +147,7 @@ exports.Prisma.ClinicianProfileScalarFieldEnum = {
   currency: 'currency',
   sessionDefaultDuration: 'sessionDefaultDuration',
   sessionDefaultPrice: 'sessionDefaultPrice',
+  plan: 'plan',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -352,6 +353,11 @@ exports.UserRole = exports.$Enums.UserRole = {
 
 exports.ClinicianType = exports.$Enums.ClinicianType = {
   PSYCHOLOGIST: 'PSYCHOLOGIST'
+};
+
+exports.ClinicianPlan = exports.$Enums.ClinicianPlan = {
+  INDIVIDUAL: 'INDIVIDUAL',
+  CLINIC: 'CLINIC'
 };
 
 exports.PatientStatus = exports.$Enums.PatientStatus = {

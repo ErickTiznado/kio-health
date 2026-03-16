@@ -49,3 +49,8 @@ export enum ClinicRole {
   ADMIN = 'ADMIN',
   MEMBER = 'MEMBER',
 }
+
+export enum ClinicianPlan {
+  INDIVIDUAL = 'INDIVIDUAL',
+  CLINIC = 'CLINIC',
+}

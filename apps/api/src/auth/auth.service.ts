@@ -63,6 +63,7 @@ export class AuthService {
             currency: true,
             sessionDefaultDuration: true,
             sessionDefaultPrice: true,
+            plan: true,
             googleIntegration: { select: { id: true } },
             clinicMemberships: {
               select: { clinicId: true, role: true },
@@ -182,6 +183,7 @@ export class AuthService {
             currency: true,
             sessionDefaultDuration: true,
             sessionDefaultPrice: true,
+            plan: true,
             googleIntegration: { select: { id: true } },
             clinicMemberships: {
               select: { clinicId: true, role: true },
@@ -229,6 +231,7 @@ export class AuthService {
       data: {
         userId,
         type: dto.type,
+        plan: dto.plan,
         licenseNumber: dto.licenseNumber ?? null,
         currency: dto.currency,
         sessionDefaultDuration: dto.sessionDefaultDuration,
@@ -259,54 +262,12 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
 
-    const user = await this.prisma.$transaction(async (tx) => {
-      // 1. Create User
-      const newUser = await tx.user.create({
-        data: {
-          email: dto.email.toLowerCase().trim(),
-          passwordHash,
-          role: 'CLINICIAN',
-        },
-      });
-
-      // 2. Create Clinic
-      const newClinic = await tx.clinic.create({
-        data: {
-          name: dto.clinicName,
-        },
-      });
-
-      // 3. Create ClinicianProfile
-      const newProfile = await tx.clinicianProfile.create({
-        data: {
-          userId: newUser.id,
-          type: 'PSYCHOLOGIST', // Default type
-          // Default values are set by Prisma schema
-        },
-      });
-
-      // 4. Create ClinicMember (OWNER)
-      await tx.clinicMember.create({
-        data: {
-          clinicId: newClinic.id,
-          clinicianId: newProfile.id,
-          role: 'OWNER',
-        },
-      });
-
-      // 5. Create ClinicSubscription (TRIALING)
-      const currentPeriodEnd = new Date();
-      currentPeriodEnd.setDate(currentPeriodEnd.getDate() + 14); // 14 days trial
-
-      await tx.clinicSubscription.create({
-        data: {
-          clinicId: newClinic.id,
-          status: 'TRIALING',
-          currentPeriodEnd,
-        },
-      });
-
-      return newUser;
+    const user = await this.prisma.user.create({
+      data: {
+        email: dto.email.toLowerCase().trim(),
+        passwordHash,
+        role: 'CLINICIAN',
+      },
     });
 
     return this.login({ id: user.id, email: user.email, role: user.role });

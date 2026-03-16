@@ -3,6 +3,7 @@ import type { User } from '../types/auth.types';
 
 export interface CompleteProfilePayload {
   type: 'PSYCHOLOGIST';
+  plan: 'INDIVIDUAL' | 'CLINIC';
   licenseNumber?: string;
   currency: string;
   sessionDefaultDuration: number;
