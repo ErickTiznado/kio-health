@@ -5,3 +5,11 @@ dist/
 
 # Uploaded patient documents
 uploads/
+
+# Build artifacts and caches
+.turbo/
+coverage/
+playwright-report/
+test-results/
+apps/api/public/
+apps/api/prisma/generated/client/*.node.tmp*
