@@ -77,7 +77,7 @@ export function OnboardingPage() {
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 shadow-lg shadow-kio/20 overflow-hidden">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4 overflow-hidden">
             <img src="/logo.png" alt="Kio Health" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-2xl font-bold text-kanji dark:text-white">Configura tu perfil</h1>
