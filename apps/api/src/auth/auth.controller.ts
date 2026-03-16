@@ -30,7 +30,7 @@ function setAuthCookies(
   res.cookie(ACCESS_TOKEN_COOKIE, accessToken, {
     httpOnly: true,
     secure: IS_PROD,
-    sameSite: IS_PROD ? 'none' : 'strict',
+    sameSite: 'strict',
     maxAge: 15 * 60 * 1000, // 15 minutes
     path: '/',
   });
@@ -38,7 +38,7 @@ function setAuthCookies(
   res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, {
     httpOnly: true,
     secure: IS_PROD,
-    sameSite: IS_PROD ? 'none' : 'strict',
+    sameSite: 'strict',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
   });
