@@ -13,6 +13,18 @@ async function bootstrap() {
   // Cookie parser (must be before guards that read cookies)
   app.use(cookieParser());
 
+  // CORS must be enabled before helmet so OPTIONS preflight requests are handled first
+  const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
+    : ['http://localhost:5173'];
+
+  app.enableCors({
+    origin: allowedOrigins,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type,Authorization',
+    credentials: true,
+  });
+
   // Security Headers with explicit CSP
   app.use(
     helmet({
@@ -29,9 +41,9 @@ async function bootstrap() {
           upgradeInsecureRequests: [],
         },
       },
-      crossOriginEmbedderPolicy: true,
-      crossOriginOpenerPolicy: { policy: 'same-origin' },
-      crossOriginResourcePolicy: { policy: 'same-origin' },
+      crossOriginEmbedderPolicy: false,
+      crossOriginOpenerPolicy: false,
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
       referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
     }),
   );
@@ -39,17 +51,6 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   app.setGlobalPrefix('api');
-
-  // Strict CORS for frontend domains only (in production)
-  const allowedOrigins = process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(',')
-    : ['http://localhost:5173']; // Default to Vite local port for dev
-
-  app.enableCors({
-    origin: allowedOrigins,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
 
   await app.listen(process.env.PORT ?? 3001);
 }
