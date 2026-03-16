@@ -12,6 +12,7 @@ export interface User {
   id: string;
   email: string;
   role: 'ADMIN' | 'CLINICIAN';
+  mustChangePassword: boolean;
   createdAt: string;
   profile: ClinicianProfile | null;
   clinicId?: string | null;

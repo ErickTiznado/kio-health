@@ -33,8 +33,9 @@ export function SignupPage() {
       // Get fresh user state after signup
       const user = useAuthStore.getState().user;
 
-      // Redirect based on profile status
-      if (user?.profile) {
+      if (user?.mustChangePassword) {
+        navigate('/change-password', { replace: true });
+      } else if (user?.profile) {
         navigate('/dashboard', { replace: true });
       } else {
         navigate('/onboarding', { replace: true });

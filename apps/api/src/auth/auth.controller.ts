@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Patch,
   Body,
   Res,
   Req,
@@ -132,5 +133,19 @@ export class AuthController {
     @CurrentUser() user: { userId: string; email: string; role: string },
   ): Promise<Record<string, unknown>> {
     return this.authService.getCurrentUser(user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('change-password')
+  async changePassword(
+    @CurrentUser() user: { userId: string },
+    @Body() body: { currentPassword: string; newPassword: string },
+  ): Promise<{ ok: boolean }> {
+    await this.authService.changePassword(
+      user.userId,
+      body.currentPassword,
+      body.newPassword,
+    );
+    return { ok: true };
   }
 }

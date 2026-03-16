@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { createHash, randomUUID } from 'crypto';
@@ -23,7 +24,7 @@ export class AuthService {
   async validateUser(
     email: string,
     password: string,
-  ): Promise<{ id: string; email: string; role: string }> {
+  ): Promise<{ id: string; email: string; role: string; mustChangePassword: boolean }> {
     const user = await this.prisma.user.findUnique({
       where: { email: email.toLowerCase().trim() },
     });
@@ -38,10 +39,10 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    return { id: user.id, email: user.email, role: user.role };
+    return { id: user.id, email: user.email, role: user.role, mustChangePassword: user.mustChangePassword };
   }
 
-  async login(user: { id: string; email: string; role: string }): Promise<{
+  async login(user: { id: string; email: string; role: string; mustChangePassword?: boolean }): Promise<{
     accessToken: string;
     refreshToken: string;
     user: Record<string, unknown>;
@@ -52,6 +53,7 @@ export class AuthService {
         id: true,
         email: true,
         role: true,
+        mustChangePassword: true,
         createdAt: true,
         profile: {
           select: {
@@ -170,6 +172,7 @@ export class AuthService {
         id: true,
         email: true,
         role: true,
+        mustChangePassword: true,
         createdAt: true,
         profile: {
           select: {
@@ -307,6 +310,29 @@ export class AuthService {
     });
 
     return this.login({ id: user.id, email: user.email, role: user.role });
+  }
+
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+    const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!isValid) {
+      throw new BadRequestException('La contraseña actual es incorrecta');
+    }
+
+    if (currentPassword === newPassword) {
+      throw new BadRequestException('La nueva contraseña debe ser diferente a la actual');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash, mustChangePassword: false },
+    });
   }
 
   private async createRefreshToken(userId: string): Promise<string> {

@@ -10,6 +10,7 @@ import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { OnboardingPage } from './pages/OnboardingPage';
+import { ChangePasswordPage } from './pages/ChangePasswordPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { AgendaPage } from './pages/AgendaPage';
 import { SessionPage } from './pages/SessionPage';
@@ -28,7 +29,10 @@ function RootRedirect() {
     return <Navigate to="/login" replace />;
   }
 
-  // Switch logic: profile exists → dashboard, no profile → onboarding
+  if (user?.mustChangePassword) {
+    return <Navigate to="/change-password" replace />;
+  }
+
   if (user?.profile) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -75,6 +79,18 @@ function App() {
             element={
               <PageTransition>
                 <SignupPage />
+              </PageTransition>
+            }
+          />
+
+          {/* Force password change — protected but no sidebar */}
+          <Route
+            path="/change-password"
+            element={
+              <PageTransition>
+                <RequireAuth>
+                  <ChangePasswordPage />
+                </RequireAuth>
               </PageTransition>
             }
           />
