@@ -10,6 +10,10 @@
         "$TURBO_DEFAULT$",
         ".env*"
       ],
+      "env": [
+        "VITE_API_URL",
+        "NODE_ENV"
+      ],
       "outputs": [
         "dist/**",
         ".next/**",
