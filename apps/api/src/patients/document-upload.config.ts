@@ -1,7 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { diskStorage } from 'multer';
-import { join, extname } from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import { memoryStorage } from 'multer';
 
 export const ALLOWED_MIME_TYPES = new Set([
   'image/jpeg',
@@ -13,19 +11,7 @@ export const ALLOWED_MIME_TYPES = new Set([
 
 export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 
-export const UPLOADS_BASE_DIR = join(
-  process.cwd(),
-  'uploads',
-  'patient-documents',
-);
-
-export const documentStorage = diskStorage({
-  destination: join(UPLOADS_BASE_DIR, '_staging'),
-  filename: (_req, file, cb) => {
-    const ext = extname(file.originalname);
-    cb(null, `${uuidv4()}${ext}`);
-  },
-});
+export const documentStorage = memoryStorage();
 
 export const multerFileFilter = (
   _req: any,

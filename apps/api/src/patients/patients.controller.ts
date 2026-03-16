@@ -11,11 +11,9 @@ import {
   Req,
   UseInterceptors,
   UploadedFile,
-  Res,
-  StreamableFile,
+  Redirect,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createReadStream } from 'fs';
 import { PatientsService } from './patients.service';
 import { PatientDocumentsService } from './patients-documents.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
@@ -203,25 +201,18 @@ export class PatientsController {
   }
 
   @Get(':id/documents/:docId/file')
+  @Redirect()
   async getDocumentFile(
     @CurrentUser() user: any,
     @CurrentClinician() clinicianId: string,
     @Param('id') id: string,
     @Param('docId') docId: string,
     @Req() req: any,
-    @Res({ passthrough: true }) res: any,
   ) {
-    const { filePath, mimeType, originalName } =
-      await this.patientDocumentsService.getDocumentFilePath(
-        id,
-        docId,
-        clinicianId,
-      );
-
-    res.setHeader('Content-Type', mimeType);
-    res.setHeader(
-      'Content-Disposition',
-      `inline; filename="${encodeURIComponent(originalName)}"`,
+    const { signedUrl } = await this.patientDocumentsService.getSignedUrl(
+      id,
+      docId,
+      clinicianId,
     );
 
     await this.accessLogService.logAccess(
@@ -234,7 +225,7 @@ export class PatientsController {
       req.headers['user-agent'],
     );
 
-    return new StreamableFile(createReadStream(filePath));
+    return { url: signedUrl, statusCode: 302 };
   }
 
   @Delete(':id/documents/:docId')

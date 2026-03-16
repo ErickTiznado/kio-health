@@ -1,17 +1,33 @@
 import {
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { StorageClient } from '@supabase/storage-js';
+import { v4 as uuidv4 } from 'uuid';
+import { extname } from 'path';
 import { PrismaService } from '../prisma/prisma.service';
 import { UploadDocumentDto } from './dto/upload-document.dto';
-import { UPLOADS_BASE_DIR } from './document-upload.config';
-import { join } from 'path';
-import { mkdir, rename, unlink } from 'fs/promises';
+
+const BUCKET = 'patient-documents';
+const SIGNED_URL_EXPIRY = 60 * 60; // 1 hour
 
 @Injectable()
 export class PatientDocumentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly storage: StorageClient;
+
+  constructor(private readonly prisma: PrismaService) {
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) {
+      throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required');
+    }
+    this.storage = new StorageClient(`${url}/storage/v1`, {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+    });
+  }
 
   async uploadDocument(
     patientId: string,
@@ -21,17 +37,22 @@ export class PatientDocumentsService {
   ) {
     await this.assertPatientOwnership(patientId, clinicianId);
 
-    const targetDir = join(UPLOADS_BASE_DIR, patientId);
-    await mkdir(targetDir, { recursive: true });
+    const ext = extname(file.originalname);
+    const storagePath = `${clinicianId}/${patientId}/${uuidv4()}${ext}`;
 
-    const targetPath = join(targetDir, file.filename);
-    await rename(file.path, targetPath);
+    const { error } = await this.storage
+      .from(BUCKET)
+      .upload(storagePath, file.buffer, { contentType: file.mimetype });
+
+    if (error) {
+      throw new InternalServerErrorException(`Error al subir archivo: ${error.message}`);
+    }
 
     return this.prisma.patientDocument.create({
       data: {
         patientId,
         clinicianId,
-        fileName: file.filename,
+        fileName: storagePath,
         originalName: file.originalname,
         mimeType: file.mimetype,
         fileSize: file.size,
@@ -65,23 +86,28 @@ export class PatientDocumentsService {
     });
   }
 
-  async getDocumentFilePath(
+  async getSignedUrl(
     patientId: string,
     docId: string,
     clinicianId: string,
-  ) {
+  ): Promise<{ signedUrl: string; mimeType: string; originalName: string }> {
     await this.assertPatientOwnership(patientId, clinicianId);
 
     const doc = await this.prisma.patientDocument.findFirst({
       where: { id: docId, patientId, clinicianId },
     });
 
-    if (!doc) {
-      throw new NotFoundException('Documento no encontrado');
+    if (!doc) throw new NotFoundException('Documento no encontrado');
+
+    const { data, error } = await this.storage
+      .from(BUCKET)
+      .createSignedUrl(doc.fileName, SIGNED_URL_EXPIRY);
+
+    if (error || !data?.signedUrl) {
+      throw new InternalServerErrorException('No se pudo generar el link de descarga');
     }
 
-    const filePath = join(UPLOADS_BASE_DIR, patientId, doc.fileName);
-    return { filePath, mimeType: doc.mimeType, originalName: doc.originalName };
+    return { signedUrl: data.signedUrl, mimeType: doc.mimeType, originalName: doc.originalName };
   }
 
   async deleteDocument(patientId: string, docId: string, clinicianId: string) {
@@ -91,18 +117,11 @@ export class PatientDocumentsService {
       where: { id: docId, patientId, clinicianId },
     });
 
-    if (!doc) {
-      throw new NotFoundException('Documento no encontrado');
-    }
+    if (!doc) throw new NotFoundException('Documento no encontrado');
 
     await this.prisma.patientDocument.delete({ where: { id: docId } });
 
-    const filePath = join(UPLOADS_BASE_DIR, patientId, doc.fileName);
-    try {
-      await unlink(filePath);
-    } catch {
-      // Non-critical: file may already be missing
-    }
+    await this.storage.from(BUCKET).remove([doc.fileName]);
   }
 
   private async assertPatientOwnership(patientId: string, clinicianId: string) {
@@ -111,8 +130,6 @@ export class PatientDocumentsService {
       select: { id: true },
     });
 
-    if (!patient) {
-      throw new ForbiddenException('No tienes acceso a este paciente');
-    }
+    if (!patient) throw new ForbiddenException('No tienes acceso a este paciente');
   }
 }
