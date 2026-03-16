@@ -46,6 +46,14 @@ import { TourOverlay } from './components/ui/TourOverlay';
 function App() {
   const location = useLocation();
   const syncOfflineNotes = useNoteStore((state) => state.syncOfflineNotes);
+  const { isAuthenticated, fetchCurrentUser } = useAuthStore();
+
+  // Sync fresh user data (including fullName) from server on every app load
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchCurrentUser();
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const handleOnline = () => {
