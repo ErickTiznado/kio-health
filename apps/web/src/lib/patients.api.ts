@@ -1,5 +1,5 @@
 import { api } from './api';
-import type { CreatePatientDto, UpdatePatientDto, QueryPatientsDto, Patient, PatientsResponse } from '../types/patients.types';
+import type { CreatePatientDto, UpdatePatientDto, QueryPatientsDto, Patient, PatientsResponse, PatientDocument } from '../types/patients.types';
 
 export const getPatients = async (params: QueryPatientsDto): Promise<PatientsResponse> => {
   const response = await api.get<PatientsResponse>('/patients', { params });
@@ -24,4 +24,34 @@ export const updatePatient = async (id: string, data: UpdatePatientDto): Promise
 export const archivePatient = async (id: string): Promise<Patient> => {
   const response = await api.patch<Patient>(`/patients/${id}/archive`);
   return response.data;
+};
+
+export const listPatientDocuments = async (patientId: string): Promise<PatientDocument[]> => {
+  const response = await api.get<PatientDocument[]>(`/patients/${patientId}/documents`);
+  return response.data;
+};
+
+export const uploadPatientDocument = async (
+  patientId: string,
+  file: File,
+  category?: string,
+): Promise<PatientDocument> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  if (category) formData.append('category', category);
+  const response = await api.post<PatientDocument>(`/patients/${patientId}/documents`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+};
+
+export const fetchDocumentBlob = async (patientId: string, docId: string): Promise<Blob> => {
+  const response = await api.get<Blob>(`/patients/${patientId}/documents/${docId}/file`, {
+    responseType: 'blob',
+  });
+  return response.data;
+};
+
+export const deletePatientDocument = async (patientId: string, docId: string): Promise<void> => {
+  await api.delete(`/patients/${patientId}/documents/${docId}`);
 };

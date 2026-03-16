@@ -16,6 +16,7 @@ import {
   DollarSign,
   UserPlus,
   CalendarPlus,
+  Building2,
 } from 'lucide-react';
 import { PatientModal } from './patients/PatientModal';
 import { ScheduleAppointmentModal } from '../features/calendar/components/ScheduleAppointmentModal';
@@ -30,22 +31,23 @@ interface NavItem {
   to: string;
   label: string;
   icon: ReactNode;
+  tourId?: string;
 }
 
 const PSYCHOLOGIST_NAV: NavItem[] = [
-  { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-  { to: '/patients', label: 'Pacientes', icon: <Users size={20} /> },
-  { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} /> },
+  { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, tourId: 'sidebar-dashboard' },
+  { to: '/patients', label: 'Pacientes', icon: <Users size={20} />, tourId: 'sidebar-patients' },
+  { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} />, tourId: 'sidebar-agenda' },
   { to: '/bitacora', label: 'Bitácora', icon: <BookOpen size={20} /> },
-  { to: '/finance', label: 'Finanzas', icon: <DollarSign size={20} /> },
+  { to: '/finance', label: 'Finanzas', icon: <DollarSign size={20} />, tourId: 'sidebar-finance' },
 ];
 
 const NUTRITIONIST_NAV: NavItem[] = [
-  { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-  { to: '/patients', label: 'Pacientes', icon: <Users size={20} /> },
-  { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} /> },
+  { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, tourId: 'sidebar-dashboard' },
+  { to: '/patients', label: 'Pacientes', icon: <Users size={20} />, tourId: 'sidebar-patients' },
+  { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} />, tourId: 'sidebar-agenda' },
   { to: '/measurements', label: 'Mediciones', icon: <Ruler size={20} /> },
-  { to: '/finance', label: 'Finanzas', icon: <DollarSign size={20} /> },
+  { to: '/finance', label: 'Finanzas', icon: <DollarSign size={20} />, tourId: 'sidebar-finance' },
 ];
 
 /**
@@ -64,7 +66,11 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
   const createPatientMutation = useCreatePatient();
 
   const clinicianType = user?.profile?.type;
-  const navItems = clinicianType === 'NUTRITIONIST' ? NUTRITIONIST_NAV : PSYCHOLOGIST_NAV;
+  const baseNav = (clinicianType as string) === 'NUTRITIONIST' ? NUTRITIONIST_NAV : PSYCHOLOGIST_NAV;
+  const clinicNavItem: NavItem[] = ['OWNER', 'ADMIN'].includes(user?.clinicRole ?? '')
+    ? [{ to: '/clinic', label: 'Clínica', icon: <Building2 size={20} /> }]
+    : [];
+  const navItems = [...baseNav, ...clinicNavItem];
 
   const handleLogout = async () => {
     setSidebarOpen(false);
@@ -133,6 +139,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                 <NavLink
                   to={item.to}
                   onClick={() => setSidebarOpen(false)}
+                  {...(item.tourId ? { 'data-tour': item.tourId } : {})}
                   className={({ isActive }) =>
                     `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative ${
                       isActive
@@ -164,6 +171,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
           <NavLink
             to="/settings"
             onClick={() => setSidebarOpen(false)}
+            data-tour="sidebar-settings"
             className={({ isActive }) =>
               `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative ${
                 isActive
@@ -217,6 +225,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
             <div className="flex items-center gap-1 mr-2">
               <button
                 onClick={() => setIsPatientModalOpen(true)}
+                data-tour="tour-quick-actions"
                 className="p-2 rounded-full transition-all bg-surface dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-kanji dark:hover:text-kio"
                 title="Nuevo Paciente"
               >

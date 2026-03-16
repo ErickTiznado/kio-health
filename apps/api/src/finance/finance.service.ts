@@ -6,9 +6,13 @@ import { endOfMonth } from 'date-fns';
 
 @Injectable()
 export class FinanceService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
-  private async findAllByClinicianId(clinicianId: string, month: number, year: number) {
+  private async findAllByClinicianId(
+    clinicianId: string,
+    month: number,
+    year: number,
+  ) {
     const startDate = new Date(year, month - 1, 1);
     const endDate = endOfMonth(startDate);
 
@@ -123,7 +127,11 @@ export class FinanceService {
   }
 
   async getSummary(clinicianId: string, month: number, year: number) {
-    const transactions = await this.findAllByClinicianId(clinicianId, month, year);
+    const transactions = await this.findAllByClinicianId(
+      clinicianId,
+      month,
+      year,
+    );
 
     const totalIncome = transactions
       .filter((t) => t.type === TransactionType.INCOME)
@@ -136,7 +144,11 @@ export class FinanceService {
     // Previous month comparison
     const prevMonth = month === 1 ? 12 : month - 1;
     const prevYear = month === 1 ? year - 1 : year;
-    const prevTransactions = await this.findAllByClinicianId(clinicianId, prevMonth, prevYear);
+    const prevTransactions = await this.findAllByClinicianId(
+      clinicianId,
+      prevMonth,
+      prevYear,
+    );
     const prevIncome = prevTransactions
       .filter((t) => t.type === TransactionType.INCOME)
       .reduce((sum, t) => sum + Number(t.amount), 0);
@@ -155,7 +167,10 @@ export class FinanceService {
       },
       select: { price: true },
     });
-    const projection = scheduledAppointments.reduce((sum, a) => sum + Number(a.price), 0);
+    const projection = scheduledAppointments.reduce(
+      (sum, a) => sum + Number(a.price),
+      0,
+    );
 
     // Payment method breakdown (INCOME only)
     const paymentMethodBreakdown = { CASH: 0, CARD: 0, TRANSFER: 0 };
@@ -163,8 +178,10 @@ export class FinanceService {
       if (t.type !== TransactionType.INCOME) continue;
       const method = (t.appointment as any)?.paymentMethod;
       if (method === 'CASH') paymentMethodBreakdown.CASH += Number(t.amount);
-      else if (method === 'CARD') paymentMethodBreakdown.CARD += Number(t.amount);
-      else if (method === 'TRANSFER') paymentMethodBreakdown.TRANSFER += Number(t.amount);
+      else if (method === 'CARD')
+        paymentMethodBreakdown.CARD += Number(t.amount);
+      else if (method === 'TRANSFER')
+        paymentMethodBreakdown.TRANSFER += Number(t.amount);
     }
 
     return {

@@ -2,6 +2,8 @@ import 'dotenv/config';
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -16,13 +18,21 @@ import { FinanceModule } from './finance/finance.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SearchModule } from './search/search.module';
 import { EncryptionModule } from './lib/encryption.module';
+import { ClinicsModule } from './clinics/clinics.module';
+import { IntegrationsModule } from './integrations/integrations.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([{
-      ttl: 60000, // 1 minute
-      limit: 100, // 100 requests per minute
-    }]),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'public'),
+    }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // 1 minute
+        limit: 100, // 100 requests per minute
+      },
+    ]),
     PrismaModule,
     AuthModule,
     AppointmentsModule,
@@ -34,7 +44,10 @@ import { EncryptionModule } from './lib/encryption.module';
     FinanceModule,
     SearchModule,
     EncryptionModule,
+    ClinicsModule,
+    IntegrationsModule,
     EventEmitterModule.forRoot(),
+    SubscriptionsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -46,4 +59,3 @@ import { EncryptionModule } from './lib/encryption.module';
   ],
 })
 export class AppModule {}
-

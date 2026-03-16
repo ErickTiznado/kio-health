@@ -12,7 +12,7 @@ if (!ENCRYPTION_KEY) {
 if (!/^[0-9a-fA-F]{64}$/.test(ENCRYPTION_KEY)) {
   throw new Error(
     'ENCRYPTION_KEY must be exactly 64 hex characters (32 bytes). ' +
-      'Generate one with: node -e "require(\'crypto\').randomBytes(32).toString(\'hex\')"',
+      "Generate one with: node -e \"require('crypto').randomBytes(32).toString('hex')\"",
   );
 }
 const keyBuffer = Buffer.from(ENCRYPTION_KEY, 'hex');

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { useAuthStore } from '../stores/auth.store';
@@ -9,6 +10,7 @@ import { PendingNotesWidget } from '../components/widgets/PendingNotesWidget';
 import { RecentPatientsWidget } from '../components/widgets/RecentPatientsWidget';
 import { TodayAgendaWidget } from '../components/widgets/TodayAgendaWidget';
 import { useDocumentTitle } from '../hooks/use-document-title';
+import { useTourStore } from '../stores/tour.store';
 
 /**
  * Dashboard Page — Composition-only component.
@@ -19,6 +21,7 @@ import { useDocumentTitle } from '../hooks/use-document-title';
  */
 export function DashboardPage() {
   const { user } = useAuthStore();
+  const { hasCompletedTour, startTour } = useTourStore();
   const {
     nextAppointment,
     recentPatients,
@@ -30,6 +33,13 @@ export function DashboardPage() {
   } = useDashboardData();
 
   const userName = user?.email?.split('@')[0] ?? 'Doctor';
+
+  useEffect(() => {
+    if (!hasCompletedTour) {
+      const t = setTimeout(startTour, 1500);
+      return () => clearTimeout(t);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const titleLabel =
     todayAppointments.length > 0

@@ -1,4 +1,10 @@
-import { IsNumber, IsOptional, IsPositive, Min, IsString } from 'class-validator';
+import {
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  Min,
+  IsString,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class UpdateProfileDto {

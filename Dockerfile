@@ -16,11 +16,12 @@ COPY packages/ packages/
 # Install all dependencies
 RUN npm ci
 
-# Copy API source code and Prisma files
+# Copy API and Web source code
 COPY apps/api/ apps/api/
+COPY apps/web/ apps/web/
 
-# Generate Prisma client and build NestJS
-RUN npx turbo run build --filter=api
+# Generate Prisma client and build NestJS and React
+RUN npx turbo run build --filter=api --filter=web
 
 # ---- Production Stage ----
 FROM node:20-alpine AS runner
@@ -40,6 +41,7 @@ RUN npm ci --omit=dev
 
 # Copy built output from builder
 COPY --from=builder /app/apps/api/dist apps/api/dist
+COPY --from=builder /app/apps/web/dist apps/api/public
 
 # Copy Prisma schema, migrations, and generated client
 COPY --from=builder /app/apps/api/prisma apps/api/prisma

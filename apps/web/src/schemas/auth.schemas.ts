@@ -8,4 +8,21 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
+export const signupSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'El correo electrónico es requerido')
+    .email('Por favor ingresa un correo electrónico válido'),
+  password: z
+    .string()
+    .min(8, 'La contraseña debe tener al menos 8 caracteres'),
+  fullName: z
+    .string()
+    .min(1, 'El nombre completo es requerido'),
+  clinicName: z
+    .string()
+    .min(1, 'El nombre de la clínica es requerido'),
+});
+
 export type LoginFormData = z.infer<typeof loginSchema>;
+export type SignupFormData = z.infer<typeof signupSchema>;

@@ -53,6 +53,17 @@ export interface PatientsResponse {
   };
 }
 
+export interface PatientDocument {
+  id: string;
+  originalName: string;
+  mimeType: string;
+  fileSize: number;
+  category?: string;
+  createdAt: string;
+}
+
+export type DocumentCategory = 'referencia' | 'laboratorio' | 'receta' | 'otro';
+
 export type TimelineItem = Appointment & {
   psychNote?: PsychNote;
 };

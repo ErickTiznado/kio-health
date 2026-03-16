@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type { CreatePatientDto, UpdatePatientDto, QueryPatientsDto, Patient, PatientsResponse, TimelineResponse } from '../types/patients.types';
-import { patientKeys, appointmentKeys } from '../lib/query-keys';
+import { patientKeys } from '../lib/query-keys';
+import { listPatientDocuments, uploadPatientDocument, deletePatientDocument, fetchDocumentBlob } from '../lib/patients.api';
 
 const fetchPatients = async (params: QueryPatientsDto): Promise<PatientsResponse> => {
   const { data } = await api.get<PatientsResponse>('/patients', { params });
@@ -113,6 +114,45 @@ export const usePatientScales = (patientId: string) => {
       return data;
     },
     enabled: !!patientId,
+  });
+};
+
+export const usePatientDocuments = (patientId: string) => {
+  return useQuery({
+    queryKey: patientKeys.documents(patientId),
+    queryFn: () => listPatientDocuments(patientId),
+    enabled: !!patientId,
+  });
+};
+
+export const useUploadDocument = (patientId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ file, category }: { file: File; category?: string }) =>
+      uploadPatientDocument(patientId, file, category),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: patientKeys.documents(patientId) });
+    },
+  });
+};
+
+export const useDeleteDocument = (patientId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (docId: string) => deletePatientDocument(patientId, docId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: patientKeys.documents(patientId) });
+    },
+  });
+};
+
+export const useDocumentBlob = (patientId: string, docId: string, enabled: boolean) => {
+  return useQuery({
+    queryKey: [...patientKeys.documents(patientId), docId, 'blob'],
+    queryFn: () => fetchDocumentBlob(patientId, docId),
+    enabled: enabled && !!patientId && !!docId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 };
 

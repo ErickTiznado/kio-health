@@ -22,9 +22,7 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { RescheduleAppointmentDto } from './dto/reschedule-appointment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { CreatePsychNoteDto } from './dto/create-psych-note.dto';
-import { CreateAnthropometryDto } from './dto/create-anthropometry.dto';
 import { AccessLogService } from '../access-log/access-log.service';
-import { CreateMealPlanDto } from './dto/create-meal-plan.dto';
 import { CreateClinicalScaleDto } from './dto/create-clinical-scale.dto';
 import { AppointmentOwnershipGuard } from '../auth/guards/appointment-ownership.guard';
 
@@ -34,7 +32,7 @@ export class AppointmentsController {
   constructor(
     private readonly appointmentsService: AppointmentsService,
     private readonly accessLogService: AccessLogService,
-  ) { }
+  ) {}
 
   @Post()
   async create(
@@ -68,9 +66,7 @@ export class AppointmentsController {
   }
 
   @Get('recent-patients')
-  async getRecentPatients(
-    @CurrentClinician() clinicianId: string,
-  ) {
+  async getRecentPatients(@CurrentClinician() clinicianId: string) {
     return this.appointmentsService.getRecentPatients(clinicianId);
   }
 
@@ -87,16 +83,12 @@ export class AppointmentsController {
   }
 
   @Get('next')
-  async getNextUpcoming(
-    @CurrentClinician() clinicianId: string,
-  ) {
+  async getNextUpcoming(@CurrentClinician() clinicianId: string) {
     return this.appointmentsService.getNextUpcoming(clinicianId);
   }
 
   @Get('pending-notes-count')
-  async getPendingNotesCount(
-    @CurrentClinician() clinicianId: string,
-  ) {
+  async getPendingNotesCount(@CurrentClinician() clinicianId: string) {
     return this.appointmentsService.getPendingNotesCount(clinicianId);
   }
 
@@ -107,8 +99,11 @@ export class AppointmentsController {
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Req() req: any,
   ) {
-    const result = await this.appointmentsService.getSessionContext(clinicianId, appointmentId);
-    
+    const result = await this.appointmentsService.getSessionContext(
+      clinicianId,
+      appointmentId,
+    );
+
     // Log access
     await this.accessLogService.logAccess(
       req.user.userId,
@@ -119,7 +114,7 @@ export class AppointmentsController {
       req.ip,
       req.headers['user-agent'],
     );
-    
+
     return result;
   }
 
@@ -187,7 +182,10 @@ export class AppointmentsController {
     @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
   ) {
-    return this.appointmentsService.cancelAppointment(clinicianId, appointmentId);
+    return this.appointmentsService.cancelAppointment(
+      clinicianId,
+      appointmentId,
+    );
   }
 
   @UseGuards(AppointmentOwnershipGuard)
@@ -206,8 +204,11 @@ export class AppointmentsController {
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Req() req: any,
   ) {
-    const result = await this.appointmentsService.getPsychNote(clinicianId, appointmentId);
-    
+    const result = await this.appointmentsService.getPsychNote(
+      clinicianId,
+      appointmentId,
+    );
+
     // Log access
     await this.accessLogService.logAccess(
       req.user.userId,
@@ -218,7 +219,7 @@ export class AppointmentsController {
       req.ip,
       req.headers['user-agent'],
     );
-    
+
     return result;
   }
 
@@ -230,8 +231,12 @@ export class AppointmentsController {
     @Body() dto: CreatePsychNoteDto,
     @Req() req: any,
   ) {
-    const result = await this.appointmentsService.upsertPsychNote(clinicianId, appointmentId, dto);
-    
+    const result = await this.appointmentsService.upsertPsychNote(
+      clinicianId,
+      appointmentId,
+      dto,
+    );
+
     // Log access
     await this.accessLogService.logAccess(
       req.user.userId,
@@ -242,28 +247,8 @@ export class AppointmentsController {
       req.ip,
       req.headers['user-agent'],
     );
-    
+
     return result;
-  }
-
-  @UseGuards(AppointmentOwnershipGuard)
-  @Post(':id/anthropometry')
-  async upsertAnthropometry(
-    @CurrentClinician() clinicianId: string,
-    @Param('id', ParseUUIDPipe) appointmentId: string,
-    @Body() dto: CreateAnthropometryDto,
-  ) {
-    return this.appointmentsService.upsertAnthropometry(clinicianId, appointmentId, dto);
-  }
-
-  @UseGuards(AppointmentOwnershipGuard)
-  @Post(':id/meal-plan')
-  async upsertMealPlan(
-    @CurrentClinician() clinicianId: string,
-    @Param('id', ParseUUIDPipe) appointmentId: string,
-    @Body() dto: CreateMealPlanDto,
-  ) {
-    return this.appointmentsService.upsertMealPlan(clinicianId, appointmentId, dto);
   }
 
   @UseGuards(AppointmentOwnershipGuard)
@@ -273,7 +258,11 @@ export class AppointmentsController {
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Body() dto: CreateClinicalScaleDto,
   ) {
-    return this.appointmentsService.upsertClinicalScale(clinicianId, appointmentId, dto);
+    return this.appointmentsService.upsertClinicalScale(
+      clinicianId,
+      appointmentId,
+      dto,
+    );
   }
 
   @UseGuards(AppointmentOwnershipGuard)
@@ -292,7 +281,11 @@ export class AppointmentsController {
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Body('notes') notes: string,
   ) {
-    return this.appointmentsService.updateNotes(clinicianId, appointmentId, notes);
+    return this.appointmentsService.updateNotes(
+      clinicianId,
+      appointmentId,
+      notes,
+    );
   }
 
   @UseGuards(AppointmentOwnershipGuard)
@@ -302,6 +295,10 @@ export class AppointmentsController {
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Body() dto: UpdatePaymentDto,
   ) {
-    return this.appointmentsService.updatePayment(clinicianId, appointmentId, dto);
+    return this.appointmentsService.updatePayment(
+      clinicianId,
+      appointmentId,
+      dto,
+    );
   }
 }

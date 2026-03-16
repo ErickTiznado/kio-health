@@ -12,6 +12,8 @@ import type { Response, Request } from 'express';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { CompleteProfileDto } from './dto/complete-profile.dto';
+import { SignupDto } from './dto/signup.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 
@@ -20,7 +22,11 @@ const IS_PROD = process.env.NODE_ENV === 'production';
 const ACCESS_TOKEN_COOKIE = 'access_token';
 const REFRESH_TOKEN_COOKIE = 'refresh_token';
 
-function setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
+function setAuthCookies(
+  res: Response,
+  accessToken: string,
+  refreshToken: string,
+) {
   res.cookie(ACCESS_TOKEN_COOKIE, accessToken, {
     httpOnly: true,
     secure: IS_PROD,
@@ -48,6 +54,18 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Throttle({ default: { limit: 5, ttl: 900000 } })
+  @Post('signup')
+  async signup(
+    @Body() signupDto: SignupDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ user: Record<string, unknown> }> {
+    const { accessToken, refreshToken, user } =
+      await this.authService.signup(signupDto);
+    setAuthCookies(res, accessToken, refreshToken);
+    return { user };
+  }
+
+  @Throttle({ default: { limit: 5, ttl: 900000 } })
   @Post('login')
   async login(
     @Body() loginDto: LoginDto,
@@ -57,7 +75,8 @@ export class AuthController {
       loginDto.email,
       loginDto.password,
     );
-    const { accessToken, refreshToken, user } = await this.authService.login(validatedUser);
+    const { accessToken, refreshToken, user } =
+      await this.authService.login(validatedUser);
     setAuthCookies(res, accessToken, refreshToken);
     return { user };
   }
@@ -89,6 +108,22 @@ export class AuthController {
     }
     clearAuthCookies(res);
     return { ok: true };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('complete-profile')
+  async completeProfile(
+    @CurrentUser() user: { userId: string },
+    @Body() dto: CompleteProfileDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ user: Record<string, unknown> }> {
+    const {
+      accessToken,
+      refreshToken,
+      user: responseUser,
+    } = await this.authService.completeProfile(user.userId, dto);
+    setAuthCookies(res, accessToken, refreshToken);
+    return { user: responseUser };
   }
 
   @UseGuards(JwtAuthGuard)

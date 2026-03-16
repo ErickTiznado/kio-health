@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, IsOptional, IsDateString, ValidateNested } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsDateString,
+  ValidateNested,
+} from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 
 export class EmergencyContactDto {
@@ -21,7 +27,7 @@ export class CreatePatientDto {
   fullName: string;
 
   @IsOptional()
-  @Transform(({ value }) => value ? new Date(value) : undefined)
+  @Transform(({ value }) => (value ? new Date(value) : undefined))
   dateOfBirth?: Date;
 
   @IsString()

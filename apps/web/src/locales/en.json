@@ -1,0 +1,17 @@
+{
+  "auth": {
+    "login_title": "Welcome to Kio",
+    "login_subtitle": "Sign in to your account",
+    "email_label": "Email",
+    "password_label": "Password",
+    "login_button": "Sign In",
+    "login_loading": "Signing in...",
+    "no_account": "Don't have an account?",
+    "signup_link": "Sign up here",
+    "errors": {
+      "email_required": "Email is required",
+      "email_invalid": "Please enter a valid email",
+      "password_required": "Password is required"
+    }
+  }
+}

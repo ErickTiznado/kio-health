@@ -119,52 +119,12 @@ export interface CreatePsychNoteDto {
   tags?: string[];
 }
 
-export interface Anthropometry {
-  id: string;
-  patientId: string;
-  appointmentId: string;
-  weight: string;
-  height: string;
-  bodyFat?: string;
-  waist?: string;
-  hip?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface MealPlan {
-  id: string;
-  patientId: string;
-  appointmentId: string;
-  content?: string;
-  fileUrl?: string;
-  fileName?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface SessionContext {
   appointment: Appointment;
   patient: Patient;
   lastVisit: string | null;
   sessionNumber: number;
-  anthropometry?: Anthropometry | null;
-  mealPlan?: MealPlan | null;
   clinicalScales?: ClinicalScale[];
-}
-
-export interface CreateAnthropometryPayload {
-  weight: number;
-  height: number;
-  bodyFat?: number;
-  waist?: number;
-  hip?: number;
-}
-
-export interface CreateMealPlanPayload {
-  content?: string;
-  fileUrl?: string;
-  fileName?: string;
 }
 
 export type ScaleType = 'PHQ9' | 'GAD7';

@@ -1,10 +1,11 @@
 export interface ClinicianProfile {
   id: string;
-  type: 'PSYCHOLOGIST' | 'NUTRITIONIST';
+  type: 'PSYCHOLOGIST';
   licenseNumber: string | null;
   currency: string;
   sessionDefaultDuration: number;
   sessionDefaultPrice: number;
+  googleIntegration?: { id: string } | null;
 }
 
 export interface User {
@@ -13,6 +14,8 @@ export interface User {
   role: 'ADMIN' | 'CLINICIAN';
   createdAt: string;
   profile: ClinicianProfile | null;
+  clinicId?: string | null;
+  clinicRole?: 'OWNER' | 'ADMIN' | 'MEMBER' | null;
 }
 
 export interface LoginResponse {

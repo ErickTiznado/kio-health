@@ -94,3 +94,14 @@
   --font-roboto: Roboto, sans-serif;
   --font-inter: Inter, sans-serif;
 }
+
+/* Guided tour highlight — backdrop via box-shadow spread trick */
+.tour-highlight {
+  position: relative !important;
+  z-index: 9001 !important;
+  box-shadow:
+    0 0 0 4px #ae93fe,
+    0 0 0 9999px rgba(0, 0, 0, 0.55) !important;
+  border-radius: 8px;
+  transition: box-shadow 0.25s ease;
+}

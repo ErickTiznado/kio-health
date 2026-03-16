@@ -24,12 +24,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     email: string;
     role: string;
     clinicianId?: string;
+    clinicId?: string;
+    clinicRole?: string;
   } {
     return {
       userId: payload.sub,
       email: payload.email,
       role: payload.role,
       clinicianId: payload.clinicianId,
+      clinicId: payload.clinicId,
+      clinicRole: payload.clinicRole,
     };
   }
 }

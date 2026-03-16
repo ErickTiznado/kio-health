@@ -1,14 +1,16 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/auth.store';
 import { loginSchema, type LoginFormData } from '../schemas/auth.schemas';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoading } = useAuthStore();
   const [serverError, setServerError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const {
     register,
@@ -54,8 +56,8 @@ export function LoginPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-kio rounded-2xl mb-4 shadow-lg shadow-kio/20">
             <span className="text-2xl font-bold text-white">K</span>
           </div>
-          <h1 className="text-3xl font-bold text-kanji dark:text-white">Bienvenido a Kio</h1>
-          <p className="text-text/60 dark:text-slate-400 mt-2">Inicia sesión en tu cuenta</p>
+          <h1 className="text-3xl font-bold text-kanji dark:text-white">{t('auth.login_title')}</h1>
+          <p className="text-text/60 dark:text-slate-400 mt-2">{t('auth.login_subtitle')}</p>
         </div>
 
         {/* Login Form */}
@@ -76,7 +78,7 @@ export function LoginPage() {
               htmlFor="email"
               className="block text-sm font-medium text-kanji dark:text-slate-200 mb-2"
             >
-              Correo Electrónico
+              {t('auth.email_label')}
             </label>
             <input
               {...register('email')}
@@ -92,7 +94,7 @@ export function LoginPage() {
               `}
             />
             {errors.email && (
-              <p className="mt-2 text-sm text-red-500">{errors.email.message}</p>
+              <p className="mt-2 text-sm text-red-500">{t(`auth.errors.${errors.email.message}`, { defaultValue: errors.email.message })}</p>
             )}
           </div>
 
@@ -102,7 +104,7 @@ export function LoginPage() {
               htmlFor="password"
               className="block text-sm font-medium text-kanji dark:text-slate-200 mb-2"
             >
-              Contraseña
+              {t('auth.password_label')}
             </label>
             <input
               {...register('password')}
@@ -119,7 +121,7 @@ export function LoginPage() {
             />
             {errors.password && (
               <p className="mt-2 text-sm text-red-500">
-                {errors.password.message}
+                {t(`auth.errors.${errors.password.message}`, { defaultValue: errors.password.message })}
               </p>
             )}
           </div>
@@ -140,12 +142,19 @@ export function LoginPage() {
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Iniciando sesión...
+                {t('auth.login_loading')}
               </span>
             ) : (
-              'Iniciar Sesión'
+              t('auth.login_button')
             )}
           </button>
+          
+          <p className="mt-6 text-center text-sm text-text/60 dark:text-slate-400">
+            {t('auth.no_account')}{' '}
+            <Link to="/signup" className="text-kio hover:text-kio/80 font-medium transition-colors">
+              {t('auth.signup_link')}
+            </Link>
+          </p>
         </form>
 
         {/* Footer */}

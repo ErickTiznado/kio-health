@@ -1,10 +1,13 @@
+import { useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { useAuthStore } from './stores/auth.store';
+import { useNoteStore } from './stores/notes.store';
 import { Toaster } from 'sonner';
 import { RequireAuth } from './components/RequireAuth';
 import { PageTransition } from './components/ui/PageTransition';
 import { LoginPage } from './pages/LoginPage';
+import { SignupPage } from './pages/SignupPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -15,6 +18,8 @@ import PatientDetailsPage from './pages/PatientDetailsPage';
 import FinancePage from './pages/finance/FinancePage';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import NotFoundPage from './pages/NotFoundPage';
+import ClinicPage from './pages/ClinicPage';
+import InvitationAcceptPage from './pages/InvitationAcceptPage';
 
 function RootRedirect() {
   const { isAuthenticated, user } = useAuthStore();
@@ -32,14 +37,28 @@ function RootRedirect() {
 }
 
 import { Omnibox } from './components/ui/Omnibox';
+import { TourOverlay } from './components/ui/TourOverlay';
 
 function App() {
   const location = useLocation();
+  const syncOfflineNotes = useNoteStore((state) => state.syncOfflineNotes);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      syncOfflineNotes();
+    };
+
+    window.addEventListener('online', handleOnline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [syncOfflineNotes]);
 
   return (
     <ErrorBoundary>
       <Toaster position="bottom-right" richColors />
       <Omnibox />
+      <TourOverlay />
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           {/* Public Routes */}
@@ -48,6 +67,14 @@ function App() {
             element={
               <PageTransition>
                 <LoginPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <PageTransition>
+                <SignupPage />
               </PageTransition>
             }
           />
@@ -130,6 +157,25 @@ function App() {
                 <RequireAuth>
                   <SettingsPage />
                 </RequireAuth>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/clinic"
+            element={
+              <PageTransition>
+                <RequireAuth>
+                  <ClinicPage />
+                </RequireAuth>
+              </PageTransition>
+            }
+          />
+          {/* Public route — InvitationAcceptPage handles auth redirect internally */}
+          <Route
+            path="/join/:token"
+            element={
+              <PageTransition>
+                <InvitationAcceptPage />
               </PageTransition>
             }
           />

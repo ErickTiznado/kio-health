@@ -7,10 +7,13 @@ import { CurrentClinician } from '../auth/decorators/current-clinician.decorator
 @Controller('finance')
 @UseGuards(JwtAuthGuard)
 export class FinanceController {
-  constructor(private readonly financeService: FinanceService) { }
+  constructor(private readonly financeService: FinanceService) {}
 
   @Post()
-  async create(@CurrentClinician() clinicianId: string, @Body() dto: CreateTransactionDto) {
+  async create(
+    @CurrentClinician() clinicianId: string,
+    @Body() dto: CreateTransactionDto,
+  ) {
     return this.financeService.create(clinicianId, dto);
   }
 

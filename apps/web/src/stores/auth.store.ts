@@ -12,6 +12,7 @@ interface AuthState {
 
 interface AuthActions {
   login: (email: string, password: string) => Promise<void>;
+  signup: (data: { email: string; password: string; fullName: string; clinicName: string }) => Promise<void>;
   logout: () => Promise<void>;
   fetchCurrentUser: () => Promise<void>;
   clearError: () => void;
@@ -30,6 +31,35 @@ export const useAuthStore = create<AuthStore>()(
       error: null,
 
       // Actions
+      signup: async (data: { email: string; password: string; fullName: string; clinicName: string }) => {
+        set({ isLoading: true, error: null });
+
+        try {
+          const response = await api.post<{ user: User }>('/auth/signup', data);
+
+          set({
+            user: response.data.user,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
+        } catch (error: unknown) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : 'El registro falló. Por favor intenta de nuevo.';
+
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: errorMessage,
+          });
+
+          throw error;
+        }
+      },
+
       login: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
 

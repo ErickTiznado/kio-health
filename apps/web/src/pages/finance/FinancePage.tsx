@@ -4,6 +4,7 @@ import { BalanceChart } from '../../features/finance/components/BalanceChart';
 import { ExpenseModal } from '../../features/finance/components/ExpenseModal';
 import { PaymentMethodCard } from '../../features/finance/components/PaymentMethodCard';
 import { MovimientosTab } from '../../features/finance/components/MovimientosTab';
+import { SubscriptionTab } from '../../features/finance/components/SubscriptionTab';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { useAuthStore } from '../../stores/auth.store';
 import { format, subMonths, addMonths } from 'date-fns';
@@ -13,7 +14,7 @@ import { Skeleton } from '@repo/ui/skeleton';
 import { useDocumentTitle } from '../../hooks/use-document-title';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type Tab = 'resumen' | 'movimientos';
+type Tab = 'resumen' | 'movimientos' | 'suscripción';
 
 function calcDelta(current: number, previous: number): number | null {
   if (previous === 0) return null;
@@ -89,7 +90,7 @@ export default function FinancePage() {
 
           {/* Tabs */}
           <div className="flex items-center gap-6 px-8 mt-4">
-            {(['resumen', 'movimientos'] as Tab[]).map((tab) => (
+            {(['resumen', 'movimientos', 'suscripción'] as Tab[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -199,7 +200,7 @@ export default function FinancePage() {
                   </div>
                 </div>
               </motion.div>
-            ) : (
+            ) : activeTab === 'movimientos' ? (
               <motion.div
                 key="movimientos"
                 initial={{ opacity: 0, y: 8 }}
@@ -209,6 +210,17 @@ export default function FinancePage() {
                 className="max-w-5xl mx-auto"
               >
                 <MovimientosTab month={month} year={year} currency={currency} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="suscripcion"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                className="max-w-5xl mx-auto"
+              >
+                <SubscriptionTab />
               </motion.div>
             )}
           </AnimatePresence>

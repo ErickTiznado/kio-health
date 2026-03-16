@@ -24,7 +24,9 @@ export class UsersService {
 
     if (data.sessionDefaultPrice !== undefined) {
       // Convert to Decimal for Prisma
-      updateData.sessionDefaultPrice = new Prisma.Decimal(data.sessionDefaultPrice);
+      updateData.sessionDefaultPrice = new Prisma.Decimal(
+        data.sessionDefaultPrice,
+      );
     }
 
     if (data.sessionDefaultDuration !== undefined) {

@@ -64,6 +64,20 @@ enum NoteTemplateType {
   CBT
 }
 
+enum ClinicRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+}
+
 enum ScaleType {
   PHQ9
   GAD7
@@ -118,10 +132,14 @@ model ClinicianProfile {
   createdAt              DateTime      @default(now()) @map("created_at")
   updatedAt              DateTime      @updatedAt @map("updated_at")
 
-  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  patients     Patient[]
-  appointments Appointment[]
-  transactions FinanceTransaction[]
+  user               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patients           Patient[]
+  appointments       Appointment[]
+  transactions       FinanceTransaction[]
+  patientDocuments   PatientDocument[]
+  clinicMemberships  ClinicMember[]
+  createdInvitations ClinicInvitation[]
+  googleIntegration  GoogleIntegration?
 
   @@map("clinician_profiles")
 }
@@ -140,14 +158,13 @@ model Patient {
   createdAt        DateTime      @default(now()) @map("created_at")
   updatedAt        DateTime      @updatedAt @map("updated_at")
 
-  clinician       ClinicianProfile @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
-  appointments    Appointment[]
-  psychNotes      PsychNote[]
-  accessLogs      AccessLog[]
-  tasks           Task[]
-  anthropometries Anthropometry[]
-  mealPlans       MealPlan[]
-  clinicalScales  ClinicalScale[]
+  clinician      ClinicianProfile  @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
+  appointments   Appointment[]
+  psychNotes     PsychNote[]
+  accessLogs     AccessLog[]
+  tasks          Task[]
+  clinicalScales ClinicalScale[]
+  documents      PatientDocument[]
 
   @@index([fullName])
   @@map("patients")
@@ -166,6 +183,7 @@ model Appointment {
   paymentMethod PaymentMethod?    @map("payment_method")
   price         Decimal           @db.Decimal(10, 2)
   notes         String?
+  googleEventId String?           @unique @map("google_event_id")
   createdAt     DateTime          @default(now()) @map("created_at")
   updatedAt     DateTime          @updatedAt @map("updated_at")
 
@@ -173,8 +191,6 @@ model Appointment {
   clinician      ClinicianProfile    @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
   psychNote      PsychNote?
   transaction    FinanceTransaction?
-  anthropometry  Anthropometry?
-  mealPlan       MealPlan?
   clinicalScales ClinicalScale[]
 
   @@map("appointments")
@@ -248,40 +264,6 @@ model FinanceTransaction {
   @@map("finance_transactions")
 }
 
-model Anthropometry {
-  id            String   @id @default(uuid()) @db.Uuid
-  patientId     String   @map("patient_id") @db.Uuid
-  appointmentId String   @unique @map("appointment_id") @db.Uuid
-  weight        Decimal  @db.Decimal(5, 2) // kg
-  height        Decimal  @db.Decimal(3, 2) // meters
-  bodyFat       Decimal? @map("body_fat") @db.Decimal(5, 2) // %
-  waist         Decimal? @db.Decimal(5, 2) // cm
-  hip           Decimal? @db.Decimal(5, 2) // cm
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
-
-  patient     Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-
-  @@map("anthropometries")
-}
-
-model MealPlan {
-  id            String   @id @default(uuid()) @db.Uuid
-  patientId     String   @map("patient_id") @db.Uuid
-  appointmentId String   @unique @map("appointment_id") @db.Uuid
-  content       String?
-  fileUrl       String?  @map("file_url")
-  fileName      String?  @map("file_name")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
-
-  patient     Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-
-  @@map("meal_plans")
-}
-
 model ClinicalScale {
   id            String         @id @default(uuid()) @db.Uuid
   patientId     String         @map("patient_id") @db.Uuid
@@ -298,4 +280,116 @@ model ClinicalScale {
 
   @@unique([appointmentId, scaleType])
   @@map("clinical_scales")
+}
+
+model PatientDocument {
+  id           String   @id @default(uuid()) @db.Uuid
+  patientId    String   @map("patient_id") @db.Uuid
+  clinicianId  String   @map("clinician_id") @db.Uuid
+  fileName     String   @map("file_name")
+  originalName String   @map("original_name")
+  mimeType     String   @map("mime_type")
+  fileSize     Int      @map("file_size")
+  category     String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  patient   Patient          @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  clinician ClinicianProfile @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
+
+  @@index([patientId])
+  @@map("patient_documents")
+}
+
+model Clinic {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  members      ClinicMember[]
+  invitations  ClinicInvitation[]
+  subscription ClinicSubscription?
+
+  @@map("clinics")
+}
+
+model ClinicMember {
+  id          String     @id @default(uuid()) @db.Uuid
+  clinicId    String     @map("clinic_id") @db.Uuid
+  clinicianId String     @map("clinician_id") @db.Uuid
+  role        ClinicRole @default(MEMBER)
+  joinedAt    DateTime   @default(now()) @map("joined_at")
+
+  clinic    Clinic           @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  clinician ClinicianProfile @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
+
+  @@unique([clinicId, clinicianId])
+  @@map("clinic_members")
+}
+
+model ClinicInvitation {
+  id           String     @id @default(uuid()) @db.Uuid
+  clinicId     String     @map("clinic_id") @db.Uuid
+  invitedEmail String     @map("invited_email")
+  invitedRole  ClinicRole @default(MEMBER) @map("invited_role")
+  token        String     @unique @default(uuid())
+  expiresAt    DateTime   @map("expires_at")
+  acceptedAt   DateTime?  @map("accepted_at")
+  createdById  String     @map("created_by_id") @db.Uuid
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  clinic    Clinic           @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  createdBy ClinicianProfile @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@map("clinic_invitations")
+}
+
+model SubscriptionPlan {
+  id            String   @id @default(uuid()) @db.Uuid
+  name          String
+  price         Decimal  @db.Decimal(10, 2)
+  stripePriceId String?  @unique @map("stripe_price_id")
+  features      String[] @default([])
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  subscriptions ClinicSubscription[]
+
+  @@map("subscription_plans")
+}
+
+model ClinicSubscription {
+  id                   String             @id @default(uuid()) @db.Uuid
+  clinicId             String             @unique @map("clinic_id") @db.Uuid
+  planId               String?            @map("plan_id") @db.Uuid
+  status               SubscriptionStatus @default(TRIALING)
+  stripeCustomerId     String?            @unique @map("stripe_customer_id")
+  stripeSubscriptionId String?            @unique @map("stripe_subscription_id")
+  currentPeriodEnd     DateTime?          @map("current_period_end")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+
+  clinic Clinic            @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  plan   SubscriptionPlan? @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@map("clinic_subscriptions")
+}
+
+model GoogleIntegration {
+  id                String   @id @default(uuid()) @db.Uuid
+  clinicianId       String   @unique @map("clinician_id") @db.Uuid
+  accessToken       String   @map("access_token")
+  refreshToken      String?  @map("refresh_token")
+  expiryDate        BigInt   @map("expiry_date")
+  calendarId        String?  @default("primary") @map("calendar_id")
+  syncToken         String?  @map("sync_token")
+  channelId         String?  @map("channel_id")
+  resourceId        String?  @map("resource_id")
+  channelExpiration BigInt?  @map("channel_expiration")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  clinician ClinicianProfile @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
+
+  @@map("google_integrations")
 }

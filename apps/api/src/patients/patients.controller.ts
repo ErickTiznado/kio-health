@@ -9,23 +9,36 @@ import {
   UseGuards,
   Query,
   Req,
+  UseInterceptors,
+  UploadedFile,
+  Res,
+  StreamableFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { createReadStream } from 'fs';
 import { PatientsService } from './patients.service';
+import { PatientDocumentsService } from './patients-documents.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { QueryPatientsDto } from './dto/query-patients.dto';
 import { QueryTimelineDto } from './dto/query-timeline.dto';
+import { UploadDocumentDto } from './dto/upload-document.dto';
+import {
+  documentStorage,
+  multerFileFilter,
+  MAX_FILE_SIZE_BYTES,
+} from './document-upload.config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CurrentClinician } from '../auth/decorators/current-clinician.decorator';
 import { AccessLogService } from '../access-log/access-log.service';
-import { Request } from 'express';
 
 @Controller('patients')
 @UseGuards(JwtAuthGuard)
 export class PatientsController {
   constructor(
     private readonly patientsService: PatientsService,
+    private readonly patientDocumentsService: PatientDocumentsService,
     private readonly accessLogService: AccessLogService,
   ) {}
 
@@ -36,9 +49,11 @@ export class PatientsController {
     @Body() createPatientDto: CreatePatientDto,
     @Req() req: any,
   ) {
-    const result = await this.patientsService.create(clinicianId, createPatientDto);
-    
-    // Log access
+    const result = await this.patientsService.create(
+      clinicianId,
+      createPatientDto,
+    );
+
     await this.accessLogService.logAccess(
       user.userId,
       'CREATE_PATIENT',
@@ -48,7 +63,7 @@ export class PatientsController {
       req.ip,
       req.headers['user-agent'],
     );
-    
+
     return result;
   }
 
@@ -59,8 +74,6 @@ export class PatientsController {
     @Query() query: QueryPatientsDto,
     @Req() req: any,
   ) {
-    
-    // Log access
     await this.accessLogService.logAccess(
       user.userId,
       'LIST_PATIENTS',
@@ -70,7 +83,7 @@ export class PatientsController {
       req.ip,
       req.headers['user-agent'],
     );
-    
+
     return this.patientsService.findAll(clinicianId, query);
   }
 
@@ -82,8 +95,6 @@ export class PatientsController {
     @Query() query: QueryTimelineDto,
     @Req() req: any,
   ) {
-    
-    // Log access
     await this.accessLogService.logAccess(
       user.userId,
       'VIEW_TIMELINE',
@@ -104,8 +115,6 @@ export class PatientsController {
     @Param('id') id: string,
     @Req() req: any,
   ) {
-    
-    // Log access
     await this.accessLogService.logAccess(
       user.userId,
       'VIEW_MOOD_HISTORY',
@@ -115,7 +124,7 @@ export class PatientsController {
       req.ip,
       req.headers['user-agent'],
     );
-    
+
     return this.patientsService.getMoodHistory(id, clinicianId);
   }
 
@@ -126,8 +135,6 @@ export class PatientsController {
     @Param('id') id: string,
     @Req() req: any,
   ) {
-    
-    // Log access
     await this.accessLogService.logAccess(
       user.userId,
       'VIEW_LAST_NOTE',
@@ -137,7 +144,7 @@ export class PatientsController {
       req.ip,
       req.headers['user-agent'],
     );
-    
+
     return this.patientsService.getLastNote(id, clinicianId);
   }
 
@@ -149,6 +156,112 @@ export class PatientsController {
     return this.patientsService.getScalesHistory(id, clinicianId);
   }
 
+  // ---- Document endpoints ----
+
+  @Post(':id/documents')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: documentStorage,
+      fileFilter: multerFileFilter,
+      limits: { fileSize: MAX_FILE_SIZE_BYTES },
+    }),
+  )
+  async uploadDocument(
+    @CurrentUser() user: any,
+    @CurrentClinician() clinicianId: string,
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: UploadDocumentDto,
+    @Req() req: any,
+  ) {
+    const result = await this.patientDocumentsService.uploadDocument(
+      id,
+      clinicianId,
+      file,
+      dto,
+    );
+
+    await this.accessLogService.logAccess(
+      user.userId,
+      'UPLOAD_DOCUMENT',
+      `Patient:${id}`,
+      id,
+      `Document: ${file.originalname}`,
+      req.ip,
+      req.headers['user-agent'],
+    );
+
+    return result;
+  }
+
+  @Get(':id/documents')
+  async listDocuments(
+    @CurrentClinician() clinicianId: string,
+    @Param('id') id: string,
+  ) {
+    return this.patientDocumentsService.listDocuments(id, clinicianId);
+  }
+
+  @Get(':id/documents/:docId/file')
+  async getDocumentFile(
+    @CurrentUser() user: any,
+    @CurrentClinician() clinicianId: string,
+    @Param('id') id: string,
+    @Param('docId') docId: string,
+    @Req() req: any,
+    @Res({ passthrough: true }) res: any,
+  ) {
+    const { filePath, mimeType, originalName } =
+      await this.patientDocumentsService.getDocumentFilePath(
+        id,
+        docId,
+        clinicianId,
+      );
+
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader(
+      'Content-Disposition',
+      `inline; filename="${encodeURIComponent(originalName)}"`,
+    );
+
+    await this.accessLogService.logAccess(
+      user.userId,
+      'VIEW_DOCUMENT',
+      `Patient:${id}`,
+      id,
+      `Document: ${docId}`,
+      req.ip,
+      req.headers['user-agent'],
+    );
+
+    return new StreamableFile(createReadStream(filePath));
+  }
+
+  @Delete(':id/documents/:docId')
+  async deleteDocument(
+    @CurrentUser() user: any,
+    @CurrentClinician() clinicianId: string,
+    @Param('id') id: string,
+    @Param('docId') docId: string,
+    @Req() req: any,
+  ) {
+    await this.patientDocumentsService.deleteDocument(id, docId, clinicianId);
+
+    await this.accessLogService.logAccess(
+      user.userId,
+      'DELETE_DOCUMENT',
+      `Patient:${id}`,
+      id,
+      `Document: ${docId}`,
+      req.ip,
+      req.headers['user-agent'],
+    );
+
+    return { success: true };
+  }
+
+  // ---- Patient CRUD ----
+
   @Get(':id')
   async findOne(
     @CurrentUser() user: any,
@@ -156,8 +269,6 @@ export class PatientsController {
     @Param('id') id: string,
     @Req() req: any,
   ) {
-    
-    // Log access
     await this.accessLogService.logAccess(
       user.userId,
       'VIEW_PROFILE',
@@ -179,9 +290,12 @@ export class PatientsController {
     @Body() updatePatientDto: UpdatePatientDto,
     @Req() req: any,
   ) {
-    const result = await this.patientsService.update(id, clinicianId, updatePatientDto);
-    
-    // Log access
+    const result = await this.patientsService.update(
+      id,
+      clinicianId,
+      updatePatientDto,
+    );
+
     await this.accessLogService.logAccess(
       user.userId,
       'UPDATE_PATIENT',
@@ -191,20 +305,19 @@ export class PatientsController {
       req.ip,
       req.headers['user-agent'],
     );
-    
+
     return result;
   }
 
   @Patch(':id/archive')
   async archive(
     @CurrentUser() user: any,
-    @CurrentClinician() clinicianId: string, 
+    @CurrentClinician() clinicianId: string,
     @Param('id') id: string,
     @Req() req: any,
   ) {
     const result = await this.patientsService.archive(id, clinicianId);
-    
-    // Log access
+
     await this.accessLogService.logAccess(
       user.userId,
       'ARCHIVE_PATIENT',
@@ -214,7 +327,7 @@ export class PatientsController {
       req.ip,
       req.headers['user-agent'],
     );
-    
+
     return result;
   }
 }

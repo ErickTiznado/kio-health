@@ -8,6 +8,7 @@ export const patientKeys = {
   moodHistory: (id: string) => [...patientKeys.detail(id), 'mood-history'] as const,
   lastNote: (id: string) => [...patientKeys.detail(id), 'last-note'] as const,
   scales: (id: string) => [...patientKeys.detail(id), 'scales'] as const,
+  documents: (id: string) => [...patientKeys.detail(id), 'documents'] as const,
 };
 
 export const appointmentKeys = {
@@ -28,4 +29,12 @@ export const taskKeys = {
   all: ['tasks'] as const,
   lists: () => [...taskKeys.all, 'list'] as const,
   list: (patientId: string) => [...taskKeys.lists(), patientId] as const,
+};
+
+export const clinicKeys = {
+  all: ['clinic'] as const,
+  mine: () => [...clinicKeys.all, 'mine'] as const,
+  invitations: () => [...clinicKeys.all, 'invitations'] as const,
+  patients: () => [...clinicKeys.all, 'patients'] as const,
+  finance: (month: number, year: number) => [...clinicKeys.all, 'finance', month, year] as const,
 };

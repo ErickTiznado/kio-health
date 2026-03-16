@@ -30,7 +30,9 @@ export class AppointmentOwnershipGuard implements CanActivate {
     }
 
     if (appointment.clinicianId !== clinicianId) {
-      throw new ForbiddenException('No tienes permiso para acceder a esta cita');
+      throw new ForbiddenException(
+        'No tienes permiso para acceder a esta cita',
+      );
     }
 
     return true;

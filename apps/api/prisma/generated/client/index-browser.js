@@ -178,6 +178,7 @@ exports.Prisma.AppointmentScalarFieldEnum = {
   paymentMethod: 'paymentMethod',
   price: 'price',
   notes: 'notes',
+  googleEventId: 'googleEventId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -231,30 +232,6 @@ exports.Prisma.FinanceTransactionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.AnthropometryScalarFieldEnum = {
-  id: 'id',
-  patientId: 'patientId',
-  appointmentId: 'appointmentId',
-  weight: 'weight',
-  height: 'height',
-  bodyFat: 'bodyFat',
-  waist: 'waist',
-  hip: 'hip',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.MealPlanScalarFieldEnum = {
-  id: 'id',
-  patientId: 'patientId',
-  appointmentId: 'appointmentId',
-  content: 'content',
-  fileUrl: 'fileUrl',
-  fileName: 'fileName',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
 exports.Prisma.ClinicalScaleScalarFieldEnum = {
   id: 'id',
   patientId: 'patientId',
@@ -263,6 +240,82 @@ exports.Prisma.ClinicalScaleScalarFieldEnum = {
   scores: 'scores',
   totalScore: 'totalScore',
   riskLevel: 'riskLevel',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PatientDocumentScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  clinicianId: 'clinicianId',
+  fileName: 'fileName',
+  originalName: 'originalName',
+  mimeType: 'mimeType',
+  fileSize: 'fileSize',
+  category: 'category',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.ClinicScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ClinicMemberScalarFieldEnum = {
+  id: 'id',
+  clinicId: 'clinicId',
+  clinicianId: 'clinicianId',
+  role: 'role',
+  joinedAt: 'joinedAt'
+};
+
+exports.Prisma.ClinicInvitationScalarFieldEnum = {
+  id: 'id',
+  clinicId: 'clinicId',
+  invitedEmail: 'invitedEmail',
+  invitedRole: 'invitedRole',
+  token: 'token',
+  expiresAt: 'expiresAt',
+  acceptedAt: 'acceptedAt',
+  createdById: 'createdById',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.SubscriptionPlanScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  price: 'price',
+  stripePriceId: 'stripePriceId',
+  features: 'features',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ClinicSubscriptionScalarFieldEnum = {
+  id: 'id',
+  clinicId: 'clinicId',
+  planId: 'planId',
+  status: 'status',
+  stripeCustomerId: 'stripeCustomerId',
+  stripeSubscriptionId: 'stripeSubscriptionId',
+  currentPeriodEnd: 'currentPeriodEnd',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.GoogleIntegrationScalarFieldEnum = {
+  id: 'id',
+  clinicianId: 'clinicianId',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  expiryDate: 'expiryDate',
+  calendarId: 'calendarId',
+  syncToken: 'syncToken',
+  channelId: 'channelId',
+  resourceId: 'resourceId',
+  channelExpiration: 'channelExpiration',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -356,6 +409,20 @@ exports.ScaleRiskLevel = exports.$Enums.ScaleRiskLevel = {
   SEVERE: 'SEVERE'
 };
 
+exports.ClinicRole = exports.$Enums.ClinicRole = {
+  OWNER: 'OWNER',
+  ADMIN: 'ADMIN',
+  MEMBER: 'MEMBER'
+};
+
+exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {
+  TRIALING: 'TRIALING',
+  ACTIVE: 'ACTIVE',
+  PAST_DUE: 'PAST_DUE',
+  CANCELED: 'CANCELED',
+  UNPAID: 'UNPAID'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   RefreshToken: 'RefreshToken',
@@ -366,9 +433,14 @@ exports.Prisma.ModelName = {
   Task: 'Task',
   AccessLog: 'AccessLog',
   FinanceTransaction: 'FinanceTransaction',
-  Anthropometry: 'Anthropometry',
-  MealPlan: 'MealPlan',
-  ClinicalScale: 'ClinicalScale'
+  ClinicalScale: 'ClinicalScale',
+  PatientDocument: 'PatientDocument',
+  Clinic: 'Clinic',
+  ClinicMember: 'ClinicMember',
+  ClinicInvitation: 'ClinicInvitation',
+  SubscriptionPlan: 'SubscriptionPlan',
+  ClinicSubscription: 'ClinicSubscription',
+  GoogleIntegration: 'GoogleIntegration'
 };
 
 /**

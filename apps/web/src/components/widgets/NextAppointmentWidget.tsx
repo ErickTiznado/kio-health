@@ -252,7 +252,7 @@ export function NextAppointmentWidget({ appointment, isLoading }: NextAppointmen
   const inProgress = appointment ? isInProgress(appointment) : false;
 
   return (
-    <div className="col-span-12 lg:col-span-8 p-6 md:p-8 lg:p-10 xl:p-14 text-white relative overflow-hidden">
+    <div data-tour="tour-next-appointment" className="col-span-12 lg:col-span-8 p-6 md:p-8 lg:p-10 xl:p-14 text-white relative overflow-hidden">
       {isLoading ? (
         <Skeleton className="w-64 h-12 bg-white/20" />
       ) : appointment ? (

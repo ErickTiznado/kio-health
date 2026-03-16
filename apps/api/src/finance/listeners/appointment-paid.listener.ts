@@ -5,7 +5,7 @@ import { TransactionType } from '#generated/prisma';
 
 @Injectable()
 export class AppointmentPaidListener {
-  constructor(private readonly financeService: FinanceService) { }
+  constructor(private readonly financeService: FinanceService) {}
 
   @OnEvent('appointment.paid')
   async handleAppointmentPaidEvent(payload: any) {

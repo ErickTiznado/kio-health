@@ -14,12 +14,15 @@ import {
     Target,
     CalendarDays,
     Activity,
+    FolderOpen,
 } from 'lucide-react';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { TimelineContainer } from '../components/patient/timeline/TimelineContainer';
 import { MoodChart } from '../components/patient/insights/MoodChart';
 import { TasksWidget } from '../components/patient/tasks/TasksWidget';
 import { PatientModal } from '../components/patients/PatientModal';
+import { DocumentUpload } from '../components/patients/DocumentUpload';
+import { DocumentViewer } from '../components/patients/DocumentViewer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -33,6 +36,7 @@ const TABS = [
     { id: 'history', label: 'Historia Clínica', icon: FileClock },
     { id: 'profile', label: 'Perfil Clínico', icon: User },
     { id: 'stats', label: 'Estadísticas', icon: BarChart2 },
+    { id: 'documents', label: 'Documentos', icon: FolderOpen },
 ];
 
 export default function PatientDetailsPage() {
@@ -378,6 +382,24 @@ export default function PatientDetailsPage() {
 
                                 <MoodChart patientId={patient.id} />
                                 <ScalesHistoryChart data={scalesHistory} />
+                            </motion.div>
+                        )}
+
+                        {/* TAB: Documentos */}
+                        {activeTab === 'documents' && (
+                            <motion.div
+                                key="documents"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="max-w-3xl mx-auto"
+                            >
+                                <div className="bg-surface dark:bg-slate-900 rounded-2xl shadow-sm border border-[var(--color-cruz)] dark:border-slate-800 p-6 space-y-8">
+                                    <DocumentUpload patientId={patient.id} />
+                                    <hr className="border-gray-100 dark:border-slate-800" />
+                                    <DocumentViewer patientId={patient.id} />
+                                </div>
                             </motion.div>
                         )}
 

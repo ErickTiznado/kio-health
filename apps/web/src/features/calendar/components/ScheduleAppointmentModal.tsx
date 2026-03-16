@@ -82,6 +82,12 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
             return;
         }
 
+        const numDuration = Number(duration);
+        if (numDuration < 15 || numDuration > 90) {
+            toast.error('La duración debe ser entre 15 y 90 minutos');
+            return;
+        }
+
         if (!selectedPatientId) {
             toast.error('Selecciona un paciente');
             return;
@@ -215,8 +221,9 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                                         type="number"
                                         value={duration}
                                         onChange={(e) => setDuration(e.target.value)}
-                                        min="1"
-                                        step="5"
+                                        min="15"
+                                        max="90"
+                                        step="1"
                                         className="w-full pl-4 pr-16 py-3 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/20 focus:border-[var(--color-kanji)] transition-all"
                                     />
                                     <span className="absolute right-4 top-3 text-gray-400 dark:text-slate-500 text-xs font-bold pointer-events-none mt-0.5">MIN</span>

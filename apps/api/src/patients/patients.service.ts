@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
@@ -21,15 +25,22 @@ export class PatientsService {
     });
 
     if (!profile) {
-      throw new NotFoundException('Perfil de clínico no encontrado para este usuario');
+      throw new NotFoundException(
+        'Perfil de clínico no encontrado para este usuario',
+      );
     }
 
     return profile.id;
   }
 
   async create(clinicianId: string, createPatientDto: CreatePatientDto) {
-    const { emergencyContact, diagnosis, clinicalContext, contactPhone, ...data } =
-      createPatientDto;
+    const {
+      emergencyContact,
+      diagnosis,
+      clinicalContext,
+      contactPhone,
+      ...data
+    } = createPatientDto;
 
     const encryptedDiagnosis = diagnosis
       ? this.encryptionService.encrypt(diagnosis)
@@ -61,7 +72,10 @@ export class PatientsService {
   async findAll(
     clinicianId: string,
     query: QueryPatientsDto,
-  ): Promise<{ data: any[]; meta: { total: number; page: number; lastPage: number } }> {
+  ): Promise<{
+    data: any[];
+    meta: { total: number; page: number; lastPage: number };
+  }> {
     const { page = 1, limit = 10, search, status } = query;
     const skip = (page - 1) * limit;
 
@@ -163,7 +177,11 @@ export class PatientsService {
 
       return {
         ...apt,
-        psychNote: { ...apt.psychNote, privateNotes: decryptedPrivateNotes, content: decryptedContent },
+        psychNote: {
+          ...apt.psychNote,
+          privateNotes: decryptedPrivateNotes,
+          content: decryptedContent,
+        },
       };
     });
 
@@ -179,11 +197,17 @@ export class PatientsService {
         appointment: { clinicianId },
         moodRating: { not: null },
       },
-      select: { moodRating: true, appointment: { select: { startTime: true } } },
+      select: {
+        moodRating: true,
+        appointment: { select: { startTime: true } },
+      },
       orderBy: { appointment: { startTime: 'asc' } },
     });
 
-    return notes.map((n) => ({ date: n.appointment.startTime, mood: n.moodRating }));
+    return notes.map((n) => ({
+      date: n.appointment.startTime,
+      mood: n.moodRating,
+    }));
   }
 
   async getLastNote(id: string, clinicianId: string) {
@@ -195,20 +219,35 @@ export class PatientsService {
     });
 
     if (lastNote?.privateNotes) {
-      lastNote.privateNotes = this.encryptionService.decrypt(lastNote.privateNotes);
+      lastNote.privateNotes = this.encryptionService.decrypt(
+        lastNote.privateNotes,
+      );
     }
 
     return lastNote;
   }
 
-  async update(id: string, clinicianId: string, updatePatientDto: UpdatePatientDto) {
+  async update(
+    id: string,
+    clinicianId: string,
+    updatePatientDto: UpdatePatientDto,
+  ) {
     await this.findOne(id, clinicianId);
 
-    const { emergencyContact, diagnosis, clinicalContext, contactPhone, ...data } =
-      updatePatientDto;
+    const {
+      emergencyContact,
+      diagnosis,
+      clinicalContext,
+      contactPhone,
+      ...data
+    } = updatePatientDto;
 
     const encryptedDiagnosis =
-      diagnosis !== undefined ? (diagnosis ? this.encryptionService.encrypt(diagnosis) : null) : undefined;
+      diagnosis !== undefined
+        ? diagnosis
+          ? this.encryptionService.encrypt(diagnosis)
+          : null
+        : undefined;
     const encryptedClinicalContext =
       clinicalContext !== undefined
         ? clinicalContext
@@ -232,10 +271,18 @@ export class PatientsService {
       where: { id },
       data: {
         ...data,
-        ...(encryptedDiagnosis !== undefined && { diagnosis: encryptedDiagnosis }),
-        ...(encryptedClinicalContext !== undefined && { clinicalContext: encryptedClinicalContext }),
-        ...(encryptedContactPhone !== undefined && { contactPhone: encryptedContactPhone }),
-        ...(encryptedEmergencyContact !== undefined && { emergencyContact: encryptedEmergencyContact }),
+        ...(encryptedDiagnosis !== undefined && {
+          diagnosis: encryptedDiagnosis,
+        }),
+        ...(encryptedClinicalContext !== undefined && {
+          clinicalContext: encryptedClinicalContext,
+        }),
+        ...(encryptedContactPhone !== undefined && {
+          contactPhone: encryptedContactPhone,
+        }),
+        ...(encryptedEmergencyContact !== undefined && {
+          emergencyContact: encryptedEmergencyContact,
+        }),
       },
     });
 
@@ -244,7 +291,10 @@ export class PatientsService {
 
   async archive(id: string, clinicianId: string) {
     await this.findOne(id, clinicianId);
-    return this.prisma.patient.update({ where: { id }, data: { status: 'ARCHIVED' } });
+    return this.prisma.patient.update({
+      where: { id },
+      data: { status: 'ARCHIVED' },
+    });
   }
 
   async getScalesHistory(patientId: string, clinicianId: string) {
@@ -265,20 +315,26 @@ export class PatientsService {
 
   // ── Private helpers ─────────────────────────────────────────────────────────
 
-  private decryptPatient(patient: Patient & { appointments?: unknown[] }): typeof patient {
+  private decryptPatient(
+    patient: Patient & { appointments?: unknown[] },
+  ): typeof patient {
     const result = { ...patient } as any;
 
     if (result.diagnosis) {
       result.diagnosis = this.encryptionService.decrypt(result.diagnosis);
     }
     if (result.clinicalContext) {
-      result.clinicalContext = this.encryptionService.decrypt(result.clinicalContext);
+      result.clinicalContext = this.encryptionService.decrypt(
+        result.clinicalContext,
+      );
     }
     if (result.contactPhone) {
       result.contactPhone = this.encryptionService.decrypt(result.contactPhone);
     }
     if (result.emergencyContact) {
-      const raw = this.encryptionService.decrypt(result.emergencyContact as string);
+      const raw = this.encryptionService.decrypt(
+        result.emergencyContact as string,
+      );
       result.emergencyContact = JSON.parse(raw);
     }
 

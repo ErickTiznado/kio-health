@@ -7,10 +7,13 @@ import { User } from '#generated/prisma';
 @Controller('search')
 @UseGuards(JwtAuthGuard)
 export class SearchController {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   @Get()
-  async search(@CurrentClinician() clinicianId: string, @Query('q') query: string) {
+  async search(
+    @CurrentClinician() clinicianId: string,
+    @Query('q') query: string,
+  ) {
     if (!query || query.length < 2) return { patients: [], appointments: [] };
 
     const patients = await this.prisma.patient.findMany({
@@ -35,8 +38,8 @@ export class SearchController {
         id: true,
         startTime: true,
         reason: true,
-        patient: { select: { fullName: true } }
-      }
+        patient: { select: { fullName: true } },
+      },
     });
 
     return {
@@ -45,8 +48,8 @@ export class SearchController {
         id: a.id,
         label: `${a.reason} - ${a.patient.fullName}`,
         startTime: a.startTime,
-        type: 'appointment'
-      }))
+        type: 'appointment',
+      })),
     };
   }
 }

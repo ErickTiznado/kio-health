@@ -3,4 +3,6 @@ export interface JwtPayload {
   email: string;
   role: string;
   clinicianId?: string;
+  clinicId?: string;
+  clinicRole?: string;
 }

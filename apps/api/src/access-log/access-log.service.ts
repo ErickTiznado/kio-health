@@ -28,7 +28,10 @@ export class AccessLogService {
       });
     } catch (error) {
       // Non-critical: access logging should never crash the main request
-      console.warn(`[AccessLog] Failed to log access for user ${userId}:`, (error as Error).message);
+      console.warn(
+        `[AccessLog] Failed to log access for user ${userId}:`,
+        (error as Error).message,
+      );
       return null;
     }
   }

@@ -137,6 +137,7 @@ export default function PatientsPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={openCreateModal}
+                data-tour="tour-new-patient-btn"
                 className="bg-kio hover:bg-kanji text-white px-5 py-2 rounded-full text-sm font-medium shadow-lg shadow-kio/20 transition-all flex items-center gap-2 whitespace-nowrap"
               >
                 <Plus size={16} />

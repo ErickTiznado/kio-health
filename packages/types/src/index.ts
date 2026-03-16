@@ -43,3 +43,9 @@ export enum ScaleRiskLevel {
   MODERATELY_SEVERE = 'MODERATELY_SEVERE',
   SEVERE = 'SEVERE',
 }
+
+export enum ClinicRole {
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
+  MEMBER = 'MEMBER',
+}

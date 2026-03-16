@@ -1,9 +1,15 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { createHash, randomUUID } from 'crypto';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { CompleteProfileDto } from './dto/complete-profile.dto';
+import { SignupDto } from './dto/signup.dto';
 
 const REFRESH_TOKEN_EXPIRY_DAYS = 7;
 
@@ -35,11 +41,11 @@ export class AuthService {
     return { id: user.id, email: user.email, role: user.role };
   }
 
-  async login(user: {
-    id: string;
-    email: string;
-    role: string;
-  }): Promise<{ accessToken: string; refreshToken: string; user: Record<string, unknown> }> {
+  async login(user: { id: string; email: string; role: string }): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    user: Record<string, unknown>;
+  }> {
     const fullUser = await this.prisma.user.findUnique({
       where: { id: user.id },
       select: {
@@ -55,28 +61,50 @@ export class AuthService {
             currency: true,
             sessionDefaultDuration: true,
             sessionDefaultPrice: true,
+            googleIntegration: { select: { id: true } },
+            clinicMemberships: {
+              select: { clinicId: true, role: true },
+              take: 1,
+            },
           },
         },
       },
     });
 
+    const membership = fullUser?.profile?.clinicMemberships?.[0];
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
       role: user.role,
       clinicianId: fullUser?.profile?.id,
+      clinicId: membership?.clinicId,
+      clinicRole: membership?.role,
     };
 
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = await this.createRefreshToken(user.id);
 
-    return { accessToken, refreshToken, user: fullUser as Record<string, unknown> };
+    // Strip clinicMemberships from response before returning
+    const { profile, ...rest } = fullUser as Record<string, unknown> & {
+      profile: Record<string, unknown> & { clinicMemberships: unknown[] };
+    };
+    const { clinicMemberships: _m, ...profileRest } = profile ?? {};
+    const responseUser = {
+      ...rest,
+      profile: profileRest,
+      clinicId: membership?.clinicId ?? null,
+      clinicRole: membership?.role ?? null,
+    };
+
+    return { accessToken, refreshToken, user: responseUser };
   }
 
   async refreshAccessToken(
     rawRefreshToken: string,
   ): Promise<{ accessToken: string; newRefreshToken: string }> {
-    const tokenHash = createHash('sha256').update(rawRefreshToken).digest('hex');
+    const tokenHash = createHash('sha256')
+      .update(rawRefreshToken)
+      .digest('hex');
 
     const stored = await this.prisma.refreshToken.findUnique({
       where: { tokenHash },
@@ -86,7 +114,15 @@ export class AuthService {
             id: true,
             email: true,
             role: true,
-            profile: { select: { id: true } },
+            profile: {
+              select: {
+                id: true,
+                clinicMemberships: {
+                  select: { clinicId: true, role: true },
+                  take: 1,
+                },
+              },
+            },
           },
         },
       },
@@ -96,18 +132,23 @@ export class AuthService {
       if (stored) {
         await this.prisma.refreshToken.delete({ where: { tokenHash } });
       }
-      throw new UnauthorizedException('Token de actualización expirado o inválido');
+      throw new UnauthorizedException(
+        'Token de actualización expirado o inválido',
+      );
     }
 
     // Rotate: delete old token, issue new one
     await this.prisma.refreshToken.delete({ where: { tokenHash } });
     const newRefreshToken = await this.createRefreshToken(stored.userId);
 
+    const membership = stored.user.profile?.clinicMemberships?.[0];
     const payload: JwtPayload = {
       sub: stored.user.id,
       email: stored.user.email,
       role: stored.user.role,
       clinicianId: stored.user.profile?.id,
+      clinicId: membership?.clinicId,
+      clinicRole: membership?.role,
     };
 
     const accessToken = this.jwtService.sign(payload);
@@ -116,7 +157,9 @@ export class AuthService {
   }
 
   async revokeRefreshToken(rawRefreshToken: string): Promise<void> {
-    const tokenHash = createHash('sha256').update(rawRefreshToken).digest('hex');
+    const tokenHash = createHash('sha256')
+      .update(rawRefreshToken)
+      .digest('hex');
     await this.prisma.refreshToken.deleteMany({ where: { tokenHash } });
   }
 
@@ -136,6 +179,11 @@ export class AuthService {
             currency: true,
             sessionDefaultDuration: true,
             sessionDefaultPrice: true,
+            googleIntegration: { select: { id: true } },
+            clinicMemberships: {
+              select: { clinicId: true, role: true },
+              take: 1,
+            },
           },
         },
       },
@@ -145,7 +193,120 @@ export class AuthService {
       throw new UnauthorizedException('Usuario no encontrado');
     }
 
-    return user as Record<string, unknown>;
+    const membership = user.profile?.clinicMemberships?.[0];
+    const { profile, ...rest } = user as Record<string, unknown> & {
+      profile: Record<string, unknown> & { clinicMemberships: unknown[] };
+    };
+    const { clinicMemberships: _m, ...profileRest } = profile ?? {};
+
+    return {
+      ...rest,
+      profile: profileRest,
+      clinicId: membership?.clinicId ?? null,
+      clinicRole: membership?.role ?? null,
+    };
+  }
+
+  async completeProfile(
+    userId: string,
+    dto: CompleteProfileDto,
+  ): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    user: Record<string, unknown>;
+  }> {
+    const existing = await this.prisma.clinicianProfile.findUnique({
+      where: { userId },
+    });
+    if (existing) {
+      throw new ConflictException('El perfil clínico ya existe');
+    }
+
+    await this.prisma.clinicianProfile.create({
+      data: {
+        userId,
+        type: dto.type,
+        licenseNumber: dto.licenseNumber ?? null,
+        currency: dto.currency,
+        sessionDefaultDuration: dto.sessionDefaultDuration,
+        sessionDefaultPrice: dto.sessionDefaultPrice,
+      },
+    });
+
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: { id: true, email: true, role: true },
+    });
+
+    return this.login(user);
+  }
+
+  async signup(dto: SignupDto): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    user: Record<string, unknown>;
+  }> {
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: dto.email.toLowerCase().trim() },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('El correo electrónico ya está en uso');
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+
+    const user = await this.prisma.$transaction(async (tx) => {
+      // 1. Create User
+      const newUser = await tx.user.create({
+        data: {
+          email: dto.email.toLowerCase().trim(),
+          passwordHash,
+          role: 'CLINICIAN',
+        },
+      });
+
+      // 2. Create Clinic
+      const newClinic = await tx.clinic.create({
+        data: {
+          name: dto.clinicName,
+        },
+      });
+
+      // 3. Create ClinicianProfile
+      const newProfile = await tx.clinicianProfile.create({
+        data: {
+          userId: newUser.id,
+          type: 'PSYCHOLOGIST', // Default type
+          // Default values are set by Prisma schema
+        },
+      });
+
+      // 4. Create ClinicMember (OWNER)
+      await tx.clinicMember.create({
+        data: {
+          clinicId: newClinic.id,
+          clinicianId: newProfile.id,
+          role: 'OWNER',
+        },
+      });
+
+      // 5. Create ClinicSubscription (TRIALING)
+      const currentPeriodEnd = new Date();
+      currentPeriodEnd.setDate(currentPeriodEnd.getDate() + 14); // 14 days trial
+
+      await tx.clinicSubscription.create({
+        data: {
+          clinicId: newClinic.id,
+          status: 'TRIALING',
+          currentPeriodEnd,
+        },
+      });
+
+      return newUser;
+    });
+
+    return this.login({ id: user.id, email: user.email, role: user.role });
   }
 
   private async createRefreshToken(userId: string): Promise<string> {

@@ -1,4 +1,12 @@
-import { IsArray, IsEnum, IsInt, Max, Min, ArrayMinSize, ArrayMaxSize } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsInt,
+  Max,
+  Min,
+  ArrayMinSize,
+  ArrayMaxSize,
+} from 'class-validator';
 import { ScaleType } from '#generated/prisma';
 
 export class CreateClinicalScaleDto {

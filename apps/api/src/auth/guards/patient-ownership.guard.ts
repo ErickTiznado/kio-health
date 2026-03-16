@@ -30,7 +30,9 @@ export class PatientOwnershipGuard implements CanActivate {
     }
 
     if (patient.clinicianId !== clinicianId) {
-      throw new ForbiddenException('No tienes permiso para acceder a este paciente');
+      throw new ForbiddenException(
+        'No tienes permiso para acceder a este paciente',
+      );
     }
 
     return true;

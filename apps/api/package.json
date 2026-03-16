@@ -29,22 +29,31 @@
     "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/serve-static": "^5.0.4",
     "@nestjs/throttler": "^6.5.0",
     "@prisma/adapter-pg": "^6.19.2",
     "@prisma/client": "^6.19.2",
+    "@sentry/nestjs": "^10.43.0",
+    "@sentry/node": "^10.43.0",
+    "@sentry/profiling-node": "^10.43.0",
+    "@sentry/react": "^10.43.0",
     "@types/cookie-parser": "^1.4.10",
+    "@types/multer": "^2.1.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.0.3",
+    "googleapis": "^171.4.0",
     "helmet": "^8.1.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pdfkit": "^0.17.2",
     "prisma": "^6.19.2",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "stripe": "^20.4.1",
+    "vite-plugin-pwa": "^1.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -59,6 +68,7 @@
     "@types/passport-jwt": "^4.0.1",
     "@types/pdfkit": "^0.17.5",
     "@types/supertest": "^6.0.2",
+    "@types/uuid": "^9.0.8",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
@@ -72,7 +82,8 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.20.0"
+    "typescript-eslint": "^8.20.0",
+    "uuid": "^9.0.1"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -89,7 +100,13 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "setupFiles": [
+      "<rootDir>/test/jest-setup.ts"
+    ],
+    "moduleNameMapper": {
+      "^#generated/prisma$": "<rootDir>/../prisma/generated/client/index.js"
+    }
   },
   "imports": {
     "#generated/prisma": "./prisma/generated/client/index.js"

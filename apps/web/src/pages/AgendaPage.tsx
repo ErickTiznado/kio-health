@@ -312,6 +312,7 @@ export function AgendaPage() {
             <button
               type="button"
               onClick={handleNewAppointmentClick}
+              data-tour="tour-schedule-btn"
               className="bg-kio hover:bg-kanji text-white px-5 py-2.5 rounded-[24px] text-sm font-bold shadow-sm transition-all active:scale-95 flex items-center gap-2 ml-1"
             >
               <Plus size={18} />
