@@ -52,6 +52,7 @@ export class AuthService {
       select: {
         id: true,
         email: true,
+        fullName: true,
         role: true,
         mustChangePassword: true,
         createdAt: true,
@@ -172,6 +173,7 @@ export class AuthService {
       select: {
         id: true,
         email: true,
+        fullName: true,
         role: true,
         mustChangePassword: true,
         createdAt: true,
@@ -265,6 +267,7 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: {
         email: dto.email.toLowerCase().trim(),
+        fullName: dto.fullName.trim(),
         passwordHash,
         role: 'CLINICIAN',
       },

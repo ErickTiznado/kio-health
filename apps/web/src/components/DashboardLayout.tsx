@@ -84,7 +84,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
     });
   };
 
-  const userName = user?.email?.split('@')[0] || 'Doctor';
+  const userName = user?.fullName || user?.email?.split('@')[0] || 'Doctor';
   const initials = userName.slice(0, 2).toUpperCase();
 
   // Determine current page label for breadcrumb

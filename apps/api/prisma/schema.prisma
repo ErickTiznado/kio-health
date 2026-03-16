@@ -104,6 +104,7 @@ enum ScaleRiskLevel {
 model User {
   id            String            @id @default(uuid()) @db.Uuid
   email         String            @unique
+  fullName           String?           @map("full_name")
   passwordHash       String            @map("password_hash")
   mustChangePassword Boolean           @default(false) @map("must_change_password")
   role               UserRole

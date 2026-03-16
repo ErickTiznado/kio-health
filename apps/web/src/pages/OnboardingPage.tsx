@@ -86,7 +86,7 @@ export function OnboardingPage() {
           </div>
           <h1 className="text-2xl font-bold text-kanji dark:text-white">Configura tu perfil</h1>
           <p className="text-text/60 dark:text-slate-400 text-sm mt-1">
-            Hola, <strong>{user?.email?.split('@')[0]}</strong> — solo necesitamos unos datos para empezar.
+            Hola, <strong>{user?.fullName || user?.email?.split('@')[0]}</strong> — solo necesitamos unos datos para empezar.
           </p>
         </div>
 
