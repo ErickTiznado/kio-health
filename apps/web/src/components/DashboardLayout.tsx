@@ -112,12 +112,11 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-5 border-b border-transparent dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl overflow-hidden shadow-sm">
+            <div className="w-14 h-14 rounded-xl overflow-hidden shadow-sm">
               <img src="/logo.png" alt="Kio Health" className="w-full h-full object-contain" />
             </div>
             <div>
-              <span className="font-bold text-kanji dark:text-kio text-lg">Kio</span>
-              <span className="text-gray-400 dark:text-kanji text-lg ml-0.5">Health</span>
+              <span className="text-gray-400 dark:text-kanji text-lg">Health</span>
             </div>
           </div>
           <button
