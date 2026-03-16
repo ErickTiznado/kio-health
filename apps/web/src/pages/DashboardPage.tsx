@@ -32,7 +32,7 @@ export function DashboardPage() {
     isTodayLoading,
   } = useDashboardData();
 
-  const userName = user?.email?.split('@')[0] ?? 'Doctor';
+  const userName = user?.fullName || user?.email?.split('@')[0] || 'Doctor';
 
   useEffect(() => {
     if (!hasCompletedTour) {
