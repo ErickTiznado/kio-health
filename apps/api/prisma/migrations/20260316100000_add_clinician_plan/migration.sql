@@ -1,9 +1,12 @@
--- CreateEnum
-CREATE TYPE "ClinicianPlan" AS ENUM ('INDIVIDUAL', 'CLINIC');
+-- CreateEnum (idempotent)
+DO $$ BEGIN
+  CREATE TYPE "ClinicianPlan" AS ENUM ('INDIVIDUAL', 'CLINIC');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- AlterTable
+-- AlterTable (idempotent)
 ALTER TABLE "clinician_profiles"
-  ADD COLUMN "plan" "ClinicianPlan" NOT NULL DEFAULT 'INDIVIDUAL';
+  ADD COLUMN IF NOT EXISTS "plan" "ClinicianPlan" NOT NULL DEFAULT 'INDIVIDUAL';
 
 -- Backfill: clinicians with existing clinic memberships → CLINIC
 UPDATE "clinician_profiles" cp
