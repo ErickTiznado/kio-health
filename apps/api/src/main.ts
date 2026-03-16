@@ -19,7 +19,7 @@ async function bootstrap() {
     : ['http://localhost:5173'];
 
   app.enableCors({
-    origin: (origin, callback) => {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       // Allow requests with no origin (mobile apps, curl, server-to-server)
       if (!origin) return callback(null, true);
       // Allow exact matches from ALLOWED_ORIGINS
