@@ -53,8 +53,8 @@ export function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo & Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-kio rounded-2xl mb-4 shadow-lg shadow-kio/20">
-            <span className="text-2xl font-bold text-white">K</span>
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-lg shadow-kio/20 overflow-hidden">
+            <img src="/logo.png" alt="Kio Health" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-3xl font-bold text-kanji dark:text-white">{t('auth.login_title')}</h1>
           <p className="text-text/60 dark:text-slate-400 mt-2">{t('auth.login_subtitle')}</p>
