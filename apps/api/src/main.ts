@@ -19,7 +19,17 @@ async function bootstrap() {
     : ['http://localhost:5173'];
 
   app.enableCors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      // Allow exact matches from ALLOWED_ORIGINS
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      // Allow Vercel preview deployments (*.vercel.app)
+      if (origin.endsWith('.vercel.app')) return callback(null, true);
+      // Allow localhost for development
+      if (origin.startsWith('http://localhost:')) return callback(null, true);
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type,Authorization',
     credentials: true,

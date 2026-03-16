@@ -12,7 +12,21 @@
       "Bash(npm run:*)",
       "Bash(npx tsc:*)",
       "mcp__claude_ai_Supabase__list_projects",
-      "mcp__claude_ai_Supabase__execute_sql"
+      "mcp__claude_ai_Supabase__execute_sql",
+      "Bash(echo:*)",
+      "Bash(npm install:*)",
+      "mcp__claude_ai_Supabase__restore_project",
+      "mcp__claude_ai_Supabase__apply_migration",
+      "mcp__claude_ai_Supabase__get_project",
+      "mcp__claude_ai_Supabase__list_tables",
+      "Bash(cd C:/Users/50370/Documents/GitHub/kio-health/apps/web && npx eslint src/stores/tour.store.ts src/components/ui/TourOverlay.tsx 2>&1)",
+      "Bash(cd C:/Users/50370/Documents/GitHub/kio-health/apps/web && npx eslint src/pages/DashboardPage.tsx src/pages/SettingsPage.tsx src/pages/PatientsPage.tsx src/pages/AgendaPage.tsx src/components/DashboardLayout.tsx src/App.tsx 2>&1)",
+      "Bash(ls -la \"C:\\\\Users\\\\50370\\\\Documents\\\\GitHub\\\\kio-health\\\\apps\\\\web\\\\src\\\\stores\\\\\" 2>/dev/null | tail -n +4 || echo \"stores directory not found\")",
+      "Bash(cd C:/Users/50370/Documents/GitHub/kio-health && npm test -w web 2>&1)",
+      "Bash(find:*)",
+      "Bash(npm test:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)"
     ]
   }
 }

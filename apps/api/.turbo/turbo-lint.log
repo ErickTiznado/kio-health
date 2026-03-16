@@ -1,0 +1,251 @@
+
+> api@0.0.1 lint
+> eslint "{src,apps,libs,test}/**/*.ts" --fix
+
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\appointments\appointments.controller.ts
+  111:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+  111:11  error    Unsafe member access .user on an `any` value                                        @typescript-eslint/no-unsafe-member-access
+  116:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  116:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+  117:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  117:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+  140:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+  140:11  error    Unsafe member access .user on an `any` value                                        @typescript-eslint/no-unsafe-member-access
+  145:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  145:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+  146:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  146:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+  149:5   error    Unsafe call of an `any` typed value                                                 @typescript-eslint/no-unsafe-call
+  149:9   error    Unsafe member access .set on an `any` value                                         @typescript-eslint/no-unsafe-member-access
+  155:5   error    Unsafe call of an `any` typed value                                                 @typescript-eslint/no-unsafe-call
+  155:9   error    Unsafe member access .end on an `any` value                                         @typescript-eslint/no-unsafe-member-access
+  216:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+  216:11  error    Unsafe member access .user on an `any` value                                        @typescript-eslint/no-unsafe-member-access
+  221:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  221:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+  222:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  222:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+  244:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+  244:11  error    Unsafe member access .user on an `any` value                                        @typescript-eslint/no-unsafe-member-access
+  249:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  249:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+  250:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  250:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\appointments\appointments.service.ts
+  339:9   error  Unsafe assignment of an `any` value               @typescript-eslint/no-unsafe-assignment
+  358:11  error  'appointment' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  372:7   error  Unsafe assignment of an `any` value               @typescript-eslint/no-unsafe-assignment
+  488:11  error  'appointment' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  540:7   error  Unsafe assignment of an `any` value               @typescript-eslint/no-unsafe-assignment
+  831:11  error  'appointment' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  851:11  error  'appointment' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\appointments\dto\create-psych-note.dto.ts
+   9:3   error  'ValidateNested' is defined but never used  @typescript-eslint/no-unused-vars
+  12:10  error  'Type' is defined but never used            @typescript-eslint/no-unused-vars
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\auth\auth.controller.ts
+   89:11  error    Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
+   95:49  warning  Unsafe argument of type `any` assigned to a parameter of type `string`  @typescript-eslint/no-unsafe-argument
+  105:11  error    Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
+  107:49  warning  Unsafe argument of type `any` assigned to a parameter of type `string`  @typescript-eslint/no-unsafe-argument
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\auth\auth.service.ts
+   90:32  error  '_m' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  198:32  error  '_m' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\auth\decorators\current-clinician.decorator.ts
+   9:11  error  Unsafe assignment of an `any` value                  @typescript-eslint/no-unsafe-assignment
+  10:11  error  Unsafe assignment of an `any` value                  @typescript-eslint/no-unsafe-assignment
+  10:26  error  Unsafe member access .user on an `any` value         @typescript-eslint/no-unsafe-member-access
+  12:24  error  Unsafe member access .clinicianId on an `any` value  @typescript-eslint/no-unsafe-member-access
+  18:5   error  Unsafe return of a value of type `any`               @typescript-eslint/no-unsafe-return
+  18:17  error  Unsafe member access .clinicianId on an `any` value  @typescript-eslint/no-unsafe-member-access
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\auth\decorators\current-user.decorator.ts
+  5:11  error  Unsafe assignment of an `any` value           @typescript-eslint/no-unsafe-assignment
+  6:5   error  Unsafe return of a value of type `any`        @typescript-eslint/no-unsafe-return
+  6:20  error  Unsafe member access .user on an `any` value  @typescript-eslint/no-unsafe-member-access
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\auth\guards\appointment-ownership.guard.ts
+  15:11  error  Unsafe assignment of an `any` value             @typescript-eslint/no-unsafe-assignment
+  16:11  error  Unsafe assignment of an `any` value             @typescript-eslint/no-unsafe-assignment
+  16:35  error  Unsafe member access .params on an `any` value  @typescript-eslint/no-unsafe-member-access
+  17:11  error  Unsafe assignment of an `any` value             @typescript-eslint/no-unsafe-assignment
+  17:33  error  Unsafe member access .user on an `any` value    @typescript-eslint/no-unsafe-member-access
+  24:16  error  Unsafe assignment of an `any` value             @typescript-eslint/no-unsafe-assignment
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\auth\guards\patient-ownership.guard.ts
+  15:11  error  Unsafe assignment of an `any` value             @typescript-eslint/no-unsafe-assignment
+  16:11  error  Unsafe assignment of an `any` value             @typescript-eslint/no-unsafe-assignment
+  16:31  error  Unsafe member access .params on an `any` value  @typescript-eslint/no-unsafe-member-access
+  17:11  error  Unsafe assignment of an `any` value             @typescript-eslint/no-unsafe-assignment
+  17:33  error  Unsafe member access .user on an `any` value    @typescript-eslint/no-unsafe-member-access
+  24:16  error  Unsafe assignment of an `any` value             @typescript-eslint/no-unsafe-assignment
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\auth\strategies\jwt.strategy.ts
+  13:27  error  Unsafe return of a value of type `any`  @typescript-eslint/no-unsafe-return
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\clinics\guards\clinic-admin.guard.ts
+  11:11  error  Unsafe assignment of an `any` value           @typescript-eslint/no-unsafe-assignment
+  12:26  error  Unsafe member access .user on an `any` value  @typescript-eslint/no-unsafe-member-access
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\clinics\guards\clinic-owner.guard.ts
+  11:11  error  Unsafe assignment of an `any` value           @typescript-eslint/no-unsafe-assignment
+  12:26  error  Unsafe member access .user on an `any` value  @typescript-eslint/no-unsafe-member-access
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\export\export.service.ts
+  21:34  error    'reject' is defined but never used                                      @typescript-eslint/no-unused-vars
+  62:15  error    Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
+  69:23  error    Unsafe member access .s on an `any` value                               @typescript-eslint/no-unsafe-member-access
+  73:11  error    Unsafe member access .s on an `any` value                               @typescript-eslint/no-unsafe-member-access
+  76:23  error    Unsafe member access .o on an `any` value                               @typescript-eslint/no-unsafe-member-access
+  80:11  error    Unsafe member access .o on an `any` value                               @typescript-eslint/no-unsafe-member-access
+  83:23  error    Unsafe member access .a on an `any` value                               @typescript-eslint/no-unsafe-member-access
+  87:11  error    Unsafe member access .a on an `any` value                               @typescript-eslint/no-unsafe-member-access
+  90:23  error    Unsafe member access .p on an `any` value                               @typescript-eslint/no-unsafe-member-access
+  94:11  error    Unsafe member access .p on an `any` value                               @typescript-eslint/no-unsafe-member-access
+  99:13  warning  Unsafe argument of type `any` assigned to a parameter of type `string`  @typescript-eslint/no-unsafe-argument
+  99:21  error    Unsafe member access .body on an `any` value                            @typescript-eslint/no-unsafe-member-access
+  99:37  error    Unsafe member access .notes on an `any` value                           @typescript-eslint/no-unsafe-member-access
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\finance\finance.service.ts
+    1:22  error  'NotFoundException' is defined but never used          @typescript-eslint/no-unused-vars
+  103:21  error  Unsafe member access .type on an `any` value           @typescript-eslint/no-unsafe-member-access
+  107:9   error  Unsafe assignment of an `any` value                    @typescript-eslint/no-unsafe-assignment
+  120:46  error  Unsafe assignment of an `any` value                    @typescript-eslint/no-unsafe-assignment
+  179:13  error  Unsafe assignment of an `any` value                    @typescript-eslint/no-unsafe-assignment
+  179:46  error  Unsafe member access .paymentMethod on an `any` value  @typescript-eslint/no-unsafe-member-access
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\finance\listeners\appointment-paid.listener.ts
+  12:11  error    Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
+  16:50  warning  Unsafe argument of type `any` assigned to a parameter of type `string`  @typescript-eslint/no-unsafe-argument
+  16:62  error    Unsafe member access .clinicianId on an `any` value                     @typescript-eslint/no-unsafe-member-access
+  19:34  error    Unsafe member access .price on an `any` value                           @typescript-eslint/no-unsafe-member-access
+  20:49  error    Unsafe member access .patient on an `any` value                         @typescript-eslint/no-unsafe-member-access
+  21:7   error    Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
+  21:34  error    Unsafe member access .id on an `any` value                              @typescript-eslint/no-unsafe-member-access
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\main.ts
+   6:7   error    Unsafe assignment of an `any` value                                                                                                                                 @typescript-eslint/no-unsafe-assignment
+  12:11  error    Unsafe call of an `any` typed value                                                                                                                                 @typescript-eslint/no-unsafe-call
+  52:1   warning  Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\patients\dto\create-patient.dto.ts
+   5:3   error    'IsDateString' is defined but never used                                                @typescript-eslint/no-unused-vars
+  30:47  warning  Unsafe argument of type `any` assigned to a parameter of type `string | number | Date`  @typescript-eslint/no-unsafe-argument
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\patients\patients.controller.ts
+   58:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+   58:12  error    Unsafe member access .userId on an `any` value                                      @typescript-eslint/no-unsafe-member-access
+   63:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+   63:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+   64:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+   64:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+   78:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+   78:12  error    Unsafe member access .userId on an `any` value                                      @typescript-eslint/no-unsafe-member-access
+   83:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+   83:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+   84:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+   84:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+   99:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+   99:12  error    Unsafe member access .userId on an `any` value                                      @typescript-eslint/no-unsafe-member-access
+  104:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  104:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+  105:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  105:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+  119:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+  119:12  error    Unsafe member access .userId on an `any` value                                      @typescript-eslint/no-unsafe-member-access
+  124:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  124:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+  125:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  125:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+  139:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+  139:12  error    Unsafe member access .userId on an `any` value                                      @typescript-eslint/no-unsafe-member-access
+  144:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  144:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+  145:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  145:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+  185:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+  185:12  error    Unsafe member access .userId on an `any` value                                      @typescript-eslint/no-unsafe-member-access
+  190:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  190:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+  191:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  191:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+  221:5   error    Unsafe call of an `any` typed value                                                 @typescript-eslint/no-unsafe-call
+  221:9   error    Unsafe member access .setHeader on an `any` value                                   @typescript-eslint/no-unsafe-member-access
+  222:5   error    Unsafe call of an `any` typed value                                                 @typescript-eslint/no-unsafe-call
+  222:9   error    Unsafe member access .setHeader on an `any` value                                   @typescript-eslint/no-unsafe-member-access
+  228:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+  228:12  error    Unsafe member access .userId on an `any` value                                      @typescript-eslint/no-unsafe-member-access
+  233:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  233:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+  234:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  234:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+  251:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+  251:12  error    Unsafe member access .userId on an `any` value                                      @typescript-eslint/no-unsafe-member-access
+  256:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  256:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+  257:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  257:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+  273:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+  273:12  error    Unsafe member access .userId on an `any` value                                      @typescript-eslint/no-unsafe-member-access
+  278:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  278:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+  279:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  279:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+  300:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+  300:12  error    Unsafe member access .userId on an `any` value                                      @typescript-eslint/no-unsafe-member-access
+  305:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  305:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+  306:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  306:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+  322:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+  322:12  error    Unsafe member access .userId on an `any` value                                      @typescript-eslint/no-unsafe-member-access
+  327:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  327:11  error    Unsafe member access .ip on an `any` value                                          @typescript-eslint/no-unsafe-member-access
+  328:7   warning  Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  328:11  error    Unsafe member access .headers on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\patients\patients.service.ts
+    4:3   error    'InternalServerErrorException' is defined but never used                @typescript-eslint/no-unused-vars
+  175:9   error    Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
+  321:11  error    Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
+  323:16  error    Unsafe member access .diagnosis on an `any` value                       @typescript-eslint/no-unsafe-member-access
+  324:14  error    Unsafe member access .diagnosis on an `any` value                       @typescript-eslint/no-unsafe-member-access
+  324:57  warning  Unsafe argument of type `any` assigned to a parameter of type `string`  @typescript-eslint/no-unsafe-argument
+  324:64  error    Unsafe member access .diagnosis on an `any` value                       @typescript-eslint/no-unsafe-member-access
+  326:16  error    Unsafe member access .clinicalContext on an `any` value                 @typescript-eslint/no-unsafe-member-access
+  327:14  error    Unsafe member access .clinicalContext on an `any` value                 @typescript-eslint/no-unsafe-member-access
+  328:9   warning  Unsafe argument of type `any` assigned to a parameter of type `string`  @typescript-eslint/no-unsafe-argument
+  328:16  error    Unsafe member access .clinicalContext on an `any` value                 @typescript-eslint/no-unsafe-member-access
+  331:16  error    Unsafe member access .contactPhone on an `any` value                    @typescript-eslint/no-unsafe-member-access
+  332:14  error    Unsafe member access .contactPhone on an `any` value                    @typescript-eslint/no-unsafe-member-access
+  332:60  warning  Unsafe argument of type `any` assigned to a parameter of type `string`  @typescript-eslint/no-unsafe-argument
+  332:67  error    Unsafe member access .contactPhone on an `any` value                    @typescript-eslint/no-unsafe-member-access
+  334:16  error    Unsafe member access .emergencyContact on an `any` value                @typescript-eslint/no-unsafe-member-access
+  336:16  error    Unsafe member access .emergencyContact on an `any` value                @typescript-eslint/no-unsafe-member-access
+  338:7   error    Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
+  338:14  error    Unsafe member access .emergencyContact on an `any` value                @typescript-eslint/no-unsafe-member-access
+  341:5   error    Unsafe return of a value of type `any`                                  @typescript-eslint/no-unsafe-return
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\search\search.controller.ts
+   5:10  error  'User' is defined but never used                   @typescript-eslint/no-unused-vars
+  48:9   error  Unsafe assignment of an `any` value                @typescript-eslint/no-unsafe-assignment
+  48:15  error  Unsafe member access .id on an `any` value         @typescript-eslint/no-unsafe-member-access
+  49:21  error  Unsafe member access .reason on an `any` value     @typescript-eslint/no-unsafe-member-access
+  49:35  error  Unsafe member access .patient on an `any` value    @typescript-eslint/no-unsafe-member-access
+  50:9   error  Unsafe assignment of an `any` value                @typescript-eslint/no-unsafe-assignment
+  50:22  error  Unsafe member access .startTime on an `any` value  @typescript-eslint/no-unsafe-member-access
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\tasks\tasks.service.ts
+  1:22  error  'NotFoundException' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\50370\Documents\GitHub\kio-health\apps\api\src\users\dto\update-profile.dto.ts
+  21:5  error  Unsafe return of a value of type `any`  @typescript-eslint/no-unsafe-return
+  32:5  error  Unsafe return of a value of type `any`  @typescript-eslint/no-unsafe-return
+
+✖ 200 problems (146 errors, 54 warnings)
+
