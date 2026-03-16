@@ -6,7 +6,6 @@ import {
   useMyClinic,
   useClinicInvitations,
   useClinicPatients,
-  useClinicFinance,
   useCreateInvitation,
   useRevokeInvitation,
   useCreateMemberAccount,
@@ -18,7 +17,6 @@ import {
   Building2,
   Users,
   Mail,
-  DollarSign,
   Copy,
   Trash2,
   Shield,
@@ -27,17 +25,8 @@ import {
   Check,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
 
-type Tab = 'members' | 'invitations' | 'patients' | 'finance';
+type Tab = 'members' | 'invitations' | 'patients';
 
 const ROLE_LABELS: Record<ClinicRole, string> = {
   OWNER: 'Propietario',
@@ -56,14 +45,9 @@ export default function ClinicPage() {
   const [activeTab, setActiveTab] = useState<Tab>('members');
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
 
-  const now = new Date();
-  const [financeMonth, setFinanceMonth] = useState(now.getMonth() + 1);
-  const [financeYear, setFinanceYear] = useState(now.getFullYear());
-
   const { data: clinic, isLoading } = useMyClinic();
   const { data: invitations } = useClinicInvitations();
   const { data: patients } = useClinicPatients();
-  const { data: finance } = useClinicFinance(financeMonth, financeYear);
 
   const createInvitationMutation = useCreateInvitation();
   const revokeInvitationMutation = useRevokeInvitation();
@@ -108,7 +92,6 @@ export default function ClinicPage() {
     { id: 'members', label: 'Miembros', icon: Users },
     { id: 'invitations', label: 'Invitaciones', icon: Mail },
     { id: 'patients', label: 'Pacientes', icon: Shield },
-    { id: 'finance', label: 'Finanzas', icon: DollarSign },
   ];
 
   if (isLoading) {
@@ -394,76 +377,6 @@ export default function ClinicPage() {
           </div>
         )}
 
-        {/* Finance Tab */}
-        {activeTab === 'finance' && (
-          <div className="space-y-6">
-            {/* Month/Year selector */}
-            <div className="flex items-center gap-3">
-              <select
-                value={financeMonth}
-                onChange={(e) => setFinanceMonth(Number(e.target.value))}
-                className="px-3 py-2 rounded-xl border border-cruz dark:border-slate-700 bg-bg dark:bg-slate-800 text-kanji dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-kio/50"
-              >
-                {Array.from({ length: 12 }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {new Date(2000, i, 1).toLocaleDateString('es', { month: 'long' })}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                value={financeYear}
-                onChange={(e) => setFinanceYear(Number(e.target.value))}
-                min={2020}
-                max={2030}
-                className="w-24 px-3 py-2 rounded-xl border border-cruz dark:border-slate-700 bg-bg dark:bg-slate-800 text-kanji dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-kio/50"
-              />
-            </div>
-
-            {finance && finance.length > 0 ? (
-              <div className="bg-surface dark:bg-slate-900 rounded-xl border border-cruz dark:border-slate-800 p-5">
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={finance.map((f) => ({ name: f.email.split('@')[0], Ingresos: f.income, Gastos: f.expense }))}>
-                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                    <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="Ingresos" fill="#ae93fe" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="Gastos" fill="#f87171" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-
-                <div className="mt-4 space-y-2">
-                  {finance.map((f) => (
-                    <div
-                      key={f.clinicianId}
-                      className="flex items-center justify-between p-3 rounded-lg bg-bg dark:bg-slate-800/50"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-kanji dark:text-white">{f.email}</p>
-                        <span className={`text-xs ${ROLE_BADGE[f.role]} px-1.5 py-0.5 rounded`}>
-                          {ROLE_LABELS[f.role]}
-                        </span>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
-                          +{f.income.toFixed(2)}
-                        </p>
-                        <p className="text-xs text-red-500 dark:text-red-400">
-                          -{f.expense.toFixed(2)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm text-text/50 dark:text-slate-400">
-                No hay datos financieros para este período.
-              </p>
-            )}
-          </div>
-        )}
       </div>
     </DashboardLayout>
   );

@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   Calendar,
   Users,
-  BookOpen,
   Ruler,
   Settings,
   LogOut,
@@ -38,7 +37,6 @@ const PSYCHOLOGIST_NAV: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, tourId: 'sidebar-dashboard' },
   { to: '/patients', label: 'Pacientes', icon: <Users size={20} />, tourId: 'sidebar-patients' },
   { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} />, tourId: 'sidebar-agenda' },
-  { to: '/bitacora', label: 'Bitácora', icon: <BookOpen size={20} /> },
   { to: '/finance', label: 'Finanzas', icon: <DollarSign size={20} />, tourId: 'sidebar-finance' },
 ];
 
