@@ -115,7 +115,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
             <div className="w-16 h-16 rounded-xl overflow-hidden">
               <img src="/logo.png" alt="Kio Health" className="w-full h-full object-contain" />
             </div>
-            <span className="text-gray-400 dark:text-kanji text-lg -ml-1">Health</span>
+            <span className="text-gray-400 dark:text-kanji text-lg ml-1">Health</span>
           </div>
           <button
             type="button"
