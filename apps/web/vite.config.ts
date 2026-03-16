@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['kio.svg'],
+      includeAssets: ['logo.png'],
       manifest: {
         name: 'Kio Health',
         short_name: 'Kio',
@@ -16,14 +16,14 @@ export default defineConfig({
         theme_color: '#ffffff',
         icons: [
           {
-            src: 'kio.svg',
+            src: 'logo.png',
             sizes: '192x192',
-            type: 'image/svg+xml'
+            type: 'image/png'
           },
           {
-            src: 'kio.svg',
+            src: 'logo.png',
             sizes: '512x512',
-            type: 'image/svg+xml'
+            type: 'image/png'
           }
         ]
       }
