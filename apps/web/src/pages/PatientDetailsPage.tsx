@@ -76,7 +76,7 @@ export default function PatientDetailsPage() {
     if (isLoading) {
         return (
             <DashboardLayout>
-                <div className="flex flex-col h-[calc(100vh-64px)] -m-6 bg-bg dark:bg-slate-950 p-8">
+                <div className="flex flex-col h-[calc(100vh-64px)] -m-4 sm:-m-6 bg-bg dark:bg-slate-950 p-4 sm:p-6 md:p-8">
                     <div className="h-32 bg-gray-100 dark:bg-slate-800 rounded-2xl animate-pulse mb-8"></div>
                     <div className="grid grid-cols-3 gap-6">
                         <div className="col-span-2 h-96 bg-gray-100 dark:bg-slate-800 rounded-2xl animate-pulse"></div>
@@ -111,7 +111,7 @@ export default function PatientDetailsPage() {
 
     return (
         <DashboardLayout>
-            <div className="flex flex-col h-[calc(100vh-64px)] -m-6 bg-bg dark:bg-slate-950 overflow-hidden">
+            <div className="flex flex-col h-[calc(100vh-64px)] -m-4 sm:-m-6 bg-bg dark:bg-slate-950 overflow-hidden">
 
                 {/* Sticky Header */}
                 <motion.div
@@ -119,7 +119,7 @@ export default function PatientDetailsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="sticky top-0 z-30 bg-surface/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-[var(--color-cruz)] dark:border-slate-800 shadow-sm"
                 >
-                    <div className="px-8 pt-6 pb-2">
+                    <div className="px-4 pt-4 pb-2 sm:px-6 sm:pt-5 md:px-8 md:pt-6">
                         {/* Top Row: Back & Actions */}
                         <div className="flex justify-between items-start mb-4">
                             <button
@@ -197,7 +197,7 @@ export default function PatientDetailsPage() {
                         </div>
 
                         {/* Tabs */}
-                        <div className="flex items-center gap-8">
+                        <div className="flex items-center gap-4 sm:gap-6 md:gap-8 overflow-x-auto whitespace-nowrap">
                             {TABS.map((tab) => (
                                 <button
                                     key={tab.id}
@@ -222,7 +222,7 @@ export default function PatientDetailsPage() {
                 </motion.div>
 
                 {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-slate-950 p-8">
+                <div className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-slate-950 p-4 sm:p-6 md:p-8">
                     <AnimatePresence mode="wait">
 
                         {/* TAB: Historia Clínica */}

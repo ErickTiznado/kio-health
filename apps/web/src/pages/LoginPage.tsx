@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/auth.store';
 import { loginSchema, type LoginFormData } from '../schemas/auth.schemas';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getErrorMessage } from '../lib/errors';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -41,11 +42,7 @@ export function LoginPage() {
         navigate('/onboarding', { replace: true });
       }
     } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Credenciales inválidas. Por favor intenta de nuevo.';
-      setServerError(message);
+      setServerError(getErrorMessage(error, 'Credenciales inválidas. Por favor intenta de nuevo.'));
     }
   };
 
@@ -53,8 +50,8 @@ export function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-bg via-bg to-kio/5 dark:from-slate-950 dark:via-slate-950 dark:to-kio/10 px-4">
       <div className="w-full max-w-md">
         {/* Logo & Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-44 h-44 rounded-2xl mb-4 overflow-hidden">
+        <div className="text-center mb-5 sm:mb-8">
+          <div className="inline-flex items-center justify-center w-28 h-28 sm:w-36 sm:h-36 rounded-2xl mb-4 overflow-hidden">
             <img src="/logo.png" alt="Kio Health" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-3xl font-bold text-kanji dark:text-white">{t('auth.login_title')}</h1>
@@ -64,7 +61,7 @@ export function LoginPage() {
         {/* Login Form */}
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-black/5 dark:shadow-black/20 border border-cruz/50 dark:border-slate-800 p-8"
+          className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-black/5 dark:shadow-black/20 border border-cruz/50 dark:border-slate-800 p-6 sm:p-8"
         >
           {/* Server Error */}
           {serverError && (

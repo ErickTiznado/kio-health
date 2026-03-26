@@ -52,7 +52,7 @@ export function DashboardPage() {
       <div className="max-w-7xl mx-auto pb-10 space-y-0">
 
         {/* HEADER */}
-        <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
           <div>
             <p className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
               {formatDateHeader()}
@@ -88,7 +88,7 @@ export function DashboardPage() {
               />
 
               {/* CALENDAR & ATTENTION (4/12) */}
-              <div className="col-span-12 lg:col-span-4 flex flex-col">
+              <div className="col-span-12 md:col-span-5 lg:col-span-4 flex flex-col">
                 <AvailabilityWidget days={calendarDays} />
                 <PendingNotesWidget count={pendingNotesCount} />
               </div>
@@ -97,10 +97,10 @@ export function DashboardPage() {
         </div>
 
         {/* MAIN CONTENT AREA */}
-        <div className="grid grid-cols-12 gap-4 xl:gap-6 px-4 mt-6 pb-10">
+        <div className="grid grid-cols-12 gap-3 md:gap-4 xl:gap-6 px-4 mt-6 pb-10">
           <RecentPatientsWidget patients={recentPatients} />
 
-          <div className="col-span-12 lg:col-span-5 flex flex-col gap-4 xl:gap-6 h-full">
+          <div className="col-span-12 md:col-span-6 lg:col-span-5 flex flex-col gap-4 xl:gap-6 h-full">
             <div className="flex-1 min-h-0">
               <TodayAgendaWidget appointments={todayAppointments} isLoading={isTodayLoading} />
             </div>

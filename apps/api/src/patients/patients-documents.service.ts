@@ -15,18 +15,26 @@ const SIGNED_URL_EXPIRY = 60 * 60; // 1 hour
 
 @Injectable()
 export class PatientDocumentsService {
-  private readonly storage: StorageClient;
+  private readonly storage: StorageClient | undefined;
 
   constructor(private readonly prisma: PrismaService) {
     const url = process.env.SUPABASE_URL;
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!url || !key) {
-      throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required');
+    if (url && key) {
+      this.storage = new StorageClient(`${url}/storage/v1`, {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      });
     }
-    this.storage = new StorageClient(`${url}/storage/v1`, {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-    });
+  }
+
+  private getStorage(): StorageClient {
+    if (!this.storage) {
+      throw new InternalServerErrorException(
+        'Document storage is not configured (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY missing)',
+      );
+    }
+    return this.storage;
   }
 
   async uploadDocument(
@@ -40,7 +48,7 @@ export class PatientDocumentsService {
     const ext = extname(file.originalname);
     const storagePath = `${clinicianId}/${patientId}/${uuidv4()}${ext}`;
 
-    const { error } = await this.storage
+    const { error } = await this.getStorage()
       .from(BUCKET)
       .upload(storagePath, file.buffer, { contentType: file.mimetype });
 
@@ -99,7 +107,7 @@ export class PatientDocumentsService {
 
     if (!doc) throw new NotFoundException('Documento no encontrado');
 
-    const { data, error } = await this.storage
+    const { data, error } = await this.getStorage()
       .from(BUCKET)
       .createSignedUrl(doc.fileName, SIGNED_URL_EXPIRY);
 
@@ -121,7 +129,7 @@ export class PatientDocumentsService {
 
     await this.prisma.patientDocument.delete({ where: { id: docId } });
 
-    await this.storage.from(BUCKET).remove([doc.fileName]);
+    await this.getStorage().from(BUCKET).remove([doc.fileName]);
   }
 
   private async assertPatientOwnership(patientId: string, clinicianId: string) {

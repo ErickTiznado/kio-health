@@ -2,8 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { User, Loader2, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-
-import { toast } from 'sonner';
 import { api } from '../../../lib/api';
 
 interface WaitlistPatient {
@@ -13,7 +11,11 @@ interface WaitlistPatient {
   updatedAt: string;
 }
 
-export function WaitlistPanel() {
+interface WaitlistPanelProps {
+  onPromote: (patient: { id: string; fullName: string }) => void;
+}
+
+export function WaitlistPanel({ onPromote }: WaitlistPanelProps) {
   const { data: waitlist = [], isLoading } = useQuery({
     queryKey: ['patients', 'waitlist'],
     queryFn: async () => {
@@ -55,12 +57,11 @@ export function WaitlistPanel() {
               </div>
               <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-2 truncate">{patient.contactPhone}</p>
               
-              <button 
+              <button
                 className="w-full bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-500 dark:hover:bg-amber-600 text-amber-700 dark:text-amber-200 hover:text-white text-[10px] font-bold py-1.5 rounded transition-colors flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 absolute bottom-2 left-2 right-2 width-auto"
                 onClick={(e) => {
-                    e.stopPropagation();
-                    // Open Promote Modal logic here (TODO)
-                    toast.info('Funcionalidad de promover paciente próximamente');
+                  e.stopPropagation();
+                  onPromote({ id: patient.id, fullName: patient.fullName });
                 }}
               >
                 Promover a Cita <ArrowRight size={10} />

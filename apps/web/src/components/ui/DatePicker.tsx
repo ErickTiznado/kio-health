@@ -1,19 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { 
-  format, 
-  subMonths, 
-  addMonths, 
-  startOfMonth, 
-  endOfMonth, 
-  eachDayOfInterval, 
-  isSameMonth, 
-  isSameDay, 
+import {
+  format,
+  subMonths,
+  addMonths,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
   isToday,
   setYear,
   getYear,
   startOfWeek,
-  endOfWeek
+  endOfWeek,
+  parse,
+  isValid
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -42,14 +44,56 @@ export function DatePicker({
   const [viewDate, setViewDate] = useState(value ? new Date(value) : new Date());
   const [mode, setMode] = useState<'day' | 'year'>('day');
   const [position, setPosition] = useState({ top: 0, left: 0, width: 320 });
+  const [inputText, setInputText] = useState(() =>
+    value ? format(new Date(value), 'dd/MM/yyyy') : ''
+  );
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Update view if value changes externally
+  // Update view and input if value changes externally
   useEffect(() => {
     if (value) {
-      setViewDate(new Date(value));
+      const d = new Date(value);
+      setViewDate(d);
+      setInputText(format(d, 'dd/MM/yyyy'));
+    } else {
+      setInputText('');
     }
   }, [value]);
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 8);
+
+    let formatted = digits;
+    if (digits.length > 4) {
+      formatted = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+    } else if (digits.length > 2) {
+      formatted = digits.slice(0, 2) + '/' + digits.slice(2);
+    }
+
+    setInputText(formatted);
+
+    if (digits.length === 8) {
+      const parsed = parse(formatted, 'dd/MM/yyyy', new Date());
+      if (isValid(parsed)) {
+        onChange(parsed);
+        setViewDate(parsed);
+      }
+    } else if (digits.length === 0) {
+      onChange(undefined);
+    }
+  };
+
+  const handleTextBlur = () => {
+    const digits = inputText.replace(/\D/g, '');
+    if (digits.length > 0 && digits.length < 8) {
+      // Partial input — restore last valid value or clear
+      if (value) {
+        setInputText(format(new Date(value), 'dd/MM/yyyy'));
+      } else {
+        setInputText('');
+      }
+    }
+  };
 
   // Handle positioning
   useEffect(() => {
@@ -111,12 +155,14 @@ export function DatePicker({
   };
 
   const handleDaySelect = (day: Date) => {
+    setInputText(format(day, 'dd/MM/yyyy'));
     onChange(day);
     setIsOpen(false);
   };
 
   const clearDate = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setInputText('');
     onChange(undefined);
   };
 
@@ -134,43 +180,47 @@ export function DatePicker({
   const currentYear = getYear(new Date());
   const years = Array.from({ length: 110 }, (_, i) => currentYear - 100 + i).reverse();
 
-  const formattedDate = selectedDate 
-    ? format(selectedDate, "dd 'de' MMMM, yyyy", { locale: es })
-    : "";
-
   return (
     <div className={`relative ${className}`} ref={containerRef}>
       {label && <label className="block text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-1">{label}</label>}
       
       {/* Input Trigger */}
-      <div 
-        onClick={() => !disabled && setIsOpen(!isOpen)}
+      <div
         className={`
-          relative w-full cursor-pointer group flex items-center
-          border-b-2 py-3 text-lg font-medium transition-colors duration-300
-          ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
+          relative w-full flex items-center
+          border-b-2 transition-colors duration-300
+          ${disabled ? 'opacity-50' : ''}
           ${isOpen || selectedDate ? 'border-kio dark:border-kio' : 'border-gray-200 dark:border-slate-700'}
           ${error ? 'border-rose-500 dark:border-rose-500' : ''}
         `}
       >
-        <CalendarIcon 
-          size={20} 
-          className={`
-            absolute left-0 top-3.5 transition-colors
-            ${isOpen || selectedDate ? 'text-kio' : 'text-gray-400 dark:text-slate-600'}
-          `} 
+        <button
+          type="button"
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          disabled={disabled}
+          className="absolute left-0 top-3 p-0 focus:outline-none"
+          tabIndex={-1}
+        >
+          <CalendarIcon
+            size={20}
+            className={`transition-colors ${isOpen || selectedDate ? 'text-kio' : 'text-gray-400 dark:text-slate-600'}`}
+          />
+        </button>
+
+        <input
+          type="text"
+          value={inputText}
+          onChange={handleTextChange}
+          onBlur={handleTextBlur}
+          disabled={disabled}
+          placeholder={placeholder || 'dd/mm/aaaa'}
+          maxLength={10}
+          className="pl-8 pr-8 w-full bg-transparent py-3 text-lg font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none"
         />
-        
-        <div className={`pl-8 w-full ${!selectedDate ? 'text-gray-400 dark:text-slate-500' : 'text-gray-900 dark:text-white'}`}>
-          {selectedDate ? (
-            <span className="capitalize">{formattedDate}</span>
-          ) : (
-            <span>{placeholder}</span>
-          )}
-        </div>
 
         {selectedDate && !disabled && (
-          <button 
+          <button
+            type="button"
             onClick={clearDate}
             className="absolute right-0 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 hover:text-rose-500 transition-colors"
           >

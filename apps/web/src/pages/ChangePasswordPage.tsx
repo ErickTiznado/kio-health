@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useAuthStore } from '../stores/auth.store';
 import { api } from '../lib/api';
 import { toast } from 'sonner';
+import { getErrorMessage } from '../lib/errors';
 import { KeyRound, Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react';
 
 type FormData = {
@@ -49,9 +50,7 @@ export function ChangePasswordPage() {
         navigate('/onboarding', { replace: true });
       }
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'No se pudo actualizar la contraseña.';
-      toast.error(message);
+      toast.error(getErrorMessage(err, 'No se pudo actualizar la contraseña.'));
       setIsSubmitting(false);
     }
   });

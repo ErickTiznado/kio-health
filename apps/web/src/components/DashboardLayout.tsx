@@ -199,7 +199,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col lg:ml-60 xl:ml-64 transition-all duration-200">
         {/* Top Header */}
-        <header className="h-16 bg-surface dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-6 sticky top-0 z-20 transition-colors duration-200">
+        <header className="h-16 bg-surface dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-20 transition-colors duration-200">
           {/* Hamburger + Breadcrumb */}
           <div className="flex items-center gap-3 text-sm">
             <button
@@ -252,7 +252,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-6 overflow-auto">{children}</main>
+        <main className="flex-1 p-4 sm:p-6 overflow-auto">{children}</main>
 
         {/* Global Modals */}
         <PatientModal 

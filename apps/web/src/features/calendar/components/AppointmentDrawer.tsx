@@ -122,7 +122,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
 
       {/* Drawer Panel */}
       <aside
-        className={`fixed top-0 right-0 h-full w-[420px] bg-surface/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-0 right-0 h-full w-full sm:w-[420px] bg-surface/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
       >
         {/* Header — Patient Hero */}

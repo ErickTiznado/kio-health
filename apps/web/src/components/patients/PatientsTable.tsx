@@ -164,10 +164,10 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
   return (
     <div className="space-y-3">
       {/* Table Header - Sutil y Minimalista */}
-      <div className="grid grid-cols-[2fr_1fr_1fr_48px] px-6 py-2 text-xs font-bold text-gray-500 dark:text-slate-500 opacity-50 uppercase tracking-widest">
+      <div className="grid grid-cols-[2fr_1fr_48px] md:grid-cols-[2fr_1fr_1fr_48px] px-6 py-2 text-xs font-bold text-gray-500 dark:text-slate-500 opacity-50 uppercase tracking-widest">
         <div>Paciente</div>
         <div>Estado</div>
-        <div>Próxima Cita</div>
+        <div className="hidden md:block">Próxima Cita</div>
         <div></div>
       </div>
 
@@ -184,7 +184,7 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
             onClick={() => onView(patient)}
           >
             {/* Columns Grid */}
-            <div className="grid grid-cols-[2fr_1fr_1fr_48px] items-center w-full gap-4">
+            <div className="grid grid-cols-[2fr_1fr_48px] md:grid-cols-[2fr_1fr_1fr_48px] items-center w-full gap-4">
 
               {/* Name & Avatar */}
               <div className="flex items-center gap-4">
@@ -216,7 +216,7 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
               </div>
 
               {/* Next Appointment */}
-              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400 font-medium">
+              <div className="hidden md:flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400 font-medium">
                 {patient.appointments && patient.appointments.length > 0 ? (
                   <>
                     <Calendar size={14} className="text-kanji dark:text-kio opacity-60" />

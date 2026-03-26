@@ -26,7 +26,8 @@
       "Bash(find:*)",
       "Bash(npm test:*)",
       "Bash(ls:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "mcp__claude_ai_Supabase__get_project_url"
     ]
   }
 }

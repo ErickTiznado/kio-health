@@ -183,7 +183,7 @@ export const SessionCheckoutModal = ({
                 <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                   Método de Pago
                 </label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <button
                     type="button"
                     onClick={() => setMethod('CASH')}
@@ -227,7 +227,7 @@ export const SessionCheckoutModal = ({
                 <CalendarPlus size={14} />
                 Próxima Cita
               </label>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {([
                   ['1w', '1 Semana'],
                   ['15d', '15 Días'],

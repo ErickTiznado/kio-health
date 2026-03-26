@@ -96,7 +96,7 @@ export default function PatientsPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-[calc(100vh-64px)] -m-6">
+      <div className="flex flex-col h-[calc(100vh-64px)] -m-4 sm:-m-6">
         
         {/* Header Block - Fijo y unificado */}
         <motion.div 
@@ -106,7 +106,7 @@ export default function PatientsPage() {
           className="relative z-30 bg-surface/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 shadow-sm"
         >
           {/* Top Bar: Título y Acciones */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-8 pt-6 pb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 pt-4 pb-3 sm:px-6 sm:pt-5 sm:pb-4 md:px-8 md:pt-6">
             <div className="flex flex-col gap-1 w-full sm:w-auto">
               <h1 className="text-2xl font-bold text-kanji dark:text-kio tracking-tight">Pacientes</h1>
               <p className="text-sm text-gray-500 dark:text-slate-400 opacity-60 font-medium">
@@ -147,7 +147,7 @@ export default function PatientsPage() {
           </div>
 
           {/* Tabs Bar - Integrada en el Header */}
-          <div className="px-8 flex items-center gap-8 w-full overflow-x-auto no-scrollbar">
+          <div className="px-4 sm:px-6 md:px-8 flex items-center gap-8 w-full overflow-x-auto no-scrollbar">
               {TABS.map((tab) => (
                 <button
                   key={tab.id}
@@ -173,7 +173,7 @@ export default function PatientsPage() {
         </motion.div>
 
         {/* Content Area - Scrollable */}
-        <div className="flex-1 px-8 py-6 overflow-y-auto">
+        <div className="flex-1 px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 overflow-y-auto">
           <PatientsTable
             patients={filteredPatients}
             isLoading={isLoading}

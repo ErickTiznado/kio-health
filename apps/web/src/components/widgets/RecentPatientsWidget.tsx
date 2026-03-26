@@ -17,7 +17,7 @@ export function RecentPatientsWidget({ patients }: RecentPatientsWidgetProps) {
   const navigate = useNavigate();
 
   return (
-    <div className="col-span-12 lg:col-span-7 h-full">
+    <div className="col-span-12 md:col-span-6 lg:col-span-7 h-full">
       <div className="bg-surface dark:bg-slate-900 rounded-[40px] p-6 lg:p-8 shadow-sm border border-gray-100 dark:border-slate-800 h-full flex flex-col transition-colors duration-200">
         <div className="flex items-center justify-between mb-6 shrink-0">
           <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-3 text-lg transition-colors">

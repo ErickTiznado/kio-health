@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { api } from '../lib/api';
+import { getErrorMessage } from '../lib/errors';
 import type { User } from '../types/auth.types';
 
 interface AuthState {
@@ -44,10 +45,7 @@ export const useAuthStore = create<AuthStore>()(
             error: null,
           });
         } catch (error: unknown) {
-          const errorMessage =
-            error instanceof Error
-              ? error.message
-              : 'El registro falló. Por favor intenta de nuevo.';
+          const errorMessage = getErrorMessage(error, 'El registro falló. Por favor intenta de nuevo.');
 
           set({
             user: null,
@@ -74,10 +72,7 @@ export const useAuthStore = create<AuthStore>()(
             error: null,
           });
         } catch (error: unknown) {
-          const errorMessage =
-            error instanceof Error
-              ? error.message
-              : 'Login failed. Please check your credentials.';
+          const errorMessage = getErrorMessage(error, 'Credenciales inválidas. Verifica tus datos.');
 
           set({
             user: null,

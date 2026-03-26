@@ -36,13 +36,9 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Algo salió mal</h1>
             <p className="text-gray-500 dark:text-slate-400 mb-8 text-sm leading-relaxed">
-              Ha ocurrido un error inesperado. Por favor, intenta recargar la página.
+              Ha ocurrido un error inesperado. Por favor, intenta recargar la página.<br />
+              Si el problema persiste, contacta a soporte.
             </p>
-            {this.state.error && (
-              <pre className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl text-[10px] text-left text-gray-600 dark:text-slate-400 overflow-auto max-h-32 mb-6 border border-gray-100 dark:border-slate-700">
-                {this.state.error.message}
-              </pre>
-            )}
             <button
               onClick={() => window.location.reload()}
               className="w-full bg-kanji text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"

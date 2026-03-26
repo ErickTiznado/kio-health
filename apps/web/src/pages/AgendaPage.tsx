@@ -11,10 +11,12 @@ import { DailyCalendarGrid } from '../features/calendar/components/DailyCalendar
 import { AppointmentDrawer } from '../features/calendar/components/AppointmentDrawer';
 import { ScheduleAppointmentModal } from '../features/calendar/components/ScheduleAppointmentModal';
 import { PaymentModal } from '../features/calendar/components/PaymentModal';
+import { WaitlistPanel } from '../features/calendar/components/WaitlistPanel';
 import { fetchAppointmentsByRange, rescheduleAppointment, cancelAppointment } from '../lib/appointments.api';
 import type { Appointment } from '../types/appointments.types';
 import type { CalendarView } from '../types/agenda.types';
 import { toast } from 'sonner';
+import { getErrorMessage } from '../lib/errors';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDocumentTitle } from '../hooks/use-document-title';
 
@@ -33,6 +35,7 @@ export function AgendaPage() {
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [scheduleSlot, setScheduleSlot] = useState<Date | null>(null);
+  const [waitlistPatient, setWaitlistPatient] = useState<{ id: string; fullName: string } | null>(null);
   const [rescheduleAppointmentInfo, setRescheduleAppointmentInfo] = useState<Appointment | null>(null);
   const [paymentAppointment, setPaymentAppointment] = useState<Appointment | null>(null);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
@@ -144,6 +147,19 @@ export function AgendaPage() {
 
   const handleCloseSchedule = useCallback(() => {
     setScheduleSlot(null);
+    setWaitlistPatient(null);
+  }, []);
+
+  const handlePromoteWaitlistPatient = useCallback((patient: { id: string; fullName: string }) => {
+    const now = new Date();
+    const rounded = new Date(now);
+    if (now.getMinutes() < 30) {
+      rounded.setMinutes(30, 0, 0);
+    } else {
+      rounded.setHours(rounded.getHours() + 1, 0, 0, 0);
+    }
+    setWaitlistPatient(patient);
+    setScheduleSlot(rounded);
   }, []);
 
   const handleNewAppointmentClick = useCallback(() => {
@@ -166,9 +182,8 @@ export function AgendaPage() {
       toast.success('Cita reagendada correctamente');
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || 'Error al reagendar cita';
-      toast.error(message);
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, 'Error al reagendar la cita'));
     },
   });
 
@@ -187,9 +202,8 @@ export function AgendaPage() {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
       setIsDrawerOpen(false);
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || 'Error al cancelar cita';
-      toast.error(message);
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, 'Error al cancelar la cita'));
     },
   });
 
@@ -214,9 +228,9 @@ export function AgendaPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-[calc(100vh-64px)] -m-6">
+      <div className="flex flex-col h-[calc(100vh-64px)] -m-4 sm:-m-6">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 pt-4 pb-3 border-b border-gray-200 dark:border-slate-800 bg-surface dark:bg-slate-900 sticky  z-30">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 sm:px-6 pt-4 pb-3 border-b border-gray-200 dark:border-slate-800 bg-surface dark:bg-slate-900 sticky  z-30">
           <div>
             <h1 className="text-2xl font-bold text-kanji dark:text-kio tracking-tight">Mi Agenda</h1>
             <p className="text-sm text-gray-500 dark:text-slate-400 opacity-60 mt-0.5 capitalize">{dateLabel}</p>
@@ -224,7 +238,7 @@ export function AgendaPage() {
 
           <div className="flex items-center gap-3">
             {/* Legend - Using Interactive Filters */}
-            <div className="hidden xl:flex items-center gap-2 mr-4 text-[10px] font-bold text-kanji/60 dark:text-kio/60 uppercase tracking-widest border-r border-gray-200 dark:border-slate-800 pr-4">
+            <div className="hidden lg:flex items-center gap-2 mr-4 text-[10px] font-bold text-kanji/60 dark:text-kio/60 uppercase tracking-widest border-r border-gray-200 dark:border-slate-800 pr-4">
               {[
                 { key: 'COMPLETED', label: 'Completada', icon: CheckCircle2, color: 'text-emerald-500', activeBg: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-200' },
                 { key: 'SCHEDULED', label: 'Agendada', icon: Calendar, color: 'text-blue-500', activeBg: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-200' },
@@ -322,7 +336,7 @@ export function AgendaPage() {
         </div>
 
         {/* Calendar Grid & Sidebar */}
-        <div className="flex-1 min-h-0 flex gap-6 overflow-hidden">
+        <div className="flex-1 min-h-0 flex gap-4 overflow-hidden">
           <div className="flex-1 min-w-0 h-full flex flex-col">
             {activeView === 'week' ? (
               <WeeklyCalendarGrid
@@ -346,6 +360,10 @@ export function AgendaPage() {
             )}
           </div>
 
+          {/* Waitlist sidebar — only on large screens */}
+          <div className="hidden xl:flex flex-col w-64 shrink-0 py-4 pr-2">
+            <WaitlistPanel onPromote={handlePromoteWaitlistPatient} />
+          </div>
         </div>
       </div>
 
@@ -363,6 +381,7 @@ export function AgendaPage() {
         isOpen={!!scheduleSlot}
         onClose={handleCloseSchedule}
         initialDate={scheduleSlot}
+        initialPatient={waitlistPatient ?? undefined}
       />
 
       {/* Quick Reschedule Modal */}

@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addWeeks, addDays, addMonths } from 'date-fns';
 import { completeCheckout } from '../lib/appointments.api';
+import { getErrorMessage } from '../lib/errors';
 import type { PaymentMethod, CheckoutPayload } from '../types/appointments.types';
 
 /* ── Types ───────────────────────────────────────── */
@@ -121,11 +122,7 @@ export function useSessionCheckout(
       onCompleted?.();
       navigate('/dashboard');
     } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : 'Error al guardar. Intenta de nuevo.';
-      setError(message);
+      setError(getErrorMessage(err, 'Error al guardar. Intenta de nuevo.'));
     } finally {
       setIsSubmitting(false);
     }
