@@ -12,7 +12,7 @@ export class EmailService {
 
   async sendPasswordResetEmail(to: string, resetUrl: string): Promise<void> {
     const { error } = await this.resend.emails.send({
-      from: 'Kio Health <noreply@kiohealth.com>',
+      from: 'Kio Health <noreply@kioind.com>',
       to,
       subject: 'Restablecer contraseña — Kio Health',
       html: this.buildPasswordResetEmail(resetUrl),
