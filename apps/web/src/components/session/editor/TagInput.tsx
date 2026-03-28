@@ -40,9 +40,9 @@ export function TagInput({ tags, onChange, suggestions = [] }: TagInputProps) {
         <div className="flex items-center gap-2 flex-wrap px-4 pt-2 border border-gray-200 dark:border-slate-700 rounded-xl bg-surface dark:bg-slate-800 min-h-[42px] focus-within:ring-2 focus-within:ring-kio/20 transition-all">
         <Hash size={14} className="text-gray-400 dark:text-slate-500" />
         {tags.map(tag => (
-            <span key={tag} className="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1">
+            <span key={tag} className="bg-cruz dark:bg-kio/20 text-kanji dark:text-kio text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1">
             #{tag}
-            <button onClick={() => removeTag(tag)} className="hover:text-indigo-800 dark:hover:text-indigo-100">
+            <button onClick={() => removeTag(tag)} className="hover:text-kanji/70 dark:hover:text-kio/70">
                 <X size={12} />
             </button>
             </span>

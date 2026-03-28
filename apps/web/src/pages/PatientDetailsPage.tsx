@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { usePatient, useUpdatePatient, usePatientScales, type ScaleHistoryPoint } from '../hooks/use-patients';
 import { addRecentPatientToStorage } from '../lib/recent-patients.storage';
 import {
@@ -42,9 +42,11 @@ const TABS = [
 export default function PatientDetailsPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { data: patient, isLoading, error } = usePatient(id || '');
     const updatePatientMutation = useUpdatePatient();
-    const [activeTab, setActiveTab] = useState('history');
+    const activeTab = searchParams.get('tab') ?? 'history';
+    const setActiveTab = (tab: string) => setSearchParams({ tab }, { replace: true });
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     useEffect(() => {

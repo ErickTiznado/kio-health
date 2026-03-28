@@ -12,9 +12,7 @@ describe('SubscriptionsController', () => {
         {
           provide: SubscriptionsService,
           useValue: {
-            createCheckoutSession: jest.fn(),
             getSubscriptionStatus: jest.fn(),
-            handleWebhook: jest.fn(),
           },
         },
       ],

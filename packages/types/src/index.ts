@@ -5,7 +5,6 @@ export enum UserRole {
 
 export enum ClinicianType {
   PSYCHOLOGIST = 'PSYCHOLOGIST',
-  NUTRITIONIST = 'NUTRITIONIST',
 }
 
 export enum PatientStatus {

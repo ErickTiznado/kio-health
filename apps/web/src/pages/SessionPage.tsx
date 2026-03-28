@@ -59,7 +59,7 @@ export function SessionPage() {
   if (isLoading || !sessionContext) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-kio"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-kanji dark:border-kio"></div>
       </div>
     );
   }
@@ -107,7 +107,7 @@ export function SessionPage() {
   const psychContext = {
     diagnosis: patient.diagnosis || 'Sin diagnóstico',
     clinicalContext: patient.clinicalContext || 'Sin contexto registrado',
-    treatmentGoals: (patient as any).treatmentGoals || [],
+    treatmentGoals: patient.treatmentGoals || [],
     totalSessions: sessionNumber,
   };
 

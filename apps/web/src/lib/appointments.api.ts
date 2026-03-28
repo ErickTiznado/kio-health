@@ -142,6 +142,32 @@ export async function updatePayment(appointmentId: string, payload: UpdatePaymen
   return response.data;
 }
 
+/* ── Appointment Edit ───────────────────────── */
+
+export interface UpdateAppointmentPayload {
+  type?: Appointment['type'];
+  reason?: string | null;
+  price?: number;
+}
+
+export async function updateAppointment(
+  appointmentId: string,
+  payload: UpdateAppointmentPayload,
+): Promise<Appointment> {
+  const response = await api.patch<Appointment>(
+    `/appointments/${appointmentId}`,
+    payload,
+  );
+  return response.data;
+}
+
+/* ── Tag Suggestions ────────────────────────── */
+
+export async function fetchTagSuggestions(): Promise<string[]> {
+  const response = await api.get<string[]>('/appointments/tags');
+  return response.data;
+}
+
 /* ── Scheduling ─────────────────────────────── */
 
 export async function createAppointment(payload: CreateAppointmentPayload): Promise<Appointment> {

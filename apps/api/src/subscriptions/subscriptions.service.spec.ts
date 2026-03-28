@@ -12,13 +12,9 @@ describe('SubscriptionsService', () => {
         {
           provide: PrismaService,
           useValue: {
-            clinic: {
+            clinicSubscription: {
               findUnique: jest.fn(),
             },
-            clinicSubscription: {
-              update: jest.fn(),
-              findUnique: jest.fn(),
-            }
           },
         },
       ],

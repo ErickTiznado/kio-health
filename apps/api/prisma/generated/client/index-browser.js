@@ -140,6 +140,15 @@ exports.Prisma.RefreshTokenScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.ClinicianProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -290,7 +299,6 @@ exports.Prisma.SubscriptionPlanScalarFieldEnum = {
   id: 'id',
   name: 'name',
   price: 'price',
-  stripePriceId: 'stripePriceId',
   features: 'features',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -301,8 +309,6 @@ exports.Prisma.ClinicSubscriptionScalarFieldEnum = {
   clinicId: 'clinicId',
   planId: 'planId',
   status: 'status',
-  stripeCustomerId: 'stripeCustomerId',
-  stripeSubscriptionId: 'stripeSubscriptionId',
   currentPeriodEnd: 'currentPeriodEnd',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -434,6 +440,7 @@ exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {
 exports.Prisma.ModelName = {
   User: 'User',
   RefreshToken: 'RefreshToken',
+  PasswordResetToken: 'PasswordResetToken',
   ClinicianProfile: 'ClinicianProfile',
   Patient: 'Patient',
   Appointment: 'Appointment',

@@ -7,6 +7,7 @@ import { createAppointment } from '../../../lib/appointments.api';
 import { createPatient } from '../../../lib/patients.api';
 import { usePatients } from '../../../hooks/use-patients';
 import { useDebounce } from '../../../hooks/use-debounce';
+import { useUpdateAppointment } from '../../../hooks/use-appointments';
 import type { AppointmentType } from '../../../types/appointments.types';
 import { useAuthStore } from '../../../stores/auth.store';
 import { patientKeys } from '../../../lib/query-keys';
@@ -19,11 +20,14 @@ interface ScheduleAppointmentModalProps {
     isRescheduleMode?: boolean;
     onConfirm?: (date: Date, duration?: number) => void;
     initialPatient?: { id: string; fullName: string };
+    isEditMode?: boolean;
+    initialData?: { id: string; type: AppointmentType; reason: string | null; price: string };
 }
 
-export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isRescheduleMode, onConfirm, initialPatient }: ScheduleAppointmentModalProps) {
+export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isRescheduleMode, onConfirm, initialPatient, isEditMode, initialData }: ScheduleAppointmentModalProps) {
     const queryClient = useQueryClient();
     const { user } = useAuthStore();
+    const updateMutation = useUpdateAppointment();
 
     const defaultDuration = user?.profile?.sessionDefaultDuration || 50;
     const defaultPrice = user?.profile?.sessionDefaultPrice || 0;
@@ -48,7 +52,14 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
 
     // Initialize form when opening
     useEffect(() => {
-        if (isOpen && initialDate) {
+        if (!isOpen) return;
+        if (isEditMode && initialData) {
+            setType(initialData.type);
+            setReason(initialData.reason ?? '');
+            setPrice(initialData.price);
+            return;
+        }
+        if (initialDate) {
             setStartTime(format(initialDate, "yyyy-MM-dd'T'HH:mm"));
             setDuration(String(defaultDuration));
             setType('CONSULTATION');
@@ -66,7 +77,7 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                 setSelectedPatientId(null);
             }
         }
-    }, [isOpen, initialDate, defaultDuration, defaultPrice, initialPatient]);
+    }, [isOpen, isEditMode, initialData, initialDate, defaultDuration, defaultPrice, initialPatient]);
 
     // Patient Search Query
     const { data: patientsData, isLoading: isLoadingPatients } = usePatients(1, debouncedSearch, 5);
@@ -94,6 +105,21 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (isEditMode && initialData) {
+            updateMutation.mutate(
+                {
+                    id: initialData.id,
+                    data: {
+                        type,
+                        reason: reason || null,
+                        price: price !== '' ? parseFloat(price) : undefined,
+                    },
+                },
+                { onSuccess: onClose },
+            );
+            return;
+        }
 
         if (!startTime) {
             toast.error('Selecciona fecha y hora');
@@ -175,10 +201,10 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                 <div className="px-8 py-6 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900 sticky top-0 z-10">
                     <div>
                         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                            {isRescheduleMode ? 'Reagendar Cita' : 'Agendar Nueva Cita'}
+                            {isEditMode ? 'Editar Cita' : isRescheduleMode ? 'Reagendar Cita' : 'Agendar Nueva Cita'}
                         </h2>
                         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-                            {isRescheduleMode ? 'Selecciona la nueva fecha y hora' : 'Completa los datos de la sesión'}
+                            {isEditMode ? 'Actualiza los datos de la sesión' : isRescheduleMode ? 'Selecciona la nueva fecha y hora' : 'Completa los datos de la sesión'}
                         </p>
                     </div>
                     <button
@@ -194,7 +220,7 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                     <form onSubmit={handleSubmit} className="space-y-8">
 
                         {/* Patient Section */}
-                        {!isRescheduleMode && (
+                        {!isRescheduleMode && !isEditMode && (
                             <div className="space-y-2 relative">
                                 <div className="flex items-center justify-between">
                                     <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
@@ -318,7 +344,7 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                         )}
 
                         {/* Date & Time and Duration Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {!isEditMode && <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
                                     <Calendar size={14} /> Fecha y Hora
@@ -351,7 +377,9 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                             </div>
                         </div>
 
-                        {!isRescheduleMode && (
+                        {!isEditMode && </div>}
+
+                        {(!isRescheduleMode || isEditMode) && (
                             <>
                                 {/* Type and Price Grid */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -415,20 +443,23 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                             <button
                                 type="submit"
                                 disabled={
+                                    updateMutation.isPending ||
                                     createMutation.isPending ||
                                     createPatientMutation.isPending ||
-                                    !startTime ||
-                                    (!isRescheduleMode && patientMode === 'search' && !selectedPatientId) ||
-                                    (!isRescheduleMode && patientMode === 'new' && !newPatientName.trim())
+                                    (!isEditMode && !startTime) ||
+                                    (!isRescheduleMode && !isEditMode && patientMode === 'search' && !selectedPatientId) ||
+                                    (!isRescheduleMode && !isEditMode && patientMode === 'new' && !newPatientName.trim())
                                 }
                                 className="w-full bg-kanji dark:bg-kio text-white dark:text-slate-900 py-3.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:bg-opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
                                 {createPatientMutation.isPending ? (
                                     <><Loader2 size={18} className="animate-spin" /> Registrando paciente...</>
+                                ) : updateMutation.isPending ? (
+                                    <><Loader2 size={18} className="animate-spin" /> Guardando...</>
                                 ) : createMutation.isPending ? (
                                     <><Loader2 size={18} className="animate-spin" /> {isRescheduleMode ? 'Reagendando...' : 'Agendando...'}</>
                                 ) : (
-                                    isRescheduleMode ? 'Confirmar Cambio' : 'Confirmar Cita'
+                                    isEditMode ? 'Guardar Cambios' : isRescheduleMode ? 'Confirmar Cambio' : 'Confirmar Cita'
                                 )}
                             </button>
                         </div>

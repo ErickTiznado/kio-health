@@ -37,7 +37,7 @@ export const PatientContextPanel: FC<PatientContextPanelProps> = ({
         {/* Diagnosis Badge & Info Action */}
         <div className="mb-8 shrink-0">
           <h3 className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-2">Diagnóstico</h3>
-          <div className="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 p-3 rounded-xl font-medium text-sm border border-indigo-100 dark:border-indigo-800/30 mb-3">
+          <div className="bg-cruz dark:bg-kio/10 text-kanji dark:text-kio/90 p-3 rounded-xl font-medium text-sm border border-cruz dark:border-kio/20 mb-3">
             {psychContext.diagnosis || 'Sin diagnóstico'}
           </div>
 

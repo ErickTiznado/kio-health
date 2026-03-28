@@ -98,12 +98,20 @@ export function LoginPage() {
 
           {/* Password Field */}
           <div className="mb-6">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-kanji dark:text-slate-200 mb-2"
-            >
-              {t('auth.password_label')}
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-kanji dark:text-slate-200"
+              >
+                {t('auth.password_label')}
+              </label>
+              <Link
+                to="/forgot-password"
+                className="text-xs text-kio hover:text-kio/80 transition-colors"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
             <input
               {...register('password')}
               type="password"
@@ -155,11 +163,13 @@ export function LoginPage() {
           </p>
         </form>
 
-        {/* Footer */}
-        <p className="text-center text-text/50 dark:text-slate-500 text-sm mt-6">
-          Credenciales de prueba: <strong>psych@kio.com</strong> /{' '}
-          <strong>123456</strong>
-        </p>
+        {/* Footer — solo visible en desarrollo */}
+        {import.meta.env.DEV && (
+          <p className="text-center text-text/50 dark:text-slate-500 text-sm mt-6">
+            Credenciales de prueba: <strong>psych@kio.com</strong> /{' '}
+            <strong>123456</strong>
+          </p>
+        )}
       </div>
     </div>
   );

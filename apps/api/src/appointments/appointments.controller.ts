@@ -25,6 +25,7 @@ import { CreatePsychNoteDto } from './dto/create-psych-note.dto';
 import { AccessLogService } from '../access-log/access-log.service';
 import { CreateClinicalScaleDto } from './dto/create-clinical-scale.dto';
 import { AppointmentOwnershipGuard } from '../auth/guards/appointment-ownership.guard';
+import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 
 @Controller('appointments')
 @UseGuards(JwtAuthGuard)
@@ -90,6 +91,11 @@ export class AppointmentsController {
   @Get('pending-notes-count')
   async getPendingNotesCount(@CurrentClinician() clinicianId: string) {
     return this.appointmentsService.getPendingNotesCount(clinicianId);
+  }
+
+  @Get('tags')
+  async getUsedTags(@CurrentClinician() clinicianId: string) {
+    return this.appointmentsService.getUsedTags(clinicianId);
   }
 
   @UseGuards(AppointmentOwnershipGuard)
@@ -296,6 +302,20 @@ export class AppointmentsController {
     @Body() dto: UpdatePaymentDto,
   ) {
     return this.appointmentsService.updatePayment(
+      clinicianId,
+      appointmentId,
+      dto,
+    );
+  }
+
+  @UseGuards(AppointmentOwnershipGuard)
+  @Patch(':id')
+  async updateAppointment(
+    @CurrentClinician() clinicianId: string,
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+    @Body() dto: UpdateAppointmentDto,
+  ) {
+    return this.appointmentsService.updateAppointment(
       clinicianId,
       appointmentId,
       dto,

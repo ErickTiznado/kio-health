@@ -77,7 +77,7 @@ function ActionMenu({ patient, onEdit, onArchive, onView }: {
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="p-2 text-gray-400 hover:text-kanji dark:hover:text-kio rounded-full transition-colors opacity-0 group-hover:opacity-100 duration-200 hover:bg-gray-100 dark:hover:bg-slate-800"
+        className="p-2 text-gray-400 hover:text-kanji dark:hover:text-kio rounded-full transition-colors opacity-40 group-hover:opacity-100 duration-200 hover:bg-gray-100 dark:hover:bg-slate-800"
       >
         <MoreVertical size={18} />
       </motion.button>

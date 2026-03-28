@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNoteStore } from '../../../stores/notes.store';
+import { useAuthStore } from '../../../stores/auth.store';
 import { useAutoSave } from '../../../hooks/use-auto-save';
 import { NoteTemplateType } from '../../../types/appointments.types';
 
@@ -17,6 +18,7 @@ import { PatientContextPanel } from '../PatientContextPanel';
 import { ScalesTab } from '../ScalesTab';
 import type { ClinicalScale } from '../../../types/appointments.types';
 import { confirmAction } from '../../../lib/confirm-action';
+import { useTagSuggestions } from '../../../hooks/use-appointments';
 
 interface EditorContainerProps {
   appointmentId: string;
@@ -42,7 +44,6 @@ const itemVariants = {
   show: { opacity: 1, y: 0 }
 };
 
-const MOCK_TAG_SUGGESTIONS = ['Ansiedad', 'Progreso', 'TDAH', 'Sueño', 'Autoestima'];
 
 export function EditorContainer({
   appointmentId,
@@ -53,6 +54,8 @@ export function EditorContainer({
   clinicalScales,
 }: EditorContainerProps) {
   const { currentNote, status, lastSaved, error, fetchNote, reset } = useNoteStore();
+  const clinicianType = useAuthStore((s) => s.user?.profile?.type ?? 'PSYCHOLOGIST');
+  const { data: tagSuggestions = [] } = useTagSuggestions();
 
   // Local state
   const [step, setStep] = useState<1 | 2>(1); // 1: Check-in, 2: Notes
@@ -219,7 +222,7 @@ export function EditorContainer({
               <button
                 onClick={() => setIsReadMode(!isReadMode)}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${isReadMode
-                  ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
+                  ? 'bg-cruz dark:bg-kio/10 text-kanji dark:text-kio border border-kio-light dark:border-kio/30'
                   : 'bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:text-gray-700 dark:hover:text-slate-200'
                   }`}
               >
@@ -258,7 +261,7 @@ export function EditorContainer({
                   patientId={patientId}
                   patientName={patientName}
                   patientAge={patientAge || 0}
-                  clinicianType="PSYCHOLOGIST"
+                  clinicianType={clinicianType}
                   psychContext={psychContext}
                 />
               </div>
@@ -323,7 +326,7 @@ export function EditorContainer({
                             <TagInput
                               tags={tags}
                               onChange={setTags}
-                              suggestions={MOCK_TAG_SUGGESTIONS}
+                              suggestions={tagSuggestions}
                             />
                           </div>
 

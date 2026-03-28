@@ -19,7 +19,8 @@ describe('AuthService', () => {
   beforeEach(() => {
     prisma = createPrismaMock();
     jwtService = { sign: jest.fn().mockReturnValue('mock.jwt.token') } as unknown as JwtService;
-    service = new AuthService(prisma as any, jwtService);
+    const emailService = { sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined) } as any;
+    service = new AuthService(prisma as any, jwtService, emailService);
     jest.clearAllMocks();
     (jwtService.sign as jest.Mock).mockReturnValue('mock.jwt.token');
   });

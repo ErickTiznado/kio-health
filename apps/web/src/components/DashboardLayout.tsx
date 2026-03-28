@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   Calendar,
   Users,
-  Ruler,
   Settings,
   LogOut,
   ChevronRight,
@@ -16,6 +15,7 @@ import {
   UserPlus,
   CalendarPlus,
   Building2,
+  Search,
 } from 'lucide-react';
 import { PatientModal } from './patients/PatientModal';
 import { ScheduleAppointmentModal } from '../features/calendar/components/ScheduleAppointmentModal';
@@ -40,13 +40,6 @@ const PSYCHOLOGIST_NAV: NavItem[] = [
   { to: '/finance', label: 'Finanzas', icon: <DollarSign size={20} />, tourId: 'sidebar-finance' },
 ];
 
-const NUTRITIONIST_NAV: NavItem[] = [
-  { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, tourId: 'sidebar-dashboard' },
-  { to: '/patients', label: 'Pacientes', icon: <Users size={20} />, tourId: 'sidebar-patients' },
-  { to: '/agenda', label: 'Agenda', icon: <Calendar size={20} />, tourId: 'sidebar-agenda' },
-  { to: '/measurements', label: 'Mediciones', icon: <Ruler size={20} /> },
-  { to: '/finance', label: 'Finanzas', icon: <DollarSign size={20} />, tourId: 'sidebar-finance' },
-];
 
 /**
  * Professional Dashboard Layout with fixed sidebar.
@@ -63,12 +56,10 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
   const createPatientMutation = useCreatePatient();
 
-  const clinicianType = user?.profile?.type;
-  const baseNav = (clinicianType as string) === 'NUTRITIONIST' ? NUTRITIONIST_NAV : PSYCHOLOGIST_NAV;
   const clinicNavItem: NavItem[] = user?.profile?.plan === 'CLINIC'
     ? [{ to: '/clinic', label: 'Clínica', icon: <Building2 size={20} /> }]
     : [];
-  const navItems = [...baseNav, ...clinicNavItem];
+  const navItems = [...PSYCHOLOGIST_NAV, ...clinicNavItem];
 
   const handleLogout = async () => {
     setSidebarOpen(false);
@@ -139,7 +130,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                     `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative ${
                       isActive
                         ? 'bg-kio-light dark:bg-kio/10 text-kio'
-                        : 'text-gray-600 dark:text-kio hover:bg-surface/80 dark:hover:bg-slate-800 hover:text-kanji dark:hover:text-kio'
+                        : 'text-gray-600 dark:text-slate-400 hover:bg-surface/80 dark:hover:bg-slate-800 hover:text-kanji dark:hover:text-kio'
                     }`
                   }
                 >
@@ -149,7 +140,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                       {isActive && (
                         <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-kio rounded-r-full shadow-[0_0_10px_rgba(174,147,254,0.4)]" />
                       )}
-                      <span className={isActive ? 'text-kio' : 'text-gray-400 dark:text-kanji group-hover:text-kanji dark:group-hover:text-kio'}>
+                      <span className={isActive ? 'text-kio' : 'text-gray-400 dark:text-slate-500 group-hover:text-kanji dark:group-hover:text-kio'}>
                         {item.icon}
                       </span>
                       {item.label}
@@ -171,7 +162,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
               `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative ${
                 isActive
                   ? 'bg-kio-light dark:bg-kio/10 text-kio'
-                  : 'text-gray-600 dark:text-kio hover:bg-surface/80 dark:hover:bg-slate-800 hover:text-kanji dark:hover:text-kio'
+                  : 'text-gray-600 dark:text-slate-400 hover:bg-surface/80 dark:hover:bg-slate-800 hover:text-kanji dark:hover:text-kio'
               }`
             }
           >
@@ -180,7 +171,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                 {isActive && (
                   <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-kio rounded-r-full" />
                 )}
-                <Settings size={20} className={isActive ? 'text-kio' : 'text-gray-400 dark:text-kanji group-hover:text-kanji dark:group-hover:text-kio'} />
+                <Settings size={20} className={isActive ? 'text-kio' : 'text-gray-400 dark:text-slate-500 group-hover:text-kanji dark:group-hover:text-kio'} />
                 Configuración
               </>
             )}
@@ -218,20 +209,31 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
           <div className="flex items-center gap-3">
             {/* Quick Actions (Header) */}
             <div className="flex items-center gap-1 mr-2">
+              {/* Hint Cmd+K — solo visible en sm+ */}
+              <button
+                onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }))}
+                aria-label="Búsqueda global (⌘K)"
+                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-800 hover:text-kanji dark:hover:text-kio transition-colors border border-gray-200 dark:border-slate-700"
+              >
+                <Search size={14} aria-hidden="true" />
+                <kbd className="text-[11px] font-mono bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 px-1.5 py-0.5 rounded shadow-sm leading-none">
+                  ⌘K
+                </kbd>
+              </button>
               <button
                 onClick={() => setIsPatientModalOpen(true)}
                 data-tour="tour-quick-actions"
+                aria-label="Nuevo Paciente"
                 className="p-2 rounded-full transition-all bg-surface dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-kanji dark:hover:text-kio"
-                title="Nuevo Paciente"
               >
-                <UserPlus size={20} />
+                <UserPlus size={20} aria-hidden="true" />
               </button>
               <button
                 onClick={() => setIsAppointmentModalOpen(true)}
+                aria-label="Agendar Cita"
                 className="p-2 rounded-full transition-all bg-surface dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400"
-                title="Agendar Cita"
               >
-                <CalendarPlus size={20} />
+                <CalendarPlus size={20} aria-hidden="true" />
               </button>
             </div>
             
@@ -242,7 +244,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
             <div className="text-right hidden sm:block">
               <p className="text-sm font-medium text-kanji dark:text-kio">{userName}</p>
               <p className="text-xs text-gray-400 dark:text-kanji">
-                {clinicianType === 'PSYCHOLOGIST' ? 'Psicólogo' : 'Nutricionista'}
+                Psicólogo
               </p>
             </div>
             <div className="w-10 h-10 bg-gradient-to-br from-kio to-kanji rounded-full flex items-center justify-center shadow-sm ring-2 ring-surface dark:ring-slate-800">

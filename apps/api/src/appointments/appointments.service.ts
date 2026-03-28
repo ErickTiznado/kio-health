@@ -15,6 +15,7 @@ import {
   NoteTemplateType,
 } from './dto/create-psych-note.dto';
 import { CreateClinicalScaleDto } from './dto/create-clinical-scale.dto';
+import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { EncryptionService } from '../lib/encryption.service';
 import { ScaleType, ScaleRiskLevel } from '#generated/prisma';
 import { ExportService } from '../export/export.service';
@@ -702,6 +703,39 @@ export class AppointmentsService {
     );
 
     return updated;
+  }
+
+  /**
+   * Update editable appointment metadata: type, reason, price.
+   * Does not affect scheduling — use reschedule() for date/time changes.
+   */
+  async updateAppointment(
+    clinicianId: string,
+    appointmentId: string,
+    dto: UpdateAppointmentDto,
+  ) {
+    await this.findAppointmentOrFail(appointmentId, clinicianId);
+    return this.prisma.appointment.update({
+      where: { id: appointmentId },
+      data: {
+        ...(dto.type !== undefined && { type: dto.type }),
+        ...(dto.reason !== undefined && { reason: dto.reason }),
+        ...(dto.price !== undefined && { price: dto.price }),
+      },
+      include: { patient: { select: { id: true, fullName: true } } },
+    });
+  }
+
+  /**
+   * Return all unique tags used in psych notes for this clinician's appointments.
+   */
+  async getUsedTags(clinicianId: string): Promise<string[]> {
+    const notes = await this.prisma.psychNote.findMany({
+      where: { appointment: { clinicianId } },
+      select: { tags: true },
+    });
+    const allTags = notes.flatMap((n) => n.tags);
+    return [...new Set(allTags)].sort();
   }
 
   /**

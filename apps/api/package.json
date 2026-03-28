@@ -52,8 +52,8 @@
     "pdfkit": "^0.17.2",
     "prisma": "^6.19.2",
     "reflect-metadata": "^0.2.2",
+    "resend": "^6.9.4",
     "rxjs": "^7.8.1",
-    "stripe": "^20.4.1",
     "uuid": "^9.0.1",
     "vite-plugin-pwa": "^1.2.0"
   },

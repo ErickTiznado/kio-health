@@ -1,11 +1,14 @@
+import type { EmergencyContact } from './patients.types';
+
 export interface Patient {
   id: string;
   fullName: string;
   dateOfBirth: string | null;
   diagnosis: string | null;
   clinicalContext: string | null;
-  contactPhone?: string;
-  emergencyContact?: any;
+  contactPhone?: string | null;
+  emergencyContact?: EmergencyContact | null;
+  treatmentGoals?: string[];
 }
 
 export type PaymentMethod = 'CASH' | 'CARD' | 'TRANSFER';

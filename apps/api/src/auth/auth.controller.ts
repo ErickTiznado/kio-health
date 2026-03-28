@@ -15,6 +15,8 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { CompleteProfileDto } from './dto/complete-profile.dto';
 import { SignupDto } from './dto/signup.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 
@@ -141,6 +143,20 @@ export class AuthController {
     @CurrentUser() user: { userId: string; email: string; role: string },
   ): Promise<Record<string, unknown>> {
     return this.authService.getCurrentUser(user.userId);
+  }
+
+  @Throttle({ default: { limit: 3, ttl: 900000 } })
+  @Post('forgot-password')
+  async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<{ ok: boolean }> {
+    await this.authService.requestPasswordReset(dto.email);
+    return { ok: true };
+  }
+
+  @Throttle({ default: { limit: 3, ttl: 900000 } })
+  @Post('reset-password')
+  async resetPassword(@Body() dto: ResetPasswordDto): Promise<{ ok: boolean }> {
+    await this.authService.resetPassword(dto.token, dto.newPassword);
+    return { ok: true };
   }
 
   @UseGuards(JwtAuthGuard)

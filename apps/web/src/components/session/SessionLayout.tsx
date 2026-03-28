@@ -64,7 +64,7 @@ export const SessionLayout: FC<SessionLayoutProps> = ({
                 href={`/patients/${patientId}`}
                 target="_blank"
                 rel="noreferrer"
-                className="ml-2 text-indigo-600 dark:text-kio hover:text-indigo-800 dark:hover:text-kio/80 hover:underline cursor-pointer"
+                className="ml-2 text-kanji dark:text-kio hover:text-kanji/80 dark:hover:text-kio/80 hover:underline cursor-pointer"
               >
                 Ver Historial Completo
               </a>
@@ -96,7 +96,7 @@ export const SessionLayout: FC<SessionLayoutProps> = ({
               </button>
               <button
                 onClick={onStartSession}
-                className="flex items-center gap-2 bg-indigo-600 dark:bg-kio text-white dark:text-slate-900 text-sm font-bold px-5 py-2 rounded-full hover:bg-indigo-700 dark:hover:bg-kio/80 transition-all shadow-md hover:shadow-lg"
+                className="flex items-center gap-2 bg-kanji dark:bg-kio text-white dark:text-slate-900 text-sm font-bold px-5 py-2 rounded-full hover:bg-kanji/90 dark:hover:bg-kio/80 transition-all shadow-md hover:shadow-lg"
               >
                 <CheckCircle size={16} />
                 Iniciar Sesión

@@ -4,7 +4,10 @@ import { X, CreditCard, FileText, Clock, Stethoscope, ClipboardList, Calendar, E
 import { format, parseISO, formatDistanceToNowStrict } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
 import type { Appointment } from '../../../types/appointments.types';
+import type { TimelineResponse } from '../../../types/patients.types';
+import { api } from '../../../lib/api';
 
 import { useState } from 'react';
 
@@ -41,6 +44,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
   const navigate = useNavigate();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const currency = useAuthStore((s) => s.user?.profile?.currency ?? 'USD');
 
   // Derived state for display
@@ -107,8 +111,34 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
     ), { duration: Infinity, position: 'top-center' }); // Persistent until interaction, center screen
   };
 
-  // Check for history empty state
-  const history: Array<{ id: string; date: string; summary: string; tags: string[]; tagColor: string }> = [];
+  // Fetch recent history for this patient (last 4, then exclude current appointment)
+  const { data: recentHistory = [] } = useQuery({
+    queryKey: ['appointment-drawer-history', appointment?.patientId],
+    queryFn: async () => {
+      const { data } = await api.get<TimelineResponse>(`/patients/${appointment!.patientId}/timeline`, {
+        params: { page: 1, limit: 4 },
+      });
+      return data.data
+        .filter((item) => item.id !== appointment!.id)
+        .slice(0, 3)
+        .map((item) => ({
+          id: item.id,
+          date: item.startTime,
+          summary:
+            item.psychNote
+              ? (typeof item.psychNote.content?.s === 'string'
+                  ? item.psychNote.content.s
+                  : typeof item.psychNote.content?.body === 'string'
+                  ? item.psychNote.content.body
+                  : item.reason ?? 'Sin detalles')
+              : (item.reason ?? 'Sin detalles'),
+          tags: item.psychNote?.tags ?? [],
+          tagColor: 'bg-kio/10 dark:bg-kio/20 text-kanji dark:text-kio',
+        }));
+    },
+    enabled: isOpen && !!appointment?.patientId,
+    staleTime: 60_000,
+  });
 
   return (
     <>
@@ -133,7 +163,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
               type="button"
               title="Editar Cita"
               className="p-2 rounded-xl hover:bg-kio-light/20 dark:hover:bg-slate-800 text-kanji/60 dark:text-slate-400 hover:text-kio transition-colors"
-              onClick={() => toast.info('Edición completa próximamente', { description: 'Utiliza "Reagendar" para cambiar la fecha.' })}
+              onClick={() => setIsEditModalOpen(true)}
             >
               <Edit2 size={16} />
             </button>
@@ -254,14 +284,14 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
                 <ClipboardList size={14} className="text-kanji/60 dark:text-slate-400" />
                 <p className="text-[10px] font-bold text-kanji/60 dark:text-slate-400 uppercase tracking-widest">Historial reciente</p>
               </div>
-              {history.length > 0 && (
+              {recentHistory.length > 0 && (
                 <button className="text-[10px] font-bold text-kanji dark:text-kio hover:underline">Ver todo</button>
               )}
             </div>
 
             <div className="pl-6">
               {/* Empty State (Guidance) */}
-              {history.length === 0 ? (
+              {recentHistory.length === 0 ? (
                 <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 border border-dashed border-gray-200 dark:border-slate-700 text-center">
                   <p className="text-xs font-semibold text-kanji/80 dark:text-slate-300 mb-1">Primera sesión</p>
                   <p className="text-[10px] text-gray-500 dark:text-slate-500 mb-3">Este paciente no tiene historial clínico previo.</p>
@@ -275,7 +305,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {history.map((note) => (
+                  {recentHistory.map((note) => (
                     <div key={note.id} className="group relative">
                       {/* Timeline dot */}
                       <div className="absolute -left-[27px] top-1.5 w-2.5 h-2.5 rounded-full border-[2px] border-white dark:border-slate-900 ring-1 ring-gray-200 dark:ring-slate-700 bg-gray-200 dark:bg-slate-700 group-hover:bg-kanji dark:group-hover:bg-kio group-hover:ring-kanji/30 dark:group-hover:ring-kio/30 transition-colors z-10" />
@@ -359,7 +389,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
             <button
               type="button"
               onClick={handleStartSession}
-              className="w-full bg-indigo-600 dark:bg-indigo-500 text-white py-4 rounded-[16px] font-bold text-base flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[1px] active:shadow-md transition-all duration-200 group relative overflow-hidden"
+              className="w-full bg-kanji dark:bg-kio text-white dark:text-slate-900 py-4 rounded-[16px] font-bold text-base flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[1px] active:shadow-md transition-all duration-200 group relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]" />
               <Stethoscope size={20} className="stroke-[2.5px]" />
@@ -390,6 +420,20 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
           setIsRescheduleModalOpen(false);
         }}
         isRescheduleMode={true}
+      />
+
+      {/* Edit Modal */}
+      <ScheduleAppointmentModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        initialDate={null}
+        isEditMode={true}
+        initialData={{
+          id: appointment.id,
+          type: appointment.type,
+          reason: appointment.reason,
+          price: String(appointment.price ?? ''),
+        }}
       />
     </>
   );

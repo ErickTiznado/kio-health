@@ -59,11 +59,11 @@ export function ClinicalDetailsModal({
                 
                 {/* Diagnosis */}
                 <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                    <div className="flex items-center gap-2 text-kanji dark:text-kio">
                         <Activity size={20} />
                         <h3 className="text-sm font-bold uppercase tracking-wider">Diagnóstico Actual</h3>
                     </div>
-                    <div className="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-800 dark:text-indigo-200 p-4 rounded-xl border border-indigo-100 dark:border-indigo-800/30 font-medium leading-relaxed">
+                    <div className="bg-cruz dark:bg-kio/10 text-kanji dark:text-kio/90 p-4 rounded-xl border border-cruz dark:border-kio/20 font-medium leading-relaxed">
                         {psychContext.diagnosis || 'Sin diagnóstico registrado.'}
                     </div>
                 </div>

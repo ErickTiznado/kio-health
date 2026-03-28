@@ -32,8 +32,8 @@ export function EditorToolbox({ onTemplateChange, onExport, onCopy, currentTempl
     { icon: Heading1, label: 'Título Grande', value: '# ', type: 'h1', color: 'text-blue-500' },
     { icon: Heading2, label: 'Subtítulo', value: '## ', type: 'h2', color: 'text-blue-400' },
     { icon: Type, label: 'Texto', value: '', type: 'paragraph', color: 'text-gray-500' },
-    { icon: List, label: 'Lista Puntos', value: '- ', type: 'bullet-list', color: 'text-indigo-500' },
-    { icon: ListOrdered, label: 'Lista Num.', value: '1. ', type: 'number-list', color: 'text-indigo-400' },
+    { icon: List, label: 'Lista Puntos', value: '- ', type: 'bullet-list', color: 'text-kanji' },
+    { icon: ListOrdered, label: 'Lista Num.', value: '1. ', type: 'number-list', color: 'text-kio' },
     { icon: CheckSquare, label: 'Tarea', value: '- [ ] ', type: 'check-list', color: 'text-emerald-500' },
     { icon: Quote, label: 'Cita', value: '> ', type: 'quote', color: 'text-amber-500' },
   ];

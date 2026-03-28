@@ -47,7 +47,7 @@ export function MarkdownToolbar({ textareaRef, onTextChange }: MarkdownToolbarPr
             key={idx}
             type="button"
             onClick={() => handleFormat(tool.prefix, tool.suffix)}
-            className="p-1.5 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-md transition-colors"
+            className="p-1.5 text-gray-400 hover:text-kanji dark:hover:text-kio hover:bg-cruz dark:hover:bg-kio/10 rounded-md transition-colors"
             title={tool.label}
           >
             <Icon size={16} />

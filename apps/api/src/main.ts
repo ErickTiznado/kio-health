@@ -8,7 +8,7 @@ import * as Sentry from '@sentry/nestjs';
 const cookieParser = require('cookie-parser');
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { rawBody: true });
+  const app = await NestFactory.create(AppModule);
 
   // Cookie parser (must be before guards that read cookies)
   app.use(cookieParser());

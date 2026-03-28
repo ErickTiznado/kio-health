@@ -93,6 +93,14 @@
 
   --font-roboto: Roboto, sans-serif;
   --font-inter: Inter, sans-serif;
+
+  /* Border Radius Scale */
+  --radius-xs: 6px;     /* tags, badges pequeños */
+  --radius-sm: 10px;    /* inputs, botones pequeños */
+  --radius-md: 14px;    /* cards secundarias, modales internos */
+  --radius-lg: 20px;    /* cards principales, modales */
+  --radius-xl: 28px;    /* hero cards, dashboard main card */
+  --radius-hero: 40px;  /* único uso: dashboard liquid card */
 }
 
 /* Guided tour highlight — backdrop via box-shadow spread trick */

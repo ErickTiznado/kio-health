@@ -62,7 +62,7 @@ export function TemplateSelector({ currentType, onSelect, hasContent }: Template
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors border border-transparent hover:border-gray-200 dark:hover:border-slate-700"
       >
-        <span className="p-1 rounded-md bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+        <span className="p-1 rounded-md bg-cruz dark:bg-kio/10 text-kanji dark:text-kio">
             <ActiveIcon size={14} />
         </span>
         <span className="text-xs uppercase tracking-wide font-bold">{activeTemplate.label}</span>
@@ -92,16 +92,16 @@ export function TemplateSelector({ currentType, onSelect, hasContent }: Template
                   onClick={() => handleSelect(template.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all ${
                     isActive
-                      ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                      ? 'bg-cruz dark:bg-kio/10 text-kanji dark:text-kio'
                       : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-slate-200'
                   }`}
                 >
-                  <Icon size={16} className={isActive ? 'text-indigo-600 dark:text-indigo-400' : 'opacity-70'} />
+                  <Icon size={16} className={isActive ? 'text-kanji dark:text-kio' : 'opacity-70'} />
                   <div className="flex-1">
                       <div className="text-xs font-bold">{template.label}</div>
                       <div className="text-[10px] opacity-70 font-normal leading-tight mt-0.5">{template.description}</div>
                   </div>
-                  {isActive && <Check size={14} className="text-indigo-600 dark:text-indigo-400" />}
+                  {isActive && <Check size={14} className="text-kanji dark:text-kio" />}
                 </button>
               );
             })}

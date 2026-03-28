@@ -8,6 +8,8 @@ import { RequireAuth } from './components/RequireAuth';
 import { PageTransition } from './components/ui/PageTransition';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { ChangePasswordPage } from './pages/ChangePasswordPage';
@@ -87,6 +89,22 @@ function App() {
             element={
               <PageTransition>
                 <SignupPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <PageTransition>
+                <ForgotPasswordPage />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/reset-password"
+            element={
+              <PageTransition>
+                <ResetPasswordPage />
               </PageTransition>
             }
           />
