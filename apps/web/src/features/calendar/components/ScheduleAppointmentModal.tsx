@@ -344,40 +344,40 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                         )}
 
                         {/* Date & Time and Duration Grid */}
-                        {!isEditMode && <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                                    <Calendar size={14} /> Fecha y Hora
-                                </label>
-                                <input
-                                    type="datetime-local"
-                                    value={startTime}
-                                    onChange={(e) => setStartTime(e.target.value)}
-                                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/20 focus:border-[var(--color-kanji)] transition-all"
-                                    required
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                                    <Clock size={14} /> Duración
-                                </label>
-                                <div className="relative">
+                        {!isEditMode && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                        <Calendar size={14} /> Fecha y Hora
+                                    </label>
                                     <input
-                                        type="number"
-                                        value={duration}
-                                        onChange={(e) => setDuration(e.target.value)}
-                                        min="15"
-                                        max="90"
-                                        step="1"
-                                        className="w-full pl-4 pr-16 py-3 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/20 focus:border-[var(--color-kanji)] transition-all"
+                                        type="datetime-local"
+                                        value={startTime}
+                                        onChange={(e) => setStartTime(e.target.value)}
+                                        className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/20 focus:border-[var(--color-kanji)] transition-all"
+                                        required
                                     />
-                                    <span className="absolute right-4 top-3 text-gray-400 dark:text-slate-500 text-xs font-bold pointer-events-none mt-0.5">MIN</span>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                        <Clock size={14} /> Duración
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type="number"
+                                            value={duration}
+                                            onChange={(e) => setDuration(e.target.value)}
+                                            min="15"
+                                            max="90"
+                                            step="1"
+                                            className="w-full pl-4 pr-16 py-3 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/20 focus:border-[var(--color-kanji)] transition-all"
+                                        />
+                                        <span className="absolute right-4 top-3 text-gray-400 dark:text-slate-500 text-xs font-bold pointer-events-none mt-0.5">MIN</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-                        {!isEditMode && </div>}
+                        )}
 
                         {(!isRescheduleMode || isEditMode) && (
                             <>
