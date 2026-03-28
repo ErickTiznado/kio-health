@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/auth.store';
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : '/api'),
   withCredentials: true, // Send httpOnly cookies on every request
+  timeout: 15000,        // 15 s — evita peticiones colgadas indefinidamente
 });
 
 // ── Refresh token rotation ────────────────────────────────────────────────────

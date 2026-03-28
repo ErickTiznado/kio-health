@@ -29,7 +29,7 @@ export function ForgotPasswordPage() {
         {/* Logo & Header */}
         <div className="text-center mb-5 sm:mb-8">
           <div className="inline-flex items-center justify-center w-28 h-28 sm:w-36 sm:h-36 rounded-2xl mb-4 overflow-hidden">
-            <img src="/logo.png" alt="Kio Health" className="w-full h-full object-contain" />
+            <img src="/kio.svg" alt="Kio Health" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-3xl font-bold text-kanji dark:text-white">Recuperar contraseña</h1>
           <p className="text-text/60 dark:text-slate-400 mt-2">

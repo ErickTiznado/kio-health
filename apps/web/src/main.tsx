@@ -15,12 +15,21 @@ Sentry.init({
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
   ],
-  tracesSampleRate: 1.0,
+  tracesSampleRate: 0.1,          // reducido de 1.0 → 10% de transacciones
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
 });
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 2 * 60 * 1000,      // 2 min — evita refetch en cada mount
+      gcTime: 10 * 60 * 1000,         // 10 min — mantiene cache en memoria
+      retry: 1,                        // default era 3 — menos ruido en errores reales
+      refetchOnWindowFocus: false,     // evita rafaga de requests al cambiar de pestaña
+    },
+  },
+})
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

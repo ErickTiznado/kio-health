@@ -104,7 +104,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
         <div className="h-28 flex items-center justify-between px-5 border-b border-transparent dark:border-slate-800">
           <div className="flex items-center gap-0">
             <div className="w-28 h-28 overflow-hidden">
-              <img src="/logo.png" alt="Kio Health" className="w-full h-full object-contain" />
+              <img src="/kio.svg" alt="Kio Health" className="w-full h-full object-contain" />
             </div>
             <span className="text-gray-400 dark:text-kanji text-lg ml-1">Health</span>
           </div>
