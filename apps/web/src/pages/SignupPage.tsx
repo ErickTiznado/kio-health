@@ -15,6 +15,7 @@ export function SignupPage() {
   const [emailAvailable, setEmailAvailable] = useState(false);
   const [emailChecking, setEmailChecking] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const {
     register,
@@ -36,15 +37,20 @@ export function SignupPage() {
     setEmailTaken(false);
     setEmailAvailable(false);
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    // Cancela cualquier request anterior en vuelo
+    abortRef.current?.abort();
 
     // Only check if the email looks valid (basic shape)
     if (!emailValue || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) return;
 
     setEmailChecking(true);
     debounceRef.current = setTimeout(async () => {
+      const controller = new AbortController();
+      abortRef.current = controller;
       try {
         const { data } = await api.get<{ available: boolean }>('/auth/check-email', {
           params: { email: emailValue },
+          signal: controller.signal,
         });
         if (data.available) {
           setEmailAvailable(true);
@@ -53,8 +59,10 @@ export function SignupPage() {
           setEmailAvailable(false);
           setEmailTaken(true);
         }
-      } catch {
-        // No bloquear al usuario si el check falla — el backend validará al hacer submit
+      } catch (err: unknown) {
+        // Ignorar cancelaciones (AbortError) — no son errores reales
+        if (err && typeof err === 'object' && 'code' in err && (err as { code: string }).code === 'ERR_CANCELED') return;
+        // Si falla por otra razón, resetear sin bloquear al usuario
         setEmailAvailable(false);
         setEmailTaken(false);
       } finally {
@@ -64,6 +72,7 @@ export function SignupPage() {
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
+      abortRef.current?.abort();
     };
   }, [emailValue]);
 
