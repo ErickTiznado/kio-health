@@ -243,7 +243,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                 type="button"
                 data-tour="tour-quick-actions"
                 onClick={() => setIsQuickMenuOpen((v) => !v)}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-br from-kio to-kanji shadow-md shadow-kio/25 hover:shadow-kio/40 hover:brightness-105 active:scale-95 transition-all duration-150"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold text-white bg-kio shadow-md shadow-kio/20 hover:bg-kio/90 active:scale-95 transition-all duration-150"
               >
                 <motion.span
                   animate={{ rotate: isQuickMenuOpen ? 45 : 0 }}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { X, Search, Calendar, User, FileText, Banknote, Loader2, Clock, UserPlus, ArrowLeft } from 'lucide-react';
@@ -184,18 +185,26 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
         setPatientSearch(patient.fullName);
     };
 
-    if (!isOpen) return null;
-
     return (
+        <AnimatePresence>
+        {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
             {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm"
                 onClick={onClose}
             />
 
             {/* Modal Content */}
-            <div className="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-[24px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh] border border-gray-100 dark:border-slate-800">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                transition={{ type: 'spring', duration: 0.5, bounce: 0 }}
+                className="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-[24px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-gray-100 dark:border-slate-800">
 
                 {/* Header */}
                 <div className="px-8 py-6 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900 sticky top-0 z-10">
@@ -465,7 +474,9 @@ export function ScheduleAppointmentModal({ isOpen, onClose, initialDate, isResch
                         </div>
                     </form>
                 </div>
-            </div>
+            </motion.div>
         </div>
+        )}
+        </AnimatePresence>
     );
 }
