@@ -1,4 +1,4 @@
-import { type FC, type ReactNode, useState } from 'react';
+import { type FC, type ReactNode, useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/auth.store';
 import { ThemeToggle } from './common/ThemeToggle';
@@ -12,11 +12,13 @@ import {
   Menu,
   X,
   DollarSign,
-  UserPlus,
-  CalendarPlus,
   Building2,
   Search,
+  Plus,
+  UserPlus,
+  CalendarPlus,
 } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { PatientModal } from './patients/PatientModal';
 import { ScheduleAppointmentModal } from '../features/calendar/components/ScheduleAppointmentModal';
 import { useCreatePatient } from '../hooks/use-patients';
@@ -54,7 +56,19 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
   // Quick Actions State
   const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
+  const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
+  const quickMenuRef = useRef<HTMLDivElement>(null);
   const createPatientMutation = useCreatePatient();
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (quickMenuRef.current && !quickMenuRef.current.contains(e.target as Node)) {
+        setIsQuickMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const clinicNavItem: NavItem[] = user?.profile?.plan === 'CLINIC'
     ? [{ to: '/clinic', label: 'Clínica', icon: <Building2 size={20} /> }]
@@ -191,53 +205,100 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
       <div className="flex-1 flex flex-col lg:ml-60 xl:ml-64 transition-all duration-200">
         {/* Top Header */}
         <header className="h-16 bg-surface dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-20 transition-colors duration-200">
-          {/* Hamburger + Breadcrumb */}
+          {/* Hamburger + Logo (mobile) + Breadcrumb */}
           <div className="flex items-center gap-3 text-sm">
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-500 dark:text-kio hover:text-kanji dark:hover:text-kio"
+              className="lg:hidden text-gray-500 dark:text-slate-400 hover:text-kanji dark:hover:text-kio"
             >
               <Menu size={22} />
             </button>
-            <span className="text-gray-400 dark:text-kanji font-medium">Inicio</span>
-            <ChevronRight size={14} className="text-gray-300 dark:text-kanji/60" />
+            {/* Logo — solo visible en móvil (el sidebar está oculto) */}
+            <div className="lg:hidden flex items-center">
+              <img src="/logo.png" alt="Kio" className="h-8 w-8 object-contain" />
+            </div>
+            <span className="hidden sm:inline text-gray-400 dark:text-slate-500 font-medium">Inicio</span>
+            <ChevronRight size={14} className="hidden sm:inline text-gray-300 dark:text-slate-600" />
             <span className="text-kanji dark:text-kio font-bold">{pageLabel}</span>
           </div>
 
-          {/* User Avatar */}
+          {/* Right side actions */}
           <div className="flex items-center gap-3">
-            {/* Quick Actions (Header) */}
-            <div className="flex items-center gap-1 mr-2">
-              {/* Hint Cmd+K — solo visible en sm+ */}
+            {/* Búsqueda ⌘K */}
+            <button
+              onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }))}
+              aria-label="Búsqueda global (⌘K)"
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-800 hover:text-kanji dark:hover:text-kio transition-colors border border-gray-200 dark:border-slate-700"
+            >
+              <Search size={14} aria-hidden="true" />
+              <kbd className="text-[11px] font-mono bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 px-1.5 py-0.5 rounded shadow-sm leading-none">
+                ⌘K
+              </kbd>
+            </button>
+
+            {/* Botón único "+ Nuevo" con dropdown */}
+            <div className="relative" ref={quickMenuRef}>
               <button
-                onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }))}
-                aria-label="Búsqueda global (⌘K)"
-                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-800 hover:text-kanji dark:hover:text-kio transition-colors border border-gray-200 dark:border-slate-700"
-              >
-                <Search size={14} aria-hidden="true" />
-                <kbd className="text-[11px] font-mono bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 px-1.5 py-0.5 rounded shadow-sm leading-none">
-                  ⌘K
-                </kbd>
-              </button>
-              <button
-                onClick={() => setIsPatientModalOpen(true)}
+                type="button"
                 data-tour="tour-quick-actions"
-                aria-label="Nuevo Paciente"
-                className="p-2 rounded-full transition-all bg-surface dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-kanji dark:hover:text-kio"
+                onClick={() => setIsQuickMenuOpen((v) => !v)}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-br from-kio to-kanji shadow-md shadow-kio/25 hover:shadow-kio/40 hover:brightness-105 active:scale-95 transition-all duration-150"
               >
-                <UserPlus size={20} aria-hidden="true" />
+                <motion.span
+                  animate={{ rotate: isQuickMenuOpen ? 45 : 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex"
+                >
+                  <Plus size={16} strokeWidth={2.5} />
+                </motion.span>
+                <span className="hidden sm:inline">Nuevo</span>
               </button>
-              <button
-                onClick={() => setIsAppointmentModalOpen(true)}
-                aria-label="Agendar Cita"
-                className="p-2 rounded-full transition-all bg-surface dark:bg-slate-800 text-gray-400 dark:text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400"
-              >
-                <CalendarPlus size={20} aria-hidden="true" />
-              </button>
+
+              <AnimatePresence>
+                {isQuickMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -6 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -6 }}
+                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                    className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-700 rounded-2xl shadow-xl shadow-black/10 dark:shadow-black/40 overflow-hidden z-50"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => { setIsPatientModalOpen(true); setIsQuickMenuOpen(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors group"
+                    >
+                      <span className="w-8 h-8 rounded-xl bg-kio/10 dark:bg-kio/20 flex items-center justify-center shrink-0 group-hover:bg-kio/20 dark:group-hover:bg-kio/30 transition-colors">
+                        <UserPlus size={15} className="text-kio" />
+                      </span>
+                      <div className="text-left">
+                        <p className="text-sm font-semibold text-kanji dark:text-white leading-tight">Nuevo Paciente</p>
+                        <p className="text-xs text-gray-400 dark:text-slate-500 leading-tight mt-0.5">Registrar expediente</p>
+                      </div>
+                    </button>
+
+                    <div className="mx-4 h-px bg-gray-100 dark:bg-slate-800" />
+
+                    <button
+                      type="button"
+                      onClick={() => { setIsAppointmentModalOpen(true); setIsQuickMenuOpen(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors group"
+                    >
+                      <span className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/50 transition-colors">
+                        <CalendarPlus size={15} className="text-emerald-600 dark:text-emerald-400" />
+                      </span>
+                      <div className="text-left">
+                        <p className="text-sm font-semibold text-kanji dark:text-white leading-tight">Nueva Cita</p>
+                        <p className="text-xs text-gray-400 dark:text-slate-500 leading-tight mt-0.5">Agendar sesión</p>
+                      </div>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-            
-            <div className="w-px h-6 bg-gray-200 dark:bg-slate-700 mx-1" />
+
+            <div className="w-px h-6 bg-gray-200 dark:bg-slate-700" />
 
             <ThemeToggle />
             <div className="w-px h-6 bg-gray-200 dark:bg-slate-700 mx-1" />
