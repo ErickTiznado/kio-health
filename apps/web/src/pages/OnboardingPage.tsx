@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -44,7 +44,12 @@ const SESSION_STORAGE_KEY = 'kio-onboarding-draft';
 function loadDraft(): Partial<FormData> {
   try {
     const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Partial<FormData>) : {};
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    // Validate draft with the schema (partial) — discard if invalid to avoid
+    // a corrupted draft silently blocking form submission
+    const result = onboardingSchema.partial().safeParse(parsed);
+    return result.success ? result.data : {};
   } catch {
     return {};
   }
@@ -63,7 +68,9 @@ export function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const draft = loadDraft();
+  // loadDraft only once on mount — useRef prevents re-reading every render
+  const draftRef = useRef(loadDraft());
+  const draft = draftRef.current;
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(onboardingSchema),
@@ -76,15 +83,17 @@ export function OnboardingPage() {
     },
   });
 
-  // Persist form state to sessionStorage on every change
-  const watchedValues = watch();
+  // Persist form state to sessionStorage using subscription (avoids object-ref churn)
   useEffect(() => {
-    try {
-      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(watchedValues));
-    } catch {
-      // sessionStorage may be unavailable (private mode, quota exceeded)
-    }
-  }, [watchedValues]);
+    const subscription = watch((values) => {
+      try {
+        sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(values));
+      } catch {
+        // sessionStorage may be unavailable (private mode, quota exceeded)
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   const handleLogout = async () => {
     sessionStorage.removeItem(SESSION_STORAGE_KEY);
@@ -92,26 +101,46 @@ export function OnboardingPage() {
     navigate('/login', { replace: true });
   };
 
-  const onSubmit = handleSubmit(async (data) => {
-    setIsSubmitting(true);
-    try {
-      await completeProfile({
-        type: 'PSYCHOLOGIST',
-        plan: data.plan,
-        licenseNumber: data.licenseNumber || undefined,
-        currency: data.currency,
-        sessionDefaultDuration: Number(data.sessionDefaultDuration),
-        sessionDefaultPrice: Number(data.sessionDefaultPrice),
-      });
-      sessionStorage.removeItem(SESSION_STORAGE_KEY);
-      await fetchCurrentUser();
-      toast.success('¡Perfil completado! Bienvenido a Kio Health.');
-      navigate('/dashboard', { replace: true });
-    } catch {
-      toast.error('No se pudo guardar el perfil. Intenta de nuevo.');
-      setIsSubmitting(false);
-    }
-  });
+  const onSubmit = handleSubmit(
+    async (data) => {
+      setIsSubmitting(true);
+      try {
+        await completeProfile({
+          type: 'PSYCHOLOGIST',
+          plan: data.plan,
+          licenseNumber: data.licenseNumber || undefined,
+          currency: data.currency,
+          sessionDefaultDuration: Number(data.sessionDefaultDuration),
+          sessionDefaultPrice: Number(data.sessionDefaultPrice),
+        });
+        sessionStorage.removeItem(SESSION_STORAGE_KEY);
+        await fetchCurrentUser();
+        toast.success('¡Perfil completado! Bienvenido a Kio Health.');
+        navigate('/dashboard', { replace: true });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Error desconocido';
+        toast.error(`No se pudo guardar el perfil: ${msg}`);
+        setIsSubmitting(false);
+      }
+    },
+    // Called when Zod validation fails — go to the first step with an error
+    (validationErrors) => {
+      const fields = Object.keys(validationErrors);
+      const stepFields: Record<number, string[]> = {
+        2: ['plan'],
+        3: ['currency', 'licenseNumber'],
+        4: ['sessionDefaultDuration', 'sessionDefaultPrice'],
+      };
+      for (let s = 2; s <= 4; s++) {
+        if (stepFields[s].some((f) => fields.includes(f))) {
+          setStep(s);
+          toast.error('Por favor completa todos los campos requeridos.');
+          return;
+        }
+      }
+      toast.error('Por favor completa todos los campos requeridos.');
+    },
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-bg via-bg to-kio/5 dark:from-slate-950 dark:via-slate-950 dark:to-kio/10 flex items-center justify-center px-4">
