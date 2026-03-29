@@ -24,8 +24,6 @@ const translateStatus = (status: string) => {
   switch (status) {
     case 'ACTIVE':
       return 'Activo';
-    case 'WAITLIST':
-      return 'Espera';
     case 'ARCHIVED':
       return 'Archivado';
     default:
@@ -37,8 +35,6 @@ const translateStatusColor = (status: string) => {
   switch (status) {
     case 'ACTIVE':
       return 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-600/20 dark:ring-emerald-500/20';
-    case 'WAITLIST':
-      return 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 ring-1 ring-amber-600/20 dark:ring-amber-500/20';
     default:
       return 'bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-400 ring-1 ring-gray-200 dark:ring-slate-700';
   }

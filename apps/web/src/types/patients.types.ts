@@ -13,7 +13,7 @@ export interface Patient {
   dateOfBirth?: string;
   diagnosis?: string;
   clinicalContext?: string;
-  status: 'ACTIVE' | 'ARCHIVED' | 'WAITLIST';
+  status: 'ACTIVE' | 'ARCHIVED';
   contactPhone?: string;
   emergencyContact?: EmergencyContact;
   treatmentGoals?: string[];

@@ -25,7 +25,6 @@ enum ClinicianType {
 enum PatientStatus {
   ACTIVE
   ARCHIVED
-  WAITLIST
 }
 
 enum AppointmentStatus {

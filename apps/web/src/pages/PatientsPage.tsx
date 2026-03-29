@@ -14,7 +14,6 @@ import { confirmAction } from '../lib/confirm-action';
 const TABS = [
   { id: 'ALL', label: 'Todos' },
   { id: 'ACTIVE', label: 'Activos' },
-  { id: 'WAITLIST', label: 'Lista de Espera' },
   { id: 'ARCHIVED', label: 'Archivados' },
 ];
 

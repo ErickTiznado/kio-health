@@ -354,16 +354,10 @@ export default function ClinicPage() {
                           className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                             patient.status === 'ACTIVE'
                               ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                              : patient.status === 'WAITLIST'
-                                ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
-                                : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
+                              : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
                           }`}
                         >
-                          {patient.status === 'ACTIVE'
-                            ? 'Activo'
-                            : patient.status === 'WAITLIST'
-                              ? 'Lista de espera'
-                              : 'Archivado'}
+                          {patient.status === 'ACTIVE' ? 'Activo' : 'Archivado'}
                         </span>
                         <span className="text-xs text-text/40 dark:text-slate-500">
                           {new Date(patient.createdAt).toLocaleDateString()}

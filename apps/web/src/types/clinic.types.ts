@@ -39,7 +39,7 @@ export interface InvitationLink {
 export interface ClinicPatient {
   id: string;
   fullName: string;
-  status: 'ACTIVE' | 'ARCHIVED' | 'WAITLIST';
+  status: 'ACTIVE' | 'ARCHIVED';
   createdAt: string;
   clinicianId: string;
 }

@@ -10,7 +10,6 @@ export enum ClinicianType {
 export enum PatientStatus {
   ACTIVE = 'ACTIVE',
   ARCHIVED = 'ARCHIVED',
-  WAITLIST = 'WAITLIST',
 }
 
 export enum AppointmentStatus {

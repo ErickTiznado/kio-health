@@ -148,10 +148,10 @@ describe('PatientsService', () => {
       prisma.patient.findMany.mockResolvedValue([]);
       prisma.patient.count.mockResolvedValue(0);
 
-      await service.findAll('clinician-1', { status: 'WAITLIST' } as any);
+      await service.findAll('clinician-1', { status: 'ARCHIVED' } as any);
 
       const whereArg = prisma.patient.findMany.mock.calls[0][0].where;
-      expect(whereArg.status).toBe('WAITLIST');
+      expect(whereArg.status).toBe('ARCHIVED');
     });
 
     it('returns correct pagination meta', async () => {

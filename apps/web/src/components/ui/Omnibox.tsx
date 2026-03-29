@@ -96,9 +96,6 @@ export function Omnibox() {
               >
                 <User className="w-4 h-4 mr-3 text-gray-400 dark:text-slate-500" />
                 {patient.fullName}
-                {patient.status === 'WAITLIST' && (
-                    <span className="ml-auto text-[10px] bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-200 px-2 py-0.5 rounded-full">Lista de Espera</span>
-                )}
               </Command.Item>
             ))}
           </Command.Group>

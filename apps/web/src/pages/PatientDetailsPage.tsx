@@ -487,12 +487,10 @@ function ScalesHistoryChart({ data }: { data: ScaleHistoryPoint[] }) {
 function StatusBadge({ status }: { status: Patient['status'] }) {
     const styles: Record<Patient['status'], string> = {
         ACTIVE: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
-        WAITLIST: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
         ARCHIVED: 'bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border-gray-200 dark:border-slate-700',
     };
     const labels: Record<Patient['status'], string> = {
         ACTIVE: 'Activo',
-        WAITLIST: 'Lista de espera',
         ARCHIVED: 'Archivado',
     };
     return (

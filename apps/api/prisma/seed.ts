@@ -181,8 +181,8 @@ const NOTE_TAGS = [
 // HELPER FUNCTIONS
 // ============================================
 
-function randomStatus(): 'ACTIVE' | 'WAITLIST' {
-  return Math.random() > 0.2 ? 'ACTIVE' : 'WAITLIST';
+function randomStatus(): 'ACTIVE' | 'ARCHIVED' {
+  return Math.random() > 0.15 ? 'ACTIVE' : 'ARCHIVED';
 }
 
 function generateMexicanPhone(): string {

@@ -125,8 +125,7 @@ export type ClinicianType = (typeof ClinicianType)[keyof typeof ClinicianType]
 
 export const PatientStatus: {
   ACTIVE: 'ACTIVE',
-  ARCHIVED: 'ARCHIVED',
-  WAITLIST: 'WAITLIST'
+  ARCHIVED: 'ARCHIVED'
 };
 
 export type PatientStatus = (typeof PatientStatus)[keyof typeof PatientStatus]

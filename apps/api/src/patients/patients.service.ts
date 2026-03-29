@@ -93,8 +93,7 @@ export class PatientsService {
       where.OR = [{ fullName: { contains: search, mode: 'insensitive' } }];
     }
 
-    const orderBy: Prisma.PatientOrderByWithRelationInput =
-      status === 'WAITLIST' ? { updatedAt: 'asc' } : { createdAt: 'desc' };
+    const orderBy: Prisma.PatientOrderByWithRelationInput = { createdAt: 'desc' };
 
     const [data, total] = await Promise.all([
       this.prisma.patient.findMany({ where, skip, take: limit, orderBy }),

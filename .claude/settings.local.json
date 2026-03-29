@@ -27,7 +27,24 @@
       "Bash(npm test:*)",
       "Bash(ls:*)",
       "Bash(mkdir:*)",
-      "mcp__claude_ai_Supabase__get_project_url"
+      "mcp__claude_ai_Supabase__get_project_url",
+      "mcp__5fe14a4f-5db9-4e91-9c3a-501e35a21ec6__list_projects",
+      "mcp__5fe14a4f-5db9-4e91-9c3a-501e35a21ec6__apply_migration",
+      "Bash(rm C:/Users/50370/Documents/GitHub/kio-health/.git/HEAD.lock)",
+      "Bash(rm C:/Users/50370/Documents/GitHub/kio-health/.git/index.lock)",
+      "mcp__5fe14a4f-5db9-4e91-9c3a-501e35a21ec6__execute_sql",
+      "Bash(file /c/Users/50370/Documents/GitHub/kio-health/apps/web/public/*.png)",
+      "Bash(identify /c/Users/50370/Documents/GitHub/kio-health/apps/web/public/*.png)",
+      "Bash(npx vite:*)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\({k: v for k, v in {**d.get\\(''''dependencies'''',{}\\), **d.get\\(''''devDependencies'''',{}\\)}.items\\(\\) if any\\(x in k for x in [''''react'''',''''tanstack'''',''''framer'''',''''recharts'''',''''sentry'''',''''lucide'''',''''sonner'''',''''date-fns'''',''''zod'''',''''react-hook-form'''',''''axios'''']\\)}, indent=2\\)\\)\")",
+      "Bash(python -c \":*)",
+      "Bash(node -e \"require\\(''sharp''\\)\")",
+      "Bash(npm root:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\(''''packages'''',{}\\).get\\(''''node_modules/@hookform/resolvers'''',{}\\).get\\(''''version'''',''''not found''''\\)\\)\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); pkgs=d.get\\(''''packages'''',{}\\); print\\(pkgs.get\\(''''node_modules/@hookform/resolvers'''',{}\\).get\\(''''version'''',''''not found''''\\)\\)\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''version:'''', d[''''version'''']\\)\")",
+      "Bash(python3 -c \":*)"
     ]
   }
 }

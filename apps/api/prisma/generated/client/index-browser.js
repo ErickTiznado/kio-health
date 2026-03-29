@@ -369,8 +369,7 @@ exports.ClinicianPlan = exports.$Enums.ClinicianPlan = {
 
 exports.PatientStatus = exports.$Enums.PatientStatus = {
   ACTIVE: 'ACTIVE',
-  ARCHIVED: 'ARCHIVED',
-  WAITLIST: 'WAITLIST'
+  ARCHIVED: 'ARCHIVED'
 };
 
 exports.AppointmentType = exports.$Enums.AppointmentType = {

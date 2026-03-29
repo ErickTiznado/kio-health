@@ -11,7 +11,6 @@ import { DailyCalendarGrid } from '../features/calendar/components/DailyCalendar
 import { AppointmentDrawer } from '../features/calendar/components/AppointmentDrawer';
 import { ScheduleAppointmentModal } from '../features/calendar/components/ScheduleAppointmentModal';
 import { PaymentModal } from '../features/calendar/components/PaymentModal';
-import { WaitlistPanel } from '../features/calendar/components/WaitlistPanel';
 import { fetchAppointmentsByRange, rescheduleAppointment, cancelAppointment } from '../lib/appointments.api';
 import type { Appointment } from '../types/appointments.types';
 import type { CalendarView } from '../types/agenda.types';
@@ -35,7 +34,6 @@ export function AgendaPage() {
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [scheduleSlot, setScheduleSlot] = useState<Date | null>(null);
-  const [waitlistPatient, setWaitlistPatient] = useState<{ id: string; fullName: string } | null>(null);
   const [rescheduleAppointmentInfo, setRescheduleAppointmentInfo] = useState<Appointment | null>(null);
   const [paymentAppointment, setPaymentAppointment] = useState<Appointment | null>(null);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
@@ -147,19 +145,6 @@ export function AgendaPage() {
 
   const handleCloseSchedule = useCallback(() => {
     setScheduleSlot(null);
-    setWaitlistPatient(null);
-  }, []);
-
-  const handlePromoteWaitlistPatient = useCallback((patient: { id: string; fullName: string }) => {
-    const now = new Date();
-    const rounded = new Date(now);
-    if (now.getMinutes() < 30) {
-      rounded.setMinutes(30, 0, 0);
-    } else {
-      rounded.setHours(rounded.getHours() + 1, 0, 0, 0);
-    }
-    setWaitlistPatient(patient);
-    setScheduleSlot(rounded);
   }, []);
 
   const handleNewAppointmentClick = useCallback(() => {
@@ -360,10 +345,6 @@ export function AgendaPage() {
             )}
           </div>
 
-          {/* Waitlist sidebar — only on large screens */}
-          <div className="hidden xl:flex flex-col w-64 shrink-0 py-4 pr-2">
-            <WaitlistPanel onPromote={handlePromoteWaitlistPatient} />
-          </div>
         </div>
       </div>
 
@@ -381,7 +362,6 @@ export function AgendaPage() {
         isOpen={!!scheduleSlot}
         onClose={handleCloseSchedule}
         initialDate={scheduleSlot}
-        initialPatient={waitlistPatient ?? undefined}
       />
 
       {/* Quick Reschedule Modal */}
