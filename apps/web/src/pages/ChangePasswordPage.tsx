@@ -62,7 +62,7 @@ export function ChangePasswordPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-44 h-44 rounded-2xl mb-4 overflow-hidden">
-            <img src="/kio.svg" alt="Kio Health" className="w-full h-full object-contain" />
+            <img src="/logo.png" alt="Kio Health" className="w-full h-full object-contain" />
           </div>
         </div>
 
