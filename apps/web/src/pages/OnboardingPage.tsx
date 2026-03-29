@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useAuthStore } from '../stores/auth.store';
 import { completeProfile } from '../lib/auth.api';
 import { toast } from 'sonner';
@@ -17,15 +19,36 @@ const CURRENCIES = [
   { code: 'EUR', label: 'EUR — Euro' },
 ];
 
+const VALID_CURRENCY_CODES = CURRENCIES.map((c) => c.code) as [string, ...string[]];
+
 const SESSION_DURATIONS = [25, 45, 50, 60, 90];
 
-type FormData = {
-  licenseNumber: string;
-  currency: string;
-  sessionDefaultDuration: number;
-  sessionDefaultPrice: number;
-  plan: 'INDIVIDUAL' | 'CLINIC';
-};
+const onboardingSchema = z.object({
+  licenseNumber: z.string().optional(),
+  currency: z.enum(VALID_CURRENCY_CODES, { errorMap: () => ({ message: 'Selecciona una moneda válida' }) }),
+  sessionDefaultDuration: z.coerce
+    .number()
+    .min(15, 'Mínimo 15 minutos')
+    .max(180, 'Máximo 180 minutos'),
+  sessionDefaultPrice: z.coerce
+    .number()
+    .min(0, 'El precio no puede ser negativo')
+    .max(99999, 'El precio no puede superar 99,999'),
+  plan: z.enum(['INDIVIDUAL', 'CLINIC']),
+});
+
+type FormData = z.infer<typeof onboardingSchema>;
+
+const SESSION_STORAGE_KEY = 'kio-onboarding-draft';
+
+function loadDraft(): Partial<FormData> {
+  try {
+    const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as Partial<FormData>) : {};
+  } catch {
+    return {};
+  }
+}
 
 const STEPS = [
   { id: 1, label: 'Especialidad', icon: BrainCircuit },
@@ -40,17 +63,31 @@ export function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const draft = loadDraft();
+
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(onboardingSchema),
     defaultValues: {
-      licenseNumber: '',
-      currency: 'USD',
-      sessionDefaultDuration: 50,
-      sessionDefaultPrice: 0,
-      plan: 'INDIVIDUAL',
+      licenseNumber: draft.licenseNumber ?? '',
+      currency: draft.currency ?? 'USD',
+      sessionDefaultDuration: draft.sessionDefaultDuration ?? 50,
+      sessionDefaultPrice: draft.sessionDefaultPrice ?? 0,
+      plan: draft.plan ?? 'INDIVIDUAL',
     },
   });
 
+  // Persist form state to sessionStorage on every change
+  const watchedValues = watch();
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(watchedValues));
+    } catch {
+      // sessionStorage may be unavailable (private mode, quota exceeded)
+    }
+  }, [watchedValues]);
+
   const handleLogout = async () => {
+    sessionStorage.removeItem(SESSION_STORAGE_KEY);
     await logout();
     navigate('/login', { replace: true });
   };
@@ -66,6 +103,7 @@ export function OnboardingPage() {
         sessionDefaultDuration: Number(data.sessionDefaultDuration),
         sessionDefaultPrice: Number(data.sessionDefaultPrice),
       });
+      sessionStorage.removeItem(SESSION_STORAGE_KEY);
       await fetchCurrentUser();
       toast.success('¡Perfil completado! Bienvenido a Kio Health.');
       navigate('/dashboard', { replace: true });

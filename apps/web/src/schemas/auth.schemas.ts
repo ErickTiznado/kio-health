@@ -15,7 +15,9 @@ export const signupSchema = z.object({
     .email('Por favor ingresa un correo electrónico válido'),
   password: z
     .string()
-    .min(8, 'La contraseña debe tener al menos 8 caracteres'),
+    .min(8, 'La contraseña debe tener al menos 8 caracteres')
+    .regex(/(?=.*[A-Z])/, 'Debe contener al menos una letra mayúscula')
+    .regex(/(?=.*\d)/, 'Debe contener al menos un número'),
   fullName: z
     .string()
     .min(1, 'El nombre completo es requerido'),

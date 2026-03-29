@@ -3,11 +3,13 @@ import {
   Post,
   Get,
   Patch,
+  Query,
   Body,
   Res,
   Req,
   UseGuards,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import type { Response, Request } from 'express';
 import { Throttle } from '@nestjs/throttler';
@@ -63,6 +65,17 @@ function clearAuthCookies(res: Response) {
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
+  @Get('check-email')
+  async checkEmail(
+    @Query('email') email: string,
+  ): Promise<{ available: boolean }> {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new BadRequestException('Email inválido');
+    }
+    return this.authService.checkEmailAvailable(email);
+  }
 
   @Throttle({ default: { limit: 5, ttl: 900000 } })
   @Post('signup')

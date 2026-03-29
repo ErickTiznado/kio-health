@@ -1,5 +1,6 @@
 import {
   IsEnum,
+  IsIn,
   IsOptional,
   IsString,
   IsNumber,
@@ -8,6 +9,17 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ClinicianType, ClinicianPlan } from '#generated/prisma';
+
+export const VALID_CURRENCIES = [
+  'USD',
+  'MXN',
+  'COP',
+  'ARS',
+  'PEN',
+  'CLP',
+  'BRL',
+  'EUR',
+] as const;
 
 export class CompleteProfileDto {
   @IsEnum(ClinicianType)
@@ -20,7 +32,7 @@ export class CompleteProfileDto {
   @IsString()
   licenseNumber?: string;
 
-  @IsString()
+  @IsIn(VALID_CURRENCIES, { message: `currency must be one of: ${VALID_CURRENCIES.join(', ')}` })
   currency: string;
 
   @IsNumber()
@@ -31,6 +43,7 @@ export class CompleteProfileDto {
 
   @IsNumber()
   @Min(0)
+  @Max(99999)
   @Type(() => Number)
   sessionDefaultPrice: number;
 }

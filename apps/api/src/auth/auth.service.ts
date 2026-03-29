@@ -23,6 +23,14 @@ export class AuthService {
     private readonly emailService: EmailService,
   ) {}
 
+  async checkEmailAvailable(email: string): Promise<{ available: boolean }> {
+    const existing = await this.prisma.user.findUnique({
+      where: { email: email.toLowerCase().trim() },
+      select: { id: true },
+    });
+    return { available: !existing };
+  }
+
   async validateUser(
     email: string,
     password: string,

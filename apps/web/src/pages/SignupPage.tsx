@@ -3,17 +3,22 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/auth.store';
 import { signupSchema, type SignupFormData } from '../schemas/auth.schemas';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getErrorMessage } from '../lib/errors';
+import { api } from '../lib/api';
 
 export function SignupPage() {
   const navigate = useNavigate();
   const { signup, isLoading } = useAuthStore();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [emailTaken, setEmailTaken] = useState(false);
+  const [emailChecking, setEmailChecking] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -24,8 +29,37 @@ export function SignupPage() {
     },
   });
 
+  const emailValue = watch('email');
+
+  useEffect(() => {
+    setEmailTaken(false);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    // Only check if the email looks valid (basic shape)
+    if (!emailValue || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) return;
+
+    setEmailChecking(true);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const { data } = await api.get<{ available: boolean }>('/auth/check-email', {
+          params: { email: emailValue },
+        });
+        setEmailTaken(!data.available);
+      } catch {
+        // silently ignore — server-side validation will catch it on submit
+      } finally {
+        setEmailChecking(false);
+      }
+    }, 600);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [emailValue]);
+
   const onSubmit = async (data: SignupFormData) => {
     setServerError(null);
+    if (emailTaken) return;
 
     try {
       await signup(data);
@@ -102,21 +136,29 @@ export function SignupPage() {
             >
               Correo Electrónico
             </label>
-            <input
-              {...register('email')}
-              type="email"
-              id="email"
-              autoComplete="email"
-              placeholder="you@example.com"
-              className={`
-                w-full px-4 py-3 rounded-xl border transition-all duration-200
-                bg-bg dark:bg-slate-800 text-kanji dark:text-white placeholder:text-text/40 dark:placeholder:text-slate-500
-                focus:outline-none focus:ring-2 focus:ring-kio/30 focus:border-kio
-                ${errors.email ? 'border-red-400' : 'border-cruz dark:border-slate-700'}
-              `}
-            />
+            <div className="relative">
+              <input
+                {...register('email')}
+                type="email"
+                id="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                className={`
+                  w-full px-4 py-3 pr-10 rounded-xl border transition-all duration-200
+                  bg-bg dark:bg-slate-800 text-kanji dark:text-white placeholder:text-text/40 dark:placeholder:text-slate-500
+                  focus:outline-none focus:ring-2 focus:ring-kio/30 focus:border-kio
+                  ${errors.email || emailTaken ? 'border-red-400' : 'border-cruz dark:border-slate-700'}
+                `}
+              />
+              {emailChecking && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-kio/40 border-t-kio rounded-full animate-spin" />
+              )}
+            </div>
             {errors.email && (
               <p className="mt-2 text-sm text-red-500">{errors.email.message}</p>
+            )}
+            {!errors.email && emailTaken && (
+              <p className="mt-2 text-sm text-red-500">Este correo ya está registrado. ¿Ya tienes cuenta?</p>
             )}
           </div>
 
