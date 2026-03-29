@@ -105,7 +105,9 @@ export class AuthService {
     const { clinicMemberships: _m, ...profileRest } = profile ?? {};
     const responseUser = {
       ...rest,
-      profile: profileRest,
+      // Preserve null when user has no profile — empty object {} would be truthy
+      // and cause the frontend to redirect to /dashboard instead of /onboarding
+      profile: profile ? profileRest : null,
       clinicId: membership?.clinicId ?? null,
       clinicRole: membership?.role ?? null,
     };
