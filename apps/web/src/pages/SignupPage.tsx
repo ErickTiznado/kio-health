@@ -12,6 +12,7 @@ export function SignupPage() {
   const { signup, isLoading } = useAuthStore();
   const [serverError, setServerError] = useState<string | null>(null);
   const [emailTaken, setEmailTaken] = useState(false);
+  const [emailAvailable, setEmailAvailable] = useState(false);
   const [emailChecking, setEmailChecking] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -33,6 +34,7 @@ export function SignupPage() {
 
   useEffect(() => {
     setEmailTaken(false);
+    setEmailAvailable(false);
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     // Only check if the email looks valid (basic shape)
@@ -44,9 +46,17 @@ export function SignupPage() {
         const { data } = await api.get<{ available: boolean }>('/auth/check-email', {
           params: { email: emailValue },
         });
-        setEmailTaken(!data.available);
+        if (data.available) {
+          setEmailAvailable(true);
+          setEmailTaken(false);
+        } else {
+          setEmailAvailable(false);
+          setEmailTaken(true);
+        }
       } catch {
-        // silently ignore — server-side validation will catch it on submit
+        // No bloquear al usuario si el check falla — el backend validará al hacer submit
+        setEmailAvailable(false);
+        setEmailTaken(false);
       } finally {
         setEmailChecking(false);
       }
@@ -147,11 +157,30 @@ export function SignupPage() {
                   w-full px-4 py-3 pr-10 rounded-xl border transition-all duration-200
                   bg-bg dark:bg-slate-800 text-kanji dark:text-white placeholder:text-text/40 dark:placeholder:text-slate-500
                   focus:outline-none focus:ring-2 focus:ring-kio/30 focus:border-kio
-                  ${errors.email || emailTaken ? 'border-red-400' : 'border-cruz dark:border-slate-700'}
+                  ${errors.email || emailTaken
+                    ? 'border-red-400 focus:ring-red-300'
+                    : emailAvailable
+                    ? 'border-green-400 focus:ring-green-300'
+                    : 'border-cruz dark:border-slate-700'}
                 `}
               />
+              {/* Indicador de estado del email */}
               {emailChecking && (
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-kio/40 border-t-kio rounded-full animate-spin" />
+              )}
+              {!emailChecking && emailAvailable && !errors.email && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </span>
+              )}
+              {!emailChecking && emailTaken && !errors.email && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                  </svg>
+                </span>
               )}
             </div>
             {errors.email && (
@@ -159,6 +188,9 @@ export function SignupPage() {
             )}
             {!errors.email && emailTaken && (
               <p className="mt-2 text-sm text-red-500">Este correo ya está registrado. ¿Ya tienes cuenta?</p>
+            )}
+            {!errors.email && emailAvailable && !emailChecking && (
+              <p className="mt-1 text-sm text-green-600 dark:text-green-400">Correo disponible</p>
             )}
           </div>
 
