@@ -1,4 +1,5 @@
 import { type FC, type ReactNode, useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/auth.store';
 import { ThemeToggle } from './common/ThemeToggle';
@@ -57,18 +58,31 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
   const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
+  const quickBtnRef = useRef<HTMLButtonElement>(null);
   const quickMenuRef = useRef<HTMLDivElement>(null);
   const createPatientMutation = useCreatePatient();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (quickMenuRef.current && !quickMenuRef.current.contains(e.target as Node)) {
+      if (
+        quickMenuRef.current && !quickMenuRef.current.contains(e.target as Node) &&
+        quickBtnRef.current && !quickBtnRef.current.contains(e.target as Node)
+      ) {
         setIsQuickMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const openQuickMenu = () => {
+    if (quickBtnRef.current) {
+      const rect = quickBtnRef.current.getBoundingClientRect();
+      setDropdownPos({ top: rect.bottom + 8, right: window.innerWidth - rect.right });
+    }
+    setIsQuickMenuOpen((v) => !v);
+  };
 
   const clinicNavItem: NavItem[] = user?.profile?.plan === 'CLINIC'
     ? [{ to: '/clinic', label: 'Clínica', icon: <Building2 size={20} /> }]
@@ -237,12 +251,13 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
               </kbd>
             </button>
 
-            {/* Botón único "+ Nuevo" con dropdown */}
-            <div className="relative" ref={quickMenuRef}>
+            {/* Botón único "+ Nuevo" con dropdown (portal para evitar clipping del header sticky) */}
+            <div>
               <button
+                ref={quickBtnRef}
                 type="button"
                 data-tour="tour-quick-actions"
-                onClick={() => setIsQuickMenuOpen((v) => !v)}
+                onClick={openQuickMenu}
                 className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold text-white bg-kio shadow-md shadow-kio/20 hover:bg-kio/90 active:scale-95 transition-all duration-150"
               >
                 <motion.span
@@ -254,15 +269,20 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                 </motion.span>
                 <span className="hidden sm:inline">Nuevo</span>
               </button>
+            </div>
 
+            {/* Portal dropdown — renderizado en body para escapar el stacking context del header */}
+            {createPortal(
               <AnimatePresence>
                 {isQuickMenuOpen && (
                   <motion.div
+                    ref={quickMenuRef}
                     initial={{ opacity: 0, scale: 0.95, y: -6 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -6 }}
                     transition={{ duration: 0.15, ease: 'easeOut' }}
-                    className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-700 rounded-2xl shadow-xl shadow-black/10 dark:shadow-black/40 overflow-hidden z-50"
+                    style={{ position: 'fixed', top: dropdownPos.top, right: dropdownPos.right }}
+                    className="w-56 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-700 rounded-2xl shadow-xl shadow-black/10 dark:shadow-black/40 overflow-hidden z-[9999]"
                   >
                     <button
                       type="button"
@@ -295,8 +315,9 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                     </button>
                   </motion.div>
                 )}
-              </AnimatePresence>
-            </div>
+              </AnimatePresence>,
+              document.body,
+            )}
 
             <div className="w-px h-6 bg-gray-200 dark:bg-slate-700" />
 
