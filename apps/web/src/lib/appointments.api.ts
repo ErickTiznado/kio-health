@@ -202,6 +202,30 @@ export async function upsertPsychNote(
   return response.data;
 }
 
+/* ── PDF Export ─────────────────────────────── */
+
+/**
+ * Download the session PDF for a given appointment.
+ * Triggers a browser download using a Blob URL.
+ */
+export async function exportSessionPdf(
+  appointmentId: string,
+  includePrivate = false,
+): Promise<void> {
+  const response = await api.get(`/appointments/${appointmentId}/export/pdf`, {
+    params: { includePrivate: includePrivate ? 'true' : undefined },
+    responseType: 'blob',
+  });
+  const url = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `sesion-${appointmentId.slice(0, 8)}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 export async function upsertClinicalScale(
   appointmentId: string,
   payload: CreateClinicalScalePayload,
