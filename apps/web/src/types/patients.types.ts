@@ -1,8 +1,8 @@
 import type { Appointment, PsychNote } from './appointments.types';
 
 export interface EmergencyContact {
-  name: string;
-  phone: string;
+  name?: string;
+  phone?: string;
   relation?: string;
 }
 

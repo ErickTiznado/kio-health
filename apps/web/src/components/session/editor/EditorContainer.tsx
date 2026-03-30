@@ -10,7 +10,7 @@ import { SoapForm } from './SoapForm';
 import { FreeForm } from './FreeForm';
 import { TagInput } from './TagInput';
 import { EditorToolbox } from './EditorToolbox';
-import { Check, PenTool, Target, ArrowLeft, ArrowRight, Activity } from 'lucide-react';
+import { Check, PenTool, Target, ArrowLeft, ArrowRight, Activity, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -60,6 +60,7 @@ export function EditorContainer({
   // Local state
   const [step, setStep] = useState<1 | 2>(1); // 1: Check-in, 2: Notes
   const [prepTab, setPrepTab] = useState<'prep' | 'scales'>('prep');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [templateType, setTemplateType] = useState<NoteTemplateType>(NoteTemplateType.FREE);
   const [content, setContent] = useState<any>({ body: '', sessionGoal: '' });
   const [moodRating, setMoodRating] = useState<number>(5);
@@ -253,23 +254,38 @@ export function EditorContainer({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
-              className="h-full grid grid-cols-12"
+              className="h-full flex overflow-hidden"
             >
-              {/* Left: Patient Context (Sidebar) */}
-              <div className="col-span-4 border-r border-gray-200 dark:border-slate-800 h-full overflow-hidden bg-surface dark:bg-slate-900">
-                <PatientContextPanel
-                  patientId={patientId}
-                  patientName={patientName}
-                  patientAge={patientAge || 0}
-                  clinicianType={clinicianType}
-                  psychContext={psychContext}
-                />
-              </div>
+              {/* Left: Patient Context (Sidebar) — collapsible */}
+              <motion.div
+                animate={{ width: sidebarCollapsed ? 0 : 320 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                className="shrink-0 border-r border-gray-200 dark:border-slate-800 h-full overflow-hidden bg-surface dark:bg-slate-900"
+                style={{ minWidth: 0 }}
+              >
+                <div className="w-80 h-full">
+                  <PatientContextPanel
+                    patientId={patientId}
+                    patientName={patientName}
+                    patientAge={patientAge || 0}
+                    clinicianType={clinicianType}
+                    psychContext={psychContext}
+                  />
+                </div>
+              </motion.div>
 
               {/* Right: Session Prep */}
-              <div className="col-span-8 h-full overflow-y-auto bg-gray-50/50 dark:bg-slate-950 flex flex-col">
+              <div className="flex-1 h-full overflow-y-auto bg-gray-50/50 dark:bg-slate-950 flex flex-col min-w-0">
                 {/* Tabs */}
-                <div className="flex border-b border-gray-200 dark:border-slate-700 px-8 pt-6 shrink-0">
+                <div className="flex items-center gap-1 border-b border-gray-200 dark:border-slate-700 px-6 pt-6 shrink-0">
+                  {/* Sidebar toggle */}
+                  <button
+                    onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                    className="p-1.5 mr-2 rounded-lg bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-400 dark:text-slate-500 hover:text-kio dark:hover:text-kio transition-all"
+                    title={sidebarCollapsed ? 'Mostrar contexto del paciente' : 'Ocultar panel de contexto'}
+                  >
+                    {sidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+                  </button>
                   <button
                     onClick={() => setPrepTab('prep')}
                     className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-all -mb-px ${
@@ -295,64 +311,88 @@ export function EditorContainer({
                 </div>
 
                 <div className="flex-1 overflow-y-auto">
-                  {prepTab === 'prep' ? (
-                    <div className="p-8 flex flex-col items-center justify-center">
+                  <AnimatePresence mode="wait">
+                    {prepTab === 'prep' ? (
                       <motion.div
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="show"
-                        className="max-w-xl w-full space-y-8"
+                        key="tab-prep"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="p-8 flex flex-col items-center justify-center"
                       >
-                        <motion.div variants={itemVariants} className="text-center mb-8">
-                          <h2 className="text-2xl font-bold text-kanji dark:text-white mb-2">Preparación de Sesión</h2>
-                        </motion.div>
+                        <motion.div
+                          variants={containerVariants}
+                          initial="hidden"
+                          animate="show"
+                          className="max-w-xl w-full space-y-8"
+                        >
+                          <motion.div variants={itemVariants} className="text-center mb-8">
+                            <h2 className="text-2xl font-bold text-kanji dark:text-white mb-2">Preparación de Sesión</h2>
+                          </motion.div>
 
-                        <motion.div variants={itemVariants} className="bg-surface dark:bg-slate-900 p-8 rounded-3xl border border-gray-200 dark:border-slate-800 shadow-sm space-y-8">
-                          <div>
-                            <label className="block text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3">Estado de Ánimo</label>
-                            <div className="flex justify-center">
-                              <MoodTracker
-                                value={moodRating}
-                                onChange={setMoodRating}
-                                label="Percepción Inicial de Ánimo"
+                          <motion.div variants={itemVariants} className="bg-surface dark:bg-slate-900 p-8 rounded-3xl border border-gray-200 dark:border-slate-800 shadow-sm space-y-8">
+                            <div>
+                              <label className="block text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3">Estado de Ánimo</label>
+                              <div className="flex justify-center">
+                                <MoodTracker
+                                  value={moodRating}
+                                  onChange={setMoodRating}
+                                  label="Percepción Inicial de Ánimo"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="h-px bg-gray-100 dark:bg-slate-800 w-full" />
+
+                            <div>
+                              <label className="block text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3">Etiquetas</label>
+                              <TagInput
+                                tags={tags}
+                                onChange={setTags}
+                                suggestions={tagSuggestions}
                               />
                             </div>
-                          </div>
 
-                          <div className="h-px bg-gray-100 dark:bg-slate-800 w-full" />
+                            <div className="h-px bg-gray-100 dark:bg-slate-800 w-full" />
 
-                          <div>
-                            <label className="block text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3">Etiquetas</label>
-                            <TagInput
-                              tags={tags}
-                              onChange={setTags}
-                              suggestions={tagSuggestions}
-                            />
-                          </div>
-
-                          <div className="h-px bg-gray-100 dark:bg-slate-800 w-full" />
-
-                          <div>
-                            <label className="block text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                              <Target size={14} />
-                              Objetivo Principal
-                            </label>
-                            <textarea
-                              value={content.sessionGoal || ''}
-                              onChange={(e) => setContent({ ...content, sessionGoal: e.target.value })}
-                              className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-kio/20 focus:border-kio transition-all resize-none placeholder:text-gray-400 dark:placeholder:text-slate-500"
-                              rows={2}
-                              placeholder="Ej. Trabajar en técnicas de afrontamiento para la ansiedad..."
-                            />
-                          </div>
+                            <div>
+                              <label className="block text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <Target size={14} />
+                                Objetivo Principal
+                              </label>
+                              <textarea
+                                value={content.sessionGoal || ''}
+                                onChange={(e) => setContent({ ...content, sessionGoal: e.target.value })}
+                                className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-kio/20 focus:border-kio transition-all resize-none placeholder:text-gray-400 dark:placeholder:text-slate-500"
+                                rows={2}
+                                placeholder="Ej. Trabajar en técnicas de afrontamiento para la ansiedad..."
+                              />
+                            </div>
+                          </motion.div>
                         </motion.div>
                       </motion.div>
-                    </div>
-                  ) : (
-                    <div className="p-8">
-                      <ScalesTab appointmentId={appointmentId} initialData={clinicalScales} />
-                    </div>
-                  )}
+                    ) : (
+                      <motion.div
+                        key="tab-scales"
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 10 }}
+                        transition={{ duration: 0.2 }}
+                        className="p-8"
+                      >
+                        <motion.div
+                          variants={containerVariants}
+                          initial="hidden"
+                          animate="show"
+                        >
+                          <motion.div variants={itemVariants}>
+                            <ScalesTab appointmentId={appointmentId} initialData={clinicalScales} />
+                          </motion.div>
+                        </motion.div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 {/* Continue button — always visible regardless of active tab */}
