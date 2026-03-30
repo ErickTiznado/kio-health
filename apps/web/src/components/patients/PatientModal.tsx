@@ -28,7 +28,7 @@ export function PatientModal({ isOpen, onClose, initialData, onSubmit, isLoading
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: 'spring', duration: 0.5, bounce: 0 }}
-            className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-lg z-10 relative overflow-hidden border border-gray-100 dark:border-slate-800"
+            className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-lg z-10 relative border border-gray-100 dark:border-slate-800"
           >
             <WizardPatientForm
               initialData={initialData || undefined}

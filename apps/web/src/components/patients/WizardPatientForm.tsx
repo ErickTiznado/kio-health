@@ -73,7 +73,7 @@ export function WizardPatientForm({ initialData, onSubmit, onCancel, isLoading }
   const errorClass = 'mt-1.5 text-xs text-rose-500 font-medium';
 
   return (
-    <div className="flex flex-col h-full min-h-[520px]">
+    <div className="flex flex-col h-full min-h-[540px] rounded-3xl overflow-hidden">
       {/* ── Header ───────────────────────────────────── */}
       <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 dark:border-slate-800 shrink-0">
         <img src="/LogoFavi.png" alt="Kio" className="h-7 w-7 object-contain shrink-0" />
@@ -111,7 +111,7 @@ export function WizardPatientForm({ initialData, onSubmit, onCancel, isLoading }
 
       {/* ── Steps ────────────────────────────────────── */}
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1">
-        <div className="flex-1 relative px-6 pt-6 pb-2 overflow-hidden">
+        <div className="flex-1 relative px-6 pt-6 pb-2 overflow-x-hidden overflow-y-auto">
           <AnimatePresence initial={false} custom={direction} mode="wait">
 
             {/* Step 1 — Identidad */}
