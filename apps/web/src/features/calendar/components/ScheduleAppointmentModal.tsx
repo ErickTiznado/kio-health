@@ -16,6 +16,7 @@ import type { AppointmentType } from '../../../types/appointments.types';
 import { useAuthStore } from '../../../stores/auth.store';
 import { patientKeys } from '../../../lib/query-keys';
 import { getErrorMessage } from '../../../lib/errors';
+import { PhoneInput } from '../../../components/ui/PhoneInput';
 
 interface ScheduleAppointmentModalProps {
     isOpen: boolean;
@@ -336,9 +337,9 @@ export function ScheduleAppointmentModal({
                                             </div>
                                             <div>
                                                 <label className={labelClass}>Teléfono <span className="text-gray-400 font-normal normal-case">(opcional)</span></label>
-                                                <input type="text" value={newPatientPhone}
-                                                    onChange={(e) => setNewPatientPhone(e.target.value)}
-                                                    placeholder="+52..." className={inputClass}
+                                                <PhoneInput
+                                                    value={newPatientPhone}
+                                                    onChange={setNewPatientPhone}
                                                 />
                                             </div>
                                             <p className="text-[11px] text-gray-400 dark:text-slate-500">

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { patientSchema, type PatientFormValues } from '../../schemas/patients.schema';
 import type { Patient } from '../../types/patients.types';
+import { PhoneInput } from '../ui/PhoneInput';
 
 interface WizardPatientFormProps {
   initialData?: Patient;
@@ -60,7 +61,7 @@ export function WizardPatientForm({ initialData, onSubmit, onCancel, isLoading }
   const nextStep = async () => {
     let valid = true;
     if (step === 1) valid = await trigger(['fullName', 'contactPhone', 'dateOfBirth']);
-    else if (step === 2) valid = await trigger('emergencyContact');
+    // step 2 (emergency contact) is fully optional — always advance
     if (valid) { setDirection(1); setStep((s) => Math.min(s + 1, STEPS.length)); }
   };
 
@@ -130,7 +131,13 @@ export function WizardPatientForm({ initialData, onSubmit, onCancel, isLoading }
                 </div>
                 <div>
                   <label className={labelClass}>Teléfono</label>
-                  <input {...register('contactPhone')} className={inputClass} placeholder="+52 000 000 0000" />
+                  <Controller
+                    control={control}
+                    name="contactPhone"
+                    render={({ field }) => (
+                      <PhoneInput value={field.value || ''} onChange={field.onChange} />
+                    )}
+                  />
                   {errors.contactPhone && <p className={errorClass}>{errors.contactPhone.message}</p>}
                 </div>
                 <div>
@@ -138,12 +145,15 @@ export function WizardPatientForm({ initialData, onSubmit, onCancel, isLoading }
                     control={control}
                     name="dateOfBirth"
                     render={({ field }) => (
-                      <DatePicker
-                        label="Fecha de Nacimiento"
-                        value={field.value}
-                        onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
-                        error={errors.dateOfBirth?.message}
-                      />
+                      <>
+                        <DatePicker
+                          label="Fecha de Nacimiento"
+                          value={field.value}
+                          onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                          error={errors.dateOfBirth?.message}
+                        />
+                        <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Formato: DD/MM/AAAA</p>
+                      </>
                     )}
                   />
                 </div>
@@ -178,7 +188,13 @@ export function WizardPatientForm({ initialData, onSubmit, onCancel, isLoading }
                   </div>
                   <div>
                     <label className={labelClass}>Teléfono</label>
-                    <input {...register('emergencyContact.phone')} className={inputClass} placeholder="+52..." />
+                    <Controller
+                      control={control}
+                      name="emergencyContact.phone"
+                      render={({ field }) => (
+                        <PhoneInput value={field.value || ''} onChange={field.onChange} />
+                      )}
+                    />
                     {errors.emergencyContact?.phone && <p className={errorClass}>{errors.emergencyContact.phone.message}</p>}
                   </div>
                 </div>

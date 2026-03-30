@@ -19,6 +19,27 @@ const CURRENCIES = [
   { code: 'EUR', label: 'EUR — Euro' },
 ];
 
+const COUNTRIES = [
+  { code: 'SV', label: '🇸🇻 El Salvador', currency: 'USD' },
+  { code: 'MX', label: '🇲🇽 México', currency: 'MXN' },
+  { code: 'CO', label: '🇨🇴 Colombia', currency: 'COP' },
+  { code: 'AR', label: '🇦🇷 Argentina', currency: 'ARS' },
+  { code: 'PE', label: '🇵🇪 Perú', currency: 'PEN' },
+  { code: 'CL', label: '🇨🇱 Chile', currency: 'CLP' },
+  { code: 'BR', label: '🇧🇷 Brasil', currency: 'BRL' },
+  { code: 'ES', label: '🇪🇸 España', currency: 'EUR' },
+  { code: 'US', label: '🇺🇸 Estados Unidos', currency: 'USD' },
+  { code: 'GT', label: '🇬🇹 Guatemala', currency: 'USD' },
+  { code: 'HN', label: '🇭🇳 Honduras', currency: 'USD' },
+  { code: 'NI', label: '🇳🇮 Nicaragua', currency: 'USD' },
+  { code: 'CR', label: '🇨🇷 Costa Rica', currency: 'USD' },
+  { code: 'PA', label: '🇵🇦 Panamá', currency: 'USD' },
+  { code: 'EC', label: '🇪🇨 Ecuador', currency: 'USD' },
+  { code: 'VE', label: '🇻🇪 Venezuela', currency: 'USD' },
+  { code: 'DO', label: '🇩🇴 Rep. Dominicana', currency: 'USD' },
+  { code: 'OTHER', label: '🌍 Otro', currency: 'USD' },
+];
+
 const VALID_CURRENCY_CODES = CURRENCIES.map((c) => c.code) as [string, ...string[]];
 
 const SESSION_DURATIONS = [25, 45, 50, 60, 90];
@@ -67,6 +88,7 @@ export function OnboardingPage() {
   const { user, logout, fetchCurrentUser } = useAuthStore();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState('SV');
 
   // loadDraft only once on mount — useRef prevents re-reading every render
   const draftRef = useRef(loadDraft());
@@ -305,6 +327,25 @@ export function OnboardingPage() {
                 </div>
 
                 <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-kanji dark:text-slate-200 mb-1.5">
+                      País
+                    </label>
+                    <select
+                      value={selectedCountry}
+                      onChange={(e) => {
+                        setSelectedCountry(e.target.value);
+                        const country = COUNTRIES.find((c) => c.code === e.target.value);
+                        if (country) setValue('currency', country.currency);
+                      }}
+                      className="w-full px-4 py-2.5 rounded-xl border border-cruz dark:border-slate-700 bg-bg dark:bg-slate-800 text-kanji dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-kio/50"
+                    >
+                      {COUNTRIES.map((c) => (
+                        <option key={c.code} value={c.code}>{c.label}</option>
+                      ))}
+                    </select>
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-kanji dark:text-slate-200 mb-1.5">
                       Número de colegiatura / licencia
