@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { DatePicker } from '../ui/DatePicker';
 import {
-  X, User, HeartPulse, FileText, ArrowLeft, ArrowRight, Check, AlertCircle,
+  X, User, HeartPulse, FileText, ArrowLeft, ArrowRight, Check, AlertCircle, Plus, Trash2,
 } from 'lucide-react';
 import { patientSchema, type PatientFormValues } from '../../schemas/patients.schema';
 import type { Patient } from '../../types/patients.types';
@@ -48,6 +48,7 @@ export function WizardPatientForm({ initialData, onSubmit, onCancel, isLoading }
         : '',
       diagnosis: initialData?.diagnosis || 'En proceso de evaluación',
       clinicalContext: initialData?.clinicalContext || '',
+      treatmentGoals: initialData?.treatmentGoals || [],
       emergencyContact: {
         name: initialData?.emergencyContact?.name || '',
         phone: initialData?.emergencyContact?.phone || '',
@@ -57,6 +58,21 @@ export function WizardPatientForm({ initialData, onSubmit, onCancel, isLoading }
   });
 
   const diagnosisValue = watch('diagnosis');
+  const treatmentGoals = watch('treatmentGoals') || [];
+  const goalInputRef = useRef<HTMLInputElement>(null);
+  const [goalDraft, setGoalDraft] = useState('');
+
+  const addGoal = () => {
+    const trimmed = goalDraft.trim();
+    if (!trimmed) return;
+    setValue('treatmentGoals', [...treatmentGoals, trimmed]);
+    setGoalDraft('');
+    goalInputRef.current?.focus();
+  };
+
+  const removeGoal = (index: number) => {
+    setValue('treatmentGoals', treatmentGoals.filter((_, i) => i !== index));
+  };
 
   const nextStep = async () => {
     let valid = true;
@@ -264,6 +280,42 @@ export function WizardPatientForm({ initialData, onSubmit, onCancel, isLoading }
                     className={`${inputClass} resize-none`}
                     placeholder="Describe brevemente el motivo de la visita..."
                   />
+                </div>
+                <div>
+                  <label className={labelClass}>Objetivos de Tratamiento</label>
+                  {treatmentGoals.length > 0 && (
+                    <ul className="space-y-2 mb-2">
+                      {treatmentGoals.map((goal, i) => (
+                        <li key={i} className="flex items-start gap-2 bg-gray-50 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                          <span className="mt-0.5 w-5 h-5 rounded-full bg-kio/10 dark:bg-kio/20 flex items-center justify-center text-[10px] font-bold text-kio shrink-0">{i + 1}</span>
+                          <span className="flex-1 text-sm text-gray-700 dark:text-slate-300 leading-snug">{goal}</span>
+                          <button type="button" onClick={() => removeGoal(i)} className="text-gray-300 hover:text-rose-400 dark:text-slate-600 dark:hover:text-rose-400 transition-colors shrink-0 mt-0.5">
+                            <Trash2 size={14} />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <div className="flex gap-2">
+                    <input
+                      ref={goalInputRef}
+                      type="text"
+                      value={goalDraft}
+                      onChange={(e) => setGoalDraft(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addGoal(); } }}
+                      placeholder="Ej. Reducir niveles de ansiedad..."
+                      className={`${inputClass} flex-1`}
+                    />
+                    <button
+                      type="button"
+                      onClick={addGoal}
+                      disabled={!goalDraft.trim()}
+                      className="px-3 py-3 rounded-xl bg-kio/10 hover:bg-kio/20 dark:bg-kio/20 dark:hover:bg-kio/30 text-kio transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                    >
+                      <Plus size={16} />
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Presiona Enter o el botón + para agregar</p>
                 </div>
               </motion.div>
             )}

@@ -22,6 +22,7 @@ export const patientSchema = z.object({
   dateOfBirth: z.string().optional(),
   diagnosis: z.string().optional(),
   clinicalContext: z.string().optional(),
+  treatmentGoals: z.array(z.string().min(1)).optional(),
   emergencyContact: emergencyContactSchema.optional(),
 });
 
