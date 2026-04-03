@@ -29,10 +29,15 @@ const archivePatient = async (id: string): Promise<Patient> => {
   return data;
 };
 
-export const usePatients = (page: number = 1, search: string = '', limit: number = 10) => {
+const unarchivePatient = async (id: string): Promise<Patient> => {
+  const { data } = await api.patch<Patient>(`/patients/${id}/unarchive`);
+  return data;
+};
+
+export const usePatients = (page: number = 1, search: string = '', status?: 'ACTIVE' | 'ARCHIVED', limit: number = 10) => {
   return useQuery({
-    queryKey: patientKeys.list({ page, search, limit }),
-    queryFn: () => fetchPatients({ page, search, limit }),
+    queryKey: patientKeys.list({ page, search, status, limit }),
+    queryFn: () => fetchPatients({ page, search, status, limit }),
     placeholderData: (previousData) => previousData, // Keep previous data while fetching new page
   });
 };
@@ -70,6 +75,17 @@ export const useArchivePatient = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: archivePatient,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: patientKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: patientKeys.detail(data.id) });
+    },
+  });
+};
+
+export const useUnarchivePatient = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: unarchivePatient,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: patientKeys.lists() });
       queryClient.invalidateQueries({ queryKey: patientKeys.detail(data.id) });

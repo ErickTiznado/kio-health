@@ -163,13 +163,6 @@ export function LoginPage() {
           </p>
         </form>
 
-        {/* Footer — solo visible en desarrollo */}
-        {import.meta.env.DEV && (
-          <p className="text-center text-text/50 dark:text-slate-500 text-sm mt-6">
-            Credenciales de prueba: <strong>psych@kio.com</strong> /{' '}
-            <strong>123456</strong>
-          </p>
-        )}
       </div>
     </div>
   );

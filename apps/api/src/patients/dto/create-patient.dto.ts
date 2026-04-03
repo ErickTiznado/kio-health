@@ -50,4 +50,12 @@ export class CreatePatientDto {
   @IsOptional()
   @IsString({ each: true })
   treatmentGoals?: string[];
+
+  @IsString()
+  @IsOptional()
+  medicacionActual?: string;
+
+  @IsString()
+  @IsOptional()
+  alergias?: string;
 }

@@ -47,10 +47,37 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const currency = useAuthStore((s) => s.user?.profile?.currency ?? 'USD');
 
+  // Fetch recent history for this patient (last 4, then exclude current appointment)
+  const { data: recentHistory = [] } = useQuery({
+    queryKey: ['appointment-drawer-history', appointment?.patientId],
+    queryFn: async () => {
+      const { data } = await api.get<TimelineResponse>(`/patients/${appointment!.patientId}/timeline`, {
+        params: { page: 1, limit: 4 },
+      });
+      return data.data
+        .filter((item) => item.id !== appointment!.id)
+        .slice(0, 3)
+        .map((item) => ({
+          id: item.id,
+          date: item.startTime,
+          summary:
+            item.psychNote
+              ? (typeof item.psychNote.content?.s === 'string'
+                  ? item.psychNote.content.s
+                  : typeof item.psychNote.content?.body === 'string'
+                  ? item.psychNote.content.body
+                  : item.reason ?? 'Sin detalles')
+              : (item.reason ?? 'Sin detalles'),
+          tags: item.psychNote?.tags ?? [],
+          tagColor: 'bg-kio/10 dark:bg-kio/20 text-kanji dark:text-kio',
+        }));
+    },
+    enabled: isOpen && !!appointment?.patientId,
+    staleTime: 60_000,
+  });
+
   // Derived state for display
   const amount = Number(appointment?.price) || 0;
-
-
 
   if (!appointment) return null;
 
@@ -110,35 +137,6 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
       </div>
     ), { duration: Infinity, position: 'top-center' }); // Persistent until interaction, center screen
   };
-
-  // Fetch recent history for this patient (last 4, then exclude current appointment)
-  const { data: recentHistory = [] } = useQuery({
-    queryKey: ['appointment-drawer-history', appointment?.patientId],
-    queryFn: async () => {
-      const { data } = await api.get<TimelineResponse>(`/patients/${appointment!.patientId}/timeline`, {
-        params: { page: 1, limit: 4 },
-      });
-      return data.data
-        .filter((item) => item.id !== appointment!.id)
-        .slice(0, 3)
-        .map((item) => ({
-          id: item.id,
-          date: item.startTime,
-          summary:
-            item.psychNote
-              ? (typeof item.psychNote.content?.s === 'string'
-                  ? item.psychNote.content.s
-                  : typeof item.psychNote.content?.body === 'string'
-                  ? item.psychNote.content.body
-                  : item.reason ?? 'Sin detalles')
-              : (item.reason ?? 'Sin detalles'),
-          tags: item.psychNote?.tags ?? [],
-          tagColor: 'bg-kio/10 dark:bg-kio/20 text-kanji dark:text-kio',
-        }));
-    },
-    enabled: isOpen && !!appointment?.patientId,
-    staleTime: 60_000,
-  });
 
   return (
     <>
@@ -296,7 +294,7 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
                   <p className="text-xs font-semibold text-kanji/80 dark:text-slate-300 mb-1">Primera sesión</p>
                   <p className="text-[10px] text-gray-500 dark:text-slate-500 mb-3">Este paciente no tiene historial clínico previo.</p>
                   <Link
-                    to={`/patients/${appointment.patientId}`}
+                    to={`/patients/${appointment.patientId}?tab=profile`}
                     className="text-xs font-bold text-kanji dark:text-kio flex items-center justify-center gap-1.5 mx-auto hover:bg-kanji/5 dark:hover:bg-kio/10 px-3 py-1.5 rounded-lg transition-colors"
                   >
                     <FileText size={12} />

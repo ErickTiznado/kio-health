@@ -26,6 +26,10 @@ import { AccessLogService } from '../access-log/access-log.service';
 import { CreateClinicalScaleDto } from './dto/create-clinical-scale.dto';
 import { AppointmentOwnershipGuard } from '../auth/guards/appointment-ownership.guard';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+import { AddendumService } from '../addendums/addendums.service';
+import { CreateAddendumDto } from '../addendums/dto/create-addendum.dto';
+import { RiskFlagsService } from '../risk-flags/risk-flags.service';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @Controller('appointments')
 @UseGuards(JwtAuthGuard)
@@ -33,6 +37,8 @@ export class AppointmentsController {
   constructor(
     private readonly appointmentsService: AppointmentsService,
     private readonly accessLogService: AccessLogService,
+    private readonly addendumService: AddendumService,
+    private readonly riskFlagsService: RiskFlagsService,
   ) {}
 
   @Post()
@@ -320,5 +326,42 @@ export class AppointmentsController {
       appointmentId,
       dto,
     );
+  }
+
+  // ── Addendum Endpoints ──────────────────────────────────────────
+
+  @UseGuards(AppointmentOwnershipGuard)
+  @Post(':id/addendum')
+  async createAddendum(
+    @CurrentUser() user: any,
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+    @Body() dto: CreateAddendumDto,
+    @Req() req: any,
+  ) {
+    const result = await this.addendumService.createAddendum(
+      appointmentId,
+      user.userId,
+      dto,
+    );
+
+    await this.accessLogService.logAccess(
+      user.userId,
+      'CREATE_ADDENDUM',
+      `Addendum:${result.id}`,
+      result.patientId,
+      `Appointment ID: ${appointmentId}`,
+      req.ip,
+      req.headers['user-agent'],
+    );
+
+    return result;
+  }
+
+  @UseGuards(AppointmentOwnershipGuard)
+  @Get(':id/addendums')
+  async getAddendums(
+    @Param('id', ParseUUIDPipe) appointmentId: string,
+  ) {
+    return this.addendumService.getAddendums(appointmentId);
   }
 }

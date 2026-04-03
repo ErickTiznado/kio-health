@@ -11,7 +11,6 @@ import {
     AlertTriangle,
     Edit,
     BarChart2,
-    Target,
     CalendarDays,
     Activity,
     FolderOpen,
@@ -19,10 +18,11 @@ import {
 import { DashboardLayout } from '../components/DashboardLayout';
 import { TimelineContainer } from '../components/patient/timeline/TimelineContainer';
 import { MoodChart } from '../components/patient/insights/MoodChart';
-import { TasksWidget } from '../components/patient/tasks/TasksWidget';
 import { PatientModal } from '../components/patients/PatientModal';
 import { DocumentUpload } from '../components/patients/DocumentUpload';
 import { DocumentViewer } from '../components/patients/DocumentViewer';
+import { PatientProfileEditor } from '../components/patients/PatientProfileEditor';
+import { RiskFlagBanner } from '../components/patient/RiskFlagBanner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -114,7 +114,7 @@ export default function PatientDetailsPage() {
     return (
         <DashboardLayout>
             <div className="flex flex-col h-[calc(100vh-64px)] -m-4 sm:-m-6 bg-bg dark:bg-slate-950 overflow-hidden">
-
+                <RiskFlagBanner patientId={patient.id} />
                 {/* Sticky Header */}
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
@@ -249,111 +249,8 @@ export default function PatientDetailsPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 transition={{ duration: 0.2 }}
-                                className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6"
                             >
-                                {/* Left: Goals + Tasks */}
-                                <div className="space-y-6">
-                                    {patient.treatmentGoals && patient.treatmentGoals.length > 0 ? (
-                                        <div className="bg-surface dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-[var(--color-cruz)] dark:border-slate-800">
-                                            <h3 className="text-lg font-bold text-[var(--color-kanji)] dark:text-white mb-4 flex items-center gap-2">
-                                                <Target size={18} />
-                                                Objetivos de Tratamiento
-                                            </h3>
-                                            <ul className="space-y-3">
-                                                {patient.treatmentGoals.map((goal, i) => (
-                                                    <li key={i} className="flex items-start gap-3">
-                                                        <span className="mt-0.5 w-5 h-5 rounded-full bg-[var(--color-bg)] dark:bg-slate-800 border border-[var(--color-kanji)]/30 flex items-center justify-center text-[10px] font-bold text-[var(--color-kanji)] dark:text-kio shrink-0">
-                                                            {i + 1}
-                                                        </span>
-                                                        <span className="text-sm text-gray-700 dark:text-slate-300 leading-relaxed">{goal}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    ) : (
-                                        <div className="bg-surface dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-dashed border-[var(--color-cruz)] dark:border-slate-700">
-                                            <div className="flex items-center gap-2 mb-2 text-gray-400 dark:text-slate-500">
-                                                <Target size={18} />
-                                                <h3 className="text-sm font-bold">Objetivos de Tratamiento</h3>
-                                            </div>
-                                            <p className="text-xs text-gray-400 dark:text-slate-500 leading-relaxed">
-                                                No se han definido objetivos. Edita el expediente para agregarlos.
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    <TasksWidget patientId={patient.id} />
-                                </div>
-
-                                {/* Right: Clinical + Personal */}
-                                <div className="space-y-6">
-                                    <div className="bg-surface dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-[var(--color-cruz)] dark:border-slate-800">
-                                        <h3 className="text-lg font-bold text-[var(--color-kanji)] dark:text-white mb-4">
-                                            Escenario Clínico
-                                        </h3>
-                                        <dl className="space-y-4">
-                                            <div>
-                                                <dt className="text-xs text-gray-400 dark:text-slate-500 uppercase font-bold tracking-wider">Diagnóstico</dt>
-                                                <dd className="text-sm font-medium text-gray-700 dark:text-slate-300 mt-1 bg-gray-50 dark:bg-slate-800 p-2 rounded-lg border border-gray-100 dark:border-slate-700">
-                                                    {patient.diagnosis || 'Sin diagnóstico'}
-                                                </dd>
-                                            </div>
-                                            <div>
-                                                <dt className="text-xs text-gray-400 dark:text-slate-500 uppercase font-bold tracking-wider">Contexto Clínico</dt>
-                                                <dd className="text-sm text-gray-600 dark:text-slate-400 mt-1 leading-relaxed whitespace-pre-wrap">
-                                                    {patient.clinicalContext || 'Sin contexto registrado.'}
-                                                </dd>
-                                            </div>
-                                        </dl>
-                                    </div>
-
-                                    <div className="bg-surface dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-[var(--color-cruz)] dark:border-slate-800">
-                                        <h3 className="text-lg font-bold text-[var(--color-kanji)] dark:text-white mb-4">
-                                            Datos Personales
-                                        </h3>
-                                        <dl className="space-y-4">
-                                            <div>
-                                                <dt className="text-xs text-gray-400 dark:text-slate-500 uppercase font-bold tracking-wider">Fecha de Nacimiento</dt>
-                                                <dd className="text-sm font-medium text-gray-700 dark:text-slate-300 mt-1">
-                                                    {patient.dateOfBirth
-                                                        ? new Date(patient.dateOfBirth).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })
-                                                        : 'No registrada'}
-                                                </dd>
-                                            </div>
-                                            <div>
-                                                <dt className="text-xs text-gray-400 dark:text-slate-500 uppercase font-bold tracking-wider">Teléfono</dt>
-                                                <dd className="text-sm font-medium text-gray-700 dark:text-slate-300 mt-1">
-                                                    {patient.contactPhone || 'No registrado'}
-                                                </dd>
-                                            </div>
-                                            <div>
-                                                <dt className="text-xs text-gray-400 dark:text-slate-500 uppercase font-bold tracking-wider">Paciente desde</dt>
-                                                <dd className="text-sm font-medium text-gray-700 dark:text-slate-300 mt-1 capitalize">
-                                                    {sinceDate}
-                                                </dd>
-                                            </div>
-                                        </dl>
-                                    </div>
-
-                                    {patient.emergencyContact && (
-                                        <div className="bg-rose-50 dark:bg-rose-900/20 p-6 rounded-2xl border border-rose-100 dark:border-rose-800">
-                                            <h3 className="text-sm font-bold text-rose-800 dark:text-rose-300 mb-3 flex items-center gap-2">
-                                                <AlertTriangle size={16} />
-                                                Contacto de Emergencia
-                                            </h3>
-                                            <div className="text-sm text-rose-700 dark:text-rose-300 space-y-1">
-                                                <p>
-                                                    <span className="font-semibold">{patient.emergencyContact.name}</span>
-                                                    {' '}({patient.emergencyContact.relation || 'Relación no especificada'})
-                                                </p>
-                                                <a href={`tel:${patient.emergencyContact.phone}`} className="flex items-center gap-2 hover:underline mt-1 font-medium">
-                                                    <Phone size={14} />
-                                                    {patient.emergencyContact.phone}
-                                                </a>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                                <PatientProfileEditor patient={patient} />
                             </motion.div>
                         )}
 

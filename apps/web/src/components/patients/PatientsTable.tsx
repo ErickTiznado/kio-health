@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import type { Patient } from '../../types/patients.types';
-import { MoreVertical, Edit, FileText, Trash2, Calendar } from 'lucide-react';
+import { MoreVertical, Edit, FileText, Trash2, Calendar, AlertTriangle, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { RiskFlagBadge } from '../patient/RiskFlagBadge';
 
 interface PatientsTableProps {
   patients: Patient[];
   isLoading: boolean;
   onEdit: (patient: Patient) => void;
   onArchive: (patient: Patient) => void;
+  onUnarchive: (patient: Patient) => void;
   onView: (patient: Patient) => void;
 }
 
@@ -40,10 +42,11 @@ const translateStatusColor = (status: string) => {
   }
 };
 
-function ActionMenu({ patient, onEdit, onArchive, onView }: {
+function ActionMenu({ patient, onEdit, onArchive, onUnarchive, onView }: {
   patient: Patient;
   onEdit: (p: Patient) => void;
   onArchive: (p: Patient) => void;
+  onUnarchive: (p: Patient) => void;
   onView: (p: Patient) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -110,17 +113,31 @@ function ActionMenu({ patient, onEdit, onArchive, onView }: {
               Ver Expediente
             </button>
             <div className="h-px bg-gray-100 dark:bg-slate-800 my-1 mx-4"></div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onArchive(patient);
-                setIsOpen(false);
-              }}
-              className="w-full text-left px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 flex items-center gap-3 transition-colors font-medium"
-            >
-              <Trash2 size={16} className="text-rose-400" />
-              Archivar
-            </button>
+            {patient.status === 'ARCHIVED' ? (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUnarchive(patient);
+                  setIsOpen(false);
+                }}
+                className="w-full text-left px-4 py-2.5 text-sm text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 flex items-center gap-3 transition-colors font-medium"
+              >
+                <RotateCcw size={16} className="text-emerald-400" />
+                Reactivar
+              </button>
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onArchive(patient);
+                  setIsOpen(false);
+                }}
+                className="w-full text-left px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 flex items-center gap-3 transition-colors font-medium"
+              >
+                <Trash2 size={16} className="text-rose-400" />
+                Archivar
+              </button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -128,7 +145,7 @@ function ActionMenu({ patient, onEdit, onArchive, onView }: {
   );
 }
 
-export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }: PatientsTableProps) {
+export function PatientsTable({ patients, isLoading, onEdit, onArchive, onUnarchive, onView }: PatientsTableProps) {
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -191,7 +208,12 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
                   {getInitials(patient.fullName)}
                 </motion.div>
                 <div className="flex flex-col">
-                  <span className="font-bold text-kanji dark:text-kio text-base leading-tight">{patient.fullName}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="font-bold text-kanji dark:text-kio text-base leading-tight">{patient.fullName}</span>
+                    {patient.riskFlag && patient.riskFlag.flagTypes && patient.riskFlag.flagTypes.length > 0 && (
+                      <RiskFlagBadge flags={patient.riskFlag.flagTypes} size="sm" showLabel={true} />
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-sm text-gray-500 dark:text-slate-400 font-medium">
                       {patient.contactPhone || 'Sin contacto'}
@@ -241,6 +263,7 @@ export function PatientsTable({ patients, isLoading, onEdit, onArchive, onView }
                   patient={patient}
                   onEdit={onEdit}
                   onArchive={onArchive}
+                  onUnarchive={onUnarchive}
                   onView={onView}
                 />
               </div>

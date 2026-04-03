@@ -30,6 +30,7 @@ describe('AppointmentsService', () => {
       mockEventEmitter as any,
       encryptionService,
       mockGoogleCalendar as any,
+      {} as any, // mockRiskFlagsService
     );
     jest.clearAllMocks();
     mockGoogleCalendar.syncAppointment.mockResolvedValue(null);

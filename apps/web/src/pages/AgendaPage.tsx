@@ -222,26 +222,35 @@ export function AgendaPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Legend - Using Interactive Filters */}
-            <div className="hidden lg:flex items-center gap-2 mr-4 text-[10px] font-bold text-kanji/60 dark:text-kio/60 uppercase tracking-widest border-r border-gray-200 dark:border-slate-800 pr-4">
+            {/* Status Filters */}
+            <div className="hidden lg:flex items-center bg-surface dark:bg-slate-800 rounded-[24px] border border-gray-200 dark:border-slate-700 shadow-sm p-1 mr-1">
               {[
-                { key: 'COMPLETED', label: 'Completada', icon: CheckCircle2, color: 'text-emerald-500', activeBg: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-200' },
-                { key: 'SCHEDULED', label: 'Agendada', icon: Calendar, color: 'text-blue-500', activeBg: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-200' },
-                { key: 'CANCELLED', label: 'Cancelada', icon: XCircle, color: 'text-red-500', activeBg: 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-200' },
+                { key: 'COMPLETED', label: 'Completada', icon: CheckCircle2, iconColor: 'text-emerald-500', activeBg: 'bg-kanji/10 dark:bg-kio/10', activeBorder: 'ring-kanji/30 dark:ring-kio/30' },
+                { key: 'SCHEDULED', label: 'Agendada', icon: Calendar, iconColor: 'text-blue-500', activeBg: 'bg-kanji/10 dark:bg-kio/10', activeBorder: 'ring-kanji/30 dark:ring-kio/30' },
+                { key: 'CANCELLED', label: 'Cancelada', icon: XCircle, iconColor: 'text-red-500', activeBg: 'bg-kanji/10 dark:bg-kio/10', activeBorder: 'ring-kanji/30 dark:ring-kio/30' },
               ].map((filter) => {
                 const isActive = activeFilters.includes(filter.key);
+                const count = appointments.filter((a) => a.status === filter.key).length;
                 const Icon = filter.icon;
                 return (
                   <button
                     key={filter.key}
                     onClick={() => toggleFilter(filter.key)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all border border-transparent ${isActive
-                      ? `${filter.activeBg} border-current/10 shadow-sm`
-                      : 'hover:bg-gray-100 dark:hover:bg-slate-800 opacity-60 hover:opacity-100'
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 ${isActive
+                      ? `${filter.activeBg} text-kanji dark:text-kio ring-1 ${filter.activeBorder} shadow-sm`
+                      : 'text-kanji/60 dark:text-kio/60 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-kanji dark:hover:text-kio'
                       }`}
                   >
-                    <Icon size={12} className={isActive ? 'text-current' : filter.color} />
+                    <Icon size={13} className={filter.iconColor} />
                     {filter.label}
+                    {count > 0 && (
+                      <span className={`ml-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-black leading-none ${isActive
+                        ? 'bg-kanji/15 dark:bg-kio/20 text-kanji dark:text-kio'
+                        : 'bg-gray-200 dark:bg-slate-600 text-gray-500 dark:text-slate-400'
+                        }`}>
+                        {count}
+                      </span>
+                    )}
                   </button>
                 );
               })}

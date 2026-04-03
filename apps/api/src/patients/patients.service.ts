@@ -39,6 +39,8 @@ export class PatientsService {
       diagnosis,
       clinicalContext,
       contactPhone,
+      medicacionActual,
+      alergias,
       ...data
     } = createPatientDto;
 
@@ -54,6 +56,12 @@ export class PatientsService {
     const encryptedEmergencyContact = emergencyContact
       ? this.encryptionService.encrypt(JSON.stringify(emergencyContact))
       : undefined;
+    const encryptedMedicacionActual = medicacionActual
+      ? this.encryptionService.encrypt(medicacionActual)
+      : undefined;
+    const encryptedAlergias = alergias
+      ? this.encryptionService.encrypt(alergias)
+      : undefined;
 
     const createdPatient = await this.prisma.patient.create({
       data: {
@@ -62,6 +70,8 @@ export class PatientsService {
         clinicalContext: encryptedClinicalContext,
         contactPhone: encryptedContactPhone,
         emergencyContact: encryptedEmergencyContact,
+        medicacionActual: encryptedMedicacionActual,
+        alergias: encryptedAlergias,
         clinician: { connect: { id: clinicianId } },
       },
     });
@@ -83,8 +93,6 @@ export class PatientsService {
 
     if (status) {
       where.status = status;
-    } else {
-      where.status = { not: 'ARCHIVED' };
     }
 
     // Note: contactPhone is now encrypted — DB-level phone search is not possible.
@@ -96,7 +104,13 @@ export class PatientsService {
     const orderBy: Prisma.PatientOrderByWithRelationInput = { createdAt: 'desc' };
 
     const [data, total] = await Promise.all([
-      this.prisma.patient.findMany({ where, skip, take: limit, orderBy }),
+      this.prisma.patient.findMany({ 
+        where, 
+        skip, 
+        take: limit, 
+        orderBy,
+        include: { riskFlag: true } 
+      }),
       this.prisma.patient.count({ where }),
     ]);
 
@@ -238,6 +252,8 @@ export class PatientsService {
       diagnosis,
       clinicalContext,
       contactPhone,
+      medicacionActual,
+      alergias,
       ...data
     } = updatePatientDto;
 
@@ -265,6 +281,18 @@ export class PatientsService {
           ? this.encryptionService.encrypt(JSON.stringify(emergencyContact))
           : null
         : undefined;
+    const encryptedMedicacionActual =
+      medicacionActual !== undefined
+        ? medicacionActual
+          ? this.encryptionService.encrypt(medicacionActual)
+          : null
+        : undefined;
+    const encryptedAlergias =
+      alergias !== undefined
+        ? alergias
+          ? this.encryptionService.encrypt(alergias)
+          : null
+        : undefined;
 
     const updatedPatient = await this.prisma.patient.update({
       where: { id },
@@ -282,6 +310,12 @@ export class PatientsService {
         ...(encryptedEmergencyContact !== undefined && {
           emergencyContact: encryptedEmergencyContact,
         }),
+        ...(encryptedMedicacionActual !== undefined && {
+          medicacionActual: encryptedMedicacionActual,
+        }),
+        ...(encryptedAlergias !== undefined && {
+          alergias: encryptedAlergias,
+        }),
       },
     });
 
@@ -293,6 +327,14 @@ export class PatientsService {
     return this.prisma.patient.update({
       where: { id },
       data: { status: 'ARCHIVED' },
+    });
+  }
+
+  async unarchive(id: string, clinicianId: string) {
+    await this.findOne(id, clinicianId);
+    return this.prisma.patient.update({
+      where: { id },
+      data: { status: 'ACTIVE' },
     });
   }
 
@@ -335,6 +377,12 @@ export class PatientsService {
         result.emergencyContact as string,
       );
       result.emergencyContact = JSON.parse(raw);
+    }
+    if (result.medicacionActual) {
+      result.medicacionActual = this.encryptionService.decrypt(result.medicacionActual);
+    }
+    if (result.alergias) {
+      result.alergias = this.encryptionService.decrypt(result.alergias);
     }
 
     return result;

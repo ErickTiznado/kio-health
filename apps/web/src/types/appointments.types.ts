@@ -9,6 +9,8 @@ export interface Patient {
   contactPhone?: string | null;
   emergencyContact?: EmergencyContact | null;
   treatmentGoals?: string[];
+  medicacionActual?: string | null;
+  alergias?: string | null;
 }
 
 export type PaymentMethod = 'CASH' | 'CARD' | 'TRANSFER';

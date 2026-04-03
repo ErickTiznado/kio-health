@@ -1,10 +1,13 @@
 import { type FC, useState } from 'react';
 import { usePatientTimeline } from '../../hooks/use-patients';
+import { useRiskFlags } from '../../hooks/use-risk-flags';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ClinicalDetailsModal } from './ClinicalDetailsModal';
 import { TasksModal } from './TasksModal';
-import { FileText, ArrowRight, ListTodo } from 'lucide-react';
+import { TagsModal } from '../patient/timeline/TagsModal';
+import { FileText, ArrowRight, ListTodo, AlertTriangle, Phone, Stethoscope, Pill, MoreHorizontal } from 'lucide-react';
+import { RiskFlagBadge } from '../patient/RiskFlagBadge';
 
 interface PatientContextPanelProps {
   patientId: string;
@@ -21,10 +24,18 @@ export const PatientContextPanel: FC<PatientContextPanelProps> = ({
   psychContext,
 }) => {
   const { data: timelineData } = usePatientTimeline(patientId);
+  const { data: riskFlagsData } = useRiskFlags(patientId);
+  
   const recentHistory = timelineData?.pages.flatMap(p => p.data).slice(0, 3) || [];
+  const riskFlags = riskFlagsData?.flagTypes || [];
+  
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isTasksOpen, setIsTasksOpen] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[] | null>(null);
 
+  const emergencyContact = psychContext?.emergencyContact;
+  const hasEmergencyData = emergencyContact || riskFlags.length > 0;
+  
   return (
     <>
       <div className="bg-surface dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 h-full p-6 overflow-y-auto flex flex-col">
@@ -32,6 +43,65 @@ export const PatientContextPanel: FC<PatientContextPanelProps> = ({
         <div className="flex items-center gap-2 mb-6 shrink-0">
           <h2 className="text-xl font-bold dark:text-white truncate" title={patientName}>{patientName}</h2>
           <span className="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 px-2 py-0.5 rounded text-sm whitespace-nowrap">{patientAge} años</span>
+        </div>
+
+        {/* Crisis Contacts (Conditional) */}
+        {hasEmergencyData && (
+          <div className="mb-6 shrink-0 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-xl p-4">
+            <h3 className="text-xs font-bold text-red-800 dark:text-red-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+              <AlertTriangle size={14} />
+              Alertas y Contacto de Crisis
+            </h3>
+            
+            {riskFlags.length > 0 && (
+              <div className="mb-3">
+                <RiskFlagBadge flags={riskFlags} size="sm" />
+              </div>
+            )}
+            
+            {emergencyContact && (
+              <div className="bg-white dark:bg-slate-800 p-3 rounded-lg border border-red-100 dark:border-red-900/40">
+                <p className="text-sm font-bold text-gray-800 dark:text-slate-200 mb-1 flex items-center gap-2">
+                  <Phone size={14} className="text-red-500" />
+                  {emergencyContact.name}
+                  {emergencyContact.relation && (
+                    <span className="text-xs font-normal text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">
+                      {emergencyContact.relation}
+                    </span>
+                  )}
+                </p>
+                <a 
+                  href={`tel:${emergencyContact.phone}`}
+                  className="text-sm text-kio hover:underline font-medium"
+                >
+                  {emergencyContact.phone}
+                </a>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Medical Info */}
+        <div className="mb-6 shrink-0">
+          <h3 className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-2">Información Médica</h3>
+          
+          <div className="space-y-2">
+            <div className={`p-3 rounded-xl border text-sm ${psychContext.alergias ? 'bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-900/30 text-orange-800 dark:text-orange-300' : 'bg-gray-50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-800 text-gray-600 dark:text-slate-400'}`}>
+              <div className="flex items-center gap-2 mb-1 font-bold">
+                <Stethoscope size={14} />
+                Alergias
+              </div>
+              <p>{psychContext.alergias || 'Sin alergias registradas'}</p>
+            </div>
+            
+            <div className="p-3 rounded-xl border bg-gray-50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-800 text-sm text-gray-600 dark:text-slate-400">
+              <div className="flex items-center gap-2 mb-1 font-bold">
+                <Pill size={14} />
+                Medicación Actual
+              </div>
+              <p>{psychContext.medicacionActual || 'Sin medicación registrada'}</p>
+            </div>
+          </div>
         </div>
 
         {/* Diagnosis Badge & Info Action */}
@@ -63,6 +133,9 @@ export const PatientContextPanel: FC<PatientContextPanelProps> = ({
             <ul className="space-y-4">
               {recentHistory.map((item) => {
                 const content = item.psychNote?.content;
+                const tags = item.psychNote?.tags || [];
+                const visibleTags = tags.slice(0, 3);
+                const hasMoreTags = tags.length > 3;
                 const snippet = content?.s || content?.body || item.reason || 'Sin detalles';
 
                 return (
@@ -71,9 +144,28 @@ export const PatientContextPanel: FC<PatientContextPanelProps> = ({
                     <div className="font-bold text-gray-700 dark:text-slate-200 text-sm">
                       {format(new Date(item.startTime), "d 'de' MMMM", { locale: es })}
                     </div>
-                    <div className="text-gray-500 dark:text-slate-400 text-xs line-clamp-2 mt-1">
+                    <div className="text-gray-500 dark:text-slate-400 text-xs line-clamp-2 mt-1 mb-2">
                       {typeof snippet === 'string' ? snippet : JSON.stringify(snippet)}
                     </div>
+                    
+                    {tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 items-center">
+                        {visibleTags.map(tag => (
+                          <span key={tag} className="text-[9px] font-medium text-gray-400 dark:text-slate-500 bg-gray-50 dark:bg-slate-800/50 px-1.5 py-0.5 rounded-full border border-gray-100 dark:border-slate-800">
+                            #{tag}
+                          </span>
+                        ))}
+                        {hasMoreTags && (
+                          <button
+                            onClick={() => setSelectedTags(tags)}
+                            className="text-[9px] font-bold text-kio hover:underline flex items-center gap-0.5 ml-0.5"
+                          >
+                            <MoreHorizontal size={8} />
+                            +{tags.length - 3}
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </li>
                 );
               })}
@@ -106,6 +198,12 @@ export const PatientContextPanel: FC<PatientContextPanelProps> = ({
         isOpen={isTasksOpen}
         onClose={() => setIsTasksOpen(false)}
         patientId={patientId}
+      />
+
+      <TagsModal
+        isOpen={!!selectedTags}
+        onClose={() => setSelectedTags(null)}
+        tags={selectedTags || []}
       />
     </>
   );

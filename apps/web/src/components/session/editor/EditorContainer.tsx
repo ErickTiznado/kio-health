@@ -10,7 +10,7 @@ import { SoapForm } from './SoapForm';
 import { FreeForm } from './FreeForm';
 import { TagInput } from './TagInput';
 import { EditorToolbox } from './EditorToolbox';
-import { Check, PenTool, Target, ArrowLeft, ArrowRight, Activity, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Check, PenTool, Target, ArrowLeft, ArrowRight, Activity, ChevronLeft, ChevronRight, Copy, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -218,26 +218,24 @@ export function EditorContainer({
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-3"
+              className="flex items-center gap-2"
             >
               <button
-                onClick={() => setIsReadMode(!isReadMode)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${isReadMode
-                  ? 'bg-cruz dark:bg-kio/10 text-kanji dark:text-kio border border-kio-light dark:border-kio/30'
-                  : 'bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:text-gray-700 dark:hover:text-slate-200'
-                  }`}
+                onClick={handleCopyStructure}
+                className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:text-gray-700 dark:hover:text-slate-200 rounded-lg text-xs font-bold transition-all"
+                title="Copiar contenido al portapapeles"
               >
-                {isReadMode ? (
-                  <>
-                    <PenTool size={14} />
-                    Editar
-                  </>
-                ) : (
-                  <>
-                    <Check size={14} />
-                    Lectura
-                  </>
-                )}
+                <Copy size={14} />
+                Copiar
+              </button>
+              
+              <button
+                onClick={handleExportPdf}
+                className="flex items-center gap-2 px-3 py-1.5 bg-kanji dark:bg-kio text-white rounded-lg text-xs font-bold transition-all shadow-sm hover:opacity-90"
+                title="Exportar nota a PDF"
+              >
+                <FileDown size={14} />
+                Exportar PDF
               </button>
             </motion.div>
           )}
@@ -325,51 +323,53 @@ export function EditorContainer({
                           variants={containerVariants}
                           initial="hidden"
                           animate="show"
-                          className="max-w-xl w-full space-y-8"
+                          className="max-w-5xl w-full"
                         >
-                          <motion.div variants={itemVariants} className="text-center mb-8">
-                            <h2 className="text-2xl font-bold text-kanji dark:text-white mb-2">Preparación de Sesión</h2>
-                          </motion.div>
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                            {/* Left Side: Mood & Tags */}
+                            <motion.div variants={itemVariants} className="bg-surface dark:bg-slate-900 p-8 rounded-3xl border border-gray-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-8">
+                              <div>
+                                <label className="block text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3">Estado de Ánimo</label>
+                                <div className="flex justify-center">
+                                  <MoodTracker
+                                    value={moodRating}
+                                    onChange={setMoodRating}
+                                    label="Percepción Inicial de Ánimo"
+                                  />
+                                </div>
+                              </div>
 
-                          <motion.div variants={itemVariants} className="bg-surface dark:bg-slate-900 p-8 rounded-3xl border border-gray-200 dark:border-slate-800 shadow-sm space-y-8">
-                            <div>
-                              <label className="block text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3">Estado de Ánimo</label>
-                              <div className="flex justify-center">
-                                <MoodTracker
-                                  value={moodRating}
-                                  onChange={setMoodRating}
-                                  label="Percepción Inicial de Ánimo"
+                              <div className="h-px bg-gray-100 dark:bg-slate-800 w-full" />
+
+                              <div>
+                                <label className="block text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3">Etiquetas</label>
+                                <TagInput
+                                  tags={tags}
+                                  onChange={setTags}
+                                  suggestions={tagSuggestions}
                                 />
                               </div>
-                            </div>
+                            </motion.div>
 
-                            <div className="h-px bg-gray-100 dark:bg-slate-800 w-full" />
-
-                            <div>
-                              <label className="block text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3">Etiquetas</label>
-                              <TagInput
-                                tags={tags}
-                                onChange={setTags}
-                                suggestions={tagSuggestions}
-                              />
-                            </div>
-
-                            <div className="h-px bg-gray-100 dark:bg-slate-800 w-full" />
-
-                            <div>
+                            {/* Right Side: Session Goal */}
+                            <motion.div variants={itemVariants} className="bg-surface dark:bg-slate-900 p-8 rounded-3xl border border-gray-200 dark:border-slate-800 shadow-sm flex flex-col min-h-full">
                               <label className="block text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
                                 <Target size={14} />
-                                Objetivo Principal
+                                Objetivo Principal de la Sesión
                               </label>
-                              <textarea
-                                value={content.sessionGoal || ''}
-                                onChange={(e) => setContent({ ...content, sessionGoal: e.target.value })}
-                                className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-kio/20 focus:border-kio transition-all resize-none placeholder:text-gray-400 dark:placeholder:text-slate-500"
-                                rows={2}
-                                placeholder="Ej. Trabajar en técnicas de afrontamiento para la ansiedad..."
-                              />
-                            </div>
-                          </motion.div>
+                              <div className="flex-1 flex flex-col">
+                                <textarea
+                                  value={content.sessionGoal || ''}
+                                  onChange={(e) => setContent({ ...content, sessionGoal: e.target.value })}
+                                  className="flex-1 w-full bg-gray-50/50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-2xl p-5 text-base focus:outline-none focus:ring-2 focus:ring-kio/20 focus:border-kio transition-all resize-none placeholder:text-gray-400 dark:placeholder:text-slate-500"
+                                  placeholder="¿Qué buscas lograr en esta intervención? Ej. Trabajar en técnicas de afrontamiento para la ansiedad, revisión de tareas de exposición, etc."
+                                />
+                                <p className="mt-3 text-[11px] text-gray-400 dark:text-slate-500 leading-relaxed italic">
+                                  Este objetivo te servirá como guía visual durante la redacción de la nota clínica en el siguiente paso.
+                                </p>
+                              </div>
+                            </motion.div>
+                          </div>
                         </motion.div>
                       </motion.div>
                     ) : (

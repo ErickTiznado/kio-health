@@ -175,6 +175,8 @@ const NOTE_TAGS = [
   ['relaciones', 'asertividad', 'comunicación'],
   ['sueño', 'higiene-del-sueño', 'relajación'],
   ['trauma', 'procesamiento', 'EMDR'],
+  ['depresión', 'ideación suicida', 'urgente'],
+  ['ansiedad', 'autolesión'],
 ];
 
 // ============================================
@@ -196,7 +198,7 @@ function generateMexicanPhone(): string {
 function generateEmergencyContact(): object {
   return {
     name: faker.person.fullName(),
-    relationship: faker.helpers.arrayElement([
+    relation: faker.helpers.arrayElement([
       'Esposo/a',
       'Padre/Madre',
       'Hermano/a',
@@ -307,6 +309,8 @@ async function createPatientsForClinician(
         diagnosis: (() => { const d = faker.helpers.arrayElement(DIAGNOSES); return d ? encryptionService.encrypt(d) : null; })(),
         clinicalContext: encryptionService.encrypt(faker.helpers.arrayElement(CLINICAL_CONTEXTS)),
         dateOfBirth: faker.date.birthdate({ min: 18, max: 65, mode: 'age' }),
+        medicacionActual: Math.random() > 0.5 ? encryptionService.encrypt(faker.helpers.arrayElement(['Sertralina 50mg', 'Escitalopram 10mg', 'Fluoxetina 20mg', 'Alprazolam 0.5mg'])) : null,
+        alergias: Math.random() > 0.8 ? encryptionService.encrypt(faker.helpers.arrayElement(['Penicilina', 'Látex', 'Ibuprofeno'])) : null,
       },
     });
     patientIds.push(patient.id);

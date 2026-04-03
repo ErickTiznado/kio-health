@@ -21,6 +21,8 @@ import { ScaleType, ScaleRiskLevel } from '#generated/prisma';
 import { ExportService } from '../export/export.service';
 import { GoogleCalendarService } from '../integrations/google-calendar.service';
 
+import { RiskFlagsService } from '../risk-flags/risk-flags.service';
+
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { startOfMonth, endOfMonth } from 'date-fns';
@@ -33,6 +35,7 @@ export class AppointmentsService {
     private readonly eventEmitter: EventEmitter2,
     private readonly encryptionService: EncryptionService,
     private readonly googleCalendarService: GoogleCalendarService,
+    private readonly riskFlagsService: RiskFlagsService,
   ) {}
 
   async getMonthDensity(clinicianId: string, date: Date | string) {
@@ -416,7 +419,7 @@ export class AppointmentsService {
     }
 
     // Check if note exists and update or create atomically
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       const existingNote = await tx.psychNote.findUnique({
         where: { appointmentId },
       });
@@ -448,6 +451,50 @@ export class AppointmentsService {
         });
       }
     });
+
+    // --- Risk Flags Calculation ---
+    try {
+      const scales = await this.prisma.clinicalScale.findMany({
+        where: { appointmentId },
+      });
+      const phq9Score = scales.find((s) => s.scaleType === 'PHQ9')?.totalScore;
+      const gad7Score = scales.find((s) => s.scaleType === 'GAD7')?.totalScore;
+      const tags = dto.tags || [];
+
+      // Find previous appointment to get delta
+      const previousAppointment = await this.prisma.appointment.findFirst({
+        where: {
+          patientId: appointment.patientId,
+          clinicianId,
+          status: 'COMPLETED',
+          startTime: { lt: appointment.startTime },
+        },
+        orderBy: { startTime: 'desc' },
+      });
+
+      let previousPhq9Score: number | undefined;
+      if (previousAppointment) {
+        const prevScales = await this.prisma.clinicalScale.findMany({
+          where: { appointmentId: previousAppointment.id },
+        });
+        previousPhq9Score = prevScales.find((s) => s.scaleType === 'PHQ9')?.totalScore;
+      }
+
+      const flagTypes = await this.riskFlagsService.calculateRiskFlags({
+        patientId: appointment.patientId,
+        phq9Score,
+        gad7Score,
+        tags,
+        previousPhq9Score,
+      });
+
+      // Always update to synchronize current state
+      await this.riskFlagsService.updateRiskFlags(appointment.patientId, flagTypes);
+    } catch (e) {
+      console.error('Error calculating risk flags:', e);
+    }
+
+    return result;
   }
 
   private validateNoteContent(type: NoteTemplateType, content: any) {

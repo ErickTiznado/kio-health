@@ -38,3 +38,13 @@ export const clinicKeys = {
   patients: () => [...clinicKeys.all, 'patients'] as const,
   finance: (month: number, year: number) => [...clinicKeys.all, 'finance', month, year] as const,
 };
+
+export const riskFlagKeys = {
+  all: ['risk-flags'] as const,
+  patient: (patientId: string) => [...riskFlagKeys.all, patientId] as const,
+};
+
+export const addendumKeys = {
+  all: ['addendums'] as const,
+  appointment: (appointmentId: string) => [...addendumKeys.all, appointmentId] as const,
+};

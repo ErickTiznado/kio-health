@@ -96,6 +96,15 @@ enum ScaleRiskLevel {
   SEVERE
 }
 
+enum RiskFlagType {
+  SEVERE_DEPRESSION
+  SEVERE_ANXIETY
+  AUTOLESION
+  SUICIDAL_IDEATION
+  URGENT
+  SUDDEN_DETERIORATION
+}
+
 // ============================================
 // MODELS
 // ============================================
@@ -177,6 +186,8 @@ model Patient {
   contactPhone     String?       @map("contact_phone")
   emergencyContact String?       @map("emergency_contact")
   treatmentGoals   String[]      @default([]) @map("treatment_goals")
+  medicacionActual String?       @map("medicacion_actual")
+  alergias         String?
   createdAt        DateTime      @default(now()) @map("created_at")
   updatedAt        DateTime      @updatedAt @map("updated_at")
 
@@ -187,6 +198,8 @@ model Patient {
   tasks           Task[]
   clinicalScales  ClinicalScale[]
   documents       PatientDocument[]
+  riskFlag        RiskFlag?
+  addendums       PsychNoteAddendum[]
 
   @@index([fullName])
   @@map("patients")
@@ -413,4 +426,36 @@ model GoogleIntegration {
   clinician       ClinicianProfile @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
 
   @@map("google_integrations")
+}
+
+model RiskFlag {
+  id          String         @id @default(uuid()) @db.Uuid
+  patientId   String         @unique @map("patient_id") @db.Uuid
+  patient     Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  flagTypes   RiskFlagType[] @map("flag_types")
+  lastUpdated DateTime       @updatedAt @map("last_updated")
+  resolvedAt  DateTime?      @map("resolved_at")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  @@map("risk_flags")
+}
+
+model PsychNoteAddendum {
+  id              String        @id @default(uuid()) @db.Uuid
+  appointmentId   String        @map("appointment_id") @db.Uuid
+  patientId       String        @map("patient_id") @db.Uuid
+  patient         Patient       @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  content         String        
+  privateNotes    String?       @map("private_notes")
+
+  createdBy       String        @map("created_by") @db.Uuid
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  type            String        @default("ADDENDUM")
+
+  @@index([appointmentId])
+  @@index([patientId])
+  @@map("psych_note_addendums")
 }

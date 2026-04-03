@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { X, Hash } from 'lucide-react';
+import { X, Hash, MoreHorizontal, LayoutGrid } from 'lucide-react';
+import { TagsManagerModal } from './TagsManagerModal';
+import { SuggestionsModal } from './SuggestionsModal';
 
 interface TagInputProps {
   tags: string[];
@@ -9,6 +11,8 @@ interface TagInputProps {
 
 export function TagInput({ tags, onChange, suggestions = [] }: TagInputProps) {
   const [input, setInput] = useState('');
+  const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
+  const [isSuggestionsModalOpen, setIsSuggestionsModalOpen] = useState(false);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -34,19 +38,38 @@ export function TagInput({ tags, onChange, suggestions = [] }: TagInputProps) {
   };
 
   const availableSuggestions = suggestions.filter(s => !tags.includes(s));
+  
+  const visibleTags = tags.slice(0, 3);
+  const hiddenTagsCount = tags.length - 3;
+  
+  const visibleSuggestions = availableSuggestions.slice(0, 3);
+  const hasMoreSuggestions = availableSuggestions.length > 3;
 
   return (
     <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 flex-wrap px-4 pt-2 border border-gray-200 dark:border-slate-700 rounded-xl bg-surface dark:bg-slate-800 min-h-[42px] focus-within:ring-2 focus-within:ring-kio/20 transition-all">
         <Hash size={14} className="text-gray-400 dark:text-slate-500" />
-        {tags.map(tag => (
+        
+        {visibleTags.map(tag => (
             <span key={tag} className="bg-cruz dark:bg-kio/20 text-kanji dark:text-kio text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1">
             #{tag}
-            <button onClick={() => removeTag(tag)} className="hover:text-kanji/70 dark:hover:text-kio/70">
+            <button type="button" onClick={() => removeTag(tag)} className="hover:text-kanji/70 dark:hover:text-kio/70">
                 <X size={12} />
             </button>
             </span>
         ))}
+
+        {hiddenTagsCount > 0 && (
+          <button 
+            type="button"
+            onClick={() => setIsTagsModalOpen(true)}
+            className="text-[10px] font-bold text-kio bg-kio/10 px-2 py-1 rounded-md flex items-center gap-1 hover:bg-kio/20 transition-colors"
+          >
+            <MoreHorizontal size={10} />
+            +{hiddenTagsCount} más
+          </button>
+        )}
+
         <input
             type="text"
             value={input}
@@ -59,18 +82,46 @@ export function TagInput({ tags, onChange, suggestions = [] }: TagInputProps) {
         
         {/* Suggestions */}
         {availableSuggestions.length > 0 && (
-            <div className="flex gap-2 px-1">
-                {availableSuggestions.map(s => (
-                    <button
-                        key={s}
-                        onClick={() => addTag(s)}
-                        className="text-[10px] font-bold text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded-md hover:bg-gray-200 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-slate-300 transition-colors"
-                    >
-                        + #{s}
-                    </button>
-                ))}
+            <div className="flex items-center gap-2 px-1">
+                <div className="flex gap-2">
+                  {visibleSuggestions.map(s => (
+                      <button
+                          key={s}
+                          type="button"
+                          onClick={() => addTag(s)}
+                          className="text-[10px] font-bold text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded-md hover:bg-gray-200 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-slate-300 transition-colors"
+                      >
+                          + #{s}
+                      </button>
+                  ))}
+                </div>
+
+                {hasMoreSuggestions && (
+                  <button
+                    type="button"
+                    onClick={() => setIsSuggestionsModalOpen(true)}
+                    className="text-[10px] font-bold text-kio flex items-center gap-1 px-2 py-1 hover:bg-kio/5 rounded-md transition-colors"
+                  >
+                    <LayoutGrid size={10} />
+                    Ver todas
+                  </button>
+                )}
             </div>
         )}
+
+        <TagsManagerModal 
+          isOpen={isTagsModalOpen}
+          onClose={() => setIsTagsModalOpen(false)}
+          tags={tags}
+          onRemoveTag={removeTag}
+        />
+
+        <SuggestionsModal
+          isOpen={isSuggestionsModalOpen}
+          onClose={() => setIsSuggestionsModalOpen(false)}
+          suggestions={availableSuggestions}
+          onAddTag={addTag}
+        />
     </div>
   );
 }

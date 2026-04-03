@@ -24,6 +24,8 @@ export const patientSchema = z.object({
   clinicalContext: z.string().optional(),
   treatmentGoals: z.array(z.string().min(1)).optional(),
   emergencyContact: emergencyContactSchema.optional(),
+  medicacionActual: z.string().optional(),
+  alergias: z.string().optional(),
 });
 
 export type PatientFormValues = z.infer<typeof patientSchema>;

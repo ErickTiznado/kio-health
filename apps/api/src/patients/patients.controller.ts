@@ -30,6 +30,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CurrentClinician } from '../auth/decorators/current-clinician.decorator';
 import { AccessLogService } from '../access-log/access-log.service';
+import { RiskFlagsService } from '../risk-flags/risk-flags.service';
 
 @Controller('patients')
 @UseGuards(JwtAuthGuard)
@@ -38,6 +39,7 @@ export class PatientsController {
     private readonly patientsService: PatientsService,
     private readonly patientDocumentsService: PatientDocumentsService,
     private readonly accessLogService: AccessLogService,
+    private readonly riskFlagsService: RiskFlagsService,
   ) {}
 
   @Post()
@@ -320,5 +322,48 @@ export class PatientsController {
     );
 
     return result;
+  }
+
+  @Patch(':id/unarchive')
+  async unarchive(
+    @CurrentUser() user: any,
+    @CurrentClinician() clinicianId: string,
+    @Param('id') id: string,
+    @Req() req: any,
+  ) {
+    const result = await this.patientsService.unarchive(id, clinicianId);
+
+    await this.accessLogService.logAccess(
+      user.userId,
+      'UNARCHIVE_PATIENT',
+      `Patient:${id}`,
+      id,
+      undefined,
+      req.ip,
+      req.headers['user-agent'],
+    );
+
+    return result;
+  }
+
+  // ── Risk Flag Endpoints ──────────────────────────────────────
+
+  @Get(':id/risk-flags')
+  async getRiskFlags(
+    @CurrentClinician() clinicianId: string,
+    @Param('id') patientId: string,
+  ) {
+    await this.patientsService.findOne(patientId, clinicianId);
+    return this.riskFlagsService.getRiskFlags(patientId);
+  }
+
+  @Patch(':id/risk-flags/resolve')
+  async resolveRiskFlags(
+    @CurrentClinician() clinicianId: string,
+    @Param('id') patientId: string,
+    @Body('flagTypesToResolve') flagTypesToResolve: string[],
+  ) {
+    await this.patientsService.findOne(patientId, clinicianId);
+    return this.riskFlagsService.resolveRiskFlags(patientId, flagTypesToResolve as any);
   }
 }

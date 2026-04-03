@@ -19,6 +19,7 @@ export interface Patient {
   treatmentGoals?: string[];
   createdAt: string;
   updatedAt: string;
+  riskFlag?: RiskFlag;
   appointments?: {
     id: string;
     startTime: string;
@@ -42,6 +43,7 @@ export interface QueryPatientsDto {
   page?: number;
   limit?: number;
   search?: string;
+  status?: 'ACTIVE' | 'ARCHIVED';
 }
 
 export interface PatientsResponse {
@@ -75,4 +77,33 @@ export interface TimelineResponse {
     page: number;
     lastPage: number;
   };
+}
+
+export type RiskFlagType =
+  | 'SEVERE_DEPRESSION'
+  | 'SEVERE_ANXIETY'
+  | 'AUTOLESION'
+  | 'SUICIDAL_IDEATION'
+  | 'URGENT'
+  | 'SUDDEN_DETERIORATION';
+
+export interface RiskFlag {
+  id: string;
+  patientId: string;
+  flagTypes: RiskFlagType[];
+  lastUpdated: string;
+  resolvedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PsychNoteAddendum {
+  id: string;
+  appointmentId: string;
+  patientId: string;
+  content: string;
+  privateNotes?: string;
+  createdBy: string;
+  createdAt: string;
+  type: 'ADDENDUM' | 'CORRECTION';
 }

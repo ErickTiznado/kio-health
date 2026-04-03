@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePatients, useCreatePatient, useUpdatePatient, useArchivePatient } from '../hooks/use-patients';
+import { usePatients, useCreatePatient, useUpdatePatient, useArchivePatient, useUnarchivePatient } from '../hooks/use-patients';
 import { useDebounce } from '../hooks/use-debounce';
 import { PatientsTable } from '../components/patients/PatientsTable';
 import { PatientModal } from '../components/patients/PatientModal';
@@ -21,10 +21,14 @@ export default function PatientsPage() {
   const navigate = useNavigate();
 
   const [search, setSearch] = useState('');
-  const [activeTab, setActiveTab] = useState('ALL');
+  const [activeTab, setActiveTab] = useState<'ALL' | 'ACTIVE' | 'ARCHIVED'>('ALL');
   const debouncedSearch = useDebounce(search, 500);
   
-  const { data, isLoading } = usePatients(1, debouncedSearch);
+  const { data, isLoading } = usePatients(
+    1, 
+    debouncedSearch, 
+    activeTab === 'ALL' ? undefined : activeTab
+  );
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
@@ -32,6 +36,7 @@ export default function PatientsPage() {
   const createPatientMutation = useCreatePatient();
   const updatePatientMutation = useUpdatePatient();
   const archivePatientMutation = useArchivePatient();
+  const unarchivePatientMutation = useUnarchivePatient();
 
   const handleCreate = (data: PatientFormValues) => {
     createPatientMutation.mutate(data, {
@@ -72,6 +77,19 @@ export default function PatientsPage() {
     }
   };
 
+  const handleUnarchive = async (patient: Patient) => {
+    const confirmed = await confirmAction({
+      title: '¿Activar paciente?',
+      description: 'El paciente volverá a la lista de pacientes activos.',
+      confirmLabel: 'Sí, activar',
+      cancelLabel: 'Cancelar',
+      variant: 'primary',
+    });
+    if (confirmed) {
+      unarchivePatientMutation.mutate(patient.id);
+    }
+  };
+
   const openCreateModal = () => {
     setEditingPatient(null);
     setIsModalOpen(true);
@@ -87,11 +105,7 @@ export default function PatientsPage() {
     setEditingPatient(null);
   };
 
-  const filteredPatients = (data?.data || []).filter(patient => {
-    const status = patient.status;
-    if (activeTab === 'ALL') return status !== 'ARCHIVED';
-    return status === activeTab;
-  });
+  const filteredPatients = (data?.data || []);
 
   return (
     <DashboardLayout>
@@ -178,6 +192,7 @@ export default function PatientsPage() {
             isLoading={isLoading}
             onEdit={openEditModal}
             onArchive={handleArchive}
+            onUnarchive={handleUnarchive}
             onView={(patient) => navigate(`/patients/${patient.id}`)}
           />
         </div>

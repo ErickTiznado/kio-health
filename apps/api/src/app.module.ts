@@ -21,6 +21,8 @@ import { EncryptionModule } from './lib/encryption.module';
 import { ClinicsModule } from './clinics/clinics.module';
 import { IntegrationsModule } from './integrations/integrations.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { AddendumsModule } from './addendums/addendums.module';
+import { RiskFlagsModule } from './risk-flags/risk-flags.module';
 
 @Module({
   imports: [
@@ -48,6 +50,8 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
     IntegrationsModule,
     EventEmitterModule.forRoot(),
     SubscriptionsModule,
+    AddendumsModule,
+    RiskFlagsModule,
   ],
   controllers: [AppController],
   providers: [

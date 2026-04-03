@@ -37,25 +37,25 @@ export const SessionLayout: FC<SessionLayoutProps> = ({
   const handleGoBack = () => navigate('/agenda');
 
   return (
-    <div className="h-screen overflow-hidden bg-bg dark:bg-slate-950 flex flex-col">
+    <div className="h-screen overflow-hidden bg-bg flex flex-col">
       {/* ── Minimal Header ── */}
-      <header className="h-16 bg-surface/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
+      <header className="h-16 bg-surface/80 backdrop-blur-xl border-b border-border flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
         {/* Left — Back + Patient Info */}
         <div className="flex items-center gap-4">
           <button
             type="button"
             onClick={handleGoBack}
-            className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-500 dark:text-slate-400 transition-colors"
+            className="p-2 -ml-2 rounded-full hover:bg-secondary text-text-secondary transition-colors"
             aria-label="Volver a la agenda"
           >
             <ChevronLeft size={24} />
           </button>
 
           <div className="flex flex-col">
-            <h1 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">
-              {patientName} <span className="text-gray-400 dark:text-slate-500 font-normal">#{sessionNumber || 1}</span>
+            <h1 className="text-lg font-bold text-text leading-tight">
+              {patientName} <span className="text-text-muted font-normal">#{sessionNumber || 1}</span>
             </h1>
-            <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-slate-400">
+            <div className="flex items-center gap-3 text-xs text-text-secondary">
               {patientAge !== undefined && <span>{patientAge} años</span>}
               <span>
                 Última vez: {lastVisit ? format(new Date(lastVisit), 'dd MMM') : 'N/A'}
@@ -64,7 +64,7 @@ export const SessionLayout: FC<SessionLayoutProps> = ({
                 href={`/patients/${patientId}`}
                 target="_blank"
                 rel="noreferrer"
-                className="ml-2 text-kanji dark:text-kio hover:text-kanji/80 dark:hover:text-kio/80 hover:underline cursor-pointer"
+                className="ml-2 text-kanji dark:text-kio hover:text-kanji/80 dark:hover:text-kio/80 hover:underline cursor-pointer transition-colors"
               >
                 Ver Historial Completo
               </a>
@@ -76,9 +76,9 @@ export const SessionLayout: FC<SessionLayoutProps> = ({
         <div className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors ${
           isOvertime 
             ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400' 
-            : 'bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300'
+            : 'bg-secondary border-border text-text-secondary'
         }`}>
-          <Clock size={16} className={isOvertime ? 'animate-pulse' : 'text-gray-400 dark:text-slate-500'} />
+          <Clock size={16} className={isOvertime ? 'animate-pulse' : 'text-text-muted'} />
           <span className="text-sm font-mono font-medium tracking-wider">
             {elapsedTime}
           </span>
@@ -90,7 +90,7 @@ export const SessionLayout: FC<SessionLayoutProps> = ({
             <>
               <button
                 onClick={onNoShow}
-                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md"
+                className="px-4 py-2 text-sm font-medium text-text-secondary hover:text-red-600 dark:hover:text-red-400 transition-colors bg-surface border border-border rounded-md"
               >
                 No Asistió
               </button>

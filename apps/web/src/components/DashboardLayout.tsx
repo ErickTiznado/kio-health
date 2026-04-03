@@ -14,7 +14,6 @@ import {
   X,
   DollarSign,
   Building2,
-  Search,
   Plus,
   UserPlus,
   CalendarPlus,
@@ -239,18 +238,6 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
 
           {/* Right side actions */}
           <div className="flex items-center gap-3">
-            {/* Búsqueda ⌘K */}
-            <button
-              onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }))}
-              aria-label="Búsqueda global (⌘K)"
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-800 hover:text-kanji dark:hover:text-kio transition-colors border border-gray-200 dark:border-slate-700"
-            >
-              <Search size={14} aria-hidden="true" />
-              <kbd className="text-[11px] font-mono bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 px-1.5 py-0.5 rounded shadow-sm leading-none">
-                ⌘K
-              </kbd>
-            </button>
-
             {/* Botón único "+ Nuevo" con dropdown (portal para evitar clipping del header sticky) */}
             <div>
               <button
