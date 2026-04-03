@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Kio Health is a healthcare management platform for clinicians (psychologists, nutritionists) to manage appointments, patients, sessions, and finances. It's a Turborepo monorepo with two apps and shared packages.
+Kio Health is a healthcare management platform for psychologists to manage appointments, patients, sessions, and finances. It's a Turborepo monorepo with two apps and shared packages.
 
 ## Monorepo Structure
 
@@ -83,7 +83,7 @@ Feature-module pattern: each domain (`auth/`, `appointments/`, `patients/`, `fin
 
 Key entity chain: `User` → `ClinicianProfile` (1:1) → `Patient[]` → `Appointment[]` → `FinanceTransaction`
 
-`Appointment` has optional 1:1 relations to `PsychNote`, `Anthropometry`, `MealPlan`, and `FinanceTransaction`.
+`Appointment` has optional 1:1 relations to `PsychNote` and `FinanceTransaction`.
 
 **Ownership pattern**: All service methods that query clinician-owned data accept `clinicianId` as a parameter and pass it to `findFirst` (not `findUnique`) to enforce ownership at the query level.
 

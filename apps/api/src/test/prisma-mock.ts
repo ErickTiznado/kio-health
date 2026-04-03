@@ -28,8 +28,6 @@ export function createPrismaMock() {
     clinic: makeDelegateMock(),
     clinicMember: makeDelegateMock(),
     clinicSubscription: makeDelegateMock(),
-    anthropometry: makeDelegateMock(),
-    mealPlan: makeDelegateMock(),
     $transaction: jest.fn().mockImplementation((cb: unknown) => {
       if (typeof cb === 'function') return cb(mock);
       return Promise.resolve(cb);

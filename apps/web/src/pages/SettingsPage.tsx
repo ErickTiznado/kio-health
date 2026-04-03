@@ -445,7 +445,7 @@ export function SettingsPage() {
                         Especialidad
                       </p>
                       <p className="text-sm font-medium text-kanji dark:text-white">
-                        {user?.profile?.type === 'PSYCHOLOGIST' ? 'Psicólogo' : 'Nutriólogo'}
+                        Psicólogo
                       </p>
                     </div>
                   </li>
