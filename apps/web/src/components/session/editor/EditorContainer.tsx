@@ -25,7 +25,7 @@ interface EditorContainerProps {
   patientId: string;
   patientName: string;
   patientAge?: number;
-  psychContext: any;
+  psychContext: unknown;
   clinicalScales?: ClinicalScale[];
 }
 
@@ -62,7 +62,7 @@ export function EditorContainer({
   const [prepTab, setPrepTab] = useState<'prep' | 'scales'>('prep');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [templateType, setTemplateType] = useState<NoteTemplateType>(NoteTemplateType.FREE);
-  const [content, setContent] = useState<any>({ body: '', sessionGoal: '' });
+  const [content, setContent] = useState<Record<string, unknown>>({ body: '', sessionGoal: '' });
   const [moodRating, setMoodRating] = useState<number>(5);
   const [tags, setTags] = useState<string[]>([]);
   const [isReadMode] = useState(false);
@@ -88,19 +88,22 @@ export function EditorContainer({
   // Sync state
   useEffect(() => {
     if (currentNote && !hasInitialized.current) {
-      setTemplateType(currentNote.templateType);
-      setContent(currentNote.content);
-      if (currentNote.moodRating) setMoodRating(currentNote.moodRating);
-      if ((currentNote as any).tags) setTags((currentNote as any).tags);
+      const id = setTimeout(() => {
+        setTemplateType(currentNote.templateType);
+        setContent(currentNote.content);
+        if (currentNote.moodRating) setMoodRating(currentNote.moodRating);
+        if ((currentNote as Record<string, unknown>).tags) setTags((currentNote as Record<string, unknown>).tags as string[]);
+      }, 0);
       hasInitialized.current = true;
 
       const hasRealContent =
         (currentNote.content.body && currentNote.content.body.length > 5) ||
         (currentNote.content.s && currentNote.content.s.length > 5);
 
-      if (hasRealContent) {
-        setStep(2);
+      if (!hasRealContent) {
+        setIsEditing(true);
       }
+      return () => clearTimeout(id);
     }
   }, [currentNote]);
 
@@ -155,7 +158,7 @@ export function EditorContainer({
       link.click();
       link.remove();
       toast.success('PDF descargado');
-    } catch (_error) {
+    } catch {
       toast.error('Error al generar PDF');
     }
   };
@@ -433,13 +436,13 @@ export function EditorContainer({
                 {templateType === NoteTemplateType.SOAP ? (
                   <SoapForm
                     content={content}
-                    onChange={(key, val) => setContent((prev: any) => ({ ...prev, [key]: val }))}
+                    onChange={(key, val) => setContent((prev: Record<string, unknown>) => ({ ...prev, [key]: val }))}
                     readOnly={isReadMode}
                   />
                 ) : (
                   <FreeForm
                     content={content}
-                    onChange={(val) => setContent((prev: any) => ({ ...prev, body: val }))}
+                    onChange={(val) => setContent((prev: Record<string, unknown>) => ({ ...prev, body: val }))}
                     readOnly={isReadMode}
                   />
                 )}

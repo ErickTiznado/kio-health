@@ -77,33 +77,36 @@ export function ScheduleAppointmentModal({
 
     useEffect(() => {
         if (!isOpen) return;
-        setWizardStep(1);
-        setDirection(0);
-        if (isEditMode && initialData) {
-            setType(initialData.type);
-            setReason(initialData.reason ?? '');
-            setPrice(initialData.price);
-            return;
-        }
-        if (initialDate) {
-            setStartTime(format(initialDate, "yyyy-MM-dd'T'HH:mm"));
-            setDuration(String(defaultDuration));
-            setType('CONSULTATION');
-            setReason('');
-            setPrice(String(defaultPrice));
-            setPatientMode('search');
-            setNewPatientName('');
-            setNewPatientPhone('');
-            setNewPatientEmail('');
-            wasNewPatient.current = false;
-            if (initialPatient) {
-                setSelectedPatientId(initialPatient.id);
-                setPatientSearch(initialPatient.fullName);
-            } else {
-                setPatientSearch('');
-                setSelectedPatientId(null);
+        const id = setTimeout(() => {
+            setWizardStep(1);
+            setDirection(0);
+            if (isEditMode && initialData) {
+                setType(initialData.type);
+                setReason(initialData.reason ?? '');
+                setPrice(initialData.price);
+                return;
             }
-        }
+            if (initialDate) {
+                setStartTime(format(initialDate, "yyyy-MM-dd'T'HH:mm"));
+                setDuration(String(defaultDuration));
+                setType('CONSULTATION');
+                setReason('');
+                setPrice(String(defaultPrice));
+                setPatientMode('search');
+                setNewPatientName('');
+                setNewPatientPhone('');
+                setNewPatientEmail('');
+                wasNewPatient.current = false;
+                if (initialPatient) {
+                    setSelectedPatientId(initialPatient.id);
+                    setPatientSearch(initialPatient.fullName);
+                } else {
+                    setPatientSearch('');
+                    setSelectedPatientId(null);
+                }
+            }
+        }, 0);
+        return () => clearTimeout(id);
     }, [isOpen, isEditMode, initialData, initialDate, defaultDuration, defaultPrice, initialPatient]);
 
     const { data: patientsData, isLoading: isLoadingPatients } = usePatients(1, debouncedSearch, 'ACTIVE', 5);

@@ -29,7 +29,7 @@ export function NoteCard({ item }: NoteCardProps) {
     );
   }
 
-  const content = note.content as any;
+  const content = note.content as Record<string, string | undefined>;
   const isPinned = note.isPinned;
   const tags = note.tags || [];
   const visibleTags = tags.slice(0, 3);

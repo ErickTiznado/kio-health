@@ -41,7 +41,7 @@ export function ListBlock({
                 const len = el.value.length;
                 el.setSelectionRange(len, len);
             }
-            if (pendingFocus) setPendingFocus(null);
+            if (pendingFocus) setTimeout(() => setPendingFocus(null), 0);
         }
     }, [focusedItemId, pendingFocus, items.length]);
 

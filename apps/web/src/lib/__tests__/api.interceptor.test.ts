@@ -29,16 +29,16 @@ describe('api response interceptor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Save the original adapter so we can restore it
-    originalAdapter = (api.defaults as any).adapter;
+    originalAdapter = (api.defaults as unknown as unknown).adapter;
   });
 
   afterEach(() => {
     // Restore the original adapter after each test
-    (api.defaults as any).adapter = originalAdapter;
+    (api.defaults as unknown as unknown).adapter = originalAdapter;
   });
 
   it('passes successful responses through without modification', async () => {
-    (api.defaults as any).adapter = (config: any) => Promise.resolve(makeSuccess({ ok: true }, config));
+    (api.defaults as unknown as unknown).adapter = (config: unknown) => Promise.resolve(makeSuccess({ ok: true }, config));
 
     const response = await api.get('/data');
     expect(response.data).toEqual({ ok: true });
@@ -46,7 +46,7 @@ describe('api response interceptor', () => {
 
   it('does NOT call refresh for /auth/login 401', async () => {
     let callCount = 0;
-    (api.defaults as any).adapter = (config: any) => {
+    (api.defaults as unknown as unknown).adapter = (config: unknown) => {
       callCount++;
       return Promise.reject(makeError(config, 401));
     };
@@ -57,7 +57,7 @@ describe('api response interceptor', () => {
 
   it('does NOT call refresh for /auth/refresh 401', async () => {
     let callCount = 0;
-    (api.defaults as any).adapter = (config: any) => {
+    (api.defaults as unknown as unknown).adapter = (config: unknown) => {
       callCount++;
       return Promise.reject(makeError(config, 401));
     };
@@ -68,7 +68,7 @@ describe('api response interceptor', () => {
 
   it('does NOT call refresh for /auth/logout 401', async () => {
     let callCount = 0;
-    (api.defaults as any).adapter = (config: any) => {
+    (api.defaults as unknown as unknown).adapter = (config: unknown) => {
       callCount++;
       return Promise.reject(makeError(config, 401));
     };
@@ -79,7 +79,7 @@ describe('api response interceptor', () => {
 
   it('calls POST /auth/refresh on 401 from non-auth endpoint', async () => {
     const calledUrls: string[] = [];
-    (api.defaults as any).adapter = (config: any) => {
+    (api.defaults as unknown as unknown).adapter = (config: unknown) => {
       calledUrls.push(config.url);
       if (config.url.includes('/patients') && !config._retry) {
         return Promise.reject(makeError(config, 401));
@@ -94,7 +94,7 @@ describe('api response interceptor', () => {
 
   it('retries the original request after successful refresh', async () => {
     const calledUrls: string[] = [];
-    (api.defaults as any).adapter = (config: any) => {
+    (api.defaults as unknown as unknown).adapter = (config: unknown) => {
       calledUrls.push(config.url);
       if (config.url.includes('/patients') && !config._retry) {
         return Promise.reject(makeError(config, 401));
@@ -110,7 +110,7 @@ describe('api response interceptor', () => {
   });
 
   it('calls logout() when refresh fails', async () => {
-    (api.defaults as any).adapter = (config: any) =>
+    (api.defaults as unknown as unknown).adapter = (config: unknown) =>
       Promise.reject(makeError(config, 401));
 
     await expect(api.get('/patients')).rejects.toBeTruthy();
@@ -119,13 +119,13 @@ describe('api response interceptor', () => {
 
   it('does not retry requests already marked with _retry=true', async () => {
     let callCount = 0;
-    (api.defaults as any).adapter = (config: any) => {
+    (api.defaults as unknown as unknown).adapter = (config: unknown) => {
       callCount++;
       return Promise.reject(makeError(config, 401));
     };
 
     await expect(
-      api.request({ url: '/patients', method: 'GET', _retry: true } as any),
+      api.request({ url: '/patients', method: 'GET', _retry: true } as unknown as unknown),
     ).rejects.toBeTruthy();
 
     expect(callCount).toBe(1);
@@ -134,7 +134,7 @@ describe('api response interceptor', () => {
 
   it('does not trigger interceptor for non-401 errors', async () => {
     let callCount = 0;
-    (api.defaults as any).adapter = (config: any) => {
+    (api.defaults as unknown as unknown).adapter = (config: unknown) => {
       callCount++;
       return Promise.reject(makeError(config, 403));
     };
@@ -153,7 +153,7 @@ describe('api response interceptor', () => {
     // After refresh completes, non-refresh requests succeed (simulates valid token)
     let refreshDone = false;
 
-    (api.defaults as any).adapter = async (config: any) => {
+    (api.defaults as unknown as unknown).adapter = async (config: unknown) => {
       if (config.url?.includes('/auth/refresh')) {
         refreshCalls.push(config.url);
         await refreshBlocker;

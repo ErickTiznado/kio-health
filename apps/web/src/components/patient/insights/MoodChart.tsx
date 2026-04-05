@@ -97,7 +97,7 @@ export function MoodChart({ patientId }: MoodChartProps) {
               }}
               labelStyle={{ fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px', textTransform: 'capitalize' }}
               itemStyle={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--color-kanji)' }}
-              formatter={(value: any) => [`${value}/10`, 'Estado de Ánimo']}
+              formatter={(value: number | string) => [`${value}/10`, 'Estado de Ánimo']}
               cursor={{ stroke: 'var(--color-border)', strokeWidth: 1 }}
             />
             <Area

@@ -45,7 +45,8 @@
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); pkgs=d.get\\(''''packages'''',{}\\); print\\(pkgs.get\\(''''node_modules/@hookform/resolvers'''',{}\\).get\\(''''version'''',''''not found''''\\)\\)\")",
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''version:'''', d[''''version'''']\\)\")",
       "Bash(python3 -c \":*)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(tasklist)"
     ]
   }
 }

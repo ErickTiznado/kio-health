@@ -57,11 +57,14 @@ export const SessionCheckoutModal = ({
 
   useEffect(() => {
     if (isOpen && price) {
-      setAmount(price);
-      setPaymentStatus('PAID');
-      setMethod('CASH');
-      setNextDate('1w');
-      setSendEmail(false);
+      const id = setTimeout(() => {
+        setAmount(price);
+        setPaymentStatus('PAID');
+        setMethod('CASH');
+        setNextDate('1w');
+        setSendEmail(false);
+      }, 0);
+      return () => clearTimeout(id);
     }
   }, [isOpen, price]);
 

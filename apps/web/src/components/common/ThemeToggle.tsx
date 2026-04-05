@@ -1,18 +1,8 @@
 import { Moon, Sun, Laptop } from 'lucide-react';
 import { useThemeStore } from '../../stores/theme.store';
-import { useEffect, useState } from 'react';
 
 export function ThemeToggle() {
   const { theme, setTheme } = useThemeStore();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null; // Avoid hydration mismatch
-  }
 
   const toggleTheme = () => {
     if (theme === 'light') {

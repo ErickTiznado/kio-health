@@ -49,8 +49,10 @@ export function SessionPage() {
       updateTimer();
       intervalId = setInterval(updateTimer, 1000);
     } else {
-      setElapsedTime('00:00:00');
-      setIsOvertime(false);
+      setTimeout(() => {
+        setElapsedTime('00:00:00');
+        setIsOvertime(false);
+      }, 0);
     }
 
     return () => clearInterval(intervalId);

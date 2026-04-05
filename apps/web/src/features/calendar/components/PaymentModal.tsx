@@ -22,13 +22,14 @@ export function PaymentModal({ isOpen, onClose, appointment, defaultStatus }: Pa
 
     useEffect(() => {
         if (isOpen && appointment) {
-            setAmount(appointment.price.toString());
-            // Use defaultStatus if provided and appointment is not already paid
-            setStatus(appointment.paymentStatus === 'PAID' ? 'PAID' : (defaultStatus || appointment.paymentStatus || 'PENDING'));
-            setMethod(appointment.paymentMethod || 'CASH');
+            const id = setTimeout(() => {
+                setAmount(appointment.price.toString());
+                setStatus(appointment.paymentStatus === 'PAID' ? 'PAID' : (defaultStatus || appointment.paymentStatus || 'PENDING'));  
+                setMethod(appointment.paymentMethod || 'CASH');
+            }, 0);
+            return () => clearTimeout(id);
         }
     }, [isOpen, appointment, defaultStatus]);
-
     const mutation = useMutation({
         mutationFn: (payload: UpdatePaymentPayload) =>
             updatePayment(appointment!.id, payload),

@@ -5,7 +5,7 @@ import type { CreatePsychNoteDto, NoteTemplateType } from '../types/appointments
 
 export function useAutoSave(
   appointmentId: string,
-  content: any,
+  content: unknown,
   templateType: NoteTemplateType,
   moodRating?: number,
   privateNotes?: string,

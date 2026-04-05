@@ -119,7 +119,7 @@ describe('useCreatePatient', () => {
 
     const { result } = renderHook(() => useCreatePatient(), { wrapper: createWrapper() });
 
-    result.current.mutate({ fullName: 'Carlos López' } as any);
+    result.current.mutate({ fullName: 'Carlos López' } as unknown as unknown);
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(mockApi.post).toHaveBeenCalledWith('/patients', { fullName: 'Carlos López' });
@@ -138,7 +138,7 @@ describe('useUpdatePatient', () => {
 
     const { result } = renderHook(() => useUpdatePatient(), { wrapper: createWrapper() });
 
-    result.current.mutate({ id: 'patient-1', data: { fullName: 'Ana Updated' } as any });
+    result.current.mutate({ id: 'patient-1', data: { fullName: 'Ana Updated' } as unknown as unknown });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(mockApi.patch).toHaveBeenCalledWith('/patients/patient-1', { fullName: 'Ana Updated' });

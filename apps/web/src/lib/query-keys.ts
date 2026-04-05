@@ -1,7 +1,7 @@
 export const patientKeys = {
   all: ['patients'] as const,
   lists: () => [...patientKeys.all, 'list'] as const,
-  list: (filters: any) => [...patientKeys.lists(), filters] as const,
+  list: (filters: unknown) => [...patientKeys.lists(), filters] as const,
   details: () => [...patientKeys.all, 'detail'] as const,
   detail: (id: string) => [...patientKeys.details(), id] as const,
   timeline: (id: string) => [...patientKeys.detail(id), 'timeline'] as const,
@@ -14,7 +14,7 @@ export const patientKeys = {
 export const appointmentKeys = {
   all: ['appointments'] as const,
   lists: () => [...appointmentKeys.all, 'list'] as const,
-  list: (filters: any) => [...appointmentKeys.lists(), filters] as const,
+  list: (filters: unknown) => [...appointmentKeys.lists(), filters] as const,
   details: () => [...appointmentKeys.all, 'detail'] as const,
   detail: (id: string) => [...appointmentKeys.details(), id] as const,
   context: (id: string) => [...appointmentKeys.detail(id), 'context'] as const,

@@ -59,7 +59,7 @@ export function SoapForm({ content, onChange, readOnly }: SoapFormProps) {
   const getPreview = (key: SoapKey) => {
     const text = content[key] || '';
     if (!text) return null;
-    const clean = text.replace(/[#*_~`>\-]/g, '').trim();
+    const clean = text.replace(/[#*_~`>-]/g, '').trim();
     return clean.length > 60 ? clean.slice(0, 60) + '...' : clean;
   };
 

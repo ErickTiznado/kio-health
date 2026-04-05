@@ -107,7 +107,7 @@ describe('useAuthStore', () => {
   describe('logout()', () => {
     it('clears state in finally block even when POST fails', async () => {
       // First set some authenticated state
-      useAuthStore.setState({ user: mockUser as any, isAuthenticated: true });
+      useAuthStore.setState({ user: mockUser as unknown as unknown, isAuthenticated: true });
       mockApi.post.mockRejectedValue(new Error('Network error'));
 
       await useAuthStore.getState().logout();
@@ -119,7 +119,7 @@ describe('useAuthStore', () => {
     });
 
     it('clears state on successful logout', async () => {
-      useAuthStore.setState({ user: mockUser as any, isAuthenticated: true });
+      useAuthStore.setState({ user: mockUser as unknown as unknown, isAuthenticated: true });
       mockApi.post.mockResolvedValue({});
 
       await useAuthStore.getState().logout();
@@ -129,7 +129,7 @@ describe('useAuthStore', () => {
     });
 
     it('is async — state is cleared after await', async () => {
-      useAuthStore.setState({ user: mockUser as any, isAuthenticated: true });
+      useAuthStore.setState({ user: mockUser as unknown as unknown, isAuthenticated: true });
       mockApi.post.mockResolvedValue({});
 
       const promise = useAuthStore.getState().logout();
@@ -142,7 +142,7 @@ describe('useAuthStore', () => {
     it('removes user from localStorage', async () => {
       // Simulate a logged-in persisted state
       localStorage.setItem('kio-auth-storage', JSON.stringify({ state: { user: mockUser, isAuthenticated: true } }));
-      useAuthStore.setState({ user: mockUser as any, isAuthenticated: true });
+      useAuthStore.setState({ user: mockUser as unknown as unknown, isAuthenticated: true });
       mockApi.post.mockResolvedValue({});
 
       await useAuthStore.getState().logout();

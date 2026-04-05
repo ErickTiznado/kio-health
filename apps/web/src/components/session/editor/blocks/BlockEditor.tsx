@@ -124,7 +124,7 @@ export function BlockEditor({ initialContent, onChange, readOnly }: BlockEditorP
             block={block}
             onChange={updateBlock}
             onChangeType={changeBlockType}
-            onAddNext={(id, _type) => {
+            onAddNext={(id) => {
               // For non-list types, create a new block
               const newId = addBlock(id);
               setFocusedBlockId(newId);

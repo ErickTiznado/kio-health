@@ -33,8 +33,9 @@ export const AddendumModal: FC<AddendumModalProps> = ({ isOpen, onClose, appoint
           setPrivateNotes('');
           onClose();
         },
-        onError: (err: any) => {
-          toast.error(err.response?.data?.message || 'Error al crear el anexo');
+        onError: (err: unknown) => {
+          const error = err as { response?: { data?: { message?: string } } };
+          toast.error(error.response?.data?.message || 'Error al crear el anexo');
         },
       }
     );

@@ -49,16 +49,17 @@ export function DatePicker({
   );
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Update view and input if value changes externally
-  useEffect(() => {
+  const [prevValue, setPrevValue] = useState(value);
+  if (value !== prevValue) {
+    setPrevValue(value);
     if (value) {
       const d = new Date(value);
-      setViewDate(d);
       setInputText(format(d, 'dd/MM/yyyy'));
+      setViewDate(d);
     } else {
       setInputText('');
     }
-  }, [value]);
+  }
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const digits = e.target.value.replace(/\D/g, '').slice(0, 8);

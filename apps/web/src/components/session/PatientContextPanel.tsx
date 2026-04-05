@@ -14,7 +14,7 @@ interface PatientContextPanelProps {
   patientName: string;
   patientAge: number;
   clinicianType: string;
-  psychContext: any;
+  psychContext: Record<string, unknown>;
 }
 
 export const PatientContextPanel: FC<PatientContextPanelProps> = ({

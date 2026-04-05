@@ -25,8 +25,10 @@ export default function InvitationAcceptPage() {
     }
 
     if (!token) {
-      setError('Token de invitación no válido');
-      setValidating(false);
+      setTimeout(() => {
+        setError('Token de invitación no válido');
+        setValidating(false);
+      }, 0);
       return;
     }
 

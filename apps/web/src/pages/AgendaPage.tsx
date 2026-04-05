@@ -77,8 +77,11 @@ export function AgendaPage() {
 
   useEffect(() => {
     if (isMobile) {
-      setActiveView('day');
-      setSelectedDay(new Date());
+      const id = setTimeout(() => {
+        setActiveView('day');
+        setSelectedDay(new Date());
+      }, 0);
+      return () => clearTimeout(id);
     }
   }, [isMobile]);
 

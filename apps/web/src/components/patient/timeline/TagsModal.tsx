@@ -9,7 +9,7 @@ interface TagsModalProps {
   patientName?: string;
 }
 
-export const TagsModal: FC<TagsModalProps> = ({ isOpen, onClose, tags, patientName: _patientName }) => {
+export const TagsModal: FC<TagsModalProps> = ({ isOpen, onClose, tags }) => {
   if (!isOpen) return null;
 
   return (

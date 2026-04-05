@@ -113,7 +113,7 @@ export interface PsychNote {
   appointmentId: string;
   patientId: string;
   templateType: NoteTemplateType;
-  content: any; // JSON
+  content: unknown; // JSON
   moodRating: number | null;
   privateNotes: string | null;
   isPinned: boolean;
@@ -124,7 +124,7 @@ export interface PsychNote {
 
 export interface CreatePsychNoteDto {
   templateType: NoteTemplateType;
-  content: any;
+  content: unknown;
   moodRating?: number;
   privateNotes?: string;
   tags?: string[];

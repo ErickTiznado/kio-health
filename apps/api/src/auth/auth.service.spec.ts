@@ -215,27 +215,15 @@ describe('AuthService', () => {
       // The $transaction runs the callback with prisma as tx
       // Then login() is called, which calls user.findUnique again
       prisma.user.create.mockResolvedValue(newUser);
-      prisma.clinic.create.mockResolvedValue(newClinic);
-      prisma.clinicianProfile.create.mockResolvedValue(newProfile);
-      prisma.clinicMember.create.mockResolvedValue({});
-      prisma.clinicSubscription.create.mockResolvedValue({});
       prisma.refreshToken.create.mockResolvedValue({});
 
       await service.signup({
         email: 'new@user.com',
+        fullName: 'New User',
         password: 'Password123!',
-        clinicName: 'Mi Clínica',
       } as any);
 
       expect(prisma.user.create).toHaveBeenCalledTimes(1);
-      expect(prisma.clinic.create).toHaveBeenCalledTimes(1);
-      expect(prisma.clinicianProfile.create).toHaveBeenCalledTimes(1);
-      expect(prisma.clinicMember.create).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ role: 'OWNER' }) }),
-      );
-      expect(prisma.clinicSubscription.create).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ status: 'TRIALING' }) }),
-      );
     });
 
     it('hashes the password before storing', async () => {
@@ -247,13 +235,9 @@ describe('AuthService', () => {
           profile: { ...makeClinicianProfile(), googleIntegration: null, clinicMemberships: [] },
         });
       prisma.user.create.mockResolvedValue(newUser);
-      prisma.clinic.create.mockResolvedValue(makeClinic());
-      prisma.clinicianProfile.create.mockResolvedValue(makeClinicianProfile());
-      prisma.clinicMember.create.mockResolvedValue({});
-      prisma.clinicSubscription.create.mockResolvedValue({});
       prisma.refreshToken.create.mockResolvedValue({});
 
-      await service.signup({ email: 'a@b.com', password: 'plain', clinicName: 'C' } as any);
+      await service.signup({ email: 'a@b.com', fullName: 'Test User', password: 'plain' } as any);
 
       expect(bcrypt.hash).toHaveBeenCalledWith('plain', 10);
       expect(prisma.user.create).toHaveBeenCalledWith(

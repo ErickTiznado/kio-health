@@ -93,6 +93,8 @@ export class PatientsService {
 
     if (status) {
       where.status = status;
+    } else {
+      where.status = { not: 'ARCHIVED' };
     }
 
     // Note: contactPhone is now encrypted — DB-level phone search is not possible.

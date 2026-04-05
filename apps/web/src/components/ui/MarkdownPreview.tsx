@@ -10,7 +10,7 @@ export function MarkdownPreview({ content, className = '' }: MarkdownPreviewProp
   const htmlContent = useMemo(() => {
     if (!content) return '';
 
-    let html = content
+    const html = content
       // Escape HTML special characters first
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -26,7 +26,7 @@ export function MarkdownPreview({ content, className = '' }: MarkdownPreviewProp
       // Blockquotes
       .replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-kio/50 pl-4 py-1 my-2 italic text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-800/50 rounded-r">$1</blockquote>')
       // Lists (Unordered)
-      .replace(/^\- (.*$)/gim, '<li class="ml-4 list-disc marker:text-gray-400">$1</li>')
+      .replace(/^- (.*$)/gim, '<li class="ml-4 list-disc marker:text-gray-400">$1</li>')
       // Lists (Ordered)
       .replace(/^\d+\. (.*$)/gim, '<li class="ml-4 list-decimal marker:text-gray-400">$1</li>')
       // Line breaks

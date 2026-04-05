@@ -18,9 +18,9 @@ interface EditorToolboxProps {
   currentTemplate: NoteTemplateType;
 }
 
-export function EditorToolbox({ onTemplateChange, onExport: _onExport, onCopy: _onCopy, currentTemplate }: EditorToolboxProps) {
+export function EditorToolbox({ onTemplateChange, currentTemplate }: EditorToolboxProps) {
 
-  const handleDragStart = (e: React.DragEvent, tool: any) => {
+  const handleDragStart = (e: React.DragEvent, tool: { value: string; type: string }) => {
     e.dataTransfer.setData('text/plain', tool.value);
     e.dataTransfer.setData('block-type', tool.type);
     e.dataTransfer.effectAllowed = 'copy';

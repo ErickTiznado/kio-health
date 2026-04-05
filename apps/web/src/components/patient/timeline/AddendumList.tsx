@@ -30,7 +30,7 @@ export const AddendumList: FC<AddendumListProps> = ({ appointmentId }) => {
 
       {isExpanded && (
         <div className="mt-3 space-y-3">
-          {addendums.map((addendum: any) => (
+          {addendums.map((addendum: Record<string, unknown>) => (
             <div
               key={addendum.id}
               className="bg-gray-50 dark:bg-slate-800/50 rounded-xl p-3 border border-gray-200 dark:border-slate-700/50"

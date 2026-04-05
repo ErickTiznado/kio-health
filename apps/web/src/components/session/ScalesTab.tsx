@@ -185,8 +185,11 @@ export function ScalesTab({ appointmentId, initialData }: ScalesTabProps) {
     if (!initialData) return;
     const phq9 = initialData.find((s) => s.scaleType === 'PHQ9');
     const gad7 = initialData.find((s) => s.scaleType === 'GAD7');
-    if (phq9) setPhq9Scores(phq9.scores);
-    if (gad7) setGad7Scores(gad7.scores);
+    const id = setTimeout(() => {
+      if (phq9) setPhq9Scores(phq9.scores);
+      if (gad7) setGad7Scores(gad7.scores);
+    }, 0);
+    return () => clearTimeout(id);
   }, [initialData]);
 
   const handleScoreChange = (

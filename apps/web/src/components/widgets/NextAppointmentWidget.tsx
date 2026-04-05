@@ -164,7 +164,7 @@ function InProgressView({ appointment }: { appointment: Appointment }) {
 
 function UpcomingView({ appointment }: { appointment: Appointment }) {
   const navigate = useNavigate();
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
   const [countdown, setCountdown] = useState(() => formatCountdown(appointment.startTime));
 
   useEffect(() => {

@@ -24,7 +24,7 @@ export function useBlockEditor(initialMarkdown: string = '', onChange?: (markdow
     if (isInitialized.current) return;
 
     if (!initialMarkdown) {
-      setBlocks([{ id: generateId(), type: 'paragraph', content: '' }]);
+      setTimeout(() => setBlocks([{ id: generateId(), type: 'paragraph', content: '' }]), 0);
       isInitialized.current = true;
       return;
     }
@@ -90,7 +90,7 @@ export function useBlockEditor(initialMarkdown: string = '', onChange?: (markdow
       newBlocks.push({ id: generateId(), type: 'paragraph', content: '' });
     }
 
-    setBlocks(newBlocks);
+    setTimeout(() => setBlocks(newBlocks), 0);
     isInitialized.current = true;
   }, [initialMarkdown]);
 

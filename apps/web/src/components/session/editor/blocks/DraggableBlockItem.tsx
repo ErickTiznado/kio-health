@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Reorder, useDragControls } from 'framer-motion';
 import { GripVertical } from 'lucide-react';
-import { BlockRow, BLOCK_TYPE_OPTIONS, getBlockIcon } from './BlockRow';
+import { BlockRow } from './BlockRow';
+import { BLOCK_TYPE_OPTIONS, getBlockIcon } from './constants';
 import { ListBlock } from './ListBlock';
 import type { NoteBlock, BlockType } from './types';
 import { isListBlockType } from './types';
@@ -105,7 +106,7 @@ export function DraggableBlockItem({
                     className="p-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 rounded-md hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center cursor-pointer"
                     title="Cambiar tipo de bloque"
                   >
-                    <BlockIcon size={18} />
+                    {BlockIcon({ size: 18 })}
                   </button>
 
                   {showTypeMenu && (

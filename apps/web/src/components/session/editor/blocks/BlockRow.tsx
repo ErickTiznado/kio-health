@@ -1,33 +1,9 @@
 import { useRef, useEffect, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import {
-  GripVertical,
-  Heading1,
-  Heading2,
-  Pilcrow,
-  List,
-  ListOrdered,
-  CheckSquare as CheckSquareIcon,
-  Quote,
-} from 'lucide-react';
+import { GripVertical } from 'lucide-react';
 import { DragControls } from 'framer-motion';
 import type { NoteBlock, BlockType } from './types';
-
-const BLOCK_TYPE_OPTIONS: { type: BlockType; label: string; icon: React.ElementType }[] = [
-  { type: 'h1', label: 'Título 1', icon: Heading1 },
-  { type: 'h2', label: 'Título 2', icon: Heading2 },
-  { type: 'paragraph', label: 'Párrafo', icon: Pilcrow },
-  { type: 'bullet-list', label: 'Viñeta', icon: List },
-  { type: 'number-list', label: 'Numerada', icon: ListOrdered },
-  { type: 'check-list', label: 'Checkbox', icon: CheckSquareIcon },
-  { type: 'quote', label: 'Cita', icon: Quote },
-];
-
-function getBlockIcon(type: BlockType) {
-  const option = BLOCK_TYPE_OPTIONS.find((o) => o.type === type);
-  if (!option) return Pilcrow;
-  return option.icon;
-}
+import { BLOCK_TYPE_OPTIONS, getBlockIcon } from './constants';
 
 interface BlockRowProps {
   block: NoteBlock;
@@ -43,8 +19,6 @@ interface BlockRowProps {
   /** If true, hides the type selector and drag handle (used when rendered inside DraggableBlockItem which provides its own) */
   hideControls?: boolean;
 }
-
-export { BLOCK_TYPE_OPTIONS, getBlockIcon };
 
 export function BlockRow({
   block,
@@ -138,7 +112,7 @@ export function BlockRow({
               className="p-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 rounded-md hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center cursor-pointer"
               title="Cambiar tipo de bloque"
             >
-              <BlockIcon size={18} />
+              {BlockIcon({ size: 18 })}
             </button>
 
             {showTypeMenu && (

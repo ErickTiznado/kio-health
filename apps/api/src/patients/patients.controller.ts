@@ -9,9 +9,9 @@ import {
   UseGuards,
   Query,
   Req,
+  Res,
   UseInterceptors,
   UploadedFile,
-  Redirect,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PatientsService } from './patients.service';
@@ -203,19 +203,16 @@ export class PatientsController {
   }
 
   @Get(':id/documents/:docId/file')
-  @Redirect()
   async getDocumentFile(
     @CurrentUser() user: any,
     @CurrentClinician() clinicianId: string,
     @Param('id') id: string,
     @Param('docId') docId: string,
     @Req() req: any,
+    @Res() res: import('express').Response,
   ) {
-    const { signedUrl } = await this.patientDocumentsService.getSignedUrl(
-      id,
-      docId,
-      clinicianId,
-    );
+    const { buffer, mimeType, originalName } =
+      await this.patientDocumentsService.downloadDocument(id, docId, clinicianId);
 
     await this.accessLogService.logAccess(
       user.userId,
@@ -227,7 +224,13 @@ export class PatientsController {
       req.headers['user-agent'],
     );
 
-    return { url: signedUrl, statusCode: 302 };
+    res.set({
+      'Content-Type': mimeType,
+      'Content-Disposition': `inline; filename="${encodeURIComponent(originalName)}"`,
+      'Content-Length': buffer.length,
+      'Cache-Control': 'private, max-age=3600',
+    });
+    res.send(buffer);
   }
 
   @Delete(':id/documents/:docId')

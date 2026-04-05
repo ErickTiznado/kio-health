@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import {
   FileImage,
@@ -13,6 +13,7 @@ import {
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { usePatientDocuments, useDeleteDocument, useDocumentBlob } from '../../hooks/use-patients';
+import { fetchDocumentBlob } from '../../lib/patients.api';
 import type { PatientDocument } from '../../types/patients.types';
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -47,9 +48,29 @@ function DocumentPreview({ patientId, doc, onClose }: PreviewProps) {
   useEffect(() => {
     if (!blob) return;
     const url = URL.createObjectURL(blob);
-    setObjectUrl(url);
-    return () => URL.revokeObjectURL(url);
+    const id = setTimeout(() => setObjectUrl(url), 0);
+    return () => {
+      clearTimeout(id);
+      URL.revokeObjectURL(url);
+    };
   }, [blob]);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
+  const handleDownloadFromPreview = () => {
+    if (!objectUrl) return;
+    const a = document.createElement('a');
+    a.href = objectUrl;
+    a.download = doc.originalName;
+    a.click();
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={onClose}>
@@ -58,8 +79,18 @@ function DocumentPreview({ patientId, doc, onClose }: PreviewProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 dark:border-slate-800">
-          <p className="text-sm font-medium text-gray-700 dark:text-slate-300 truncate">{doc.originalName}</p>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 text-lg leading-none px-1">✕</button>
+          <p className="text-sm font-medium text-gray-700 dark:text-slate-300 truncate flex-1 mr-3">{doc.originalName}</p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handleDownloadFromPreview}
+              disabled={!objectUrl}
+              className="p-1.5 text-gray-400 hover:text-[var(--color-kanji)] dark:hover:text-kio rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+              title="Descargar"
+            >
+              <Download size={16} />
+            </button>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 text-lg leading-none px-1">✕</button>
+          </div>
         </div>
         <div className="flex-1 overflow-auto flex items-center justify-center bg-gray-50 dark:bg-slate-950 p-4 min-h-[400px]">
           {isLoading || !objectUrl ? (
@@ -67,7 +98,7 @@ function DocumentPreview({ patientId, doc, onClose }: PreviewProps) {
           ) : doc.mimeType.startsWith('image/') ? (
             <img src={objectUrl} alt={doc.originalName} className="max-w-full max-h-full object-contain rounded-lg" />
           ) : (
-            <embed src={objectUrl} type="application/pdf" className="w-full h-[600px] rounded-lg" />
+            <iframe src={objectUrl} title={doc.originalName} className="w-full h-[600px] rounded-lg border-0" />
           )}
         </div>
       </div>
@@ -85,16 +116,26 @@ interface RowProps {
 
 function DocumentRow({ patientId, doc, deleteConfirmId, onDeleteClick, onDeleteConfirm }: RowProps) {
   const [showPreview, setShowPreview] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const Icon = mimeIcon(doc.mimeType);
   const isDocx = doc.mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
   const canPreview = !isDocx;
 
-  const handleDownload = () => {
-    const url = `/api/patients/${patientId}/documents/${doc.id}/file`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = doc.originalName;
-    a.click();
+  const handleDownload = async () => {
+    try {
+      setIsDownloading(true);
+      const blob = await fetchDocumentBlob(patientId, doc.id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = doc.originalName;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('Error al descargar el documento');
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -122,7 +163,7 @@ function DocumentRow({ patientId, doc, deleteConfirmId, onDeleteClick, onDeleteC
           </div>
         </div>
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {canPreview ? (
+          {canPreview && (
             <button
               onClick={() => setShowPreview(true)}
               className="p-1.5 text-gray-400 hover:text-[var(--color-kanji)] dark:hover:text-kio rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
@@ -130,15 +171,15 @@ function DocumentRow({ patientId, doc, deleteConfirmId, onDeleteClick, onDeleteC
             >
               <Eye size={15} />
             </button>
-          ) : (
-            <button
-              onClick={handleDownload}
-              className="p-1.5 text-gray-400 hover:text-[var(--color-kanji)] dark:hover:text-kio rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-              title="Descargar"
-            >
-              <Download size={15} />
-            </button>
           )}
+          <button
+            onClick={handleDownload}
+            disabled={isDownloading}
+            className="p-1.5 text-gray-400 hover:text-[var(--color-kanji)] dark:hover:text-kio rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+            title="Descargar"
+          >
+            {isDownloading ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
+          </button>
           {deleteConfirmId === doc.id ? (
             <button
               onClick={() => onDeleteConfirm(doc.id)}
