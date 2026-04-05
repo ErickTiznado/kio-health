@@ -46,7 +46,7 @@ export const useCreateAddendum = () => {
       });
       toast.success('Anexo agregado correctamente');
     },
-    onError: (error: unknown) => {
+    onError: (error: any) => {
       const message = error?.response?.data?.message || 'Error al crear anexo';
       if (message.includes('30 days')) {
         toast.error('No se pueden crear anexos después de 30 días');

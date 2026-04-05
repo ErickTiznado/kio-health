@@ -25,7 +25,7 @@ interface EditorContainerProps {
   patientId: string;
   patientName: string;
   patientAge?: number;
-  psychContext: unknown;
+  psychContext: any;
   clinicalScales?: ClinicalScale[];
 }
 
@@ -62,7 +62,7 @@ export function EditorContainer({
   const [prepTab, setPrepTab] = useState<'prep' | 'scales'>('prep');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [templateType, setTemplateType] = useState<NoteTemplateType>(NoteTemplateType.FREE);
-  const [content, setContent] = useState<Record<string, unknown>>({ body: '', sessionGoal: '' });
+  const [content, setContent] = useState<any>({ body: '', sessionGoal: '' });
   const [moodRating, setMoodRating] = useState<number>(5);
   const [tags, setTags] = useState<string[]>([]);
   const [isReadMode] = useState(false);
@@ -92,16 +92,17 @@ export function EditorContainer({
         setTemplateType(currentNote.templateType);
         setContent(currentNote.content);
         if (currentNote.moodRating) setMoodRating(currentNote.moodRating);
-        if ((currentNote as Record<string, unknown>).tags) setTags((currentNote as Record<string, unknown>).tags as string[]);
+        if ((currentNote as any).tags) setTags((currentNote as any).tags as string[]);
       }, 0);
       hasInitialized.current = true;
 
+      const noteContent = currentNote.content as any;
       const hasRealContent =
-        (currentNote.content.body && currentNote.content.body.length > 5) ||
-        (currentNote.content.s && currentNote.content.s.length > 5);
+        (noteContent?.body && noteContent.body.length > 5) ||
+        (noteContent?.s && noteContent.s.length > 5);
 
       if (!hasRealContent) {
-        setIsEditing(true);
+        // setIsEditing(true);
       }
       return () => clearTimeout(id);
     }
@@ -436,13 +437,13 @@ export function EditorContainer({
                 {templateType === NoteTemplateType.SOAP ? (
                   <SoapForm
                     content={content}
-                    onChange={(key, val) => setContent((prev: Record<string, unknown>) => ({ ...prev, [key]: val }))}
+                    onChange={(key, val) => setContent((prev: any) => ({ ...prev, [key]: val }))}
                     readOnly={isReadMode}
                   />
                 ) : (
                   <FreeForm
                     content={content}
-                    onChange={(val) => setContent((prev: Record<string, unknown>) => ({ ...prev, body: val }))}
+                    onChange={(val) => setContent((prev: any) => ({ ...prev, body: val }))}
                     readOnly={isReadMode}
                   />
                 )}

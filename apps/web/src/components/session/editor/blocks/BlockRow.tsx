@@ -112,7 +112,7 @@ export function BlockRow({
               className="p-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 rounded-md hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center cursor-pointer"
               title="Cambiar tipo de bloque"
             >
-              {BlockIcon({ size: 18 })}
+              <BlockIcon size={18} />
             </button>
 
             {showTypeMenu && (

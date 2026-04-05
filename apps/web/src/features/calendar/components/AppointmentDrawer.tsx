@@ -62,10 +62,10 @@ export function AppointmentDrawer({ appointment, isOpen, onClose, onReschedule, 
           date: item.startTime,
           summary:
             item.psychNote
-              ? (typeof item.psychNote.content?.s === 'string'
-                  ? item.psychNote.content.s
-                  : typeof item.psychNote.content?.body === 'string'
-                  ? item.psychNote.content.body
+              ? (typeof (item.psychNote.content as any)?.s === 'string'
+                  ? (item.psychNote.content as any).s
+                  : typeof (item.psychNote.content as any)?.body === 'string'
+                  ? (item.psychNote.content as any).body
                   : item.reason ?? 'Sin detalles')
               : (item.reason ?? 'Sin detalles'),
           tags: item.psychNote?.tags ?? [],

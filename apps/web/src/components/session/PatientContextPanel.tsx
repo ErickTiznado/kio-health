@@ -14,7 +14,7 @@ interface PatientContextPanelProps {
   patientName: string;
   patientAge: number;
   clinicianType: string;
-  psychContext: Record<string, unknown>;
+  psychContext: any;
 }
 
 export const PatientContextPanel: FC<PatientContextPanelProps> = ({
@@ -136,7 +136,7 @@ export const PatientContextPanel: FC<PatientContextPanelProps> = ({
                 const tags = item.psychNote?.tags || [];
                 const visibleTags = tags.slice(0, 3);
                 const hasMoreTags = tags.length > 3;
-                const snippet = content?.s || content?.body || item.reason || 'Sin detalles';
+                const snippet = (content as any)?.s || (content as any)?.body || item.reason || 'Sin detalles';
 
                 return (
                   <li key={item.id} className="relative pl-4 border-l-2 border-gray-200 dark:border-slate-700 pb-1">
