@@ -1,8 +1,10 @@
 {
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/:path*",
-      "destination": "https://trustworthy-enchantment-production.up.railway.app/api/:path*"
-    }
+      "src": "/api/(.*)",
+      "dest": "https://trustworthy-enchantment-production.up.railway.app/api/$1"
+    },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
