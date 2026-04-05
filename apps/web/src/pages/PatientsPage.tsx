@@ -11,7 +11,7 @@ import { DashboardLayout } from '../components/DashboardLayout';
 import { motion } from 'framer-motion';
 import { confirmAction } from '../lib/confirm-action';
 
-const TABS = [
+const TABS: { id: 'ALL' | 'ACTIVE' | 'ARCHIVED'; label: string }[] = [
   { id: 'ALL', label: 'Todos' },
   { id: 'ACTIVE', label: 'Activos' },
   { id: 'ARCHIVED', label: 'Archivados' },
@@ -83,7 +83,7 @@ export default function PatientsPage() {
       description: 'El paciente volverá a la lista de pacientes activos.',
       confirmLabel: 'Sí, activar',
       cancelLabel: 'Cancelar',
-      variant: 'primary',
+      variant: 'default',
     });
     if (confirmed) {
       unarchivePatientMutation.mutate(patient.id);

@@ -65,7 +65,7 @@ export function EditorContainer({
   const [content, setContent] = useState<any>({ body: '', sessionGoal: '' });
   const [moodRating, setMoodRating] = useState<number>(5);
   const [tags, setTags] = useState<string[]>([]);
-  const [isReadMode, setIsReadMode] = useState(false);
+  const [isReadMode] = useState(false);
   const hasInitialized = useRef(false);
 
   // Clear store on unmount to avoid stale note bleeding into the next session

@@ -45,7 +45,7 @@ export const AddendumList: FC<AddendumListProps> = ({ appointmentId }) => {
                   </span>
                 </div>
                 {addendum.privateNotes && (
-                  <Lock size={12} className="text-amber-400" title="Contiene notas privadas" />
+                  <Lock size={12} className="text-amber-400" aria-label="Contiene notas privadas" />
                 )}
               </div>
               <div className="text-sm text-gray-700 dark:text-slate-300">

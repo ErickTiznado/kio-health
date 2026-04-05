@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { Patient } from '../../types/patients.types';
-import { MoreVertical, Edit, FileText, Trash2, Calendar, AlertTriangle, RotateCcw } from 'lucide-react';
+import { MoreVertical, Edit, FileText, Trash2, Calendar, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RiskFlagBadge } from '../patient/RiskFlagBadge';
 

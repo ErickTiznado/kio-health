@@ -5,8 +5,6 @@ import {
   ListOrdered,
   Quote,
   CheckSquare,
-  FileDown,
-  Copy,
   PenTool,
   LayoutTemplate,
   Type
@@ -20,7 +18,7 @@ interface EditorToolboxProps {
   currentTemplate: NoteTemplateType;
 }
 
-export function EditorToolbox({ onTemplateChange, onExport, onCopy, currentTemplate }: EditorToolboxProps) {
+export function EditorToolbox({ onTemplateChange, onExport: _onExport, onCopy: _onCopy, currentTemplate }: EditorToolboxProps) {
 
   const handleDragStart = (e: React.DragEvent, tool: any) => {
     e.dataTransfer.setData('text/plain', tool.value);

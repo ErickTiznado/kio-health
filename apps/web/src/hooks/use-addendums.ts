@@ -40,7 +40,7 @@ export const useCreateAddendum = () => {
 
   return useMutation({
     mutationFn: createAddendum,
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: addendumKeys.appointment(variables.appointmentId),
       });
