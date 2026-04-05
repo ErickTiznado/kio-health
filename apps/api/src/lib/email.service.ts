@@ -358,7 +358,7 @@ export class EmailService {
    * Logo is horizontal (3:1), displayed at 156×52px.
    */
   private wrapInBase(content: string): string {
-    const frontendUrl = process.env.FRONTEND_URL ?? 'https://kio.health';
+    const frontendUrl = process.env.FRONTEND_URL ?? 'https://kioind.com';
     const logoUrl = `${frontendUrl}/logo.png`;
 
     return `
