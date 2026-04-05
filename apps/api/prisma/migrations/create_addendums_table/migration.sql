@@ -1,5 +1,5 @@
 -- Create psych_note_addendums table
-CREATE TABLE "psych_note_addendums" (
+CREATE TABLE IF NOT EXISTS "psych_note_addendums" (
   "id" UUID NOT NULL,
   "appointment_id" UUID NOT NULL,
   "patient_id" UUID NOT NULL,
@@ -12,18 +12,30 @@ CREATE TABLE "psych_note_addendums" (
   CONSTRAINT "psych_note_addendums_pkey" PRIMARY KEY ("id")
 );
 
--- Add foreign keys
-ALTER TABLE "psych_note_addendums" ADD CONSTRAINT "psych_note_addendums_appointment_id_fkey"
-  FOREIGN KEY ("appointment_id") REFERENCES "appointments"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- Add foreign keys (ignore if already exist)
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'psych_note_addendums_appointment_id_fkey') THEN
+    ALTER TABLE "psych_note_addendums" ADD CONSTRAINT "psych_note_addendums_appointment_id_fkey"
+      FOREIGN KEY ("appointment_id") REFERENCES "appointments"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+END $$;
 
-ALTER TABLE "psych_note_addendums" ADD CONSTRAINT "psych_note_addendums_patient_id_fkey"
-  FOREIGN KEY ("patient_id") REFERENCES "patients"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'psych_note_addendums_patient_id_fkey') THEN
+    ALTER TABLE "psych_note_addendums" ADD CONSTRAINT "psych_note_addendums_patient_id_fkey"
+      FOREIGN KEY ("patient_id") REFERENCES "patients"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+END $$;
 
-ALTER TABLE "psych_note_addendums" ADD CONSTRAINT "psych_note_addendums_created_by_fkey"
-  FOREIGN KEY ("created_by") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'psych_note_addendums_created_by_fkey') THEN
+    ALTER TABLE "psych_note_addendums" ADD CONSTRAINT "psych_note_addendums_created_by_fkey"
+      FOREIGN KEY ("created_by") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+  END IF;
+END $$;
 
 -- Create indexes for efficient queries
-CREATE INDEX "idx_psych_note_addendums_appointment_id" ON "psych_note_addendums"("appointment_id");
-CREATE INDEX "idx_psych_note_addendums_patient_id" ON "psych_note_addendums"("patient_id");
-CREATE INDEX "idx_psych_note_addendums_created_by" ON "psych_note_addendums"("created_by");
-CREATE INDEX "idx_psych_note_addendums_created_at" ON "psych_note_addendums"("created_at");
+CREATE INDEX IF NOT EXISTS "idx_psych_note_addendums_appointment_id" ON "psych_note_addendums"("appointment_id");
+CREATE INDEX IF NOT EXISTS "idx_psych_note_addendums_patient_id" ON "psych_note_addendums"("patient_id");
+CREATE INDEX IF NOT EXISTS "idx_psych_note_addendums_created_by" ON "psych_note_addendums"("created_by");
+CREATE INDEX IF NOT EXISTS "idx_psych_note_addendums_created_at" ON "psych_note_addendums"("created_at");
