@@ -37,7 +37,7 @@ export class RemindersService {
 
     for (const reminder of pendingReminders) {
       const confirmationToken = uuidv4();
-      const apiUrl = process.env.API_URL ?? 'https://trustworthy-enchantment-production.up.railway.app';
+      const apiUrl = process.env.API_URL ?? 'https://kioind.com';
       const confirmationUrl = `${apiUrl}/api/reminders/confirm/${confirmationToken}`;
 
       try {
