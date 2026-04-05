@@ -1,26 +1,32 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Resend } from 'resend';
 
-// ─── Email-safe icon badges ────────────────────────────────────────────────────
-// Pure HTML table cells — no images, no SVG, no emoji. Works in all clients.
-function iconBadge(letter: string): string {
-  return `<table cellpadding="0" cellspacing="0" border="0" style="display:inline-table;">
+// ─── Detail row helper ────────────────────────────────────────────────────────
+function detailRow(label: string, value: string, last = false): string {
+  const border = last ? '' : 'border-bottom: 1px solid #f0ecff;';
+  return `
     <tr>
-      <td width="32" height="32" align="center" valign="middle"
-          style="width:32px;height:32px;background-color:#f5f3ff;border-radius:8px;
-                 font-size:13px;font-weight:700;color:#8a72d1;
-                 font-family:Inter,Roboto,sans-serif;line-height:32px;">
-        ${letter}
+      <td style="padding: 13px 20px; ${border}">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td width="110" style="vertical-align: top; padding-right: 12px;">
+              <span style="font-size: 11px; font-weight: 600; color: #9ca3af;
+                           text-transform: uppercase; letter-spacing: 0.07em;
+                           font-family: Inter, Roboto, sans-serif; line-height: 1.8;">
+                ${label}
+              </span>
+            </td>
+            <td style="vertical-align: top;">
+              <span style="font-size: 14px; font-weight: 700; color: #1e1b4b;
+                           font-family: Inter, Roboto, sans-serif; line-height: 1.8;">
+                ${value}
+              </span>
+            </td>
+          </tr>
+        </table>
       </td>
-    </tr>
-  </table>`;
+    </tr>`;
 }
-
-const SVG_CALENDAR = iconBadge('C');
-const SVG_CLOCK    = iconBadge('H');
-const SVG_TAG      = iconBadge('T');
-const SVG_USER     = iconBadge('P');
-const SVG_TIMER    = iconBadge('1h');
 
 @Injectable()
 export class EmailService {
@@ -141,9 +147,6 @@ export class EmailService {
           <td style="padding: 12px 16px;">
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td style="vertical-align: middle; padding-right: 8px;">
-                  ${SVG_TIMER}
-                </td>
                 <td style="font-size: 13px; color: #6b5ea8; line-height: 1.6;
                             font-family: Inter, Roboto, sans-serif;">
                   Este enlace expira en <strong>1 hora</strong> y solo puede usarse una vez.
@@ -209,107 +212,10 @@ export class EmailService {
       <table width="100%" cellpadding="0" cellspacing="0" border="0"
              style="border: 1.5px solid #ddd3fa; border-radius: 14px;
                     margin: 0 0 28px; background-color: #faf9ff;">
-
-        <!-- Fecha -->
-        <tr>
-          <td style="padding: 14px 18px; border-bottom: 1px solid #f0ecff;">
-            <table cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td style="vertical-align: middle; padding-right: 12px;">
-                  ${SVG_CALENDAR}
-                </td>
-                <td style="vertical-align: middle;">
-                  <span style="display: block; font-size: 11px; font-weight: 600;
-                               color: #9ca3af; text-transform: uppercase;
-                               letter-spacing: 0.07em; margin-bottom: 2px;
-                               font-family: Inter, Roboto, sans-serif;">
-                    Fecha
-                  </span>
-                  <span style="font-size: 14px; font-weight: 700; color: #1e1b4b;
-                               font-family: Inter, Roboto, sans-serif;">
-                    ${formattedDate}
-                  </span>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <!-- Hora -->
-        <tr>
-          <td style="padding: 14px 18px; border-bottom: 1px solid #f0ecff;">
-            <table cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td style="vertical-align: middle; padding-right: 12px;">
-                  ${SVG_CLOCK}
-                </td>
-                <td style="vertical-align: middle;">
-                  <span style="display: block; font-size: 11px; font-weight: 600;
-                               color: #9ca3af; text-transform: uppercase;
-                               letter-spacing: 0.07em; margin-bottom: 2px;
-                               font-family: Inter, Roboto, sans-serif;">
-                    Hora
-                  </span>
-                  <span style="font-size: 14px; font-weight: 700; color: #1e1b4b;
-                               font-family: Inter, Roboto, sans-serif;">
-                    ${formattedTime}
-                  </span>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <!-- Tipo -->
-        <tr>
-          <td style="padding: 14px 18px; border-bottom: 1px solid #f0ecff;">
-            <table cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td style="vertical-align: middle; padding-right: 12px;">
-                  ${SVG_TAG}
-                </td>
-                <td style="vertical-align: middle;">
-                  <span style="display: block; font-size: 11px; font-weight: 600;
-                               color: #9ca3af; text-transform: uppercase;
-                               letter-spacing: 0.07em; margin-bottom: 2px;
-                               font-family: Inter, Roboto, sans-serif;">
-                    Tipo de sesión
-                  </span>
-                  <span style="font-size: 14px; font-weight: 700; color: #1e1b4b;
-                               font-family: Inter, Roboto, sans-serif;">
-                    ${appointmentType}
-                  </span>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <!-- Profesional -->
-        <tr>
-          <td style="padding: 14px 18px;">
-            <table cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td style="vertical-align: middle; padding-right: 12px;">
-                  ${SVG_USER}
-                </td>
-                <td style="vertical-align: middle;">
-                  <span style="display: block; font-size: 11px; font-weight: 600;
-                               color: #9ca3af; text-transform: uppercase;
-                               letter-spacing: 0.07em; margin-bottom: 2px;
-                               font-family: Inter, Roboto, sans-serif;">
-                    Profesional
-                  </span>
-                  <span style="font-size: 14px; font-weight: 700; color: #1e1b4b;
-                               font-family: Inter, Roboto, sans-serif;">
-                    ${clinicianName}
-                  </span>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
+        ${detailRow('Fecha', formattedDate)}
+        ${detailRow('Hora', formattedTime)}
+        ${detailRow('Tipo de sesión', appointmentType)}
+        ${detailRow('Profesional', clinicianName, true)}
       </table>
 
       <!-- CTA -->
