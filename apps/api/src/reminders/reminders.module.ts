@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ScheduleModule } from '@nestjs/schedule';
 import { EmailModule } from '../lib/email.module';
 import { RemindersService } from './reminders.service';
 import { RemindersController } from './reminders.controller';
@@ -9,7 +8,7 @@ import { AppointmentRescheduledListener } from './listeners/appointment-reschedu
 import { AppointmentCancelledListener } from './listeners/appointment-cancelled.listener';
 
 @Module({
-  imports: [ScheduleModule.forRoot(), EmailModule],
+  imports: [EmailModule],
   controllers: [RemindersController],
   providers: [
     RemindersService,

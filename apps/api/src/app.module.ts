@@ -16,6 +16,7 @@ import { ExportModule } from './export/export.module';
 import { TasksModule } from './tasks/tasks.module';
 import { FinanceModule } from './finance/finance.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 import { SearchModule } from './search/search.module';
 import { EncryptionModule } from './lib/encryption.module';
 import { ClinicsModule } from './clinics/clinics.module';
@@ -50,6 +51,7 @@ import { RemindersModule } from './reminders/reminders.module';
     ClinicsModule,
     IntegrationsModule,
     EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
     SubscriptionsModule,
     AddendumsModule,
     RiskFlagsModule,
