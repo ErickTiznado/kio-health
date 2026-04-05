@@ -1,17 +1,26 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Resend } from 'resend';
 
-// ─── Inline SVG icons (email-safe, stroke-only, kanji color #8a72d1) ─────────
+// ─── Email-safe icon badges ────────────────────────────────────────────────────
+// Pure HTML table cells — no images, no SVG, no emoji. Works in all clients.
+function iconBadge(letter: string): string {
+  return `<table cellpadding="0" cellspacing="0" border="0" style="display:inline-table;">
+    <tr>
+      <td width="32" height="32" align="center" valign="middle"
+          style="width:32px;height:32px;background-color:#f5f3ff;border-radius:8px;
+                 font-size:13px;font-weight:700;color:#8a72d1;
+                 font-family:Inter,Roboto,sans-serif;line-height:32px;">
+        ${letter}
+      </td>
+    </tr>
+  </table>`;
+}
 
-const SVG_CALENDAR = `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Crect x='1.5' y='2.5' width='13' height='12' rx='2' stroke='%238a72d1' stroke-width='1.4'/%3E%3Cpath d='M1.5 6.5h13' stroke='%238a72d1' stroke-width='1.4'/%3E%3Cpath d='M5 1v3M11 1v3' stroke='%238a72d1' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E" width="16" height="16" alt="" style="display:block;vertical-align:middle;" />`;
-
-const SVG_CLOCK = `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Ccircle cx='8' cy='8' r='6.5' stroke='%238a72d1' stroke-width='1.4'/%3E%3Cpath d='M8 4.5v4l2.5 2' stroke='%238a72d1' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" width="16" height="16" alt="" style="display:block;vertical-align:middle;" />`;
-
-const SVG_TAG = `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M2 2h5l7 7-5 5-7-7V2z' stroke='%238a72d1' stroke-width='1.4' stroke-linejoin='round'/%3E%3Ccircle cx='5.5' cy='5.5' r='1' fill='%238a72d1'/%3E%3C/svg%3E" width="16" height="16" alt="" style="display:block;vertical-align:middle;" />`;
-
-const SVG_USER = `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Ccircle cx='8' cy='5.5' r='2.5' stroke='%238a72d1' stroke-width='1.4'/%3E%3Cpath d='M2.5 14c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5' stroke='%238a72d1' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E" width="16" height="16" alt="" style="display:block;vertical-align:middle;" />`;
-
-const SVG_TIMER = `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Ccircle cx='7' cy='7' r='5.5' stroke='%238a72d1' stroke-width='1.3'/%3E%3Cpath d='M7 4v3.5l2 1.5' stroke='%238a72d1' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E" width="14" height="14" alt="" style="display:block;vertical-align:middle;" />`;
+const SVG_CALENDAR = iconBadge('C');
+const SVG_CLOCK    = iconBadge('H');
+const SVG_TAG      = iconBadge('T');
+const SVG_USER     = iconBadge('P');
+const SVG_TIMER    = iconBadge('1h');
 
 @Injectable()
 export class EmailService {
@@ -207,11 +216,7 @@ export class EmailService {
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td style="vertical-align: middle; padding-right: 12px;">
-                  <div style="width: 32px; height: 32px; background-color: #f5f3ff;
-                               border-radius: 8px; display: flex; align-items: center;
-                               justify-content: center; text-align: center; line-height: 32px;">
-                    ${SVG_CALENDAR}
-                  </div>
+                  ${SVG_CALENDAR}
                 </td>
                 <td style="vertical-align: middle;">
                   <span style="display: block; font-size: 11px; font-weight: 600;
@@ -236,10 +241,7 @@ export class EmailService {
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td style="vertical-align: middle; padding-right: 12px;">
-                  <div style="width: 32px; height: 32px; background-color: #f5f3ff;
-                               border-radius: 8px; text-align: center; line-height: 32px;">
-                    ${SVG_CLOCK}
-                  </div>
+                  ${SVG_CLOCK}
                 </td>
                 <td style="vertical-align: middle;">
                   <span style="display: block; font-size: 11px; font-weight: 600;
@@ -264,10 +266,7 @@ export class EmailService {
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td style="vertical-align: middle; padding-right: 12px;">
-                  <div style="width: 32px; height: 32px; background-color: #f5f3ff;
-                               border-radius: 8px; text-align: center; line-height: 32px;">
-                    ${SVG_TAG}
-                  </div>
+                  ${SVG_TAG}
                 </td>
                 <td style="vertical-align: middle;">
                   <span style="display: block; font-size: 11px; font-weight: 600;
@@ -292,10 +291,7 @@ export class EmailService {
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td style="vertical-align: middle; padding-right: 12px;">
-                  <div style="width: 32px; height: 32px; background-color: #f5f3ff;
-                               border-radius: 8px; text-align: center; line-height: 32px;">
-                    ${SVG_USER}
-                  </div>
+                  ${SVG_USER}
                 </td>
                 <td style="vertical-align: middle;">
                   <span style="display: block; font-size: 11px; font-weight: 600;
@@ -404,7 +400,6 @@ export class EmailService {
                      width="156" height="52"
                      style="display: block; margin: 0 auto;
                             border: 0; outline: none; text-decoration: none;" />
-              </a>
             </td>
           </tr>
 
