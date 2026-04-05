@@ -1,10 +1,18 @@
-import { Controller, Get, Param, Res } from '@nestjs/common';
+import { Controller, Get, Param, Post, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
 import { RemindersService } from './reminders.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('reminders')
 export class RemindersController {
   constructor(private readonly remindersService: RemindersService) {}
+
+  @Post('trigger')
+  @UseGuards(JwtAuthGuard)
+  async triggerReminders() {
+    await this.remindersService.processReminders();
+    return { ok: true };
+  }
 
   @Get('confirm/:token')
   async confirmAttendance(
