@@ -52,3 +52,10 @@ export enum ClinicianPlan {
   INDIVIDUAL = 'INDIVIDUAL',
   CLINIC = 'CLINIC',
 }
+
+export enum ReminderStatus {
+  PENDING = 'PENDING',
+  SENT = 'SENT',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+}

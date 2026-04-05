@@ -19,6 +19,11 @@ export const patientSchema = z.object({
     .refine((val) => !val || /^\+?[1-9]\d{1,14}$/.test(val.replace(/\s/g, '')), {
       message: 'Formato de teléfono inválido',
     }),
+  contactEmail: z
+    .string()
+    .email('Formato de email inválido')
+    .optional()
+    .or(z.literal('')),
   dateOfBirth: z.string().optional(),
   diagnosis: z.string().optional(),
   clinicalContext: z.string().optional(),

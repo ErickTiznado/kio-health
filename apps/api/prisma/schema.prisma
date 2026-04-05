@@ -105,6 +105,13 @@ enum RiskFlagType {
   SUDDEN_DETERIORATION
 }
 
+enum ReminderStatus {
+  PENDING
+  SENT
+  FAILED
+  CANCELLED
+}
+
 // ============================================
 // MODELS
 // ============================================
@@ -159,6 +166,7 @@ model ClinicianProfile {
   currency               String        @default("USD")
   sessionDefaultDuration Int           @default(50) @map("session_default_duration")
   sessionDefaultPrice    Decimal       @default(0.00) @map("session_default_price") @db.Decimal(10, 2)
+  timezone               String        @default("America/Mexico_City")
   plan                   ClinicianPlan @default(INDIVIDUAL) @map("plan")
   createdAt              DateTime      @default(now()) @map("created_at")
   updatedAt              DateTime      @updatedAt @map("updated_at")
@@ -184,6 +192,7 @@ model Patient {
   clinicalContext  String?       @map("clinical_context")
   status           PatientStatus @default(ACTIVE)
   contactPhone     String?       @map("contact_phone")
+  contactEmail     String?       @map("contact_email")
   emergencyContact String?       @map("emergency_contact")
   treatmentGoals   String[]      @default([]) @map("treatment_goals")
   medicacionActual String?       @map("medicacion_actual")
@@ -227,8 +236,27 @@ model Appointment {
   psychNote      PsychNote?
   transaction    FinanceTransaction?
   clinicalScales ClinicalScale[]
+  reminder       AppointmentReminder?
 
   @@map("appointments")
+}
+
+model AppointmentReminder {
+  id                String         @id @default(uuid()) @db.Uuid
+  appointmentId     String         @unique @map("appointment_id") @db.Uuid
+  patientEmail      String         @map("patient_email")
+  status            ReminderStatus @default(PENDING)
+  scheduledFor      DateTime       @map("scheduled_for")
+  sentAt            DateTime?      @map("sent_at")
+  failureReason     String?        @map("failure_reason")
+  confirmationToken String?        @unique @map("confirmation_token") @db.Uuid
+  confirmedAt       DateTime?      @map("confirmed_at")
+  createdAt         DateTime       @default(now()) @map("created_at")
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@index([status, scheduledFor])
+  @@map("appointment_reminders")
 }
 
 model PsychNote {

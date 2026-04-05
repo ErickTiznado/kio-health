@@ -157,6 +157,11 @@ export function WizardPatientForm({ initialData, onSubmit, onCancel, isLoading }
                   {errors.contactPhone && <p className={errorClass}>{errors.contactPhone.message}</p>}
                 </div>
                 <div>
+                  <label className={labelClass}>Email <span className="text-gray-400 font-normal normal-case">(para recordatorios)</span></label>
+                  <input {...register('contactEmail')} type="email" className={inputClass} placeholder="paciente@email.com" />
+                  {errors.contactEmail && <p className={errorClass}>{errors.contactEmail.message}</p>}
+                </div>
+                <div>
                   <Controller
                     control={control}
                     name="dateOfBirth"

@@ -1,4 +1,4 @@
-import { MapPin, Banknote, Calendar } from 'lucide-react';
+import { MapPin, Banknote, Calendar, CheckCircle, MailCheck, Clock, MailX } from 'lucide-react';
 import { format, parseISO, differenceInMinutes } from 'date-fns';
 import type { Appointment } from '../../../types/appointments.types';
 
@@ -149,6 +149,29 @@ export function AppointmentPill({ appointment, onSelect, onQuickPay, onQuickResc
             <p className="text-xs text-gray-400 dark:text-slate-500 truncate mt-0.5 italic">
               Consulta General
             </p>
+          )}
+
+          {/* Reminder status */}
+          {appointment.reminder && (
+            <div className="flex items-center gap-1 mt-1">
+              {appointment.reminder.confirmedAt ? (
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400" title="Asistencia confirmada">
+                  <CheckCircle size={10} /> Confirmado
+                </span>
+              ) : appointment.reminder.status === 'SENT' ? (
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400" title="Recordatorio enviado">
+                  <MailCheck size={10} /> Enviado
+                </span>
+              ) : appointment.reminder.status === 'PENDING' ? (
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-gray-400 dark:text-slate-500" title="Recordatorio programado">
+                  <Clock size={10} /> Programado
+                </span>
+              ) : appointment.reminder.status === 'FAILED' ? (
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-red-500 dark:text-red-400" title="Error al enviar recordatorio">
+                  <MailX size={10} /> Error
+                </span>
+              ) : null}
+            </div>
           )}
         </>
       )}

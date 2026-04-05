@@ -3,6 +3,7 @@ import {
   IsString,
   IsOptional,
   IsDateString,
+  IsEmail,
   ValidateNested,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
@@ -41,6 +42,10 @@ export class CreatePatientDto {
   @IsString()
   @IsOptional()
   contactPhone?: string;
+
+  @IsEmail({}, { message: 'Formato de email invalido' })
+  @IsOptional()
+  contactEmail?: string;
 
   @IsOptional()
   @ValidateNested()

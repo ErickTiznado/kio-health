@@ -54,6 +54,7 @@ export function ScheduleAppointmentModal({
     // Form state
     const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
     const [patientSearch, setPatientSearch] = useState('');
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [startTime, setStartTime] = useState('');
     const [duration, setDuration] = useState<string>(String(defaultDuration));
     const [type, setType] = useState<AppointmentType>('CONSULTATION');
@@ -64,6 +65,7 @@ export function ScheduleAppointmentModal({
     const [patientMode, setPatientMode] = useState<'search' | 'new'>('search');
     const [newPatientName, setNewPatientName] = useState('');
     const [newPatientPhone, setNewPatientPhone] = useState('');
+    const [newPatientEmail, setNewPatientEmail] = useState('');
     const wasNewPatient = useRef(false);
 
     const debouncedSearch = useDebounce(patientSearch, 300);
@@ -92,6 +94,7 @@ export function ScheduleAppointmentModal({
             setPatientMode('search');
             setNewPatientName('');
             setNewPatientPhone('');
+            setNewPatientEmail('');
             wasNewPatient.current = false;
             if (initialPatient) {
                 setSelectedPatientId(initialPatient.id);
@@ -103,7 +106,7 @@ export function ScheduleAppointmentModal({
         }
     }, [isOpen, isEditMode, initialData, initialDate, defaultDuration, defaultPrice, initialPatient]);
 
-    const { data: patientsData, isLoading: isLoadingPatients } = usePatients(1, debouncedSearch, 5);
+    const { data: patientsData, isLoading: isLoadingPatients } = usePatients(1, debouncedSearch, 'ACTIVE', 5);
     const patients = patientsData?.data || [];
 
     const createPatientMutation = useMutation({ mutationFn: createPatient });
@@ -162,6 +165,7 @@ export function ScheduleAppointmentModal({
                 const newPatient = await createPatientMutation.mutateAsync({
                     fullName: newPatientName.trim(),
                     ...(newPatientPhone.trim() ? { contactPhone: newPatientPhone.trim() } : {}),
+                    ...(newPatientEmail.trim() ? { contactEmail: newPatientEmail.trim() } : {}),
                 });
                 resolvedPatientId = newPatient.id;
                 setSelectedPatientId(newPatient.id);
@@ -265,7 +269,7 @@ export function ScheduleAppointmentModal({
                                         </label>
                                         {patientMode === 'search' ? (
                                             <button type="button"
-                                                onClick={() => { setPatientMode('new'); setNewPatientName(''); setNewPatientPhone(''); }}
+                                                onClick={() => { setPatientMode('new'); setNewPatientName(''); setNewPatientPhone(''); setNewPatientEmail(''); }}
                                                 className="flex items-center gap-1 text-xs font-bold text-kio hover:text-kio/80 transition-colors"
                                             >
                                                 <UserPlus size={13} /> Nuevo paciente
@@ -286,6 +290,8 @@ export function ScheduleAppointmentModal({
                                             <input
                                                 type="text" value={patientSearch}
                                                 onChange={(e) => { setPatientSearch(e.target.value); if (selectedPatientId) setSelectedPatientId(null); }}
+                                                onFocus={() => setIsSearchFocused(true)}
+                                                onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
                                                 placeholder="Buscar paciente por nombre..."
                                                 autoFocus
                                                 className={`${inputClass} pl-11 ${
@@ -298,7 +304,7 @@ export function ScheduleAppointmentModal({
                                                 <Loader2 size={16} className="absolute right-4 top-3.5 animate-spin text-gray-400" />
                                             )}
                                             {/* Dropdown results */}
-                                            {debouncedSearch && !selectedPatientId && patients.length > 0 && (
+                                            {isSearchFocused && !selectedPatientId && patients.length > 0 && (
                                                 <div className="absolute z-50 left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl shadow-xl max-h-52 overflow-y-auto py-1.5">
                                                     {patients.map((patient) => (
                                                         <button key={patient.id} type="button"
@@ -311,7 +317,7 @@ export function ScheduleAppointmentModal({
                                                 </div>
                                             )}
                                             {/* No results */}
-                                            {debouncedSearch && !isLoadingPatients && !selectedPatientId && patients.length === 0 && (
+                                            {isSearchFocused && debouncedSearch && !isLoadingPatients && !selectedPatientId && patients.length === 0 && (
                                                 <div className="absolute z-50 left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl shadow-xl p-4">
                                                     <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">
                                                         Sin resultados para <span className="font-bold text-gray-600 dark:text-slate-300">"{debouncedSearch}"</span>
@@ -340,6 +346,13 @@ export function ScheduleAppointmentModal({
                                                 <PhoneInput
                                                     value={newPatientPhone}
                                                     onChange={setNewPatientPhone}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className={labelClass}>Email <span className="text-gray-400 font-normal normal-case">(para recordatorios)</span></label>
+                                                <input type="email" value={newPatientEmail}
+                                                    onChange={(e) => setNewPatientEmail(e.target.value)}
+                                                    placeholder="paciente@email.com" className={inputClass}
                                                 />
                                             </div>
                                             <p className="text-[11px] text-gray-400 dark:text-slate-500">

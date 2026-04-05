@@ -23,6 +23,7 @@ import { IntegrationsModule } from './integrations/integrations.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { AddendumsModule } from './addendums/addendums.module';
 import { RiskFlagsModule } from './risk-flags/risk-flags.module';
+import { RemindersModule } from './reminders/reminders.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { RiskFlagsModule } from './risk-flags/risk-flags.module';
     SubscriptionsModule,
     AddendumsModule,
     RiskFlagsModule,
+    RemindersModule,
   ],
   controllers: [AppController],
   providers: [

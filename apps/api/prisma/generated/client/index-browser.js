@@ -157,6 +157,7 @@ exports.Prisma.ClinicianProfileScalarFieldEnum = {
   currency: 'currency',
   sessionDefaultDuration: 'sessionDefaultDuration',
   sessionDefaultPrice: 'sessionDefaultPrice',
+  timezone: 'timezone',
   plan: 'plan',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -171,8 +172,11 @@ exports.Prisma.PatientScalarFieldEnum = {
   clinicalContext: 'clinicalContext',
   status: 'status',
   contactPhone: 'contactPhone',
+  contactEmail: 'contactEmail',
   emergencyContact: 'emergencyContact',
   treatmentGoals: 'treatmentGoals',
+  medicacionActual: 'medicacionActual',
+  alergias: 'alergias',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -193,6 +197,19 @@ exports.Prisma.AppointmentScalarFieldEnum = {
   googleEventId: 'googleEventId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AppointmentReminderScalarFieldEnum = {
+  id: 'id',
+  appointmentId: 'appointmentId',
+  patientEmail: 'patientEmail',
+  status: 'status',
+  scheduledFor: 'scheduledFor',
+  sentAt: 'sentAt',
+  failureReason: 'failureReason',
+  confirmationToken: 'confirmationToken',
+  confirmedAt: 'confirmedAt',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.PsychNoteScalarFieldEnum = {
@@ -329,6 +346,27 @@ exports.Prisma.GoogleIntegrationScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.RiskFlagScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  flagTypes: 'flagTypes',
+  lastUpdated: 'lastUpdated',
+  resolvedAt: 'resolvedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PsychNoteAddendumScalarFieldEnum = {
+  id: 'id',
+  appointmentId: 'appointmentId',
+  patientId: 'patientId',
+  content: 'content',
+  privateNotes: 'privateNotes',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  type: 'type'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -397,6 +435,13 @@ exports.PaymentMethod = exports.$Enums.PaymentMethod = {
   TRANSFER: 'TRANSFER'
 };
 
+exports.ReminderStatus = exports.$Enums.ReminderStatus = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED'
+};
+
 exports.NoteTemplateType = exports.$Enums.NoteTemplateType = {
   SOAP: 'SOAP',
   FREE: 'FREE',
@@ -436,6 +481,15 @@ exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {
   UNPAID: 'UNPAID'
 };
 
+exports.RiskFlagType = exports.$Enums.RiskFlagType = {
+  SEVERE_DEPRESSION: 'SEVERE_DEPRESSION',
+  SEVERE_ANXIETY: 'SEVERE_ANXIETY',
+  AUTOLESION: 'AUTOLESION',
+  SUICIDAL_IDEATION: 'SUICIDAL_IDEATION',
+  URGENT: 'URGENT',
+  SUDDEN_DETERIORATION: 'SUDDEN_DETERIORATION'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   RefreshToken: 'RefreshToken',
@@ -443,6 +497,7 @@ exports.Prisma.ModelName = {
   ClinicianProfile: 'ClinicianProfile',
   Patient: 'Patient',
   Appointment: 'Appointment',
+  AppointmentReminder: 'AppointmentReminder',
   PsychNote: 'PsychNote',
   Task: 'Task',
   AccessLog: 'AccessLog',
@@ -454,7 +509,9 @@ exports.Prisma.ModelName = {
   ClinicInvitation: 'ClinicInvitation',
   SubscriptionPlan: 'SubscriptionPlan',
   ClinicSubscription: 'ClinicSubscription',
-  GoogleIntegration: 'GoogleIntegration'
+  GoogleIntegration: 'GoogleIntegration',
+  RiskFlag: 'RiskFlag',
+  PsychNoteAddendum: 'PsychNoteAddendum'
 };
 
 /**

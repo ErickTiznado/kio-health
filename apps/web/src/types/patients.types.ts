@@ -15,6 +15,7 @@ export interface Patient {
   clinicalContext?: string;
   status: 'ACTIVE' | 'ARCHIVED';
   contactPhone?: string;
+  contactEmail?: string;
   emergencyContact?: EmergencyContact;
   treatmentGoals?: string[];
   createdAt: string;
@@ -33,6 +34,7 @@ export interface CreatePatientDto {
   diagnosis?: string;
   clinicalContext?: string;
   contactPhone?: string;
+  contactEmail?: string;
   emergencyContact?: EmergencyContact;
   treatmentGoals?: string[];
 }

@@ -97,6 +97,9 @@ export class AppointmentsService {
       },
       include: {
         patient: { select: { id: true, fullName: true } },
+        reminder: {
+          select: { status: true, sentAt: true, confirmedAt: true },
+        },
       },
       orderBy: { startTime: 'asc' },
     });
@@ -221,6 +224,9 @@ export class AppointmentsService {
             diagnosis: true,
             clinicalContext: true,
           },
+        },
+        reminder: {
+          select: { status: true, sentAt: true, confirmedAt: true },
         },
       },
       orderBy: { startTime: 'asc' },
@@ -697,6 +703,8 @@ export class AppointmentsService {
       appointment.googleEventId = googleEventId;
     }
 
+    this.eventEmitter.emit('appointment.scheduled', { appointment });
+
     return appointment;
   }
 
@@ -748,6 +756,10 @@ export class AppointmentsService {
       updated,
       updated.patient.fullName,
     );
+
+    this.eventEmitter.emit('appointment.rescheduled', {
+      appointment: updated,
+    });
 
     return updated;
   }
@@ -858,6 +870,8 @@ export class AppointmentsService {
       await this.googleCalendarService.deleteAppointment(clinicianId, updated.googleEventId);
     }
 
+    this.eventEmitter.emit('appointment.cancelled', { appointment: updated });
+
     return updated;
   }
 
@@ -960,7 +974,7 @@ export class AppointmentsService {
       clinicianId,
     );
 
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       // 1. Mark appointment as completed with payment info
       const updatedAppointment = await tx.appointment.update({
         where: { id: appointmentId },
@@ -1020,6 +1034,14 @@ export class AppointmentsService {
 
       return { updatedAppointment, nextAppointment };
     });
+
+    if (result.nextAppointment) {
+      this.eventEmitter.emit('appointment.scheduled', {
+        appointment: result.nextAppointment,
+      });
+    }
+
+    return result;
   }
 
   /* ── Private helpers (SRP) ─────────────────────── */

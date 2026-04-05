@@ -103,6 +103,7 @@ const personalSchema = z.object({
     .refine((v) => !v || /^\+?[1-9]\d{1,14}$/.test(v.replace(/\s/g, '')), {
       message: 'Formato de teléfono inválido',
     }),
+  contactEmail: z.string().email('Formato de email inválido').optional().or(z.literal('')),
   dateOfBirth: z.string().optional(),
 });
 type PersonalData = z.infer<typeof personalSchema>;
@@ -116,6 +117,7 @@ function PersonalDataSection({ patient }: { patient: Patient }) {
     defaultValues: {
       fullName: patient.fullName,
       contactPhone: patient.contactPhone ?? '',
+      contactEmail: patient.contactEmail ?? '',
       dateOfBirth: patient.dateOfBirth
         ? new Date(patient.dateOfBirth).toISOString().split('T')[0]
         : '',
@@ -126,6 +128,7 @@ function PersonalDataSection({ patient }: { patient: Patient }) {
     reset({
       fullName: patient.fullName,
       contactPhone: patient.contactPhone ?? '',
+      contactEmail: patient.contactEmail ?? '',
       dateOfBirth: patient.dateOfBirth
         ? new Date(patient.dateOfBirth).toISOString().split('T')[0]
         : '',
@@ -171,6 +174,7 @@ function PersonalDataSection({ patient }: { patient: Patient }) {
           <DataRow label="Nombre completo" value={patient.fullName} />
           <DataRow label="Fecha de nacimiento" value={dob ?? 'No registrada'} />
           <DataRow label="Teléfono" value={patient.contactPhone ?? 'No registrado'} />
+          <DataRow label="Email" value={patient.contactEmail ?? 'No registrado'} />
         </dl>
       ) : (
         <div className="space-y-4">
@@ -198,6 +202,21 @@ function PersonalDataSection({ patient }: { patient: Patient }) {
                 <p className={errorCls}>{errors.contactPhone.message}</p>
               )}
             </div>
+            <div>
+              <label className={labelCls}>Email <span className="text-gray-400 font-normal normal-case">(recordatorios)</span></label>
+              <input
+                {...register('contactEmail')}
+                type="email"
+                className={inputCls}
+                placeholder="paciente@email.com"
+              />
+              {errors.contactEmail && (
+                <p className={errorCls}>{errors.contactEmail.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <Controller
                 control={control}

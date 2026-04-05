@@ -7,6 +7,7 @@ export interface Patient {
   diagnosis: string | null;
   clinicalContext: string | null;
   contactPhone?: string | null;
+  contactEmail?: string | null;
   emergencyContact?: EmergencyContact | null;
   treatmentGoals?: string[];
   medicacionActual?: string | null;
@@ -29,6 +30,11 @@ export interface Appointment {
   paymentMethod: PaymentMethod | null;
   price: string;
   notes: string | null;
+  reminder?: {
+    status: string;
+    sentAt: string | null;
+    confirmedAt: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
   patient: Patient;
