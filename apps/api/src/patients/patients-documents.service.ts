@@ -4,49 +4,37 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-  DeleteObjectCommand,
-} from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { StorageClient } from '@supabase/storage-js';
 import { v4 as uuidv4 } from 'uuid';
 import { extname } from 'path';
 import { PrismaService } from '../prisma/prisma.service';
 import { UploadDocumentDto } from './dto/upload-document.dto';
 
+const BUCKET = 'patient-documents';
 const SIGNED_URL_EXPIRY = 60 * 60; // 1 hour
 
 @Injectable()
 export class PatientDocumentsService {
-  private readonly s3Client: S3Client | undefined;
-  private readonly bucketName: string | undefined;
+  private readonly storage: StorageClient | undefined;
 
   constructor(private readonly prisma: PrismaService) {
-    const region = process.env.AWS_REGION;
-    const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-    const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
-    this.bucketName = process.env.AWS_S3_BUCKET_NAME;
-
-    if (region && accessKeyId && secretAccessKey && this.bucketName) {
-      this.s3Client = new S3Client({
-        region,
-        credentials: {
-          accessKeyId,
-          secretAccessKey,
-        },
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (url && key) {
+      this.storage = new StorageClient(`${url}/storage/v1`, {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
       });
     }
   }
 
-  private getClient(): S3Client {
-    if (!this.s3Client || !this.bucketName) {
+  private getStorage(): StorageClient {
+    if (!this.storage) {
       throw new InternalServerErrorException(
-        'AWS S3 is not configured properly (missing region, credentials, or bucket name)',
+        'Document storage is not configured (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY missing)',
       );
     }
-    return this.s3Client;
+    return this.storage;
   }
 
   async uploadDocument(
@@ -60,18 +48,12 @@ export class PatientDocumentsService {
     const ext = extname(file.originalname);
     const storagePath = `${clinicianId}/${patientId}/${uuidv4()}${ext}`;
 
-    const client = this.getClient();
+    const { error } = await this.getStorage()
+      .from(BUCKET)
+      .upload(storagePath, file.buffer, { contentType: file.mimetype });
 
-    try {
-      const command = new PutObjectCommand({
-        Bucket: this.bucketName,
-        Key: storagePath,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      });
-      await client.send(command);
-    } catch (error: any) {
-      throw new InternalServerErrorException(`Error al subir archivo a S3: ${error.message}`);
+    if (error) {
+      throw new InternalServerErrorException(`Error al subir archivo: ${error.message}`);
     }
 
     return this.prisma.patientDocument.create({
@@ -125,20 +107,15 @@ export class PatientDocumentsService {
 
     if (!doc) throw new NotFoundException('Documento no encontrado');
 
-    const client = this.getClient();
+    const { data, error } = await this.getStorage()
+      .from(BUCKET)
+      .createSignedUrl(doc.fileName, SIGNED_URL_EXPIRY);
 
-    try {
-      const command = new GetObjectCommand({
-        Bucket: this.bucketName,
-        Key: doc.fileName,
-      });
-
-      const signedUrl = await getSignedUrl(client, command, { expiresIn: SIGNED_URL_EXPIRY });
-
-      return { signedUrl, mimeType: doc.mimeType, originalName: doc.originalName };
-    } catch (error: any) {
-      throw new InternalServerErrorException('No se pudo generar el link de descarga de S3');
+    if (error || !data?.signedUrl) {
+      throw new InternalServerErrorException('No se pudo generar el link de descarga');
     }
+
+    return { signedUrl: data.signedUrl, mimeType: doc.mimeType, originalName: doc.originalName };
   }
 
   async downloadDocument(
@@ -154,28 +131,20 @@ export class PatientDocumentsService {
 
     if (!doc) throw new NotFoundException('Documento no encontrado');
 
-    const client = this.getClient();
+    const { data, error } = await this.getStorage()
+      .from(BUCKET)
+      .download(doc.fileName);
 
-    try {
-      const command = new GetObjectCommand({
-        Bucket: this.bucketName,
-        Key: doc.fileName,
-      });
-      const response = await client.send(command);
-      const byteArray = await response.Body?.transformToByteArray();
-
-      if (!byteArray) {
-        throw new Error('Cuerpo de archivo vacío');
-      }
-
-      return {
-        buffer: Buffer.from(byteArray),
-        mimeType: doc.mimeType,
-        originalName: doc.originalName,
-      };
-    } catch (error: any) {
-      throw new InternalServerErrorException('No se pudo descargar el archivo desde S3');
+    if (error || !data) {
+      throw new InternalServerErrorException('No se pudo descargar el archivo');
     }
+
+    const arrayBuffer = await data.arrayBuffer();
+    return {
+      buffer: Buffer.from(arrayBuffer),
+      mimeType: doc.mimeType,
+      originalName: doc.originalName,
+    };
   }
 
   async deleteDocument(patientId: string, docId: string, clinicianId: string) {
@@ -187,19 +156,9 @@ export class PatientDocumentsService {
 
     if (!doc) throw new NotFoundException('Documento no encontrado');
 
-    const client = this.getClient();
-
-    try {
-      const command = new DeleteObjectCommand({
-        Bucket: this.bucketName,
-        Key: doc.fileName,
-      });
-      await client.send(command);
-    } catch (error: any) {
-      throw new InternalServerErrorException('Error al intentar eliminar el archivo de S3');
-    }
-
     await this.prisma.patientDocument.delete({ where: { id: docId } });
+
+    await this.getStorage().from(BUCKET).remove([doc.fileName]);
   }
 
   private async assertPatientOwnership(patientId: string, clinicianId: string) {
