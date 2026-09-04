@@ -146,10 +146,12 @@ describe('mapRecentPatients', () => {
     expect(result.time).toBe('Hace 3d');
   });
 
-  it('usa "Sin motivo registrado" cuando reason es null/undefined', () => {
+  it('deja reason en null cuando no hay motivo', () => {
+    // El dashboard ya no inventa un texto de relleno: el widget omite la línea.
+    // Tampoco recibe el diagnóstico, que está cifrado y no debe salir aquí.
     const p = makeRecentPatient({ reason: undefined });
     const [result] = mapRecentPatients([p]);
-    expect(result.reason).toBe('Sin motivo registrado');
+    expect(result.reason).toBeNull();
   });
 
   it('preserva el reason cuando existe', () => {
@@ -181,13 +183,41 @@ describe('mapRecentPatients', () => {
 // ── buildCalendarDays ──────────────────────────────────────────────────────
 
 describe('buildCalendarDays', () => {
-  it('siempre retorna exactamente 28 días', () => {
-    expect(buildCalendarDays(undefined)).toHaveLength(28);
-    expect(buildCalendarDays({})).toHaveLength(28);
+  // `buildCalendarDays` construye la rejilla del mes en curso: huecos iniciales
+  // (`null`) hasta el día de la semana del día 1, y luego todos los días del mes.
+  // Fijamos el reloj para que las claves de `DaySummary` caigan en la ventana.
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 2, 15, 12, 0, 0)); // 15 de marzo de 2026, hora local
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it('rellena huecos iniciales y cubre el mes completo', () => {
+    // Marzo de 2026 tiene 31 días y empieza en domingo → 6 huecos (semana L–D).
+    const cells = buildCalendarDays(undefined);
+    expect(cells).toHaveLength(6 + 31);
+    expect(cells.slice(0, 6).every((c) => c === null)).toBe(true);
+    const days = cells.filter((c) => c !== null);
+    expect(days).toHaveLength(31);
+    expect(days[0]!.day).toBe(1);
+    expect(days[30]!.day).toBe(31);
+  });
+
+  it('alinea cada día bajo su día de la semana real', () => {
+    // 1 de marzo de 2026 es domingo: séptima columna de una semana L–D.
+    const cells = buildCalendarDays(undefined);
+    const firstDayIndex = cells.findIndex((c) => c !== null);
+    expect(firstDayIndex % 7).toBe(6);
+  });
+
+  it('marca el día de hoy', () => {
+    const days = buildCalendarDays(undefined).filter((c) => c !== null);
+    expect(days.filter((d) => d!.isToday)).toHaveLength(1);
+    expect(days.find((d) => d!.isToday)!.day).toBe(15);
   });
 
   it('días sin citas tienen density="free" y status="Disponible"', () => {
-    const days = buildCalendarDays(undefined);
+    const days = buildCalendarDays(undefined).filter((c) => c !== null).map((c) => c!);
     for (const day of days) {
       expect(day.density).toBe('free');
       expect(day.status).toBe('Disponible');
@@ -197,52 +227,29 @@ describe('buildCalendarDays', () => {
 
   it('density "low" con 1 cita', () => {
     const days = buildCalendarDays({ '2026-03-01': { count: 1, appointments: [] } });
-    const day = days.find((d) => d.appointmentCount === 1);
+    const day = days.find((d) => d !== null && d.appointmentCount === 1);
     expect(day?.density).toBe('low');
     expect(day?.status).toBe('Poca demanda');
   });
 
   it('density "medium" con 2–3 citas', () => {
     const days = buildCalendarDays({ '2026-03-01': { count: 2, appointments: [] } });
-    const day = days.find((d) => d.appointmentCount === 2);
+    const day = days.find((d) => d !== null && d.appointmentCount === 2);
     expect(day?.density).toBe('medium');
     expect(day?.status).toBe('Demanda media');
   });
 
   it('density "high" con 4–5 citas', () => {
     const days = buildCalendarDays({ '2026-03-01': { count: 4, appointments: [] } });
-    const day = days.find((d) => d.appointmentCount === 4);
+    const day = days.find((d) => d !== null && d.appointmentCount === 4);
     expect(day?.density).toBe('high');
     expect(day?.status).toBe('Casi lleno');
   });
 
   it('density "full" con 6+ citas', () => {
     const days = buildCalendarDays({ '2026-03-01': { count: 6, appointments: [] } });
-    const day = days.find((d) => d.appointmentCount === 6);
+    const day = days.find((d) => d !== null && d.appointmentCount === 6);
     expect(day?.density).toBe('full');
     expect(day?.status).toBe('Lleno');
-  });
-
-  it('freeHours excluye las horas ocupadas', () => {
-    const startTime = '2026-03-01T10:00:00.000Z'; // hora 10 UTC
-    const days = buildCalendarDays({
-      '2026-03-01': {
-        count: 1,
-        appointments: [{ id: 'app-1', startTime, duration: 50 }],
-      },
-    });
-    const day = days.find((d) => d.appointmentCount === 1);
-    // La hora 10 (UTC) debe estar fuera de freeHours
-    const occupiedHour = new Date(startTime).getHours();
-    expect(day?.freeHours).not.toContain(`${occupiedHour}:00`);
-  });
-
-  it('freeHours cubre el rango de oficina 09:00–17:00', () => {
-    const days = buildCalendarDays(undefined);
-    const freeHours = days[0].freeHours;
-    expect(freeHours).toContain('9:00');
-    expect(freeHours).toContain('17:00');
-    expect(freeHours).not.toContain('8:00');
-    expect(freeHours).not.toContain('18:00');
   });
 });

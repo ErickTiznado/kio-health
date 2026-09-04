@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
+import { RequestUser } from '../interfaces/request-user.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -10,7 +11,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         // Primary: httpOnly cookie
-        (req: Request) => req?.cookies?.access_token ?? null,
+        (req: Request) =>
+          (req?.cookies as Record<string, string> | undefined)?.access_token ??
+          null,
         // Fallback: Authorization header (for dev tooling / tests)
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
@@ -19,14 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: JwtPayload): {
-    userId: string;
-    email: string;
-    role: string;
-    clinicianId?: string;
-    clinicId?: string;
-    clinicRole?: string;
-  } {
+  validate(payload: JwtPayload): RequestUser {
     return {
       userId: payload.sub,
       email: payload.email,
@@ -34,6 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       clinicianId: payload.clinicianId,
       clinicId: payload.clinicId,
       clinicRole: payload.clinicRole,
+      trialEndsAt: payload.trialEndsAt,
     };
   }
 }

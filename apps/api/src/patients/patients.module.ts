@@ -5,9 +5,10 @@ import { PatientsController } from './patients.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from '../auth/auth.module';
 import { RiskFlagsModule } from '../risk-flags/risk-flags.module';
+import { PortalModule } from '../portal/portal.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, RiskFlagsModule],
+  imports: [PrismaModule, AuthModule, RiskFlagsModule, PortalModule],
   controllers: [PatientsController],
   providers: [PatientsService, PatientDocumentsService],
   exports: [PatientsService],

@@ -25,6 +25,11 @@ export const appointmentKeys = {
   recentPatients: () => [...appointmentKeys.all, 'recent-patients'] as const,
 };
 
+export const seriesKeys = {
+  all: ['appointment-series'] as const,
+  detail: (id: string) => [...seriesKeys.all, id] as const,
+};
+
 export const taskKeys = {
   all: ['tasks'] as const,
   lists: () => [...taskKeys.all, 'list'] as const,
@@ -37,6 +42,13 @@ export const clinicKeys = {
   invitations: () => [...clinicKeys.all, 'invitations'] as const,
   patients: () => [...clinicKeys.all, 'patients'] as const,
   finance: (month: number, year: number) => [...clinicKeys.all, 'finance', month, year] as const,
+  attendance: (month: number, year: number) => [...clinicKeys.all, 'attendance', month, year] as const,
+};
+
+export const accessLogKeys = {
+  all: ['access-logs'] as const,
+  mine: (filters: unknown) => [...accessLogKeys.all, 'mine', filters] as const,
+  clinic: (filters: unknown) => [...accessLogKeys.all, 'clinic', filters] as const,
 };
 
 export const riskFlagKeys = {

@@ -8,7 +8,7 @@ import {
   Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ClinicianType, ClinicianPlan } from '#generated/prisma';
+import { ClinicianType } from '#generated/prisma';
 
 export const VALID_CURRENCIES = [
   'USD',
@@ -25,14 +25,18 @@ export class CompleteProfileDto {
   @IsEnum(ClinicianType)
   type: ClinicianType;
 
-  @IsEnum(ClinicianPlan)
-  plan: ClinicianPlan;
+  // `plan` ya no se pide aquí. Elegir modalidad antes de haber visto el
+  // producto era una decisión irreversible: INDIVIDUAL dejaba `createClinic`
+  // devolviendo 403 para siempre, sin salida self-service. Ahora todo el mundo
+  // arranca con prueba de 15 días y elige al final.
 
   @IsOptional()
   @IsString()
   licenseNumber?: string;
 
-  @IsIn(VALID_CURRENCIES, { message: `currency must be one of: ${VALID_CURRENCIES.join(', ')}` })
+  @IsIn(VALID_CURRENCIES, {
+    message: `currency must be one of: ${VALID_CURRENCIES.join(', ')}`,
+  })
   currency: string;
 
   @IsNumber()

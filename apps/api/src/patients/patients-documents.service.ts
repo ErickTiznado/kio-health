@@ -53,7 +53,9 @@ export class PatientDocumentsService {
       .upload(storagePath, file.buffer, { contentType: file.mimetype });
 
     if (error) {
-      throw new InternalServerErrorException(`Error al subir archivo: ${error.message}`);
+      throw new InternalServerErrorException(
+        `Error al subir archivo: ${error.message}`,
+      );
     }
 
     return this.prisma.patientDocument.create({
@@ -112,10 +114,16 @@ export class PatientDocumentsService {
       .createSignedUrl(doc.fileName, SIGNED_URL_EXPIRY);
 
     if (error || !data?.signedUrl) {
-      throw new InternalServerErrorException('No se pudo generar el link de descarga');
+      throw new InternalServerErrorException(
+        'No se pudo generar el link de descarga',
+      );
     }
 
-    return { signedUrl: data.signedUrl, mimeType: doc.mimeType, originalName: doc.originalName };
+    return {
+      signedUrl: data.signedUrl,
+      mimeType: doc.mimeType,
+      originalName: doc.originalName,
+    };
   }
 
   async downloadDocument(
@@ -167,6 +175,7 @@ export class PatientDocumentsService {
       select: { id: true },
     });
 
-    if (!patient) throw new ForbiddenException('No tienes acceso a este paciente');
+    if (!patient)
+      throw new ForbiddenException('No tienes acceso a este paciente');
   }
 }

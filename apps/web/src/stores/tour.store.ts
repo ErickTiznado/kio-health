@@ -10,72 +10,43 @@ export interface TourStep {
   mobileCenter?: boolean;
 }
 
+/**
+ * Four steps, all anchored on `/dashboard`.
+ *
+ * The previous nine-step version dragged the user through `/patients`,
+ * `/agenda` and `/finance` mid-tour. The sidebar is part of the global layout,
+ * so every target below is reachable without a single route change.
+ */
 export const TOUR_STEPS: TourStep[] = [
   {
     id: 'sidebar-dashboard',
     title: 'Tu panel principal',
-    description: 'Aquí encuentras un resumen de tu día: próxima cita, agenda de hoy y pacientes recientes.',
+    description: 'Un resumen de tu día: agenda de hoy, próxima cita, alertas y pacientes recientes.',
     route: '/dashboard',
     placement: 'right',
+    mobileCenter: true,
   },
   {
     id: 'tour-next-appointment',
     title: 'Tu próxima cita',
-    description: 'Este widget muestra en tiempo real tu próxima cita programada, con acceso directo a la sesión.',
+    description: 'Muestra la siguiente sesión con acceso directo. El botón para entrar aparece 15 minutos antes.',
     route: '/dashboard',
     placement: 'bottom',
   },
   {
     id: 'sidebar-patients',
-    title: 'Gestión de pacientes',
-    description: 'Accede al listado completo de tus pacientes, con búsqueda y filtros por estado.',
-    route: '/patients',
-    placement: 'right',
-    mobileCenter: true,
-  },
-  {
-    id: 'tour-new-patient-btn',
-    title: 'Agregar un paciente nuevo',
-    description: 'Con este botón puedes registrar un nuevo paciente en segundos. Sus datos quedan protegidos con cifrado.',
-    route: '/patients',
-    placement: 'bottom',
-  },
-  {
-    id: 'sidebar-agenda',
-    title: 'Tu agenda',
-    description: 'Vista semanal y diaria de tus citas. Arrastra para reagendar, haz clic para ver detalles.',
-    route: '/agenda',
-    placement: 'right',
-    mobileCenter: true,
-  },
-  {
-    id: 'tour-schedule-btn',
-    title: 'Agendar una cita',
-    description: 'Crea una nueva cita eligiendo paciente, fecha y duración. También puedes hacer clic en cualquier slot del calendario.',
-    route: '/agenda',
-    placement: 'bottom',
-  },
-  {
-    id: 'sidebar-finance',
-    title: 'Control financiero',
-    description: 'Registra pagos, revisa ingresos y exporta reportes para tu contabilidad.',
-    route: '/finance',
+    title: 'Tus pacientes',
+    description: 'El listado completo, con búsqueda y filtros. Los datos clínicos se guardan cifrados.',
+    route: '/dashboard',
     placement: 'right',
     mobileCenter: true,
   },
   {
     id: 'tour-quick-actions',
     title: 'Acciones rápidas',
-    description: 'Desde cualquier página puedes agregar un paciente o agendar una cita con un solo clic.',
+    description: 'Desde cualquier página puedes registrar un paciente o agendar una cita con un clic.',
     route: '/dashboard',
     placement: 'bottom',
-  },
-  {
-    id: 'sidebar-settings',
-    title: 'Configuración',
-    description: 'Ajusta tu moneda, duración y precio de sesión. También puedes crear o unirte a una clínica.',
-    route: '/dashboard',
-    placement: 'right',
   },
 ];
 

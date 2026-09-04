@@ -29,7 +29,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-full transition-all bg-surface dark:bg-slate-800 text-gray-500 dark:text-kio hover:bg-surface/80 dark:hover:bg-slate-700"
+      className="flex h-11 w-11 items-center justify-center rounded-full transition-colors bg-secondary dark:bg-slate-800 text-gray-600 dark:text-kio hover:bg-cruz/50 dark:hover:bg-slate-700"
       title={`Tema: ${getLabel()}`}
     >
       {getIcon()}

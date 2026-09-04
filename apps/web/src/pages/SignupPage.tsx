@@ -1,91 +1,76 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../stores/auth.store';
 import { signupSchema, type SignupFormData } from '../schemas/auth.schemas';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { AlertTriangle, Check, Lock } from 'lucide-react';
 import { getErrorMessage } from '../lib/errors';
 import { api } from '../lib/api';
+import { capture } from '../lib/analytics';
+
+type InviteState =
+  | { status: 'loading' }
+  | { status: 'missing' }
+  | { status: 'invalid'; reason: string }
+  | { status: 'valid'; email: string; token: string };
 
 export function SignupPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { signup, isLoading } = useAuthStore();
   const [serverError, setServerError] = useState<string | null>(null);
-  const [emailTaken, setEmailTaken] = useState(false);
-  const [emailAvailable, setEmailAvailable] = useState(false);
-  const [emailChecking, setEmailChecking] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const abortRef = useRef<AbortController | null>(null);
+  const inviteToken = searchParams.get('invite');
+  const [inviteResult, setInviteResult] = useState<InviteState>({ status: 'loading' });
 
   const {
     register,
     handleSubmit,
-    watch,
+    setValue,
     formState: { errors },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-      fullName: '',
-    },
+    defaultValues: { email: '', password: '', fullName: '' },
   });
 
-  const emailValue = watch('email');
-
+  // Validar token de invitación al montar
   useEffect(() => {
-    setEmailTaken(false);
-    setEmailAvailable(false);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    // Cancela cualquier request anterior en vuelo
-    abortRef.current?.abort();
+    if (!inviteToken) return;
 
-    // Only check if the email looks valid (basic shape)
-    if (!emailValue || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) return;
-
-    setEmailChecking(true);
-    debounceRef.current = setTimeout(async () => {
-      const controller = new AbortController();
-      abortRef.current = controller;
-      try {
-        const { data } = await api.get<{ available: boolean }>('/auth/check-email', {
-          params: { email: emailValue },
-          signal: controller.signal,
+    let cancelled = false;
+    api
+      .get<{ valid: boolean; email: string }>(`/auth/validate-invite/${inviteToken}`)
+      .then(({ data }) => {
+        if (cancelled) return;
+        setInviteResult({ status: 'valid', email: data.email, token: inviteToken });
+        setValue('email', data.email);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setInviteResult({
+          status: 'invalid',
+          reason: 'Este enlace de invitación no es válido o ya fue utilizado.',
         });
-        if (data.available) {
-          setEmailAvailable(true);
-          setEmailTaken(false);
-        } else {
-          setEmailAvailable(false);
-          setEmailTaken(true);
-        }
-      } catch (err: unknown) {
-        // Ignorar cancelaciones (AbortError) — no son errores reales
-        if (err && typeof err === 'object' && 'code' in err && (err as { code: string }).code === 'ERR_CANCELED') return;
-        // Si falla por otra razón, resetear sin bloquear al usuario
-        setEmailAvailable(false);
-        setEmailTaken(false);
-      } finally {
-        setEmailChecking(false);
-      }
-    }, 600);
+      });
 
     return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-      abortRef.current?.abort();
+      cancelled = true;
     };
-  }, [emailValue]);
+  }, [inviteToken, setValue]);
+
+  // Sin token en la URL no hay nada que validar: es estado derivado, no del efecto.
+  const invite: InviteState = inviteToken ? inviteResult : { status: 'missing' };
 
   const onSubmit = async (data: SignupFormData) => {
     setServerError(null);
-    if (emailTaken) return;
+    if (invite.status !== 'valid') return;
 
     try {
-      await signup(data);
+      await signup({ ...data, inviteToken: invite.token });
 
-      // Get fresh user state after signup
+      capture('signup_completed', { via_invite: true });
+
       const user = useAuthStore.getState().user;
-
       if (user?.mustChangePassword) {
         navigate('/change-password', { replace: true });
       } else if (user?.profile) {
@@ -98,26 +83,115 @@ export function SignupPage() {
     }
   };
 
+  // ── Estados de bloqueo ──────────────────────────────────────────────────────
+
+  if (invite.status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-bg dark:bg-slate-950 px-4">
+        <div role="status" className="flex flex-col items-center gap-3">
+          <span className="w-8 h-8 border-2 border-kio/40 border-t-kio rounded-full animate-spin" />
+          <p className="text-sm font-medium text-text-secondary">Validando tu invitación...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (invite.status === 'missing') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-bg dark:bg-slate-950 px-4">
+        <div className="w-full max-w-md text-center">
+          <div className="inline-flex items-center justify-center w-28 h-28 rounded-2xl mb-6 overflow-hidden">
+            <img src="/logo.png" alt="Kio Health" className="w-full h-full object-contain" />
+          </div>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-cruz/50 dark:border-slate-800 p-8">
+            <div className="w-14 h-14 bg-kio-light/40 dark:bg-kio/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Lock size={26} className="text-kanji-deep dark:text-kio" aria-hidden="true" />
+            </div>
+            <h1 className="text-2xl font-bold text-kanji-deep dark:text-white mb-2">Beta cerrada</h1>
+            <p className="text-sm font-medium leading-relaxed text-text-secondary mb-6">
+              Kio Health está en beta cerrada por el momento. El acceso es únicamente por
+              invitación.
+            </p>
+            <p className="text-xs font-medium text-text-secondary">
+              ¿Ya tienes una cuenta?{' '}
+              <Link
+                to="/login"
+                className="font-bold text-kanji-deep hover:underline dark:text-kio transition-colors"
+              >
+                Inicia sesión
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (invite.status === 'invalid') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-bg dark:bg-slate-950 px-4">
+        <div className="w-full max-w-md text-center">
+          <div className="inline-flex items-center justify-center w-28 h-28 rounded-2xl mb-6 overflow-hidden">
+            <img src="/logo.png" alt="Kio Health" className="w-full h-full object-contain" />
+          </div>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-cruz/50 dark:border-slate-800 p-8">
+            <div className="w-14 h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle size={26} className="text-red-600 dark:text-red-400" aria-hidden="true" />
+            </div>
+            <h1 className="text-2xl font-bold text-kanji-deep dark:text-white mb-2">
+              Enlace no válido
+            </h1>
+            <p role="alert" className="text-sm font-medium leading-relaxed text-text-secondary mb-6">
+              {invite.reason}
+            </p>
+            <p className="text-xs font-medium text-text-secondary">
+              ¿Ya tienes una cuenta?{' '}
+              <Link
+                to="/login"
+                className="font-bold text-kanji-deep hover:underline dark:text-kio transition-colors"
+              >
+                Inicia sesión
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Formulario de registro (invite válido) ──────────────────────────────────
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-bg via-bg to-kio/5 dark:from-slate-950 dark:via-slate-950 dark:to-kio/10 px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-bg dark:bg-slate-950 px-4 py-8">
       <div className="w-full max-w-md">
         {/* Logo & Header */}
         <div className="text-center mb-5 sm:mb-8">
           <div className="inline-flex items-center justify-center w-28 h-28 sm:w-36 sm:h-36 rounded-2xl mb-4 overflow-hidden">
             <img src="/logo.png" alt="Kio Health" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-3xl font-bold text-kanji dark:text-white">Únete a Kio</h1>
-          <p className="text-text/60 dark:text-slate-400 mt-2">Crea tu cuenta</p>
+          <h1 className="text-3xl font-bold text-kanji-deep dark:text-white">Únete a Kio</h1>
+          <p className="mt-2 text-sm font-medium text-text-secondary">Estás invitado a la beta</p>
         </div>
 
         {/* Signup Form */}
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-black/5 dark:shadow-black/20 border border-cruz/50 dark:border-slate-800 p-6 sm:p-8"
+          className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-cruz/50 dark:border-slate-800 p-6 sm:p-8"
         >
+          {/* Beta badge */}
+          <div className="flex items-center gap-2 mb-6 px-3 py-2 bg-kio-light/40 dark:bg-kio/10 rounded-xl border border-kio/20">
+            <span className="w-2 h-2 rounded-full bg-kanji-deep dark:bg-kio flex-shrink-0" />
+            <p className="text-xs font-bold text-kanji-deep dark:text-kio">
+              Acceso beta — invitado como {invite.email}
+            </p>
+          </div>
+
           {/* Server Error */}
           {serverError && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+            <div
+              role="alert"
+              className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl"
+            >
               <p className="text-red-600 dark:text-red-400 text-sm font-medium">{serverError}</p>
             </div>
           )}
@@ -126,80 +200,66 @@ export function SignupPage() {
           <div className="mb-5">
             <label
               htmlFor="fullName"
-              className="block text-sm font-medium text-kanji dark:text-slate-200 mb-2"
+              className="block text-sm font-medium text-text dark:text-slate-200 mb-2"
             >
-              Nombre Completo
+              Nombre completo
             </label>
             <input
               {...register('fullName')}
               type="text"
               id="fullName"
-              placeholder="Dra. Jane Doe"
+              placeholder="Dra. Ana Martínez"
+              aria-invalid={errors.fullName ? true : undefined}
+              aria-describedby={errors.fullName ? 'fullName-error' : undefined}
               className={`
                 w-full px-4 py-3 rounded-xl border transition-all duration-200
-                bg-bg dark:bg-slate-800 text-kanji dark:text-white placeholder:text-text/40 dark:placeholder:text-slate-500
-                focus:outline-none focus:ring-2 focus:ring-kio/30 focus:border-kio
+                bg-bg dark:bg-slate-800 text-text dark:text-white placeholder:text-text-muted dark:placeholder:text-slate-500
+                focus:outline-none focus:ring-2 focus:ring-kio/50 focus:border-kio
                 ${errors.fullName ? 'border-red-400' : 'border-cruz dark:border-slate-700'}
               `}
             />
             {errors.fullName && (
-              <p className="mt-2 text-sm text-red-500">{errors.fullName.message}</p>
+              <p id="fullName-error" className="mt-2 text-sm text-red-600 dark:text-red-400">
+                {errors.fullName.message}
+              </p>
             )}
           </div>
 
-          {/* Email Field */}
+          {/* Email Field (readonly — pre-llenado desde el token) */}
           <div className="mb-5">
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-kanji dark:text-slate-200 mb-2"
+              className="block text-sm font-medium text-text dark:text-slate-200 mb-2"
             >
-              Correo Electrónico
+              Correo electrónico
             </label>
             <div className="relative">
               <input
                 {...register('email')}
                 type="email"
                 id="email"
-                autoComplete="email"
-                placeholder="you@example.com"
-                className={`
-                  w-full px-4 py-3 pr-10 rounded-xl border transition-all duration-200
-                  bg-bg dark:bg-slate-800 text-kanji dark:text-white placeholder:text-text/40 dark:placeholder:text-slate-500
-                  focus:outline-none focus:ring-2 focus:ring-kio/30 focus:border-kio
-                  ${errors.email || emailTaken
-                    ? 'border-red-400 focus:ring-red-300'
-                    : emailAvailable
-                    ? 'border-green-400 focus:ring-green-300'
-                    : 'border-cruz dark:border-slate-700'}
-                `}
+                readOnly
+                aria-invalid={errors.email ? true : undefined}
+                aria-describedby={errors.email ? 'email-locked email-error' : 'email-locked'}
+                className={`w-full px-4 py-3 pr-10 rounded-xl border bg-secondary dark:bg-slate-800 text-text dark:text-white cursor-not-allowed ${
+                  errors.email ? 'border-red-400' : 'border-cruz dark:border-slate-700'
+                }`}
               />
-              {/* Indicador de estado del email */}
-              {emailChecking && (
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-kio/40 border-t-kio rounded-full animate-spin" />
-              )}
-              {!emailChecking && emailAvailable && !errors.email && (
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 6 9 17l-5-5" />
-                  </svg>
-                </span>
-              )}
-              {!emailChecking && emailTaken && !errors.email && (
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 6 6 18M6 6l12 12" />
-                  </svg>
-                </span>
-              )}
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-emerald-400">
+                <Check size={20} aria-hidden="true" />
+              </span>
             </div>
+            <p id="email-locked" className="mt-1 text-xs font-medium text-text-secondary">
+              El correo está vinculado a tu invitación y no puede cambiarse.
+            </p>
+            {/* El campo es readOnly y lo rellena el backend desde la invitación, pero
+                sigue registrado en el resolver: sin este bloque, un correo que el
+                esquema rechazase abortaría el submit sin pintar nada y dejaría el
+                botón "Crear cuenta" muerto sin explicación. */}
             {errors.email && (
-              <p className="mt-2 text-sm text-red-500">{errors.email.message}</p>
-            )}
-            {!errors.email && emailTaken && (
-              <p className="mt-2 text-sm text-red-500">Este correo ya está registrado. ¿Ya tienes cuenta?</p>
-            )}
-            {!errors.email && emailAvailable && !emailChecking && (
-              <p className="mt-1 text-sm text-green-600 dark:text-green-400">Correo disponible</p>
+              <p id="email-error" role="alert" className="mt-1 text-xs font-medium text-red-600 dark:text-red-400">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
@@ -207,7 +267,7 @@ export function SignupPage() {
           <div className="mb-6">
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-kanji dark:text-slate-200 mb-2"
+              className="block text-sm font-medium text-text dark:text-slate-200 mb-2"
             >
               Contraseña
             </label>
@@ -217,15 +277,17 @@ export function SignupPage() {
               id="password"
               autoComplete="new-password"
               placeholder="••••••••"
+              aria-invalid={errors.password ? true : undefined}
+              aria-describedby={errors.password ? 'password-error' : undefined}
               className={`
                 w-full px-4 py-3 rounded-xl border transition-all duration-200
-                bg-bg dark:bg-slate-800 text-kanji dark:text-white placeholder:text-text/40 dark:placeholder:text-slate-500
-                focus:outline-none focus:ring-2 focus:ring-kio/30 focus:border-kio
+                bg-bg dark:bg-slate-800 text-text dark:text-white placeholder:text-text-muted dark:placeholder:text-slate-500
+                focus:outline-none focus:ring-2 focus:ring-kio/50 focus:border-kio
                 ${errors.password ? 'border-red-400' : 'border-cruz dark:border-slate-700'}
               `}
             />
             {errors.password && (
-              <p className="mt-2 text-sm text-red-500">
+              <p id="password-error" className="mt-2 text-sm text-red-600 dark:text-red-400">
                 {errors.password.message}
               </p>
             )}
@@ -236,11 +298,10 @@ export function SignupPage() {
             type="submit"
             disabled={isLoading}
             className={`
-              w-full py-3.5 px-6 rounded-xl font-semibold text-white
-              bg-gradient-to-r from-kio to-kio/90
-              hover:from-kio/95 hover:to-kio/85
+              w-full min-h-11 py-3.5 px-6 rounded-xl font-bold text-white
+              bg-kanji-deep hover:bg-kanji-deep/90
               focus:outline-none focus:ring-2 focus:ring-kio/50 focus:ring-offset-2 dark:focus:ring-offset-slate-900
-              transition-all duration-200 shadow-lg shadow-kio/20
+              transition-colors duration-150 shadow-md shadow-kanji-deep/20
               disabled:opacity-50 disabled:cursor-not-allowed
             `}
           >
@@ -250,13 +311,16 @@ export function SignupPage() {
                 Creando cuenta...
               </span>
             ) : (
-              'Crear Cuenta'
+              'Crear cuenta'
             )}
           </button>
-          
-          <p className="mt-6 text-center text-sm text-text/60 dark:text-slate-400">
+
+          <p className="mt-6 text-center text-sm font-medium text-text-secondary">
             ¿Ya tienes una cuenta?{' '}
-            <Link to="/login" className="text-kio hover:text-kio/80 font-medium transition-colors">
+            <Link
+              to="/login"
+              className="font-bold text-kanji-deep hover:underline dark:text-kio transition-colors"
+            >
               Inicia sesión aquí
             </Link>
           </p>

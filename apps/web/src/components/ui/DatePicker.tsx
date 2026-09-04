@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useId } from 'react';
 import { createPortal } from 'react-dom';
 import {
   format,
@@ -48,6 +48,8 @@ export function DatePicker({
     value ? format(new Date(value), 'dd/MM/yyyy') : ''
   );
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputId = useId();
+  const errorId = `${inputId}-error`;
 
   const [prevValue, setPrevValue] = useState(value);
   if (value !== prevValue) {
@@ -183,7 +185,14 @@ export function DatePicker({
 
   return (
     <div className={`relative ${className}`} ref={containerRef}>
-      {label && <label className="block text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-1">{label}</label>}
+      {label && (
+        <label
+          htmlFor={inputId}
+          className="block text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1"
+        >
+          {label}
+        </label>
+      )}
       
       {/* Input Trigger */}
       <div
@@ -191,7 +200,7 @@ export function DatePicker({
           relative w-full flex items-center
           border-b-2 transition-colors duration-300
           ${disabled ? 'opacity-50' : ''}
-          ${isOpen || selectedDate ? 'border-kio dark:border-kio' : 'border-gray-200 dark:border-slate-700'}
+          ${isOpen || selectedDate ? 'border-kanji-deep dark:border-kio' : 'border-gray-200 dark:border-slate-700'}
           ${error ? 'border-rose-500 dark:border-rose-500' : ''}
         `}
       >
@@ -199,16 +208,21 @@ export function DatePicker({
           type="button"
           onClick={() => !disabled && setIsOpen(!isOpen)}
           disabled={disabled}
-          className="absolute left-0 top-3 p-0 focus:outline-none"
+          aria-label={isOpen ? 'Cerrar calendario' : 'Abrir calendario'}
+          aria-haspopup="dialog"
+          aria-expanded={isOpen}
+          // 44px de área táctil: el icono deja de ser un blanco de 20px.
+          className="absolute left-0 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center"
           tabIndex={-1}
         >
           <CalendarIcon
             size={20}
-            className={`transition-colors ${isOpen || selectedDate ? 'text-kio' : 'text-gray-400 dark:text-slate-600'}`}
+            className={`transition-colors ${isOpen || selectedDate ? 'text-kanji-deep dark:text-kio' : 'text-gray-400 dark:text-slate-600'}`}
           />
         </button>
 
         <input
+          id={inputId}
           type="text"
           value={inputText}
           onChange={handleTextChange}
@@ -216,21 +230,33 @@ export function DatePicker({
           disabled={disabled}
           placeholder={placeholder || 'dd/mm/aaaa'}
           maxLength={10}
-          className="pl-8 pr-8 w-full bg-transparent py-3 text-lg font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none"
+          // El `<label>` de arriba nombra el campo cuando existe; sin él, el
+          // placeholder no basta como nombre accesible (desaparece al escribir).
+          aria-label={label ? undefined : 'Fecha'}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
+          // Sin `focus:outline-none`: el anillo de foco global de index.css es
+          // el único indicador de teclado que tiene este campo.
+          className="pl-11 pr-11 w-full bg-transparent py-3 text-lg font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
         />
 
         {selectedDate && !disabled && (
           <button
             type="button"
             onClick={clearDate}
-            className="absolute right-0 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 hover:text-rose-500 transition-colors"
+            aria-label="Limpiar fecha"
+            className="absolute right-0 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 dark:text-slate-500 hover:text-rose-500 dark:hover:text-rose-400 transition-colors"
           >
             <X size={16} />
           </button>
         )}
       </div>
 
-      {error && <p className="mt-1 text-xs text-rose-500 font-bold">{error}</p>}
+      {error && (
+        <p id={errorId} className="mt-1 text-xs text-rose-500 dark:text-rose-400 font-bold">
+          {error}
+        </p>
+      )}
 
       {/* Portal Dropdown */}
       {createPortal(
@@ -250,29 +276,31 @@ export function DatePicker({
               className="datepicker-portal-content w-[320px] bg-surface dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden"
             >
               {/* Header */}
-              <div className="p-4 bg-gray-50 dark:bg-slate-800/50 flex items-center justify-between border-b border-gray-100 dark:border-slate-800">
-                <button 
+              <div className="px-2 py-2 bg-gray-50 dark:bg-slate-800/50 flex items-center justify-between border-b border-gray-100 dark:border-slate-800">
+                <button
                   type="button"
                   onClick={handlePrevMonth}
                   disabled={mode === 'year'}
-                  className="p-1 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 disabled:opacity-30 transition-colors"
+                  aria-label="Mes anterior"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 disabled:opacity-30 transition-colors"
                 >
                   <ChevronLeft size={20} />
                 </button>
-                
-                <button 
+
+                <button
                   type="button"
                   onClick={toggleMode}
-                  className="text-sm font-bold text-gray-800 dark:text-white capitalize hover:text-kio transition-colors px-2 py-1 rounded-lg hover:bg-white dark:hover:bg-slate-700"
+                  className="min-h-11 text-sm font-bold text-gray-800 dark:text-white capitalize hover:text-kanji-deep dark:hover:text-kio transition-colors px-3 rounded-lg hover:bg-white dark:hover:bg-slate-700"
                 >
                   {format(viewDate, 'MMMM yyyy', { locale: es })}
                 </button>
 
-                <button 
+                <button
                   type="button"
                   onClick={handleNextMonth}
                   disabled={mode === 'year'}
-                  className="p-1 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 disabled:opacity-30 transition-colors"
+                  aria-label="Mes siguiente"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 disabled:opacity-30 transition-colors"
                 >
                   <ChevronRight size={20} />
                 </button>
@@ -284,7 +312,7 @@ export function DatePicker({
                   <>
                     <div className="grid grid-cols-7 mb-2">
                       {['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'].map(day => (
-                        <div key={day} className="text-center text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase">
+                        <div key={day} className="text-center text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                           {day}
                         </div>
                       ))}
@@ -301,19 +329,24 @@ export function DatePicker({
                             key={day.toISOString()}
                             type="button"
                             onClick={() => handleDaySelect(day)}
+                            // El punto y el anillo de "hoy" son señales de color y forma;
+                            // el nombre accesible lo dice con palabras.
+                            aria-label={`${format(day, "d 'de' MMMM 'de' yyyy", { locale: es })}${isTodayDate ? ' (hoy)' : ''}`}
+                            aria-current={isTodayDate ? 'date' : undefined}
+                            aria-pressed={isSelected}
                             className={`
                               h-9 w-9 rounded-xl flex items-center justify-center text-xs font-medium transition-all duration-200 relative
-                              ${!isCurrentMonth ? 'text-gray-300 dark:text-slate-700' : 'text-gray-700 dark:text-slate-300'}
-                              ${isSelected 
-                                ? 'bg-kio text-white shadow-lg shadow-kio/30 scale-110 font-bold z-10' 
-                                : 'hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-kio dark:hover:text-kio'
+                              ${!isCurrentMonth ? 'text-gray-500 dark:text-slate-500' : 'text-gray-700 dark:text-slate-300'}
+                              ${isSelected
+                                ? 'bg-kanji-deep text-white scale-110 font-bold z-10'
+                                : 'hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-kanji-deep dark:hover:text-kio'
                               }
-                              ${isTodayDate && !isSelected ? 'ring-1 ring-kio/30 text-kio font-bold' : ''}
+                              ${isTodayDate && !isSelected ? 'ring-1 ring-kanji-deep/40 dark:ring-kio/40 text-kanji-deep dark:text-kio font-bold' : ''}
                             `}
                           >
                             {format(day, 'd')}
                             {isTodayDate && !isSelected && (
-                              <div className="absolute bottom-1.5 w-1 h-1 rounded-full bg-kio" />
+                              <div className="absolute bottom-1.5 w-1 h-1 rounded-full bg-kanji-deep dark:bg-kio" />
                             )}
                           </button>
                         );
@@ -327,10 +360,11 @@ export function DatePicker({
                         key={year}
                         type="button"
                         onClick={() => handleYearSelect(year)}
+                        aria-pressed={getYear(viewDate) === year}
                         className={`
-                          py-2 px-1 rounded-lg text-sm font-medium transition-colors
-                          ${getYear(viewDate) === year 
-                            ? 'bg-kio text-white shadow-md' 
+                          min-h-11 px-1 rounded-lg text-sm font-medium transition-colors
+                          ${getYear(viewDate) === year
+                            ? 'bg-kanji-deep text-white font-bold'
                             : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'
                           }
                         `}

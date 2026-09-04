@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { addWeeks, addDays, addMonths } from 'date-fns';
 import { completeCheckout } from '../lib/appointments.api';
 import { getErrorMessage } from '../lib/errors';
+import { capture } from '../lib/analytics';
 import type { PaymentMethod, CheckoutPayload } from '../types/appointments.types';
 
 /* ── Types ───────────────────────────────────────── */
@@ -119,6 +120,17 @@ export function useSessionCheckout(
 
     try {
       await completeCheckout(appointmentId, payload);
+
+      // Fin del embudo: agenda -> sesión -> nota -> cobro en un solo recorrido.
+      // Sin el importe: es dato financiero y el embudo no lo necesita.
+      capture('checkout_completed', {
+        payment_status: paymentStatus,
+        payment_method: paymentMethod,
+        scheduled_next: Boolean(payload.nextAppointmentDate),
+        schedule_option: scheduleOption,
+        sent_email: shouldSendEmail,
+      });
+
       onCompleted?.();
       navigate('/dashboard');
     } catch (err: unknown) {

@@ -14,14 +14,14 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import type * as Express from 'express';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ClinicsService } from './clinics.service';
+import { AccessLogService } from '../access-log/access-log.service';
+import { QueryAccessLogsDto } from '../access-log/dto/query-access-logs.dto';
 import { ClinicAdminGuard } from './guards/clinic-admin.guard';
 import { ClinicOwnerGuard } from './guards/clinic-owner.guard';
 import { CreateClinicDto } from './dto/create-clinic.dto';
 import { UpdateClinicDto } from './dto/update-clinic.dto';
 import { InviteMemberDto } from './dto/invite-member.dto';
-import { CreateMemberAccountDto } from './dto/create-member-account.dto';
 import { UpdateMemberRoleDto } from './dto/update-member-role.dto';
 
 type AuthenticatedUser = {
@@ -30,10 +30,14 @@ type AuthenticatedUser = {
   clinicRole?: string;
 };
 
+// Autenticación por el JwtAuthGuard global; los endpoints de gestión añaden
+// ClinicAdminGuard / ClinicOwnerGuard para el rol (ver app.module.ts).
 @Controller('clinics')
-@UseGuards(JwtAuthGuard)
 export class ClinicsController {
-  constructor(private readonly clinicsService: ClinicsService) {}
+  constructor(
+    private readonly clinicsService: ClinicsService,
+    private readonly accessLogService: AccessLogService,
+  ) {}
 
   private getUser(req: Express.Request): AuthenticatedUser {
     const user = req.user as AuthenticatedUser | undefined;
@@ -101,15 +105,11 @@ export class ClinicsController {
     return this.clinicsService.revokeInvitation(user.clinicId!, invitationId);
   }
 
-  @Post('mine/members')
-  @UseGuards(ClinicAdminGuard)
-  createMemberAccount(
-    @Req() req: Express.Request,
-    @Body() dto: CreateMemberAccountDto,
-  ) {
-    const user = this.getUser(req);
-    return this.clinicsService.createMemberAccount(user.clinicId!, dto);
-  }
+  // Aquí vivía `POST mine/members`: el alta en la que un OWNER o ADMIN tecleaba
+  // la contraseña de su colega. Retirado — en un producto cuya promesa es la
+  // confidencialidad clínica, nadie debe poder fijar la credencial de otra
+  // persona. El alta de un colega sin cuenta va por
+  // `POST /clinics/join/register`, donde la contraseña la elige él.
 
   @Delete('mine/members/:clinicianId')
   @UseGuards(ClinicAdminGuard)
@@ -158,6 +158,37 @@ export class ClinicsController {
       month ? parseInt(month, 10) : now.getMonth() + 1,
       year ? parseInt(year, 10) : now.getFullYear(),
     );
+  }
+
+  @Get('mine/attendance')
+  @UseGuards(ClinicAdminGuard)
+  getClinicAttendance(
+    @Req() req: Express.Request,
+    @Query('month') month: string,
+    @Query('year') year: string,
+  ) {
+    const user = this.getUser(req);
+    const now = new Date();
+    return this.clinicsService.getClinicAttendance(
+      user.clinicId!,
+      month ? parseInt(month, 10) : now.getMonth() + 1,
+      year ? parseInt(year, 10) : now.getFullYear(),
+    );
+  }
+
+  /**
+   * Registro de accesos de toda la clínica: accesos a expedientes de
+   * pacientes de los miembros + eventos de autenticación de los miembros.
+   * Decisión de producto: los admins NO ven otra actividad no-clínica.
+   */
+  @Get('mine/access-logs')
+  @UseGuards(ClinicAdminGuard)
+  getClinicAccessLogs(
+    @Req() req: Express.Request,
+    @Query() query: QueryAccessLogsDto,
+  ) {
+    const user = this.getUser(req);
+    return this.accessLogService.findForClinic(user.clinicId!, query);
   }
 
   @Post('join')

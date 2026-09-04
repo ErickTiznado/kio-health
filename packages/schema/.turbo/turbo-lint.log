@@ -1,3 +1,4 @@
-[?9001h[?1004h[?25l[2J[m[H]0;npm[?25h]0;npm run lint[?25l
+
 > @repo/schema@0.0.0 lint
-> eslint . --max-warnings 0[5;1H[?25h]0;C:\Windows\system32\cmd.exe \[K[?9001l[?1004l
+> eslint . --max-warnings 0
+

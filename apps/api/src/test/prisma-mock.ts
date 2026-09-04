@@ -11,6 +11,10 @@ function makeDelegateMock() {
     delete: jest.fn(),
     deleteMany: jest.fn(),
     count: jest.fn(),
+    // Default a lista vacía: los agregados suelen ser colaterales al caso
+    // bajo prueba (p. ej. saldos por paciente en findAll).
+    groupBy: jest.fn().mockResolvedValue([]),
+    aggregate: jest.fn(),
   };
 }
 
@@ -27,9 +31,23 @@ export function createPrismaMock() {
     accessLog: makeDelegateMock(),
     clinic: makeDelegateMock(),
     clinicMember: makeDelegateMock(),
+    clinicInvitation: makeDelegateMock(),
     clinicSubscription: makeDelegateMock(),
+    betaInvitation: makeDelegateMock(),
+    betaRequest: makeDelegateMock(),
+    subscriptionPlan: makeDelegateMock(),
+    riskFlag: makeDelegateMock(),
+    psychNoteAddendum: makeDelegateMock(),
+    passwordResetToken: makeDelegateMock(),
+    task: makeDelegateMock(),
+    appointmentReminder: makeDelegateMock(),
+    patientPortalToken: makeDelegateMock(),
+    appointmentSeries: makeDelegateMock(),
+    scaleAssignment: makeDelegateMock(),
     $transaction: jest.fn().mockImplementation((cb: unknown) => {
-      if (typeof cb === 'function') return cb(mock);
+      if (typeof cb === 'function') {
+        return (cb as (tx: typeof mock) => unknown)(mock);
+      }
       return Promise.resolve(cb);
     }),
     $connect: jest.fn(),

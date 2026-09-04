@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSettingsStore } from '../../../stores/settings.store';
-import { BlockEditor } from './blocks/BlockEditor';
+import { ProseEditor } from './ProseEditor';
 
 interface SoapFormProps {
   content: { s: string; o: string; a: string; p: string };
   onChange: (field: 's' | 'o' | 'a' | 'p', value: string) => void;
   readOnly?: boolean;
+  onSave?: () => void;
+  onFinish?: () => void;
 }
 
 const SOAP_FIELDS = [
@@ -17,7 +18,7 @@ const SOAP_FIELDS = [
     accent: 'bg-violet-500',
     accentLight: 'bg-violet-50 dark:bg-violet-500/10',
     accentBorder: 'border-violet-200 dark:border-violet-500/20',
-    accentText: 'text-violet-600 dark:text-violet-400',
+    accentText: 'text-violet-700 dark:text-violet-400',
   },
   {
     key: 'o' as const,
@@ -26,7 +27,7 @@ const SOAP_FIELDS = [
     accent: 'bg-blue-500',
     accentLight: 'bg-blue-50 dark:bg-blue-500/10',
     accentBorder: 'border-blue-200 dark:border-blue-500/20',
-    accentText: 'text-blue-600 dark:text-blue-400',
+    accentText: 'text-blue-700 dark:text-blue-400',
   },
   {
     key: 'a' as const,
@@ -35,7 +36,7 @@ const SOAP_FIELDS = [
     accent: 'bg-amber-500',
     accentLight: 'bg-amber-50 dark:bg-amber-500/10',
     accentBorder: 'border-amber-200 dark:border-amber-500/20',
-    accentText: 'text-amber-600 dark:text-amber-400',
+    accentText: 'text-amber-700 dark:text-amber-400',
   },
   {
     key: 'p' as const,
@@ -44,29 +45,66 @@ const SOAP_FIELDS = [
     accent: 'bg-emerald-500',
     accentLight: 'bg-emerald-50 dark:bg-emerald-500/10',
     accentBorder: 'border-emerald-200 dark:border-emerald-500/20',
-    accentText: 'text-emerald-600 dark:text-emerald-400',
+    accentText: 'text-emerald-700 dark:text-emerald-400',
   },
 ] as const;
 
 type SoapKey = 's' | 'o' | 'a' | 'p';
 
-export function SoapForm({ content, onChange, readOnly }: SoapFormProps) {
-  const { isDiscreteMode } = useSettingsStore();
+/**
+ * Vista previa de una sección en la barra inferior.
+ *
+ * Solo se quitan los marcadores markdown que abren línea y los de énfasis. La
+ * versión anterior aplicaba `/[#*_~`>-]/g` a todo el texto y se comía los
+ * guiones DENTRO de las palabras: "auto-lesión" se leía "autolesión" en una
+ * vista previa clínica.
+ */
+function toPreview(text: string): string | null {
+  if (!text) return null;
+  const clean = text
+    .split('\n')
+    .map((line) => line.replace(/^\s*(#{1,6}\s+|>\s+|-\s\[[ xX]\]\s+|[-*]\s+|\d+\.\s+)/, ''))
+    .join(' ')
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\*(.+?)\*/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!clean) return null;
+  return clean.length > 60 ? `${clean.slice(0, 60)}…` : clean;
+}
+
+export function SoapForm({ content, onChange, readOnly, onSave, onFinish }: SoapFormProps) {
   const [activeTab, setActiveTab] = useState<SoapKey>('s');
+  /** Solo se roba el foco cuando el salto de sección lo pidió una persona. */
+  const [focusOnEnter, setFocusOnEnter] = useState(false);
 
   const activeField = SOAP_FIELDS.find((f) => f.key === activeTab)!;
 
-  const getPreview = (key: SoapKey) => {
-    const text = content[key] || '';
-    if (!text) return null;
-    const clean = text.replace(/[#*_~`>-]/g, '').trim();
-    return clean.length > 60 ? clean.slice(0, 60) + '...' : clean;
-  };
+  const goToTab = useCallback((key: SoapKey, focus: boolean) => {
+    setFocusOnEnter(focus);
+    setActiveTab(key);
+  }, []);
+
+  const handleSection = useCallback(
+    (direction: 'prev' | 'next') => {
+      const index = SOAP_FIELDS.findIndex((f) => f.key === activeTab);
+      const nextIndex =
+        direction === 'prev'
+          ? (index - 1 + SOAP_FIELDS.length) % SOAP_FIELDS.length
+          : (index + 1) % SOAP_FIELDS.length;
+      goToTab(SOAP_FIELDS[nextIndex].key, true);
+    },
+    [activeTab, goToTab],
+  );
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      {/* Tab Bar */}
-      <div className="flex items-center gap-1 px-4 py-2 border-b border-gray-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 shrink-0">
+    <div className="flex h-full flex-col overflow-hidden">
+      {/* ── Secciones ── */}
+      <div
+        role="tablist"
+        aria-label="Secciones de la nota SOAP"
+        className="flex shrink-0 items-center gap-1 border-b border-border bg-surface px-4 py-2"
+      >
         {SOAP_FIELDS.map(({ key, label, accent, accentText }) => {
           const isActive = activeTab === key;
           const hasContent = !!content[key]?.trim();
@@ -74,54 +112,47 @@ export function SoapForm({ content, onChange, readOnly }: SoapFormProps) {
           return (
             <button
               key={key}
-              onClick={() => setActiveTab(key)}
-              className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => goToTab(key, false)}
+              className={`relative flex min-h-11 items-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors ${
                 isActive
-                  ? `${accentText} bg-white dark:bg-slate-800 shadow-sm ring-1 ring-gray-200 dark:ring-slate-700`
-                  : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800/50'
+                  ? `${accentText} bg-secondary shadow-sm`
+                  : 'text-text-secondary hover:bg-secondary hover:text-text'
               }`}
             >
-              <div className={`w-2 h-2 rounded-full transition-all ${isActive ? accent : hasContent ? `${accent} opacity-50` : 'bg-gray-300 dark:bg-slate-600'}`} />
+              <span
+                aria-hidden="true"
+                className={`size-2 rounded-full transition-colors ${
+                  isActive ? accent : hasContent ? `${accent} opacity-50` : 'bg-text-muted/40'
+                }`}
+              />
               <span className="hidden sm:inline">{label}</span>
-              <span className="sm:hidden font-black">{key.toUpperCase()}</span>
+              <span className="font-bold sm:hidden">{key.toUpperCase()}</span>
+              {/* El dato no puede vivir solo en el color del punto. */}
+              <span className="sr-only">
+                {hasContent ? 'con contenido' : 'vacía'}
+              </span>
             </button>
           );
         })}
       </div>
 
-      {/* Section Header */}
-      <div className={`px-6 py-3 border-b ${activeField.accentBorder} ${activeField.accentLight} flex items-center justify-between shrink-0`}>
-        <div className="flex items-center gap-3">
-          <div className={`w-3 h-3 rounded-full ${activeField.accent}`} />
-          <div>
-            <span className={`text-sm font-bold ${activeField.accentText}`}>
-              {activeField.key.toUpperCase()} — {activeField.label}
-            </span>
-            <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-0.5">{activeField.description}</p>
-          </div>
-        </div>
-
-        {/* Progress dots */}
-        <div className="flex items-center gap-1">
-          {SOAP_FIELDS.map(({ key }) => (
-            <button
-              key={key}
-              onClick={() => setActiveTab(key)}
-              className={`w-6 h-1.5 rounded-full transition-all ${
-                activeTab === key
-                  ? activeField.accent
-                  : content[key]?.trim()
-                    ? 'bg-gray-300 dark:bg-slate-600'
-                    : 'bg-gray-200 dark:bg-slate-700'
-              }`}
-              title={SOAP_FIELDS.find((f) => f.key === key)!.label}
-            />
-          ))}
-        </div>
+      {/* ── Encabezado de la sección activa ── */}
+      <div
+        className={`shrink-0 border-b px-6 py-3 ${activeField.accentBorder} ${activeField.accentLight}`}
+      >
+        <span className={`text-sm font-bold ${activeField.accentText}`}>
+          {activeField.key.toUpperCase()} — {activeField.label}
+        </span>
+        <p className="mt-0.5 text-[11px] font-medium text-text-secondary">
+          {activeField.description}
+        </p>
       </div>
 
-      {/* Editor Area — full remaining height */}
-      <div className="flex-1 overflow-hidden relative">
+      {/* ── Superficie de escritura ── */}
+      <div className="relative min-h-0 flex-1 overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -129,33 +160,44 @@ export function SoapForm({ content, onChange, readOnly }: SoapFormProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
-            className={`h-full overflow-hidden ${isDiscreteMode ? 'blur-sm select-none' : ''}`}
+            className="h-full overflow-hidden"
           >
-            <BlockEditor
-              initialContent={content[activeTab] || ''}
+            <ProseEditor
+              label={`${activeField.label} — nota SOAP`}
+              value={content[activeTab] || ''}
               onChange={(markdown) => onChange(activeTab, markdown)}
               readOnly={readOnly}
+              onSave={onSave}
+              onFinish={onFinish}
+              onSection={handleSection}
+              autoFocus={focusOnEnter}
+              placeholder={`${activeField.description}.`}
             />
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* Bottom: Content preview strip */}
-      <div className="shrink-0 border-t border-gray-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 px-4 py-2 flex gap-2 overflow-x-auto">
+      {/* ── Las otras secciones, de un vistazo ── */}
+      <div className="flex shrink-0 gap-2 overflow-x-auto border-t border-border bg-surface px-4 py-2">
         {SOAP_FIELDS.filter(({ key }) => key !== activeTab).map(({ key, accent, accentText }) => {
-          const preview = getPreview(key);
+          const preview = toPreview(content[key]);
           return (
             <button
               key={key}
-              onClick={() => setActiveTab(key)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:border-gray-300 dark:hover:border-slate-600 transition-all min-w-0 max-w-[250px]"
+              type="button"
+              onClick={() => goToTab(key, false)}
+              className="flex min-h-11 min-w-0 max-w-[250px] items-center gap-2 rounded-lg border border-border bg-secondary px-3 transition-colors hover:border-text-muted"
             >
-              <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${accent}`} />
-              <span className={`text-[11px] font-bold shrink-0 ${accentText}`}>{key.toUpperCase()}</span>
+              <span aria-hidden="true" className={`size-1.5 shrink-0 rounded-full ${accent}`} />
+              <span className={`shrink-0 text-[11px] font-bold ${accentText}`}>
+                {key.toUpperCase()}
+              </span>
               {preview ? (
-                <span className="text-[11px] text-gray-400 dark:text-slate-500 truncate">{preview}</span>
+                <span className="truncate text-[11px] font-medium text-text-secondary">
+                  {preview}
+                </span>
               ) : (
-                <span className="text-[11px] text-gray-300 dark:text-slate-600 italic">Vacío</span>
+                <span className="text-[11px] font-medium italic text-text-muted">Vacía</span>
               )}
             </button>
           );

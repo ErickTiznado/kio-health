@@ -3,7 +3,9 @@ import type { User } from '../types/auth.types';
 
 export interface CompleteProfilePayload {
   type: 'PSYCHOLOGIST';
-  plan: 'INDIVIDUAL' | 'CLINIC';
+  // Sin `plan`: la modalidad ya no se declara al darse de alta. Todo el mundo
+  // arranca con 15 días de prueba y elige al final, cuando ya sabe qué está
+  // eligiendo. El backend lo dejó de aceptar en `CompleteProfileDto`.
   licenseNumber?: string;
   currency: string;
   sessionDefaultDuration: number;

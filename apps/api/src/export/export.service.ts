@@ -11,48 +11,52 @@ import {
 } from '#generated/prisma';
 
 // ── Brand tokens ─────────────────────────────────────────────────────────────
-const C_KANJI   = '#8a72d1'; // primary brand purple
-const C_KIO     = '#ae93fe'; // lighter accent
-const C_CRUZ    = '#ddd3fa'; // pale accent
-const C_DARK    = '#1e1b4b'; // near-black
-const C_BODY    = '#374151'; // body text
-const C_SUBTLE  = '#9ca3af'; // labels / secondary
-const C_WHITE   = '#ffffff';
-const C_CARD    = '#f7f5ff'; // very pale purple card bg
-const C_RED     = '#e11d48'; // rose for private notes
+const C_KANJI = '#8a72d1'; // primary brand purple
+const C_KIO = '#ae93fe'; // lighter accent
+const C_CRUZ = '#ddd3fa'; // pale accent
+const C_DARK = '#1e1b4b'; // near-black
+const C_BODY = '#374151'; // body text
+const C_SUBTLE = '#9ca3af'; // labels / secondary
+const C_WHITE = '#ffffff';
+const C_CARD = '#f7f5ff'; // very pale purple card bg
+const C_RED = '#e11d48'; // rose for private notes
 
 // ── Page geometry ────────────────────────────────────────────────────────────
-const PAGE_W  = 595.28;
-const PAGE_H  = 841.89;
-const MARGIN  = 48;
+const PAGE_W = 595.28;
+const PAGE_H = 841.89;
+const MARGIN = 48;
 const INNER_W = PAGE_W - MARGIN * 2;
 const FOOTER_H = 44;
 const CONTENT_BOTTOM = PAGE_H - FOOTER_H - 10;
 
 // ── Localization helpers ──────────────────────────────────────────────────────
 function fmtDate(d: Date): string {
-  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+  return d.toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 function fmtTime(d: Date): string {
   return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 }
 const TYPE_LABELS: Record<string, string> = {
   CONSULTATION: 'Consulta',
-  EVALUATION:   'Evaluación',
-  FOLLOW_UP:    'Seguimiento',
+  EVALUATION: 'Evaluación',
+  FOLLOW_UP: 'Seguimiento',
 };
 const STATUS_LABELS: Record<string, string> = {
-  SCHEDULED:   'Programada',
+  SCHEDULED: 'Programada',
   IN_PROGRESS: 'En progreso',
-  COMPLETED:   'Completada',
-  CANCELLED:   'Cancelada',
-  NO_SHOW:     'No asistió',
+  COMPLETED: 'Completada',
+  CANCELLED: 'Cancelada',
+  NO_SHOW: 'No asistió',
 };
 const TEMPLATE_LABELS: Record<string, string> = {
-  SOAP:    'SOAP',
-  FREE:    'Libre',
+  SOAP: 'SOAP',
+  FREE: 'Libre',
   INITIAL: 'Evaluación Inicial',
-  CBT:     'TCC',
+  CBT: 'TCC',
 };
 
 // ── SOAP section accent colors ────────────────────────────────────────────────
@@ -71,7 +75,6 @@ const SOAP_LABELS: Record<string, string> = {
 
 @Injectable()
 export class ExportService {
-
   // ── Watermark ──────────────────────────────────────────────────────────────
   private drawWatermark(doc: InstanceType<typeof PDFDocument>): void {
     doc.save();
@@ -114,26 +117,14 @@ export class ExportService {
 
     // Brand name
     const textX = logoBuffer ? logoX + 52 : logoX;
-    doc
-      .fillColor(C_WHITE)
-      .fillOpacity(1)
-      .font('Helvetica-Bold')
-      .fontSize(16);
+    doc.fillColor(C_WHITE).fillOpacity(1).font('Helvetica-Bold').fontSize(16);
     doc.text('Kio Health', textX, 18, { lineBreak: false });
 
-    doc
-      .fillColor(C_WHITE)
-      .fillOpacity(0.6)
-      .font('Helvetica')
-      .fontSize(8);
+    doc.fillColor(C_WHITE).fillOpacity(0.6).font('Helvetica').fontSize(8);
     doc.text('Plataforma de Salud Mental', textX, 40, { lineBreak: false });
 
     // Clinician name — right aligned
-    doc
-      .fillColor(C_WHITE)
-      .fillOpacity(0.75)
-      .font('Helvetica')
-      .fontSize(8);
+    doc.fillColor(C_WHITE).fillOpacity(0.75).font('Helvetica').fontSize(8);
     doc.text(clinicianName, MARGIN, 24, {
       width: INNER_W,
       align: 'right',
@@ -148,11 +139,7 @@ export class ExportService {
       .fillOpacity(0.15)
       .roundedRect(badgeX, 40, badgeW, 17, 4)
       .fill();
-    doc
-      .fillColor(C_WHITE)
-      .fillOpacity(0.85)
-      .font('Helvetica-Bold')
-      .fontSize(7);
+    doc.fillColor(C_WHITE).fillOpacity(0.85).font('Helvetica-Bold').fontSize(7);
     doc.text('DOCUMENTO CONFIDENCIAL', badgeX + 5, 47, {
       width: badgeW - 10,
       align: 'center',
@@ -169,12 +156,11 @@ export class ExportService {
     y: number,
   ): number {
     doc.rect(MARGIN, y, INNER_W, 22).fill(C_KANJI);
-    doc
-      .fillColor(C_WHITE)
-      .fillOpacity(1)
-      .font('Helvetica-Bold')
-      .fontSize(7.5);
-    doc.text(label, MARGIN + 10, y + 7, { width: INNER_W - 20, lineBreak: false });
+    doc.fillColor(C_WHITE).fillOpacity(1).font('Helvetica-Bold').fontSize(7.5);
+    doc.text(label, MARGIN + 10, y + 7, {
+      width: INNER_W - 20,
+      lineBreak: false,
+    });
     return y + 22;
   }
 
@@ -187,17 +173,9 @@ export class ExportService {
     y: number,
     w: number,
   ): void {
-    doc
-      .fillColor(C_SUBTLE)
-      .fillOpacity(1)
-      .font('Helvetica')
-      .fontSize(7);
+    doc.fillColor(C_SUBTLE).fillOpacity(1).font('Helvetica').fontSize(7);
     doc.text(label.toUpperCase(), x, y, { width: w, lineBreak: false });
-    doc
-      .fillColor(C_BODY)
-      .fillOpacity(1)
-      .font('Helvetica')
-      .fontSize(9.5);
+    doc.fillColor(C_BODY).fillOpacity(1).font('Helvetica').fontSize(9.5);
     doc.text(value || '—', x, y + 11, { width: w, lineBreak: false });
   }
 
@@ -226,11 +204,7 @@ export class ExportService {
     doc.text(label, MARGIN + 12, y + 8, { lineBreak: false });
 
     // Content
-    doc
-      .fillColor(C_BODY)
-      .fillOpacity(1)
-      .font('Helvetica')
-      .fontSize(10);
+    doc.fillColor(C_BODY).fillOpacity(1).font('Helvetica').fontSize(10);
     doc.text(content, MARGIN + 12, y + 20, { width: INNER_W - 24 });
 
     return y + blockH + 6;
@@ -245,19 +219,11 @@ export class ExportService {
     const blockH = 40;
     doc.rect(MARGIN, y, INNER_W, blockH).fill(C_CARD);
 
-    doc
-      .fillColor(C_SUBTLE)
-      .fillOpacity(1)
-      .font('Helvetica')
-      .fontSize(7);
+    doc.fillColor(C_SUBTLE).fillOpacity(1).font('Helvetica').fontSize(7);
     doc.text('ESTADO DE ÁNIMO', MARGIN + 10, y + 7, { lineBreak: false });
 
     // Score text
-    doc
-      .fillColor(C_KANJI)
-      .fillOpacity(1)
-      .font('Helvetica-Bold')
-      .fontSize(14);
+    doc.fillColor(C_KANJI).fillOpacity(1).font('Helvetica-Bold').fontSize(14);
     doc.text(`${mood}/10`, PAGE_W - MARGIN - 42, y + 12, {
       width: 42,
       align: 'right',
@@ -293,11 +259,7 @@ export class ExportService {
     }
 
     // Center text
-    doc
-      .fillColor(C_SUBTLE)
-      .fillOpacity(1)
-      .font('Helvetica')
-      .fontSize(7);
+    doc.fillColor(C_SUBTLE).fillOpacity(1).font('Helvetica').fontSize(7);
     doc.text(
       'Documento Confidencial — Solo para uso clínico autorizado · Kio Health Platform',
       MARGIN + 30,
@@ -312,17 +274,12 @@ export class ExportService {
     );
 
     // Right: generation date
-    doc
-      .fillColor(C_SUBTLE)
-      .fillOpacity(1)
-      .font('Helvetica')
-      .fontSize(7);
-    doc.text(
-      fmtDate(new Date()),
-      MARGIN,
-      y + 13,
-      { width: INNER_W, align: 'right', lineBreak: false },
-    );
+    doc.fillColor(C_SUBTLE).fillOpacity(1).font('Helvetica').fontSize(7);
+    doc.text(fmtDate(new Date()), MARGIN, y + 13, {
+      width: INNER_W,
+      align: 'right',
+      lineBreak: false,
+    });
   }
 
   // ── Page break check ──────────────────────────────────────────────────────
@@ -392,20 +349,14 @@ export class ExportService {
       let y = 86;
 
       // ── Report title ──────────────────────────────────────────────────────
-      doc
-        .fillColor(C_DARK)
-        .fillOpacity(1)
-        .font('Helvetica-Bold')
-        .fontSize(20);
+      doc.fillColor(C_DARK).fillOpacity(1).font('Helvetica-Bold').fontSize(20);
       doc.text('Reporte de Sesión Clínica', MARGIN, y, { width: INNER_W });
       y += 28;
 
-      doc
-        .fillColor(C_SUBTLE)
-        .fillOpacity(1)
-        .font('Helvetica')
-        .fontSize(9);
-      doc.text(`Generado el ${fmtDate(new Date())}`, MARGIN, y, { width: INNER_W });
+      doc.fillColor(C_SUBTLE).fillOpacity(1).font('Helvetica').fontSize(9);
+      doc.text(`Generado el ${fmtDate(new Date())}`, MARGIN, y, {
+        width: INNER_W,
+      });
       y += 14;
 
       // Decorative divider
@@ -426,11 +377,7 @@ export class ExportService {
       doc.rect(MARGIN, y, 4, patientCardH).fill(C_KANJI);
 
       // Patient name
-      doc
-        .fillColor(C_DARK)
-        .fillOpacity(1)
-        .font('Helvetica-Bold')
-        .fontSize(15);
+      doc.fillColor(C_DARK).fillOpacity(1).font('Helvetica-Bold').fontSize(15);
       doc.text(patient.fullName, MARGIN + 14, y + 10, {
         width: INNER_W - 20,
         lineBreak: false,
@@ -460,15 +407,25 @@ export class ExportService {
 
       if (patient.dateOfBirth) {
         this.drawField(
-          doc, 'Fecha de Nacimiento',
+          doc,
+          'Fecha de Nacimiento',
           fmtDate(new Date(patient.dateOfBirth)),
-          MARGIN + 14, fieldRowY, col - 14,
+          MARGIN + 14,
+          fieldRowY,
+          col - 14,
         );
       }
 
       const phone = (patient as unknown as Record<string, string>).contactPhone;
       if (phone) {
-        this.drawField(doc, 'Teléfono', phone, MARGIN + 14 + col, fieldRowY, col - 14);
+        this.drawField(
+          doc,
+          'Teléfono',
+          phone,
+          MARGIN + 14 + col,
+          fieldRowY,
+          col - 14,
+        );
       }
 
       // Session number hint
@@ -482,10 +439,16 @@ export class ExportService {
       // 4 mini cards
       const cardW = (INNER_W - 9) / 4;
       const sessionCards = [
-        { label: 'Fecha',    value: fmtDate(appointment.startTime)               },
-        { label: 'Hora',     value: fmtTime(appointment.startTime)               },
-        { label: 'Tipo',     value: TYPE_LABELS[appointment.type]   ?? appointment.type   },
-        { label: 'Estado',   value: STATUS_LABELS[appointment.status] ?? appointment.status },
+        { label: 'Fecha', value: fmtDate(appointment.startTime) },
+        { label: 'Hora', value: fmtTime(appointment.startTime) },
+        {
+          label: 'Tipo',
+          value: TYPE_LABELS[appointment.type] ?? appointment.type,
+        },
+        {
+          label: 'Estado',
+          value: STATUS_LABELS[appointment.status] ?? appointment.status,
+        },
       ];
 
       sessionCards.forEach((card, i) => {
@@ -501,7 +464,11 @@ export class ExportService {
           lineBreak: false,
         });
         // Value
-        doc.fillColor(C_DARK).fillOpacity(1).font('Helvetica-Bold').fontSize(9.5);
+        doc
+          .fillColor(C_DARK)
+          .fillOpacity(1)
+          .font('Helvetica-Bold')
+          .fontSize(9.5);
         doc.text(card.value, cx + 8, y + 23, {
           width: cardW - 16,
           lineBreak: false,
@@ -509,15 +476,25 @@ export class ExportService {
       });
 
       // Price if available
-      if ((appointment as unknown as Record<string, unknown>).price !== undefined &&
-          (appointment as unknown as Record<string, unknown>).price !== null) {
+      if (
+        (appointment as unknown as Record<string, unknown>).price !==
+          undefined &&
+        (appointment as unknown as Record<string, unknown>).price !== null
+      ) {
         const priceStr = `${Number((appointment as unknown as Record<string, unknown>).price).toFixed(2)}`;
-        const currency = (clinician as unknown as Record<string, string>).currency ?? 'USD';
+        const currency =
+          (clinician as unknown as Record<string, string>).currency ?? 'USD';
         doc.rect(MARGIN, y + 56, INNER_W, 28).fill(C_CARD);
         doc.fillColor(C_SUBTLE).fillOpacity(1).font('Helvetica').fontSize(7);
         doc.text('HONORARIOS', MARGIN + 10, y + 62, { lineBreak: false });
-        doc.fillColor(C_KANJI).fillOpacity(1).font('Helvetica-Bold').fontSize(11);
-        doc.text(`${currency} ${priceStr}`, MARGIN + 10, y + 72, { lineBreak: false });
+        doc
+          .fillColor(C_KANJI)
+          .fillOpacity(1)
+          .font('Helvetica-Bold')
+          .fontSize(11);
+        doc.text(`${currency} ${priceStr}`, MARGIN + 10, y + 72, {
+          lineBreak: false,
+        });
         y += 90;
       } else {
         y += 62;
@@ -533,28 +510,46 @@ export class ExportService {
         doc.fillColor(C_SUBTLE).fillOpacity(1).font('Helvetica').fontSize(10);
         doc.text(
           'No hay nota clínica registrada para esta sesión.',
-          MARGIN + 10, y + 18,
+          MARGIN + 10,
+          y + 18,
           { width: INNER_W - 20, align: 'center', lineBreak: false },
         );
         y += 58;
       } else {
         const content = note.content as Record<string, string>;
-        const templateLabel = TEMPLATE_LABELS[note.templateType] ?? note.templateType;
+        const templateLabel =
+          TEMPLATE_LABELS[note.templateType] ?? note.templateType;
 
         // Template type badge row
         doc.rect(MARGIN, y, INNER_W, 22).fill(C_CRUZ);
-        doc.fillColor(C_KANJI).fillOpacity(1).font('Helvetica-Bold').fontSize(8);
-        doc.text(`Plantilla: ${templateLabel}`, MARGIN + 10, y + 7, { lineBreak: false });
+        doc
+          .fillColor(C_KANJI)
+          .fillOpacity(1)
+          .font('Helvetica-Bold')
+          .fontSize(8);
+        doc.text(`Plantilla: ${templateLabel}`, MARGIN + 10, y + 7, {
+          lineBreak: false,
+        });
 
         // Tags if present
-        const tags: string[] = (note as unknown as Record<string, string[]>).tags ?? [];
+        const tags: string[] =
+          (note as unknown as Record<string, string[]>).tags ?? [];
         if (tags.length > 0) {
-          doc.fillColor(C_SUBTLE).fillOpacity(1).font('Helvetica').fontSize(7.5);
-          doc.text(`Etiquetas: ${tags.join(' · ')}`, PAGE_W - MARGIN - 200, y + 7, {
-            width: 200,
-            align: 'right',
-            lineBreak: false,
-          });
+          doc
+            .fillColor(C_SUBTLE)
+            .fillOpacity(1)
+            .font('Helvetica')
+            .fontSize(7.5);
+          doc.text(
+            `Etiquetas: ${tags.join(' · ')}`,
+            PAGE_W - MARGIN - 200,
+            y + 7,
+            {
+              width: 200,
+              align: 'right',
+              lineBreak: false,
+            },
+          );
         }
 
         y += 28;
@@ -578,7 +573,9 @@ export class ExportService {
           const body = content.body ?? content.notes ?? '';
           if (body.trim()) {
             y = this.checkBreak(doc, y, 60, logoBuffer, clinicianName);
-            const textH = doc.heightOfString(body.trim(), { width: INNER_W - 24 });
+            const textH = doc.heightOfString(body.trim(), {
+              width: INNER_W - 24,
+            });
             doc.rect(MARGIN, y, INNER_W, textH + 20).fill(C_CARD);
             doc.rect(MARGIN, y, 4, textH + 20).fill(C_KIO);
             doc.fillColor(C_BODY).fillOpacity(1).font('Helvetica').fontSize(10);
@@ -598,19 +595,32 @@ export class ExportService {
           y = this.checkBreak(doc, y, 60, logoBuffer, clinicianName);
           y += 6;
 
-          const pvH = doc.heightOfString(note.privateNotes, { width: INNER_W - 24 });
+          const pvH = doc.heightOfString(note.privateNotes, {
+            width: INNER_W - 24,
+          });
           const pvBlockH = pvH + 40;
           doc.rect(MARGIN, y, INNER_W, pvBlockH).fill('#fff1f2');
           doc.rect(MARGIN, y, 4, pvBlockH).fill(C_RED);
 
-          doc.fillColor(C_RED).fillOpacity(1).font('Helvetica-Bold').fontSize(8);
+          doc
+            .fillColor(C_RED)
+            .fillOpacity(1)
+            .font('Helvetica-Bold')
+            .fontSize(8);
           doc.text(
             '🔒  NOTAS PRIVADAS — SOLO PARA EL CLÍNICO',
-            MARGIN + 12, y + 8,
+            MARGIN + 12,
+            y + 8,
             { lineBreak: false },
           );
-          doc.fillColor('#7f1d1d').fillOpacity(1).font('Helvetica').fontSize(10);
-          doc.text(note.privateNotes, MARGIN + 12, y + 22, { width: INNER_W - 24 });
+          doc
+            .fillColor('#7f1d1d')
+            .fillOpacity(1)
+            .font('Helvetica')
+            .fontSize(10);
+          doc.text(note.privateNotes, MARGIN + 12, y + 22, {
+            width: INNER_W - 24,
+          });
           y += pvBlockH + 10;
         }
       }
@@ -628,10 +638,13 @@ export class ExportService {
       doc.text(clinicianName, MARGIN, y, { lineBreak: false });
       y += 14;
 
-      const licenseNumber = (clinician as unknown as Record<string, string>).licenseNumber;
+      const licenseNumber = (clinician as unknown as Record<string, string>)
+        .licenseNumber;
       if (licenseNumber) {
         doc.fillColor(C_SUBTLE).fillOpacity(1).font('Helvetica').fontSize(8);
-        doc.text(`Cédula / Licencia: ${licenseNumber}`, MARGIN, y, { lineBreak: false });
+        doc.text(`Cédula / Licencia: ${licenseNumber}`, MARGIN, y, {
+          lineBreak: false,
+        });
       }
 
       // ── FOOTER ────────────────────────────────────────────────────────────

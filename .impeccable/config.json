@@ -1,0 +1,42 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [
+      "apps/api/src/lib/email.service.ts"
+    ],
+    "ignoreValues": [
+      {
+        "rule": "gray-on-color",
+        "value": "text-slate-400 on bg-emerald-50",
+        "createdAt": "2026-08-14T21:36:44.278Z",
+        "reason": "Claude: falso positivo — el par real es dark:text-slate-400 + dark:hover:bg-emerald-900/25; el hover claro lleva hover:text-emerald-700. Barrido de contraste en navegador: 0 fallos."
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "text-slate-400 on bg-rose-50",
+        "createdAt": "2026-08-14T21:36:44.484Z",
+        "reason": "Claude: falso positivo — el par real es dark:text-slate-400 + dark:hover:bg-rose-900/20; el hover claro lleva hover:text-rose-700. Barrido de contraste en navegador: 0 fallos."
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "text-slate-600 on bg-rose-50",
+        "createdAt": "2026-08-14T21:37:50.817Z",
+        "reason": "Claude: falso positivo — el gris es el color en reposo sobre superficie neutra; el hover fija a la vez bg-rose-50 y text-rose-700. Es el patron de boton destructivo de DESIGN.md. Barrido de contraste en navegador: 0 fallos."
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "apps/web/src/pages/SessionPage.tsx"
+        ],
+        "createdAt": "2026-08-14T23:16:49.226Z",
+        "reason": "Spinner de carga: rounded-full + border-b-2 es el modismo de indicador giratorio (borde parcial que gira), no un borde de acento sobre una tarjeta redondeada. Patron preexistente en el archivo, conservado en el rediseno."
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "border-b-2",
+        "createdAt": "2026-08-23T22:15:05.256Z"
+      }
+    ]
+  }
+}

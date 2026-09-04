@@ -1,15 +1,17 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { google } from 'googleapis';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class GoogleCalendarService {
   private readonly logger = new Logger(GoogleCalendarService.name);
-  
+
   // These should ideally come from ConfigService
   private readonly clientId = process.env.GOOGLE_CLIENT_ID || '';
   private readonly clientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
-  private readonly redirectUri = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/integrations/google/callback';
+  private readonly redirectUri =
+    process.env.GOOGLE_REDIRECT_URI ||
+    'http://localhost:3000/integrations/google/callback';
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -17,14 +19,14 @@ export class GoogleCalendarService {
     return new google.auth.OAuth2(
       this.clientId,
       this.clientSecret,
-      this.redirectUri
+      this.redirectUri,
     );
   }
 
   getAuthUrl(clinicianId: string): string {
     const oauth2Client = this.getOAuthClient();
     const scopes = ['https://www.googleapis.com/auth/calendar'];
-    
+
     return oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: scopes,
@@ -36,7 +38,7 @@ export class GoogleCalendarService {
   async handleCallback(code: string, clinicianId: string): Promise<void> {
     const oauth2Client = this.getOAuthClient();
     const { tokens } = await oauth2Client.getToken(code);
-    
+
     await this.prisma.googleIntegration.upsert({
       where: { clinicianId },
       update: {
@@ -57,18 +59,21 @@ export class GoogleCalendarService {
     const integration = await this.prisma.googleIntegration.findUnique({
       where: { clinicianId },
     });
-    
+
     if (!integration) return;
-    
+
     const oauth2Client = this.getOAuthClient();
     oauth2Client.setCredentials({ access_token: integration.accessToken });
-    
+
     try {
       await oauth2Client.revokeToken(integration.accessToken);
     } catch (e) {
-      this.logger.warn(`Failed to revoke token for clinician ${clinicianId}:`, e);
+      this.logger.warn(
+        `Failed to revoke token for clinician ${clinicianId}:`,
+        e,
+      );
     }
-    
+
     await this.prisma.googleIntegration.delete({
       where: { clinicianId },
     });
@@ -101,13 +106,16 @@ export class GoogleCalendarService {
       });
     });
 
-    return { auth: oauth2Client, calendarId: integration.calendarId || 'primary' };
+    return {
+      auth: oauth2Client,
+      calendarId: integration.calendarId || 'primary',
+    };
   }
 
   async syncAppointment(
-    clinicianId: string, 
+    clinicianId: string,
     appointment: any,
-    patientName: string
+    patientName: string,
   ): Promise<string | null> {
     const clientData = await this.getAuthorizedClient(clinicianId);
     if (!clientData) return null;
@@ -136,26 +144,35 @@ export class GoogleCalendarService {
         return res.data.id || null;
       }
     } catch (error) {
-      this.logger.error(`Failed to sync appointment ${appointment.id} to Google Calendar`, error);
+      this.logger.error(
+        `Failed to sync appointment ${appointment.id} to Google Calendar`,
+        error,
+      );
       return null;
     }
   }
 
-  async deleteAppointment(clinicianId: string, googleEventId: string): Promise<void> {
+  async deleteAppointment(
+    clinicianId: string,
+    googleEventId: string,
+  ): Promise<void> {
     if (!googleEventId) return;
-    
+
     const clientData = await this.getAuthorizedClient(clinicianId);
     if (!clientData) return;
 
     const calendar = google.calendar({ version: 'v3', auth: clientData.auth });
-    
+
     try {
       await calendar.events.delete({
         calendarId: clientData.calendarId,
         eventId: googleEventId,
       });
     } catch (error) {
-      this.logger.error(`Failed to delete appointment ${googleEventId} from Google Calendar`, error);
+      this.logger.error(
+        `Failed to delete appointment ${googleEventId} from Google Calendar`,
+        error,
+      );
     }
   }
 }

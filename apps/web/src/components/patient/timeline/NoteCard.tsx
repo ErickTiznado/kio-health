@@ -47,14 +47,17 @@ export function NoteCard({ item }: NoteCardProps) {
       {/* Header */}
       <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-[var(--color-kanji)]/60 dark:text-kio/60 uppercase tracking-wider">
+          <span className="text-xs font-bold text-kanji-deep dark:text-kio uppercase tracking-wider">
             {note.templateType}
           </span>
           {note.moodRating && <MoodIndicator rating={note.moodRating} size="sm" />}
+          {/* El candado llevaba el dato solo en `title`: en tactil y con
+              lector de pantalla eso no existe. Ahora el hecho es texto. */}
           {note.privateNotes && (
-            <div title="Contiene notas privadas">
-              <Lock size={12} className="text-amber-400" />
-            </div>
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-900 dark:bg-amber-500/20 dark:text-amber-200">
+              <Lock size={12} aria-hidden="true" />
+              Notas privadas
+            </span>
           )}
         </div>
 
@@ -62,19 +65,19 @@ export function NoteCard({ item }: NoteCardProps) {
           {canAddAddendum() && (
             <button
               onClick={() => setIsAddendumModalOpen(true)}
-              className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-500 dark:text-slate-400 hover:text-kio dark:hover:text-kio bg-gray-50 dark:bg-slate-800/50 hover:bg-kio/10 dark:hover:bg-kio/10 rounded-md transition-colors"
-              title="Agregar anexo a la nota clínica"
+              className="flex min-h-11 items-center gap-1.5 rounded-xl bg-gray-50 px-3 text-xs font-bold text-slate-600 transition-colors duration-150 hover:bg-cruz/40 hover:text-kanji-deep dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-kio/10 dark:hover:text-kio"
             >
-              <FilePlus size={12} />
-              Agregar Anexo
+              <FilePlus size={13} aria-hidden="true" />
+              Agregar anexo
             </button>
           )}
           <button
             onClick={() => togglePin(item.id)}
-            className={`p-1.5 rounded-lg transition-colors ${isPinned ? 'text-amber-500 bg-amber-100 dark:bg-amber-900/30' : 'text-gray-300 dark:text-slate-600 hover:text-gray-500 dark:hover:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800'}`}
-            title={isPinned ? "Quitar destacado" : "Destacar nota"}
+            aria-pressed={isPinned}
+            aria-label={isPinned ? 'Quitar de notas destacadas' : 'Destacar esta nota'}
+            className={`grid h-11 w-11 shrink-0 place-items-center rounded-full transition-colors duration-150 ${isPinned ? 'text-amber-700 bg-amber-100 dark:text-amber-300 dark:bg-amber-900/30' : 'text-slate-600 hover:text-kanji-deep hover:bg-secondary dark:text-slate-400 dark:hover:text-kio dark:hover:bg-slate-800'}`}
           >
-            <Pin size={14} className={isPinned ? "fill-current" : ""} />
+            <Pin size={15} aria-hidden="true" className={isPinned ? 'fill-current' : ''} />
           </button>
         </div>
       </div>
@@ -85,25 +88,25 @@ export function NoteCard({ item }: NoteCardProps) {
           <div className="grid gap-3">
             {content.s && (
               <div>
-                <span className="font-bold text-[var(--color-kanji)] dark:text-kio mr-1">S:</span>
+                <span className="font-bold text-kanji-deep dark:text-kio mr-1">S:</span>
                 <MarkdownPreview content={content.s} className="inline-block" />
               </div>
             )}
             {content.o && (
               <div>
-                <span className="font-bold text-[var(--color-kanji)] dark:text-kio mr-1">O:</span>
+                <span className="font-bold text-kanji-deep dark:text-kio mr-1">O:</span>
                 <MarkdownPreview content={content.o} className="inline-block" />
               </div>
             )}
             {content.a && (
               <div>
-                <span className="font-bold text-[var(--color-kanji)] dark:text-kio mr-1">A:</span>
+                <span className="font-bold text-kanji-deep dark:text-kio mr-1">A:</span>
                 <MarkdownPreview content={content.a} className="inline-block" />
               </div>
             )}
             {content.p && (
               <div>
-                <span className="font-bold text-[var(--color-kanji)] dark:text-kio mr-1">P:</span>
+                <span className="font-bold text-kanji-deep dark:text-kio mr-1">P:</span>
                 <MarkdownPreview content={content.p} className="inline-block" />
               </div>
             )}
@@ -118,14 +121,14 @@ export function NoteCard({ item }: NoteCardProps) {
         {tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-2 items-center">
             {visibleTags.map(tag => (
-              <span key={tag} className="text-[10px] font-medium text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+              <span key={tag} className="text-[11px] font-medium text-slate-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
                 #{tag}
               </span>
             ))}
             {hasMoreTags && (
               <button
                 onClick={() => setIsTagsModalOpen(true)}
-                className="text-[10px] font-bold text-kio hover:bg-kio/10 px-2 py-0.5 rounded-full transition-colors flex items-center gap-1"
+                className="flex min-h-11 items-center gap-1 rounded-full px-2 text-[11px] font-bold text-kanji-deep transition-colors duration-150 hover:bg-kio/10 dark:text-kio"
               >
                 <MoreHorizontal size={10} />
                 +{tags.length - 3} más

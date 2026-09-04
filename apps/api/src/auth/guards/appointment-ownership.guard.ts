@@ -5,16 +5,18 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { PrismaService } from '../../prisma/prisma.service';
+import type { RequestUser } from '../interfaces/request-user.interface';
 
 @Injectable()
 export class AppointmentOwnershipGuard implements CanActivate {
   constructor(private readonly prisma: PrismaService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const appointmentId = request.params.id;
-    const clinicianId = request.user?.clinicianId;
+    const request = context.switchToHttp().getRequest<Request>();
+    const appointmentId = request.params.id as string | undefined;
+    const clinicianId = (request.user as RequestUser | undefined)?.clinicianId;
 
     if (!appointmentId || !clinicianId) {
       return false; // Let it fail cleanly if no IDs

@@ -1,8 +1,11 @@
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EncryptionService } from '../lib/encryption.service';
 import type { CreateAddendumDto } from './dto/create-addendum.dto';
-import { AccessLogService } from '../access-log/access-log.service';
 
 const ADDENDUM_WINDOW_DAYS = 30;
 
@@ -11,25 +14,27 @@ export class AddendumService {
   constructor(
     private prisma: PrismaService,
     private encryptionService: EncryptionService,
-    private accessLogService: AccessLogService,
   ) {}
 
   /**
    * Create a new addendum for a note (bypass 24h restriction)
    * Rules:
+   * - Ownership at query level: the appointment must belong to the clinician
    * - Can be created up to ADDENDUM_WINDOW_DAYS after appointment.endTime
    * - After that window, ForbiddenException
    * - Content and privateNotes are encrypted
+   * - Audit logging (CREATE_ADDENDUM) happens in the controller, which has
+   *   access to ip/user-agent — do not log here or entries get duplicated.
    */
   async createAddendum(
+    clinicianId: string,
     appointmentId: string,
     createdBy: string,
     dto: CreateAddendumDto,
-    reqContext?: any
   ): Promise<any> {
-    // Find appointment
-    const appointment = await this.prisma.appointment.findUnique({
-      where: { id: appointmentId },
+    // Ownership: findFirst con clinicianId, nunca findUnique + post-check.
+    const appointment = await this.prisma.appointment.findFirst({
+      where: { id: appointmentId, clinicianId },
     });
 
     if (!appointment) {
@@ -53,8 +58,7 @@ export class AddendumService {
       ? this.encryptionService.encrypt(dto.privateNotes)
       : null;
 
-    // Create addendum
-    const addendum = await this.prisma.psychNoteAddendum.create({
+    return this.prisma.psychNoteAddendum.create({
       data: {
         appointmentId,
         patientId: appointment.patientId,
@@ -64,27 +68,18 @@ export class AddendumService {
         type: 'ADDENDUM',
       },
     });
-
-    // Log the action
-    await this.accessLogService.logAccess(
-      createdBy,
-      'CREATE_ADDENDUM',
-      'PsychNoteAddendum',
-      appointment.patientId,
-      `Created addendum for appointment ${appointmentId}`,
-      reqContext?.ip,
-      reqContext?.headers?.['user-agent']
-    );
-
-    return addendum;
   }
 
   /**
-   * Get all addendums for an appointment (decrypted)
+   * Get all addendums for an appointment (decrypted).
+   * Ownership at query level: only addendums of the clinician's appointments.
    */
-  async getAddendums(appointmentId: string): Promise<any[]> {
+  async getAddendums(
+    clinicianId: string,
+    appointmentId: string,
+  ): Promise<any[]> {
     const addendums = await this.prisma.psychNoteAddendum.findMany({
-      where: { appointmentId },
+      where: { appointmentId, patient: { clinicianId } },
       orderBy: { createdAt: 'asc' },
     });
 
@@ -99,11 +94,12 @@ export class AddendumService {
   }
 
   /**
-   * Get single addendum (decrypted)
+   * Get single addendum (decrypted).
+   * Ownership at query level: a foreign addendum is simply not found.
    */
-  async getAddendum(id: string): Promise<any> {
-    const addendum = await this.prisma.psychNoteAddendum.findUnique({
-      where: { id },
+  async getAddendum(clinicianId: string, id: string): Promise<any> {
+    const addendum = await this.prisma.psychNoteAddendum.findFirst({
+      where: { id, patient: { clinicianId } },
     });
 
     if (!addendum) {

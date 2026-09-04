@@ -1,6 +1,7 @@
-import { toast } from 'sonner';
 import { createElement } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { createRoot, type Root } from 'react-dom/client';
+
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 
 interface ConfirmOptions {
   title: string;
@@ -11,8 +12,46 @@ interface ConfirmOptions {
 }
 
 /**
- * Styled confirmation dialog using Sonner toast.
- * Replaces native `confirm()` with an in-app styled prompt.
+ * Bloqueo de scroll con contador. Una confirmación puede abrirse encima de un
+ * modal que ya bloqueó el scroll (PatientModal guarda y restaura
+ * `body.style.overflow` igual que aquí), y también encima de otra
+ * confirmación: sin contador, la primera en cerrarse devolvería el scroll con
+ * un diálogo todavía abierto.
+ */
+let openCount = 0;
+let previousBodyOverflow: string | null = null;
+
+function lockBodyScroll() {
+  if (openCount === 0) {
+    previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+  }
+  openCount += 1;
+}
+
+function releaseBodyScroll() {
+  openCount = Math.max(0, openCount - 1);
+  if (openCount === 0 && previousBodyOverflow !== null) {
+    document.body.style.overflow = previousBodyOverflow;
+    previousBodyOverflow = null;
+  }
+}
+
+/**
+ * Diálogo de confirmación del sistema. Sustituye a `confirm()` nativo y es el
+ * primitivo detrás de toda decisión destructiva del producto.
+ *
+ * Antes esto era un `toast.custom` de Sonner. Un toast no es un diálogo: no
+ * anunciaba su rol, no atrapaba el foco, ignoraba Escape y —lo grave— si se
+ * descartaba por cualquier vía que no fueran sus dos botones, la promesa nunca
+ * resolvía. En SessionPage eso dejaba a `ensureSaved` esperando para siempre y
+ * convertía «Finalizar sesión» en un botón muerto.
+ *
+ * La garantía que sostiene ahora este archivo: **toda vía de cierre resuelve la
+ * promesa exactamente una vez**. `settle` es idempotente y es lo único que
+ * desmonta el diálogo, así que no existe un camino que desmonte sin resolver.
+ *
+ * La firma pública no ha cambiado — mismos parámetros, mismo `Promise<boolean>`.
  */
 export function confirmAction({
   title,
@@ -21,83 +60,72 @@ export function confirmAction({
   cancelLabel = 'Cancelar',
   variant = 'default',
 }: ConfirmOptions): Promise<boolean> {
-  return new Promise((resolve) => {
-    const variantStyles = {
-      danger: {
-        icon: 'bg-red-50 dark:bg-red-900/20 text-red-500',
-        confirm: 'bg-red-500 hover:bg-red-600 shadow-red-500/20',
-        border: 'border-red-100 dark:border-red-900/30',
-      },
-      warning: {
-        icon: 'bg-amber-50 dark:bg-amber-900/20 text-amber-500',
-        confirm: 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/20',
-        border: 'border-amber-100 dark:border-amber-900/30',
-      },
-      default: {
-        icon: 'bg-kio-light/20 dark:bg-kio/20 text-kanji dark:text-kio',
-        confirm: 'bg-kanji dark:bg-kio hover:bg-kio dark:hover:bg-white shadow-kanji/20',
-        border: 'border-gray-200 dark:border-slate-700',
-      },
+  return new Promise<boolean>((resolve) => {
+    // Sin DOM (tests de nodo, SSR) no se puede preguntar nada. Resolvemos que
+    // no: nunca inventamos un «sí» para una acción destructiva.
+    if (typeof document === 'undefined') {
+      resolve(false);
+      return;
+    }
+
+    const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+    const container = document.createElement('div');
+    container.setAttribute('data-confirm-dialog', '');
+    document.body.appendChild(container);
+
+    let settled = false;
+    // `settle` necesita la raíz y la raíz necesita `settle` (para
+    // `onUncaughtError`). El contenedor rompe el ciclo sin declarar nada suelto.
+    const rootHolder: { current: Root | null } = { current: null };
+
+    const settle = (value: boolean) => {
+      if (settled) return;
+      settled = true;
+
+      // Se desmonta el DOM de forma síncrona para que el diálogo desaparezca ya
+      // y para que el listener de teclado del componente se autodesactive
+      // (comprueba `isConnected`). `root.unmount()` va en un microtask porque
+      // `settle` suele llamarse desde un handler de React.
+      container.remove();
+      releaseBodyScroll();
+
+      if (trigger && trigger.isConnected) {
+        try {
+          trigger.focus({ preventScroll: true });
+        } catch {
+          // El disparador ya no admite foco; no es motivo para romper el flujo.
+        }
+      }
+
+      // El orden importa: este microtask se encola ANTES que la continuación de
+      // quien está esperando la promesa. Si hay dos confirmaciones encadenadas,
+      // la primera termina de desmontarse y de devolver el foco antes de que la
+      // segunda se monte, así que la segunda no hereda su foco ni su posición
+      // en la pila de diálogos.
+      queueMicrotask(() => rootHolder.current?.unmount());
+
+      resolve(value);
     };
 
-    const styles = variantStyles[variant];
+    // Si el diálogo revienta al renderizar, la promesa no puede quedarse
+    // colgada: sin esto, un fallo aquí volvería a dejar a `ensureSaved`
+    // esperando para siempre. Un error se resuelve como «no confirmado».
+    const root = createRoot(container, {
+      onUncaughtError: () => settle(false),
+    });
+    rootHolder.current = root;
+    lockBodyScroll();
 
-    toast.custom(
-      (toastId) =>
-        createElement(
-          'div',
-          {
-            className: `bg-surface dark:bg-slate-800 p-5 rounded-[24px] shadow-2xl border ${styles.border} flex flex-col gap-4 w-[360px] animate-in fade-in slide-in-from-top-5 duration-300`,
-          },
-          createElement(
-            'div',
-            { className: 'flex items-start gap-4' },
-            createElement(
-              'div',
-              { className: `w-12 h-12 rounded-2xl ${styles.icon} flex items-center justify-center shrink-0` },
-              createElement(AlertTriangle, { size: 24 })
-            ),
-            createElement(
-              'div',
-              null,
-              createElement('h3', { className: 'font-bold text-kanji dark:text-white text-lg leading-tight' }, title),
-              description &&
-                createElement(
-                  'p',
-                  { className: 'text-xs text-gray-500 dark:text-slate-400 opacity-70 mt-1.5 leading-relaxed' },
-                  description
-                )
-            )
-          ),
-          createElement(
-            'div',
-            { className: 'flex gap-3 pt-2' },
-            createElement(
-              'button',
-              {
-                onClick: () => {
-                  toast.dismiss(toastId);
-                  resolve(false);
-                },
-                className:
-                  'flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-kanji dark:text-kio hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors',
-              },
-              cancelLabel
-            ),
-            createElement(
-              'button',
-              {
-                onClick: () => {
-                  toast.dismiss(toastId);
-                  resolve(true);
-                },
-                className: `flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-white dark:text-slate-900 ${styles.confirm} shadow-lg transition-all active:scale-95`,
-              },
-              confirmLabel
-            )
-          )
-        ),
-      { duration: Infinity, position: 'top-center' }
+    root.render(
+      createElement(ConfirmDialog, {
+        title,
+        description,
+        confirmLabel,
+        cancelLabel,
+        variant,
+        onResolve: settle,
+      }),
     );
   });
 }

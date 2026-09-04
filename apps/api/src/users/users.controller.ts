@@ -1,11 +1,10 @@
-import { Controller, Patch, Body, UseGuards } from '@nestjs/common';
+import { Controller, Patch, Body } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
+// Protegido por el JwtAuthGuard global (ver app.module.ts).
 @Controller('users')
-@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

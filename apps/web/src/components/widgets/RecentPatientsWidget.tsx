@@ -1,82 +1,105 @@
-import { History } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
+import { WidgetError } from './WidgetError';
+import { SKELETON_SURFACE } from './WidgetSkeleton';
 
 interface Patient {
   id: string;
   name: string;
-  reason: string;
+  /** Nunca el diagnóstico: ese campo está cifrado y no puede vivir en el dashboard. */
+  reason: string | null;
   time: string;
   color: string;
 }
 
 interface RecentPatientsWidgetProps {
   patients: Patient[];
+  /** Hay entradas guardadas cuyo nombre aún se está hidratando desde la API. */
+  isLoading?: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
 }
 
-export function RecentPatientsWidget({ patients }: RecentPatientsWidgetProps) {
+/** Anchos de las filas fantasma; distintos entre sí para que no parezcan clones. */
+const SKELETON_WIDTHS = ['w-32', 'w-24', 'w-36'];
+
+/**
+ * Cuerpo de la sección RECIENTES, en el raíl.
+ *
+ * Antes eran mosaicos de 2 columnas con un avatar de 48px y una insignia de
+ * tiempo flotando en la esquina — mucha caja para un nombre y una marca de
+ * tiempo. Aquí son filas de directorio: inicial, nombre, cuándo. Es material
+ * secundario y se comporta como tal.
+ */
+export function RecentPatientsWidget({ patients, isLoading, isError, onRetry }: RecentPatientsWidgetProps) {
   const navigate = useNavigate();
 
-  return (
-    <div className="col-span-12 md:col-span-6 lg:col-span-7 h-full">
-      <div className="bg-surface dark:bg-slate-900 rounded-[40px] p-6 lg:p-8 shadow-sm border border-gray-100 dark:border-slate-800 h-full flex flex-col transition-colors duration-200">
-        <div className="flex items-center justify-between mb-6 shrink-0">
-          <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-3 text-lg transition-colors">
-            <History size={24} className="text-gray-300 dark:text-kanji" /> Vistos Recientemente
-          </h3>
-        </div>
+  if (isError) return <WidgetError what="tus pacientes recientes" onRetry={onRetry} />;
 
-        {patients.length === 0 ? (
-          <div className="flex flex-col items-center justify-center flex-1 text-center bg-surface/60 dark:bg-slate-800/50 rounded-3xl border border-dashed border-gray-200 dark:border-slate-700 p-8 transition-colors">
-            <div className="w-12 h-12 bg-surface dark:bg-slate-700 rounded-2xl flex items-center justify-center mb-3 transition-colors">
-              <History size={20} className="text-gray-400 dark:text-kanji" />
-            </div>
-            <p className="text-gray-500 dark:text-kio font-bold text-sm">No hay actividad reciente</p>
-            <p className="text-gray-400 dark:text-kanji text-xs mt-1">Los pacientes atendidos aparecerán aquí.</p>
+  // La lista se arma con los ids guardados en local y el nombre que llega de la
+  // API: mientras esa hidratación está en vuelo, `patients` está vacío y el
+  // empty state decía "aparecerán aquí" a alguien que sí tiene recientes.
+  if (isLoading) {
+    return (
+      <div role="status">
+        <span className="sr-only">Cargando tus pacientes recientes…</span>
+        {SKELETON_WIDTHS.map((w) => (
+          <div key={w} className="flex items-center gap-3 py-2">
+            <span className={`h-8 w-8 shrink-0 rounded-full ${SKELETON_SURFACE}`} />
+            <span className={`h-4 ${w} rounded-full ${SKELETON_SURFACE}`} />
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-min overflow-y-auto pr-1">
-            {patients.map((p) => (
-              <div 
-                key={p.id} 
-                onClick={() => navigate(`/patients/${p.id}`)}
-                className="group relative p-5 rounded-3xl bg-surface/80 dark:bg-slate-800/50 hover:bg-surface dark:hover:bg-slate-800 border border-transparent hover:border-gray-100 dark:hover:border-slate-700 hover:shadow-lg dark:hover:shadow-none hover:shadow-gray-100/50 transition-all duration-300 cursor-pointer"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    navigate(`/patients/${p.id}`);
-                  }
-                }}
-              >
-                {/* Header Row */}
-                <div className="flex items-start justify-between mb-3 relative z-10">
-                  {/* Initials Avatar */}
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm shadow-sm transition-transform group-hover:scale-110 ${p.color}`}>
-                    {p.name.charAt(0).toUpperCase()}
-                  </div>
-                  
-                  {/* Time Badge */}
-                  <span className="text-[10px] font-bold text-gray-400 dark:text-kio bg-surface dark:bg-slate-900 px-2.5 py-1 rounded-full shadow-sm border border-gray-100/50 dark:border-slate-700 whitespace-nowrap transition-colors">
-                    {p.time}
-                  </span>
-                </div>
-
-                {/* Content */}
-                <div className="relative z-10">
-                  <p className="font-bold text-gray-900 dark:text-white mb-1 group-hover:text-kanji dark:group-hover:text-kio transition-colors line-clamp-1 pr-6" title={p.name}>
-                    {p.name}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-kio font-medium line-clamp-1 group-hover:text-gray-600 dark:group-hover:text-slate-300 transition-colors" title={p.reason}>
-                    {p.reason}
-                  </p>
-                </div>
-
-
-              </div>
-            ))}
-          </div>
-        )}
+        ))}
       </div>
-    </div>
+    );
+  }
+
+  if (patients.length === 0) {
+    return (
+      <p className="py-2 text-xs font-medium text-text-secondary dark:text-slate-400">
+        Los pacientes que abras aparecerán aquí.
+      </p>
+    );
+  }
+
+  return (
+    <ul className="divide-y divide-border dark:divide-slate-800">
+      {patients.map((p) => (
+        <li key={p.id}>
+          <button
+            type="button"
+            onClick={() => navigate(`/patients/${p.id}`)}
+            className="group flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-xl py-2 pr-2 text-left transition-colors duration-150 hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kio dark:hover:bg-slate-800/60"
+          >
+            <span
+              aria-hidden="true"
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${p.color}`}
+            >
+              {p.name.charAt(0).toUpperCase()}
+            </span>
+
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-bold text-text transition-colors group-hover:text-kanji-deep dark:text-white dark:group-hover:text-kio">
+                {p.name}
+              </span>
+              {p.reason && (
+                <span className="mt-0.5 block truncate text-xs font-medium text-text-secondary dark:text-slate-400">
+                  {p.reason}
+                </span>
+              )}
+            </span>
+
+            <span className="shrink-0 text-[11px] font-bold tabular-nums text-text-secondary dark:text-slate-400">
+              {p.time}
+            </span>
+
+            <ChevronRight
+              size={14}
+              aria-hidden="true"
+              className="shrink-0 text-text-muted transition-transform duration-150 group-hover:translate-x-0.5 dark:text-slate-500"
+            />
+          </button>
+        </li>
+      ))}
+    </ul>
   );
 }

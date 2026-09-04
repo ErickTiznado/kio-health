@@ -1,11 +1,9 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Controller, Get, Query } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CurrentClinician } from '../auth/decorators/current-clinician.decorator';
-import { User } from '#generated/prisma';
 
+// Protegido por el JwtAuthGuard global (ver app.module.ts).
 @Controller('search')
-@UseGuards(JwtAuthGuard)
 export class SearchController {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -19,10 +17,10 @@ export class SearchController {
     const patients = await this.prisma.patient.findMany({
       where: {
         clinicianId: clinicianId,
-        OR: [
-          { fullName: { contains: query, mode: 'insensitive' } },
-          { contactPhone: { contains: query, mode: 'insensitive' } },
-        ],
+        // contactPhone está cifrado (AES-256-GCM): un `contains` sobre la
+        // columna nunca puede coincidir. Se busca sólo por nombre, igual que
+        // en PatientsService.findAll().
+        fullName: { contains: query, mode: 'insensitive' },
       },
       take: 5,
       select: { id: true, fullName: true, status: true },
@@ -44,7 +42,7 @@ export class SearchController {
 
     return {
       patients,
-      appointments: appointments.map((a: any) => ({
+      appointments: appointments.map((a) => ({
         id: a.id,
         label: `${a.reason} - ${a.patient.fullName}`,
         startTime: a.startTime,

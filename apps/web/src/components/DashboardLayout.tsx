@@ -17,12 +17,17 @@ import {
   Plus,
   UserPlus,
   CalendarPlus,
+  ShieldCheck,
 } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { TrialBanner } from './common/TrialBanner';
 import { PatientModal } from './patients/PatientModal';
 import { ScheduleAppointmentModal } from '../features/calendar/components/ScheduleAppointmentModal';
 import { useCreatePatient } from '../hooks/use-patients';
 import type { PatientFormValues } from '../schemas/patients.schema';
+import type { User } from '../types/auth.types';
+
+type ClinicRole = NonNullable<User['clinicRole']>;
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -34,6 +39,22 @@ interface NavItem {
   icon: ReactNode;
   tourId?: string;
 }
+
+/**
+ * Etiqueta bajo el nombre del usuario.
+ *
+ * Aquí estaba cableado "Psicólogo" para cualquiera: es falso para el personal
+ * de recepción, que no da terapia, y fija el género en un mercado donde la
+ * mayoría de profesionales son mujeres. El único dato de rol que el producto
+ * tiene de verdad es `clinicRole`, así que se toma de ahí — en sustantivos de
+ * función, que en español no marcan género — y quien trabaja solo no lleva
+ * etiqueta, porque no hay nada que se sepa sobre su rol.
+ */
+const CLINIC_ROLE_LABEL: Record<ClinicRole, string> = {
+  OWNER: 'Titular de la clínica',
+  ADMIN: 'Administración de la clínica',
+  MEMBER: 'Equipo de la clínica',
+};
 
 const PSYCHOLOGIST_NAV: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, tourId: 'sidebar-dashboard' },
@@ -83,10 +104,19 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
     setIsQuickMenuOpen((v) => !v);
   };
 
-  const clinicNavItem: NavItem[] = user?.profile?.plan === 'CLINIC'
+  // Antes esto colgaba de `profile.plan`, que se elegía en el onboarding y no
+  // se podía cambiar: quien marcó "individual" nunca volvía a ver esta entrada.
+  // Ahora aparece cuando hay una clínica de verdad detrás. Crear una se
+  // descubre desde Configuración, disponible durante toda la prueba.
+  const clinicNavItem: NavItem[] = user?.clinicId
     ? [{ to: '/clinic', label: 'Clínica', icon: <Building2 size={20} /> }]
     : [];
-  const navItems = [...PSYCHOLOGIST_NAV, ...clinicNavItem];
+  const accessLogNavItem: NavItem = {
+    to: '/access-logs',
+    label: 'Accesos',
+    icon: <ShieldCheck size={20} />,
+  };
+  const navItems = [...PSYCHOLOGIST_NAV, ...clinicNavItem, accessLogNavItem];
 
   const handleLogout = async () => {
     setSidebarOpen(false);
@@ -102,8 +132,9 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
     });
   };
 
-  const userName = user?.fullName || user?.email?.split('@')[0] || 'Doctor';
+  const userName = user?.fullName || user?.email?.split('@')[0] || 'Profesional';
   const initials = userName.slice(0, 2).toUpperCase();
+  const roleLabel = user?.clinicRole ? CLINIC_ROLE_LABEL[user.clinicRole] : null;
 
   // Determine current page label for breadcrumb
   const currentNavItem = [...navItems, { to: '/settings', label: 'Configuración' }].find(
@@ -128,19 +159,18 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
         } lg:translate-x-0`}
       >
         {/* Logo */}
-        <div className="h-28 flex items-center justify-between px-5 border-b border-transparent dark:border-slate-800">
-          <div className="flex items-center gap-0">
-            <div className="w-28 h-28 overflow-hidden">
-              <img src="/logo.png" alt="Kio Health" className="w-full h-full object-contain" />
-            </div>
-            <span className="text-gray-400 dark:text-kanji text-lg ml-1">Health</span>
+        <div className="h-16 flex items-center justify-between px-5 border-b border-gray-200 dark:border-slate-800">
+          <div className="flex items-center gap-1">
+            <img src="/logo.png" alt="Kio Health" className="h-10 w-10 object-contain" />
+            <span className="text-kanji-deep dark:text-kio text-lg font-bold">Health</span>
           </div>
           <button
             type="button"
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-gray-400 hover:text-kanji"
+            aria-label="Cerrar menú de navegación"
+            className="lg:hidden flex h-11 w-11 items-center justify-center rounded-xl text-gray-600 hover:text-kanji-deep hover:bg-secondary dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-kio transition-colors"
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 
@@ -154,10 +184,10 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                   onClick={() => setSidebarOpen(false)}
                   {...(item.tourId ? { 'data-tour': item.tourId } : {})}
                   className={({ isActive }) =>
-                    `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative ${
+                    `group flex min-h-11 items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative ${
                       isActive
-                        ? 'bg-kio-light dark:bg-kio/10 text-kio'
-                        : 'text-gray-600 dark:text-slate-400 hover:bg-surface/80 dark:hover:bg-slate-800 hover:text-kanji dark:hover:text-kio'
+                        ? 'bg-kio-light dark:bg-kio/10 text-kanji-deep dark:text-kio'
+                        : 'text-gray-600 dark:text-slate-300 hover:bg-secondary dark:hover:bg-slate-800 hover:text-kanji-deep dark:hover:text-kio'
                     }`
                   }
                 >
@@ -167,7 +197,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                       {isActive && (
                         <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-kio rounded-r-full shadow-[0_0_10px_rgba(174,147,254,0.4)]" />
                       )}
-                      <span className={isActive ? 'text-kio' : 'text-gray-400 dark:text-slate-500 group-hover:text-kanji dark:group-hover:text-kio'}>
+                      <span className={isActive ? 'text-kio' : 'text-gray-600 dark:text-slate-300 group-hover:text-kanji-deep dark:group-hover:text-kio'}>
                         {item.icon}
                       </span>
                       {item.label}
@@ -186,10 +216,16 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
             onClick={() => setSidebarOpen(false)}
             data-tour="sidebar-settings"
             className={({ isActive }) =>
-              `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative ${
+              `group flex min-h-11 items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative ${
+                // Púrpura legible: sobre el velo lavanda en claro el texto va
+                // en `kanji-deep` (6.6:1), nunca en `kio` (2.2:1) ni en
+                // `kanji` (3.88:1, que solo aprueba para texto grande y esto
+                // es `text-sm`). Es la misma pareja que ya usa la navegación
+                // principal doce líneas más arriba; aquí se había quedado sin
+                // corregir. El par oscuro sigue siendo `kio`, donde sí contrasta.
                 isActive
-                  ? 'bg-kio-light dark:bg-kio/10 text-kio'
-                  : 'text-gray-600 dark:text-slate-400 hover:bg-surface/80 dark:hover:bg-slate-800 hover:text-kanji dark:hover:text-kio'
+                  ? 'bg-kio-light dark:bg-kio/10 text-kanji-deep dark:text-kio'
+                  : 'text-gray-600 dark:text-slate-400 hover:bg-surface/80 dark:hover:bg-slate-800 hover:text-kanji-deep dark:hover:text-kio'
               }`
             }
           >
@@ -198,7 +234,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                 {isActive && (
                   <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-kio rounded-r-full" />
                 )}
-                <Settings size={20} className={isActive ? 'text-kio' : 'text-gray-400 dark:text-slate-500 group-hover:text-kanji dark:group-hover:text-kio'} />
+                <Settings size={20} className={isActive ? 'text-kio' : 'text-gray-600 dark:text-slate-300 group-hover:text-kanji-deep dark:group-hover:text-kio'} />
                 Configuración
               </>
             )}
@@ -206,9 +242,9 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 dark:text-kanji hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-all duration-150"
+            className="w-full flex min-h-11 items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-700 dark:hover:text-rose-300 transition-colors duration-150"
           >
-            <LogOut size={20} />
+            <LogOut size={20} aria-hidden="true" />
             Cerrar sesión
           </button>
         </div>
@@ -223,17 +259,19 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-500 dark:text-slate-400 hover:text-kanji dark:hover:text-kio"
+              aria-label="Abrir menú de navegación"
+              aria-expanded={sidebarOpen}
+              className="lg:hidden flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-gray-600 hover:bg-secondary hover:text-kanji-deep dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-kio transition-colors"
             >
-              <Menu size={22} />
+              <Menu size={22} aria-hidden="true" />
             </button>
             {/* Logo — solo visible en móvil (el sidebar está oculto) */}
             <div className="lg:hidden flex items-center">
               <img src="/logo.png" alt="Kio" className="h-8 w-8 object-contain" />
             </div>
-            <span className="hidden sm:inline text-gray-400 dark:text-slate-500 font-medium">Inicio</span>
-            <ChevronRight size={14} className="hidden sm:inline text-gray-300 dark:text-slate-600" />
-            <span className="text-kanji dark:text-kio font-bold">{pageLabel}</span>
+            <span className="hidden sm:inline text-gray-600 dark:text-slate-300 font-medium">Inicio</span>
+            <ChevronRight size={14} aria-hidden="true" className="hidden sm:inline text-gray-500 dark:text-slate-400" />
+            <span className="text-kanji-deep dark:text-kio font-bold">{pageLabel}</span>
           </div>
 
           {/* Right side actions */}
@@ -245,7 +283,17 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                 type="button"
                 data-tour="tour-quick-actions"
                 onClick={openQuickMenu}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold text-white bg-kio shadow-md shadow-kio/20 hover:bg-kio/90 active:scale-95 transition-all duration-150"
+                aria-label="Crear nuevo paciente o cita"
+                aria-expanded={isQuickMenuOpen}
+                // `shadow-md shadow-kanji-deep/20` es la entrada "Marca" del
+                // vocabulario de sombra de DESIGN.md, no una excepción tácita:
+                // la sombra teñida del botón primario convive con la Regla del
+                // Plano en Reposo por diseño. Este botón vive en el shell, así
+                // que se pinta sobre todas las páginas y tiene que leerse igual
+                // que el resto de primarios del producto. Retirarla es un
+                // cambio de sistema (DESIGN.md + todos los primarios a la vez),
+                // nunca una decisión local de esta pantalla.
+                className="flex min-h-11 items-center gap-1.5 px-3.5 rounded-xl text-sm font-bold text-white bg-kanji-deep shadow-md shadow-kanji-deep/20 hover:bg-kanji-deep/90 active:scale-95 transition-all duration-150"
               >
                 <motion.span
                   animate={{ rotate: isQuickMenuOpen ? 45 : 0 }}
@@ -259,14 +307,16 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
             </div>
 
             {/* Portal dropdown — renderizado en body para escapar el stacking context del header */}
+            {/* Plain conditional, not AnimatePresence: its exit animation runs
+                but never unmounts the node here, leaving a stale menu in the
+                DOM after every close. Same defect as the guided tour. */}
             {createPortal(
-              <AnimatePresence>
+              <>
                 {isQuickMenuOpen && (
                   <motion.div
                     ref={quickMenuRef}
                     initial={{ opacity: 0, scale: 0.95, y: -6 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -6 }}
                     transition={{ duration: 0.15, ease: 'easeOut' }}
                     style={{ position: 'fixed', top: dropdownPos.top, right: dropdownPos.right }}
                     className="w-56 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-700 rounded-2xl shadow-xl shadow-black/10 dark:shadow-black/40 overflow-hidden z-[9999]"
@@ -277,10 +327,10 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                       className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors group"
                     >
                       <span className="w-8 h-8 rounded-xl bg-kio/10 dark:bg-kio/20 flex items-center justify-center shrink-0 group-hover:bg-kio/20 dark:group-hover:bg-kio/30 transition-colors">
-                        <UserPlus size={15} className="text-kio" />
+                        <UserPlus size={15} className="text-kanji-deep dark:text-kio" />
                       </span>
                       <div className="text-left">
-                        <p className="text-sm font-semibold text-kanji dark:text-white leading-tight">Nuevo Paciente</p>
+                        <p className="text-sm font-semibold text-kanji-deep dark:text-white leading-tight">Nuevo paciente</p>
                         <p className="text-xs text-gray-400 dark:text-slate-500 leading-tight mt-0.5">Registrar expediente</p>
                       </div>
                     </button>
@@ -296,13 +346,13 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
                         <CalendarPlus size={15} className="text-emerald-600 dark:text-emerald-400" />
                       </span>
                       <div className="text-left">
-                        <p className="text-sm font-semibold text-kanji dark:text-white leading-tight">Nueva Cita</p>
+                        <p className="text-sm font-semibold text-kanji-deep dark:text-white leading-tight">Nueva cita</p>
                         <p className="text-xs text-gray-400 dark:text-slate-500 leading-tight mt-0.5">Agendar sesión</p>
                       </div>
                     </button>
                   </motion.div>
                 )}
-              </AnimatePresence>,
+              </>,
               document.body,
             )}
 
@@ -311,10 +361,10 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
             <ThemeToggle />
             <div className="w-px h-6 bg-gray-200 dark:bg-slate-700 mx-1" />
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium text-kanji dark:text-kio">{userName}</p>
-              <p className="text-xs text-gray-400 dark:text-kanji">
-                Psicólogo
-              </p>
+              <p className="text-sm font-bold text-kanji-deep dark:text-kio">{userName}</p>
+              {roleLabel && (
+                <p className="text-xs font-medium text-gray-600 dark:text-slate-300">{roleLabel}</p>
+              )}
             </div>
             <div className="w-10 h-10 bg-gradient-to-br from-kio to-kanji rounded-full flex items-center justify-center shadow-sm ring-2 ring-surface dark:ring-slate-800">
               <span className="text-white font-semibold text-sm">{initials}</span>
@@ -323,7 +373,10 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 overflow-auto">{children}</main>
+        <main className="flex-1 p-4 sm:p-6 overflow-auto">
+          <TrialBanner />
+          {children}
+        </main>
 
         {/* Global Modals */}
         <PatientModal 

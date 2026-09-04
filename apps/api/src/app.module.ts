@@ -25,6 +25,9 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { AddendumsModule } from './addendums/addendums.module';
 import { RiskFlagsModule } from './risk-flags/risk-flags.module';
 import { RemindersModule } from './reminders/reminders.module';
+import { PortalModule } from './portal/portal.module';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { TrialGuard } from './auth/guards/trial.guard';
 
 @Module({
   imports: [
@@ -56,13 +59,27 @@ import { RemindersModule } from './reminders/reminders.module';
     AddendumsModule,
     RiskFlagsModule,
     RemindersModule,
+    PortalModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
+    // El orden importa: ThrottlerGuard corre primero (rate-limit aplica también
+    // a endpoints públicos), luego JwtAuthGuard exige token salvo en @Public().
+    // Con JwtAuthGuard global, TODA ruta nueva nace protegida por defecto.
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    // Tercero, y el orden importa: lee `request.user`, que solo existe después
+    // de que JwtAuthGuard haya validado el token.
+    {
+      provide: APP_GUARD,
+      useClass: TrialGuard,
     },
   ],
 })

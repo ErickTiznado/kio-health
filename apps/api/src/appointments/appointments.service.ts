@@ -1,5 +1,6 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   ForbiddenException,
   BadRequestException,
@@ -17,7 +18,11 @@ import {
 import { CreateClinicalScaleDto } from './dto/create-clinical-scale.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { EncryptionService } from '../lib/encryption.service';
-import { ScaleType, ScaleRiskLevel } from '#generated/prisma';
+import { isValidTimeZone, zonedDayKey, zonedRange } from '../lib/timezone.util';
+import {
+  validateScaleScores,
+  calculateScaleRiskLevel,
+} from '../lib/scales.util';
 import { ExportService } from '../export/export.service';
 import { GoogleCalendarService } from '../integrations/google-calendar.service';
 
@@ -27,8 +32,18 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { startOfMonth, endOfMonth } from 'date-fns';
 
+import type { Prisma } from '#generated/prisma';
+
+/**
+ * Tope de ids devueltos por `getPendingNotesCount`. El `count` sigue siendo
+ * exacto; esto solo acota el payload — nadie enlaza a doscientas sesiones.
+ */
+const PENDING_NOTES_ID_CAP = 50;
+
 @Injectable()
 export class AppointmentsService {
+  private readonly logger = new Logger(AppointmentsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly exportService: ExportService,
@@ -71,40 +86,49 @@ export class AppointmentsService {
     dateString?: string,
     from?: string,
     to?: string,
+    tz?: string,
   ) {
-    let startOfRange: Date;
-    let endOfRange: Date;
+    const zone = tz && isValidTimeZone(tz) ? tz : 'UTC';
 
-    if (from && to) {
-      startOfRange = new Date(from);
-      startOfRange.setHours(0, 0, 0, 0);
-      endOfRange = new Date(to);
-      endOfRange.setDate(endOfRange.getDate() + 1); // Buffer for timezone spillover
-      endOfRange.setHours(23, 59, 59, 999);
-    } else {
-      const targetDate = dateString ? new Date(dateString) : new Date();
-      startOfRange = new Date(targetDate);
-      startOfRange.setHours(0, 0, 0, 0);
-      endOfRange = new Date(targetDate);
-      endOfRange.setDate(endOfRange.getDate() + 1); // Buffer
-      endOfRange.setHours(23, 59, 59, 999);
-    }
+    // Day boundaries are the CLINICIAN's, computed in `zone`. The previous
+    // implementation parsed the date as UTC, snapped it with `setHours` in the
+    // server's zone and then padded a whole extra day "for spillover" — a
+    // two-day window starting one day early, which is how "Agenda de hoy" ended
+    // up listing yesterday's sessions.
+    const day = dateString ?? zonedDayKey(new Date(), zone);
+    const { start: startOfRange, end: endOfRange } =
+      from && to ? zonedRange(from, to, zone) : zonedRange(day, day, zone);
 
     const results = await this.prisma.appointment.findMany({
       where: {
         clinicianId: clinicianId,
-        startTime: { gte: startOfRange, lte: endOfRange },
+        // Half-open: `lt`, not `lte`. The end instant is the next day's start.
+        startTime: { gte: startOfRange, lt: endOfRange },
       },
       include: {
         patient: { select: { id: true, fullName: true } },
-        reminder: {
+        // Solo el recordatorio principal; el shape hacia el frontend sigue
+        // siendo `reminder` singular (ver map de abajo).
+        reminders: {
+          where: { kind: 'PRIMARY' },
           select: { status: true, sentAt: true, confirmedAt: true },
+          take: 1,
         },
+        // SOLO el `id`. `content` y `privateNotes` van cifrados (AES-256-GCM,
+        // ver `exportPdf`): incluirlos volcaria blobs cifrados en cada celda de
+        // la agenda. Y ni el id sale al cliente: abajo se colapsa a `hasNote`.
+        psychNote: { select: { id: true } },
       },
       orderBy: { startTime: 'asc' },
     });
 
-    return results;
+    return results.map(({ reminders, psychNote, ...apt }) => ({
+      ...apt,
+      reminder: reminders[0] ?? null,
+      // La agenda solo necesita saber SI hay nota (filtro `?pendingNotes=true`).
+      // Un booleano no filtra ids de notas clinicas a una vista de calendario.
+      hasNote: psychNote !== null,
+    }));
   }
 
   /**
@@ -152,16 +176,19 @@ export class AppointmentsService {
    * Get a count of appointments per day for a given date range.
    * Used for the availability calendar widget.
    */
-  async getDaySummary(clinicianId: string, from: string, to: string) {
-    const startOfRange = new Date(from);
-    startOfRange.setHours(0, 0, 0, 0);
-    const endOfRange = new Date(to);
-    endOfRange.setHours(23, 59, 59, 999);
+  async getDaySummary(
+    clinicianId: string,
+    from: string,
+    to: string,
+    tz?: string,
+  ) {
+    const zone = tz && isValidTimeZone(tz) ? tz : 'UTC';
+    const { start: startOfRange, end: endOfRange } = zonedRange(from, to, zone);
 
     const appointments = await this.prisma.appointment.findMany({
       where: {
         clinicianId: clinicianId,
-        startTime: { gte: startOfRange, lte: endOfRange },
+        startTime: { gte: startOfRange, lt: endOfRange },
         status: { not: 'CANCELLED' },
       },
       select: { id: true, startTime: true, endTime: true },
@@ -182,7 +209,10 @@ export class AppointmentsService {
     > = {};
 
     for (const apt of appointments) {
-      const dayKey = apt.startTime.toISOString().split('T')[0];
+      // Bucket by the clinician's calendar day, not by UTC. Grouping on
+      // `toISOString()` split a single local evening across two cells, which is
+      // why the availability grid and the agenda reported different counts.
+      const dayKey = zonedDayKey(apt.startTime, zone);
 
       if (!summary[dayKey]) {
         summary[dayKey] = { count: 0, appointments: [] };
@@ -225,9 +255,16 @@ export class AppointmentsService {
             clinicalContext: true,
           },
         },
-        reminder: {
+        reminders: {
+          where: { kind: 'PRIMARY' },
           select: { status: true, sentAt: true, confirmedAt: true },
+          take: 1,
         },
+        // Mismo criterio que `findByDate`: solo el id, y hacia fuera un
+        // booleano. Aqui la cita es SCHEDULED y futura, asi que casi siempre
+        // sera `false`; se incluye para que el shape de una cita sea el mismo
+        // en `GET /appointments` y en `GET /appointments/next`.
+        psychNote: { select: { id: true } },
       },
       orderBy: { startTime: 'asc' },
     });
@@ -254,27 +291,64 @@ export class AppointmentsService {
       },
     });
 
+    const { reminders, psychNote, ...appointmentRest } = appointment;
+
     return {
-      ...appointment,
+      ...appointmentRest,
+      reminder: reminders[0] ?? null,
+      hasNote: psychNote !== null,
       patient: decryptedPatient,
       sessionNumber: completedSessions + 1,
     };
   }
 
   /**
-   * Count completed appointments that don't have an associated psych note yet.
-   * Used by the PendingNotesWidget on the dashboard.
+   * Citas completadas que todavia no tienen nota clinica.
+   *
+   * Sin `from`/`to` cuenta el historico completo — exactamente lo de siempre,
+   * que es lo que el dashboard llama hoy. Con rango aplica el mismo techo
+   * temporal que `findByDate` y `getDaySummary` (`zonedRange` sobre la zona del
+   * clinico), para que el numero del dashboard y el de la agenda puedan hablar
+   * del mismo periodo en vez de contradecirse.
+   *
+   * Devuelve tambien los ids, acotados a `PENDING_NOTES_ID_CAP`, para poder
+   * enlazar directo a `/session/:id` cuando se debe una sola nota. `count` es
+   * siempre exacto aunque `appointmentIds` venga truncado.
    */
-  async getPendingNotesCount(clinicianId: string): Promise<{ count: number }> {
-    const count = await this.prisma.appointment.count({
-      where: {
-        clinicianId: clinicianId,
-        status: 'COMPLETED',
-        psychNote: null,
-      },
-    });
+  async getPendingNotesCount(
+    clinicianId: string,
+    from?: string,
+    to?: string,
+    tz?: string,
+  ): Promise<{ count: number; appointmentIds: string[] }> {
+    const where: Prisma.AppointmentWhereInput = {
+      clinicianId: clinicianId,
+      status: 'COMPLETED',
+      psychNote: null,
+    };
 
-    return { count };
+    // Rango solo si vienen los dos extremos; el DTO ya rechaza medio rango.
+    if (from && to) {
+      const zone = tz && isValidTimeZone(tz) ? tz : 'UTC';
+      const { start, end } = zonedRange(from, to, zone);
+      // Half-open igual que en findByDate: `end` es el arranque del dia
+      // siguiente, nunca `lte`.
+      where.startTime = { gte: start, lt: end };
+    }
+
+    const [count, pending] = await Promise.all([
+      this.prisma.appointment.count({ where }),
+      this.prisma.appointment.findMany({
+        where,
+        select: { id: true },
+        // Mas reciente primero: la nota que se acaba de deber es la que el
+        // clinico busca al pulsar el widget.
+        orderBy: { startTime: 'desc' },
+        take: PENDING_NOTES_ID_CAP,
+      }),
+    ]);
+
+    return { count, appointmentIds: pending.map((apt) => apt.id) };
   }
 
   /**
@@ -341,6 +415,14 @@ export class AppointmentsService {
         emergencyContact: patient.emergencyContact
           ? JSON.parse(this.encryptionService.decrypt(patient.emergencyContact))
           : null,
+        // Alergias y medicación alimentan el panel de contexto clínico de la
+        // sesión. Sin descifrar aquí llegaban al front como ciphertext.
+        medicacionActual: patient.medicacionActual
+          ? this.encryptionService.decrypt(patient.medicacionActual)
+          : null,
+        alergias: patient.alergias
+          ? this.encryptionService.decrypt(patient.alergias)
+          : null,
       },
       lastVisit: lastVisit?.startTime || null,
       sessionNumber,
@@ -355,10 +437,8 @@ export class AppointmentsService {
    * Decrypts private notes before returning.
    */
   async getPsychNote(clinicianId: string, appointmentId: string) {
-    const appointment = await this.findAppointmentOrFail(
-      appointmentId,
-      clinicianId,
-    );
+    // Verifica pertenencia; el registro en si no se usa aqui.
+    await this.findAppointmentOrFail(appointmentId, clinicianId);
 
     const note = await this.prisma.psychNote.findUnique({
       where: { appointmentId },
@@ -458,47 +538,13 @@ export class AppointmentsService {
       }
     });
 
-    // --- Risk Flags Calculation ---
-    try {
-      const scales = await this.prisma.clinicalScale.findMany({
-        where: { appointmentId },
-      });
-      const phq9Score = scales.find((s) => s.scaleType === 'PHQ9')?.totalScore;
-      const gad7Score = scales.find((s) => s.scaleType === 'GAD7')?.totalScore;
-      const tags = dto.tags || [];
-
-      // Find previous appointment to get delta
-      const previousAppointment = await this.prisma.appointment.findFirst({
-        where: {
-          patientId: appointment.patientId,
-          clinicianId,
-          status: 'COMPLETED',
-          startTime: { lt: appointment.startTime },
-        },
-        orderBy: { startTime: 'desc' },
-      });
-
-      let previousPhq9Score: number | undefined;
-      if (previousAppointment) {
-        const prevScales = await this.prisma.clinicalScale.findMany({
-          where: { appointmentId: previousAppointment.id },
-        });
-        previousPhq9Score = prevScales.find((s) => s.scaleType === 'PHQ9')?.totalScore;
-      }
-
-      const flagTypes = await this.riskFlagsService.calculateRiskFlags({
-        patientId: appointment.patientId,
-        phq9Score,
-        gad7Score,
-        tags,
-        previousPhq9Score,
-      });
-
-      // Always update to synchronize current state
-      await this.riskFlagsService.updateRiskFlags(appointment.patientId, flagTypes);
-    } catch (e) {
-      console.error('Error calculating risk flags:', e);
-    }
+    // --- Risk Flags Calculation (compartido con escalas y portal) ---
+    await this.riskFlagsService.recalculateForAppointment({
+      patientId: appointment.patientId,
+      clinicianId,
+      appointmentId,
+      tags: dto.tags || [],
+    });
 
     return result;
   }
@@ -529,10 +575,8 @@ export class AppointmentsService {
   }
 
   async togglePin(clinicianId: string, appointmentId: string) {
-    const appointment = await this.findAppointmentOrFail(
-      appointmentId,
-      clinicianId,
-    );
+    // Verifica pertenencia; el registro en si no se usa aqui.
+    await this.findAppointmentOrFail(appointmentId, clinicianId);
 
     const note = await this.prisma.psychNote.findUnique({
       where: { appointmentId },
@@ -601,17 +645,12 @@ export class AppointmentsService {
       clinicianId,
     );
 
-    const expectedLength = dto.scaleType === ScaleType.PHQ9 ? 9 : 7;
-    if (dto.scores.length !== expectedLength) {
-      throw new BadRequestException(
-        `${dto.scaleType} requires exactly ${expectedLength} scores, got ${dto.scores.length}`,
-      );
-    }
+    validateScaleScores(dto.scaleType, dto.scores);
 
     const totalScore = dto.scores.reduce((a, b) => a + b, 0);
-    const riskLevel = this.calculateScaleRiskLevel(dto.scaleType, totalScore);
+    const riskLevel = calculateScaleRiskLevel(dto.scaleType, totalScore);
 
-    return this.prisma.clinicalScale.upsert({
+    const scale = await this.prisma.clinicalScale.upsert({
       where: {
         appointmentId_scaleType: {
           appointmentId,
@@ -622,6 +661,8 @@ export class AppointmentsService {
         scores: dto.scores,
         totalScore,
         riskLevel,
+        // Re-entrada del clínico sobreescribe el auto-reporte del paciente.
+        source: 'CLINICIAN',
       },
       create: {
         appointmentId,
@@ -630,27 +671,19 @@ export class AppointmentsService {
         scores: dto.scores,
         totalScore,
         riskLevel,
+        source: 'CLINICIAN',
       },
     });
-  }
 
-  private calculateScaleRiskLevel(
-    scaleType: ScaleType,
-    total: number,
-  ): ScaleRiskLevel {
-    if (scaleType === ScaleType.PHQ9) {
-      if (total <= 4) return ScaleRiskLevel.MINIMAL;
-      if (total <= 9) return ScaleRiskLevel.MILD;
-      if (total <= 14) return ScaleRiskLevel.MODERATE;
-      if (total <= 19) return ScaleRiskLevel.MODERATELY_SEVERE;
-      return ScaleRiskLevel.SEVERE;
-    } else {
-      // GAD-7
-      if (total <= 4) return ScaleRiskLevel.MINIMAL;
-      if (total <= 9) return ScaleRiskLevel.MILD;
-      if (total <= 14) return ScaleRiskLevel.MODERATE;
-      return ScaleRiskLevel.SEVERE;
-    }
+    // Antes las banderas solo se recalculaban al guardar la nota; ahora
+    // también al guardar la escala (el método nunca lanza).
+    await this.riskFlagsService.recalculateForAppointment({
+      patientId: appointment.patientId,
+      clinicianId,
+      appointmentId,
+    });
+
+    return scale;
   }
 
   /* ── Status transition methods ─────────────────── */
@@ -799,14 +832,15 @@ export class AppointmentsService {
 
   /**
    * Check if a time range overlaps with any existing appointment for the clinician.
-   * Excludes CANCELLED and NO_SHOW statuses.
+   * Excludes CANCELLED and NO_SHOW statuses. Public: SeriesService lo usa para
+   * saltar (no abortar) ocurrencias en conflicto al materializar una serie.
    */
-  private async validateOverlap(
+  async hasOverlap(
     clinicianId: string,
     start: Date,
     end: Date,
     excludeAppointmentId?: string,
-  ) {
+  ): Promise<boolean> {
     const overlapping = await this.prisma.appointment.findFirst({
       where: {
         clinicianId,
@@ -814,9 +848,20 @@ export class AppointmentsService {
         id: excludeAppointmentId ? { not: excludeAppointmentId } : undefined,
         AND: [{ startTime: { lt: end } }, { endTime: { gt: start } }],
       },
+      select: { id: true },
     });
 
-    if (overlapping) {
+    return overlapping !== null;
+  }
+
+  /** Variante que lanza ConflictException — flujo de cita individual. */
+  private async validateOverlap(
+    clinicianId: string,
+    start: Date,
+    end: Date,
+    excludeAppointmentId?: string,
+  ) {
+    if (await this.hasOverlap(clinicianId, start, end, excludeAppointmentId)) {
       throw new ConflictException(
         'El horario seleccionado entra en conflicto con otra cita existente.',
       );
@@ -867,9 +912,54 @@ export class AppointmentsService {
     });
 
     if (updated.googleEventId) {
-      await this.googleCalendarService.deleteAppointment(clinicianId, updated.googleEventId);
+      await this.googleCalendarService.deleteAppointment(
+        clinicianId,
+        updated.googleEventId,
+      );
     }
 
+    this.eventEmitter.emit('appointment.cancelled', { appointment: updated });
+
+    return updated;
+  }
+
+  /**
+   * Cancel a scheduled appointment on behalf of the PATIENT (portal/email link).
+   * Ownership at query level: the appointment must belong to that patient —
+   * a foreign appointment is simply not found. No clinician session involved.
+   */
+  async cancelByPatient(appointmentId: string, patientId: string) {
+    const appointment = await this.prisma.appointment.findFirst({
+      where: { id: appointmentId, patientId, status: 'SCHEDULED' },
+      select: { id: true, clinicianId: true },
+    });
+
+    if (!appointment) {
+      throw new NotFoundException('Cita no encontrada');
+    }
+
+    const updated = await this.prisma.appointment.update({
+      where: { id: appointment.id },
+      data: { status: 'CANCELLED', cancelledBy: 'PATIENT' },
+      include: {
+        patient: { select: { id: true, fullName: true } },
+        clinician: {
+          select: {
+            timezone: true,
+            user: { select: { email: true, fullName: true } },
+          },
+        },
+      },
+    });
+
+    if (updated.googleEventId) {
+      await this.googleCalendarService.deleteAppointment(
+        appointment.clinicianId,
+        updated.googleEventId,
+      );
+    }
+
+    // El listener existente cancela los recordatorios PENDING.
     this.eventEmitter.emit('appointment.cancelled', { appointment: updated });
 
     return updated;
@@ -901,10 +991,8 @@ export class AppointmentsService {
    * Update administrative/simple notes for an appointment.
    */
   async updateNotes(clinicianId: string, appointmentId: string, notes: string) {
-    const appointment = await this.findAppointmentOrFail(
-      appointmentId,
-      clinicianId,
-    );
+    // Verifica pertenencia; el registro en si no se usa aqui.
+    await this.findAppointmentOrFail(appointmentId, clinicianId);
 
     return this.prisma.appointment.update({
       where: { id: appointmentId },
@@ -921,10 +1009,8 @@ export class AppointmentsService {
     appointmentId: string,
     dto: UpdatePaymentDto,
   ) {
-    const appointment = await this.findAppointmentOrFail(
-      appointmentId,
-      clinicianId,
-    );
+    // Verifica pertenencia; el registro en si no se usa aqui.
+    await this.findAppointmentOrFail(appointmentId, clinicianId);
 
     const result = await this.prisma.$transaction(async (tx) => {
       // 1. Update Appointment
@@ -974,6 +1060,14 @@ export class AppointmentsService {
       clinicianId,
     );
 
+    // Una cita de serie ya tiene su siguiente sesión materializada — crear
+    // otra a mano duplicaría el slot recurrente.
+    if (appointment.seriesId && dto.nextAppointmentDate) {
+      throw new BadRequestException(
+        'Esta cita pertenece a una serie recurrente: la próxima sesión ya está agendada automáticamente.',
+      );
+    }
+
     const result = await this.prisma.$transaction(async (tx) => {
       // 1. Mark appointment as completed with payment info
       const updatedAppointment = await tx.appointment.update({
@@ -990,6 +1084,18 @@ export class AppointmentsService {
       });
 
       // 2. Create finance transaction linked to appointment
+      //
+      // `date` se deja SIN pasar a proposito: cae al `@default(now())` del
+      // schema, es decir el instante real del cobro. Es criterio de caja — el
+      // dinero entra cuando se cierra la sesion, no en la fecha civil de la
+      // cita — y ademas evita que un checkout hecho al dia siguiente reabra el
+      // total de un mes ya cerrado.
+      //
+      // Contrapartida asumida: los movimientos creados a mano en finance si
+      // llevan fecha civil (el usuario la elige). Si el carril de finance pasa
+      // a normalizar `date` a medianoche civil para TODOS los movimientos, este
+      // punto deja de ser coherente y hay que decidirlo alli, no aqui: la
+      // semantica de un ingreso automatico la fija el modulo que lo lee.
       await tx.financeTransaction.create({
         data: {
           clinicianId: clinicianId,

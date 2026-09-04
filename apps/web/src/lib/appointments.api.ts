@@ -31,7 +31,7 @@ export async function fetchAppointmentsByDate(
   date: string,
 ): Promise<Appointment[]> {
   const response = await api.get<Appointment[]>('/appointments', {
-    params: { date },
+    params: { date, tz: getClientTimeZone() },
   });
   return response.data;
 }
@@ -46,7 +46,7 @@ export async function fetchAppointmentsByRange(
   to: string,
 ): Promise<Appointment[]> {
   const response = await api.get<Appointment[]>('/appointments', {
-    params: { from, to },
+    params: { from, to, tz: getClientTimeZone() },
   });
   return response.data;
 }
@@ -86,13 +86,17 @@ export async function fetchDaySummary(
   to: string,
 ): Promise<DaySummary> {
   const response = await api.get<DaySummary>('/appointments/day-summary', {
-    params: { from, to },
+    params: { from, to, tz: getClientTimeZone() },
   });
   return response.data;
 }
 
 /**
  * Get the next upcoming scheduled appointment from now onwards.
+ *
+ * El payload trae `hasNote`, pero aquí la cita es futura y `SCHEDULED`: será
+ * `false` casi siempre y eso NO significa "nota pendiente". Una nota pendiente
+ * exige `status === 'COMPLETED'` (ver `hasPendingNote` en `AgendaPage`).
  */
 export async function fetchNextAppointment(): Promise<Appointment | null> {
   const response = await api.get<Appointment | null>('/appointments/next');
@@ -180,11 +184,67 @@ export async function rescheduleAppointment(appointmentId: string, payload: Resc
   return response.data;
 }
 
+/* ── Series recurrentes ─────────────────────── */
+
+export interface CreateSeriesPayload {
+  patientId: string;
+  startTime: string;
+  frequency: 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY';
+  type?: string;
+  reason?: string;
+  price?: number;
+  duration?: number;
+  until?: string;
+  maxOccurrences?: number;
+}
+
+export interface CreateSeriesResponse {
+  series: { id: string; status: string };
+  created: Appointment[];
+  /** Fechas ISO de ocurrencias saltadas por conflicto de horario. */
+  conflicts: string[];
+}
+
+export async function createAppointmentSeries(
+  payload: CreateSeriesPayload,
+): Promise<CreateSeriesResponse> {
+  const response = await api.post<CreateSeriesResponse>(
+    '/appointment-series',
+    payload,
+  );
+  return response.data;
+}
+
+export async function cancelAppointmentSeries(
+  seriesId: string,
+): Promise<{ cancelled: number }> {
+  const response = await api.delete<{ cancelled: number }>(
+    `/appointment-series/${seriesId}`,
+  );
+  return response.data;
+}
+
 /**
- * Get today's date in YYYY-MM-DD format
+ * The clinician's IANA timezone, as reported by the browser. Sent with every
+ * date-scoped query so the server computes day boundaries in the clinician's
+ * zone instead of its own.
+ */
+export function getClientTimeZone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+}
+
+/**
+ * Today's date as YYYY-MM-DD in LOCAL time.
+ *
+ * This used to be `toISOString().split('T')[0]`, i.e. the UTC date. West of
+ * Greenwich that flips to tomorrow in the evening — precisely during the
+ * "closing the day" window — so the dashboard asked for the wrong day and then
+ * rendered the answer under the heading "Agenda de hoy".
  */
 export function getTodayDateString(): string {
-  return new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
 /* ── Clinical Notes ─────────────────────────── */

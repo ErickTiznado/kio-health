@@ -39,9 +39,15 @@ describe('EncryptionService', () => {
     });
 
     it('round-trip with JSON-stringified objects (emergencyContact pattern)', () => {
-      const contact = JSON.stringify({ name: 'María', phone: '+52 55 1234 5678' });
+      const contact = JSON.stringify({
+        name: 'María',
+        phone: '+52 55 1234 5678',
+      });
       const decrypted = service.decrypt(service.encrypt(contact));
-      expect(JSON.parse(decrypted)).toEqual({ name: 'María', phone: '+52 55 1234 5678' });
+      expect(JSON.parse(decrypted)).toEqual({
+        name: 'María',
+        phone: '+52 55 1234 5678',
+      });
     });
 
     it('throws on tampered ciphertext bytes', () => {
@@ -49,31 +55,44 @@ describe('EncryptionService', () => {
       const parts = encrypted.split(':');
       // Flip last byte of ciphertext
       const hex = parts[2];
-      const tampered = hex.slice(0, -2) + (hex.slice(-2) === 'ff' ? '00' : 'ff');
-      expect(() => service.decrypt(`${parts[0]}:${parts[1]}:${tampered}`)).toThrow();
+      const tampered =
+        hex.slice(0, -2) + (hex.slice(-2) === 'ff' ? '00' : 'ff');
+      expect(() =>
+        service.decrypt(`${parts[0]}:${parts[1]}:${tampered}`),
+      ).toThrow();
     });
 
     it('throws on tampered auth tag', () => {
       const encrypted = service.encrypt('secret');
       const parts = encrypted.split(':');
       const badTag = 'a'.repeat(parts[1].length);
-      expect(() => service.decrypt(`${parts[0]}:${badTag}:${parts[2]}`)).toThrow();
+      expect(() =>
+        service.decrypt(`${parts[0]}:${badTag}:${parts[2]}`),
+      ).toThrow();
     });
 
     it('throws on tampered IV (auth tag mismatch)', () => {
       const encrypted = service.encrypt('secret');
       const parts = encrypted.split(':');
       const badIv = 'b'.repeat(parts[0].length);
-      expect(() => service.decrypt(`${badIv}:${parts[1]}:${parts[2]}`)).toThrow();
+      expect(() =>
+        service.decrypt(`${badIv}:${parts[1]}:${parts[2]}`),
+      ).toThrow();
     });
 
     it('throws if format does not have 3 parts — too few', () => {
-      expect(() => service.decrypt('onlyone')).toThrow('Invalid encrypted text format.');
-      expect(() => service.decrypt('two:parts')).toThrow('Invalid encrypted text format.');
+      expect(() => service.decrypt('onlyone')).toThrow(
+        'Invalid encrypted text format.',
+      );
+      expect(() => service.decrypt('two:parts')).toThrow(
+        'Invalid encrypted text format.',
+      );
     });
 
     it('throws if format has too many parts', () => {
-      expect(() => service.decrypt('a:b:c:d')).toThrow('Invalid encrypted text format.');
+      expect(() => service.decrypt('a:b:c:d')).toThrow(
+        'Invalid encrypted text format.',
+      );
     });
 
     it('propagates error — does not return garbage silently', () => {

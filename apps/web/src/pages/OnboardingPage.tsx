@@ -5,8 +5,19 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuthStore } from '../stores/auth.store';
 import { completeProfile } from '../lib/auth.api';
+import { capture } from '../lib/analytics';
+import type { OnboardingStepName } from '../lib/analytics.events';
 import { toast } from 'sonner';
-import { BrainCircuit, BadgeCheck, Settings2, ChevronRight, ChevronLeft, Loader2, User, Building2 } from 'lucide-react';
+import {
+  BrainCircuit,
+  BadgeCheck,
+  Settings2,
+  Check,
+  ChevronRight,
+  ChevronLeft,
+  Loader2,
+  Gift,
+} from 'lucide-react';
 
 const CURRENCIES = [
   { code: 'USD', label: 'USD — Dólar estadounidense' },
@@ -55,7 +66,6 @@ const onboardingSchema = z.object({
     .number()
     .min(0, 'El precio no puede ser negativo')
     .max(99999, 'El precio no puede superar 99,999'),
-  plan: z.enum(['INDIVIDUAL', 'CLINIC']),
 });
 
 type FormData = z.infer<typeof onboardingSchema>;
@@ -76,12 +86,30 @@ function loadDraft(): Partial<FormData> {
   }
 }
 
+/**
+ * Dos pasos, no tres. El antiguo paso 1 ("¿Cuál es tu especialidad?") era una
+ * decisión falsa: un único botón ya seleccionado, imposible de deseleccionar,
+ * seguido de "Continuar". El perfil siempre se crea como `PSYCHOLOGIST`, así
+ * que el hecho se enuncia en la cabecera en vez de disfrazarse de elección.
+ */
 const STEPS = [
-  { id: 1, label: 'Especialidad', icon: BrainCircuit },
-  { id: 2, label: 'Plan', icon: User },
-  { id: 3, label: 'Práctica', icon: BadgeCheck },
-  { id: 4, label: 'Sesiones', icon: Settings2 },
+  { id: 1, label: 'Práctica', icon: BadgeCheck },
+  { id: 2, label: 'Sesiones', icon: Settings2 },
 ];
+
+const LAST_STEP = STEPS.length;
+
+/** Nombre estable por paso: el número solo no sobrevive a un reordenamiento. */
+const STEP_EVENT_NAMES: Record<number, OnboardingStepName> = {
+  1: 'practica',
+  2: 'sesiones',
+};
+
+/** Qué campo pertenece a qué paso, para saltar al primero que falló. */
+const STEP_FIELDS: Record<number, string[]> = {
+  1: ['currency', 'licenseNumber'],
+  2: ['sessionDefaultDuration', 'sessionDefaultPrice'],
+};
 
 export function OnboardingPage() {
   const navigate = useNavigate();
@@ -101,9 +129,15 @@ export function OnboardingPage() {
       currency: draft.currency ?? 'USD',
       sessionDefaultDuration: draft.sessionDefaultDuration ?? 50,
       sessionDefaultPrice: draft.sessionDefaultPrice ?? 0,
-      plan: draft.plan ?? 'INDIVIDUAL',
     },
   });
+
+  // Registrar cada paso es lo que convierte "creo que el onboarding es largo"
+  // en "el 60% se cae en el paso 2". El abandono se deduce: visto el paso N y
+  // nunca `onboarding_completed`.
+  useEffect(() => {
+    capture('onboarding_step_viewed', { step, step_name: STEP_EVENT_NAMES[step] });
+  }, [step]);
 
   // Persist form state to sessionStorage using subscription (avoids object-ref churn)
   useEffect(() => {
@@ -129,12 +163,18 @@ export function OnboardingPage() {
       try {
         await completeProfile({
           type: 'PSYCHOLOGIST',
-          plan: data.plan,
           licenseNumber: data.licenseNumber || undefined,
           currency: data.currency,
           sessionDefaultDuration: Number(data.sessionDefaultDuration),
           sessionDefaultPrice: Number(data.sessionDefaultPrice),
         });
+        capture('onboarding_completed', {
+          currency: data.currency,
+          has_license: Boolean(data.licenseNumber),
+          session_duration_minutes: Number(data.sessionDefaultDuration),
+          price_left_at_zero: Number(data.sessionDefaultPrice) === 0,
+        });
+
         sessionStorage.removeItem(SESSION_STORAGE_KEY);
         await fetchCurrentUser();
         toast.success('¡Perfil completado! Bienvenido a Kio Health.');
@@ -148,13 +188,8 @@ export function OnboardingPage() {
     // Called when Zod validation fails — go to the first step with an error
     (validationErrors) => {
       const fields = Object.keys(validationErrors);
-      const stepFields: Record<number, string[]> = {
-        2: ['plan'],
-        3: ['currency', 'licenseNumber'],
-        4: ['sessionDefaultDuration', 'sessionDefaultPrice'],
-      };
-      for (let s = 2; s <= 4; s++) {
-        if (stepFields[s].some((f) => fields.includes(f))) {
+      for (let s = 1; s <= LAST_STEP; s++) {
+        if (STEP_FIELDS[s].some((f) => fields.includes(f))) {
           setStep(s);
           toast.error('Por favor completa todos los campos requeridos.');
           return;
@@ -165,7 +200,7 @@ export function OnboardingPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-bg via-bg to-kio/5 dark:from-slate-950 dark:via-slate-950 dark:to-kio/10 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-bg dark:bg-slate-950 flex items-center justify-center px-4 py-8">
       <div className="max-w-lg w-full">
 
         {/* Logo */}
@@ -173,9 +208,25 @@ export function OnboardingPage() {
           <div className="inline-flex items-center justify-center w-44 h-44 rounded-2xl mb-4 overflow-hidden">
             <img src="/logo.png" alt="Kio Health" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-2xl font-bold text-kanji dark:text-white">Configura tu perfil</h1>
-          <p className="text-text/60 dark:text-slate-400 text-sm mt-1">
-            Hola, <strong>{user?.fullName || user?.email?.split('@')[0]}</strong> — solo necesitamos unos datos para empezar.
+          <h1 className="text-2xl font-bold text-kanji-deep dark:text-white">Configura tu perfil</h1>
+          <p className="mt-1 text-sm font-medium text-text-secondary">
+            Hola, <strong className="font-bold text-text dark:text-slate-200">{user?.fullName || user?.email?.split('@')[0]}</strong> — solo necesitamos unos datos para empezar.
+          </p>
+
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-cruz bg-surface px-3.5 py-1.5 dark:border-slate-700 dark:bg-slate-900">
+            <Gift size={14} className="text-kanji-deep dark:text-kio" aria-hidden="true" />
+            <p className="text-xs font-bold tracking-wide text-kanji-deep dark:text-kio">
+              15 días gratis · sin tarjeta
+            </p>
+          </div>
+
+          {/* El tipo de cuenta no es una elección: se enuncia. */}
+          <p className="mx-auto mt-3 flex max-w-sm items-start justify-center gap-1.5 text-xs font-medium text-text-secondary">
+            <BrainCircuit size={14} className="mt-0.5 shrink-0 text-kanji-deep dark:text-kio" aria-hidden="true" />
+            <span>
+              Tu cuenta se configura como psicólogo/a: notas SOAP, escalas PHQ-9 y GAD-7 y
+              seguimiento emocional.
+            </span>
           </p>
         </div>
 
@@ -185,160 +236,75 @@ export function OnboardingPage() {
             <div key={s.id} className="flex items-center">
               <div className="flex flex-col items-center gap-1.5">
                 <div
-                  className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+                  aria-current={step === s.id ? 'step' : undefined}
+                  className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
                     step > s.id
-                      ? 'bg-kio text-white'
+                      ? 'bg-kanji-deep text-white'
                       : step === s.id
-                        ? 'bg-kio/15 dark:bg-kio/25 text-kio ring-2 ring-kio'
-                        : 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500'
+                        ? 'bg-kio-light/40 dark:bg-kio/25 text-kanji-deep dark:text-kio ring-2 ring-kio'
+                        : 'bg-secondary dark:bg-slate-800 text-text-secondary'
                   }`}
                 >
                   {step > s.id ? (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                    </svg>
+                    <Check size={16} aria-hidden="true" />
                   ) : (
-                    <s.icon size={16} />
+                    <s.icon size={16} aria-hidden="true" />
                   )}
                 </div>
-                <span className={`text-xs font-medium ${step === s.id ? 'text-kio' : 'text-text/40 dark:text-slate-500'}`}>
+                <span
+                  className={`text-xs font-medium ${
+                    step === s.id
+                      ? 'text-kanji-deep dark:text-kio'
+                      : 'text-gray-600 dark:text-slate-400'
+                  }`}
+                >
                   {s.label}
                 </span>
               </div>
               {i < STEPS.length - 1 && (
-                <div className={`w-16 h-px mx-2 mb-5 transition-colors ${step > s.id ? 'bg-kio' : 'bg-gray-200 dark:bg-slate-700'}`} />
+                <div
+                  aria-hidden="true"
+                  className={`w-16 h-px mx-2 mb-5 transition-colors ${
+                    step > s.id ? 'bg-kanji-deep dark:bg-kio' : 'bg-border dark:bg-slate-700'
+                  }`}
+                />
               )}
             </div>
           ))}
         </div>
 
         {/* Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-cruz dark:border-slate-800 shadow-xl p-8">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-cruz dark:border-slate-800 shadow-sm p-6 sm:p-8">
 
           <form onSubmit={onSubmit}>
 
-            {/* Step 1: Especialidad */}
+            {/* Paso 1: Datos de práctica */}
             {step === 1 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-lg font-semibold text-kanji dark:text-white mb-1">¿Cuál es tu especialidad?</h2>
-                  <p className="text-sm text-text/60 dark:text-slate-400">
-                    Esto determina las herramientas y plantillas disponibles en tu cuenta.
-                  </p>
-                </div>
-
-                {/* Solo PSYCHOLOGIST por ahora */}
-                <button
-                  type="button"
-                  className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 border-kio bg-kio/5 dark:bg-kio/10 text-left transition-all"
-                >
-                  <div className="w-12 h-12 bg-gradient-to-br from-kio to-kanji rounded-xl flex items-center justify-center shrink-0">
-                    <BrainCircuit size={22} className="text-white" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-kanji dark:text-white">Psicólogo/a</p>
-                    <p className="text-xs text-text/60 dark:text-slate-400 mt-0.5">
-                      Notas SOAP, evaluaciones PHQ-9 / GAD-7, seguimiento emocional
-                    </p>
-                  </div>
-                  <div className="ml-auto shrink-0">
-                    <div className="w-5 h-5 rounded-full border-2 border-kio flex items-center justify-center">
-                      <div className="w-2.5 h-2.5 rounded-full bg-kio" />
-                    </div>
-                  </div>
-                </button>
-
-                <p className="text-xs text-text/40 dark:text-slate-500 text-center">
-                  Más especialidades próximamente
-                </p>
-              </div>
-            )}
-
-            {/* Step 2: Plan */}
-            {step === 2 && (
-              <div className="space-y-5">
-                <div>
-                  <h2 className="text-lg font-semibold text-kanji dark:text-white mb-1">¿Cómo trabajas?</h2>
-                  <p className="text-sm text-text/60 dark:text-slate-400">
-                    Elige el plan que describe tu práctica.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setValue('plan', 'INDIVIDUAL')}
-                  className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all ${
-                    watch('plan') === 'INDIVIDUAL'
-                      ? 'border-kio bg-kio/5 dark:bg-kio/10'
-                      : 'border-cruz dark:border-slate-700 hover:border-kio/50'
-                  }`}
-                >
-                  <div className="w-12 h-12 bg-gradient-to-br from-kio to-kanji rounded-xl flex items-center justify-center shrink-0">
-                    <User size={22} className="text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-kanji dark:text-white">Práctica individual</p>
-                    <p className="text-xs text-text/60 dark:text-slate-400 mt-0.5">
-                      Gestiona tus pacientes y agenda de forma independiente.
-                    </p>
-                  </div>
-                  <div className="shrink-0">
-                    <div className="w-5 h-5 rounded-full border-2 border-kio flex items-center justify-center">
-                      {watch('plan') === 'INDIVIDUAL' && <div className="w-2.5 h-2.5 rounded-full bg-kio" />}
-                    </div>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setValue('plan', 'CLINIC')}
-                  className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all ${
-                    watch('plan') === 'CLINIC'
-                      ? 'border-kio bg-kio/5 dark:bg-kio/10'
-                      : 'border-cruz dark:border-slate-700 hover:border-kio/50'
-                  }`}
-                >
-                  <div className="w-12 h-12 bg-gradient-to-br from-kio to-kanji rounded-xl flex items-center justify-center shrink-0">
-                    <Building2 size={22} className="text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-kanji dark:text-white">Clínica / Equipo</p>
-                    <p className="text-xs text-text/60 dark:text-slate-400 mt-0.5">
-                      Invita colaboradores y gestiona pacientes en conjunto.
-                    </p>
-                  </div>
-                  <div className="shrink-0">
-                    <div className="w-5 h-5 rounded-full border-2 border-kio flex items-center justify-center">
-                      {watch('plan') === 'CLINIC' && <div className="w-2.5 h-2.5 rounded-full bg-kio" />}
-                    </div>
-                  </div>
-                </button>
-              </div>
-            )}
-
-            {/* Step 3: Datos de práctica */}
-            {step === 3 && (
-              <div className="space-y-5">
-                <div>
-                  <h2 className="text-lg font-semibold text-kanji dark:text-white mb-1">Datos de tu práctica</h2>
-                  <p className="text-sm text-text/60 dark:text-slate-400">
+                  <h2 className="text-lg font-bold text-kanji-deep dark:text-white mb-1">Datos de tu práctica</h2>
+                  <p className="text-sm font-medium text-text-secondary">
                     Puedes actualizar esto más tarde en Configuración.
                   </p>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-kanji dark:text-slate-200 mb-1.5">
+                    <label
+                      htmlFor="country"
+                      className="block text-sm font-medium text-text dark:text-slate-200 mb-1.5"
+                    >
                       País
                     </label>
                     <select
+                      id="country"
                       value={selectedCountry}
                       onChange={(e) => {
                         setSelectedCountry(e.target.value);
                         const country = COUNTRIES.find((c) => c.code === e.target.value);
                         if (country) setValue('currency', country.currency);
                       }}
-                      className="w-full px-4 py-2.5 rounded-xl border border-cruz dark:border-slate-700 bg-bg dark:bg-slate-800 text-kanji dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-kio/50"
+                      className="w-full min-h-11 px-4 py-2.5 rounded-xl border border-cruz dark:border-slate-700 bg-bg dark:bg-slate-800 text-text dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-kio/50"
                     >
                       {COUNTRIES.map((c) => (
                         <option key={c.code} value={c.code}>{c.label}</option>
@@ -347,64 +313,84 @@ export function OnboardingPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-kanji dark:text-slate-200 mb-1.5">
+                    <label
+                      htmlFor="licenseNumber"
+                      className="block text-sm font-medium text-text dark:text-slate-200 mb-1.5"
+                    >
                       Número de colegiatura / licencia
-                      <span className="text-text/40 dark:text-slate-500 font-normal ml-1">(opcional)</span>
+                      <span className="text-text-secondary font-normal ml-1">(opcional)</span>
                     </label>
                     <input
+                      id="licenseNumber"
                       type="text"
                       placeholder="Ej. PSI-12345"
                       {...register('licenseNumber')}
-                      className="w-full px-4 py-2.5 rounded-xl border border-cruz dark:border-slate-700 bg-bg dark:bg-slate-800 text-kanji dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-kio/50 placeholder:text-text/30 dark:placeholder:text-slate-600"
+                      className="w-full min-h-11 px-4 py-2.5 rounded-xl border border-cruz dark:border-slate-700 bg-bg dark:bg-slate-800 text-text dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-kio/50 placeholder:text-text-muted dark:placeholder:text-slate-600"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-kanji dark:text-slate-200 mb-1.5">
+                    <label
+                      htmlFor="currency"
+                      className="block text-sm font-medium text-text dark:text-slate-200 mb-1.5"
+                    >
                       Moneda de trabajo
                     </label>
                     <select
+                      id="currency"
+                      aria-invalid={errors.currency ? true : undefined}
+                      aria-describedby={errors.currency ? 'currency-error' : undefined}
                       {...register('currency', { required: true })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-cruz dark:border-slate-700 bg-bg dark:bg-slate-800 text-kanji dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-kio/50"
+                      className={`w-full min-h-11 px-4 py-2.5 rounded-xl border bg-bg dark:bg-slate-800 text-text dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-kio/50 ${
+                        errors.currency ? 'border-red-400' : 'border-cruz dark:border-slate-700'
+                      }`}
                     >
                       {CURRENCIES.map((c) => (
                         <option key={c.code} value={c.code}>{c.label}</option>
                       ))}
                     </select>
+                    {errors.currency && (
+                      <p id="currency-error" className="mt-1 text-xs font-medium text-red-600 dark:text-red-400">
+                        {errors.currency.message}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Step 4: Configuración de sesiones */}
-            {step === 4 && (
+            {/* Paso 2: Configuración de sesiones */}
+            {step === 2 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-lg font-semibold text-kanji dark:text-white mb-1">Configuración de sesiones</h2>
-                  <p className="text-sm text-text/60 dark:text-slate-400">
+                  <h2 className="text-lg font-bold text-kanji-deep dark:text-white mb-1">Configuración de sesiones</h2>
+                  <p className="text-sm font-medium text-text-secondary">
                     Valores por defecto al agendar citas. Ajustables por sesión.
                   </p>
                 </div>
 
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-kanji dark:text-slate-200 mb-2">
+                  <fieldset>
+                    <legend className="block text-sm font-medium text-text dark:text-slate-200 mb-2">
                       Duración por defecto (minutos)
-                    </label>
-                    <div className="flex gap-2 flex-wrap">
+                    </legend>
+                    <div
+                      className="flex gap-2 flex-wrap"
+                      aria-describedby={errors.sessionDefaultDuration ? 'duration-error' : undefined}
+                    >
                       {SESSION_DURATIONS.map((dur) => (
                         <label key={dur} className="cursor-pointer">
                           <input
                             type="radio"
                             value={dur}
                             {...register('sessionDefaultDuration', { required: true })}
-                            className="sr-only"
+                            className="peer sr-only"
                           />
                           <span
-                            className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all ${
+                            className={`inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-sm font-medium border-2 transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-kio peer-focus-visible:ring-offset-2 dark:peer-focus-visible:ring-offset-slate-900 ${
                               Number(watch('sessionDefaultDuration')) === dur
-                                ? 'border-kio bg-kio/10 dark:bg-kio/20 text-kio'
-                                : 'border-cruz dark:border-slate-700 text-text/60 dark:text-slate-400 hover:border-kio/50'
+                                ? 'border-kio bg-kio-light/40 dark:bg-kio/20 text-kanji-deep dark:text-kio'
+                                : 'border-cruz dark:border-slate-700 text-text-secondary hover:border-kio/50'
                             }`}
                           >
                             {dur} min
@@ -412,27 +398,47 @@ export function OnboardingPage() {
                         </label>
                       ))}
                     </div>
-                  </div>
+                    {errors.sessionDefaultDuration && (
+                      <p id="duration-error" className="mt-1 text-xs font-medium text-red-600 dark:text-red-400">
+                        {errors.sessionDefaultDuration.message}
+                      </p>
+                    )}
+                  </fieldset>
 
                   <div>
-                    <label className="block text-sm font-medium text-kanji dark:text-slate-200 mb-1.5">
+                    <label
+                      htmlFor="sessionDefaultPrice"
+                      className="block text-sm font-medium text-text dark:text-slate-200 mb-1.5"
+                    >
                       Precio por defecto ({watch('currency') || 'USD'})
                     </label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text/40 dark:text-slate-500 text-sm font-medium">
+                      <span
+                        aria-hidden="true"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary text-sm font-medium"
+                      >
                         {watch('currency') || 'USD'}
                       </span>
                       <input
+                        id="sessionDefaultPrice"
                         type="number"
                         min={0}
                         step={0.01}
                         placeholder="0.00"
+                        aria-invalid={errors.sessionDefaultPrice ? true : undefined}
+                        aria-describedby={errors.sessionDefaultPrice ? 'price-error' : undefined}
                         {...register('sessionDefaultPrice', { required: true, min: 0 })}
-                        className="w-full pl-14 pr-4 py-2.5 rounded-xl border border-cruz dark:border-slate-700 bg-bg dark:bg-slate-800 text-kanji dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-kio/50 placeholder:text-text/30"
+                        className={`w-full min-h-11 pl-14 pr-4 py-2.5 rounded-xl border bg-bg dark:bg-slate-800 text-text dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-kio/50 placeholder:text-text-muted ${
+                          errors.sessionDefaultPrice
+                            ? 'border-red-400'
+                            : 'border-cruz dark:border-slate-700'
+                        }`}
                       />
                     </div>
                     {errors.sessionDefaultPrice && (
-                      <p className="text-xs text-red-500 mt-1">Ingresa un precio válido</p>
+                      <p id="price-error" className="mt-1 text-xs font-medium text-red-600 dark:text-red-400">
+                        {errors.sessionDefaultPrice.message ?? 'Ingresa un precio válido'}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -445,39 +451,39 @@ export function OnboardingPage() {
                 <button
                   type="button"
                   onClick={() => setStep((s) => s - 1)}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-text/60 dark:text-slate-400 hover:text-kanji dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                  className="flex min-h-11 items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-text-secondary hover:text-text dark:hover:text-white hover:bg-secondary dark:hover:bg-slate-800 transition-colors"
                 >
-                  <ChevronLeft size={16} />
+                  <ChevronLeft size={16} aria-hidden="true" />
                   Atrás
                 </button>
               ) : (
                 <div />
               )}
 
-              {step < 4 ? (
+              {step < LAST_STEP ? (
                 <button
                   type="button"
                   onClick={() => setStep((s) => s + 1)}
-                  className="flex items-center gap-1.5 px-5 py-2.5 bg-kio text-white rounded-xl text-sm font-semibold hover:bg-kio/90 transition-colors"
+                  className="flex min-h-11 items-center gap-1.5 px-5 py-2.5 bg-kanji-deep text-white rounded-xl text-sm font-bold shadow-md shadow-kanji-deep/20 hover:bg-kanji-deep/90 transition-colors duration-150"
                 >
                   Continuar
-                  <ChevronRight size={16} />
+                  <ChevronRight size={16} aria-hidden="true" />
                 </button>
               ) : (
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-kio text-white rounded-xl text-sm font-semibold hover:bg-kio/90 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="flex min-h-11 items-center gap-2 px-5 py-2.5 bg-kanji-deep text-white rounded-xl text-sm font-bold shadow-md shadow-kanji-deep/20 hover:bg-kanji-deep/90 transition-colors duration-150 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 size={15} className="animate-spin" />
+                      <Loader2 size={15} className="animate-spin" aria-hidden="true" />
                       Guardando...
                     </>
                   ) : (
                     <>
                       Empezar
-                      <ChevronRight size={16} />
+                      <ChevronRight size={16} aria-hidden="true" />
                     </>
                   )}
                 </button>
@@ -488,8 +494,9 @@ export function OnboardingPage() {
 
         <div className="text-center mt-6">
           <button
+            type="button"
             onClick={handleLogout}
-            className="text-text/40 dark:text-slate-600 hover:text-text/70 dark:hover:text-slate-400 text-xs font-medium transition-colors"
+            className="inline-flex min-h-11 items-center rounded-xl px-3 text-xs font-medium text-text-secondary hover:text-text dark:hover:text-slate-200 transition-colors"
           >
             Cerrar sesión
           </button>

@@ -9,6 +9,8 @@ import { PageTransition } from './components/ui/PageTransition';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Omnibox } from './components/ui/Omnibox';
 import { TourOverlay } from './components/ui/TourOverlay';
+import { FeedbackWidget } from './components/common/FeedbackWidget';
+import { usePageTracking } from './hooks/use-page-tracking';
 
 // ── Static imports — auth + public pages needed on first render ───────────
 import { LoginPage } from './pages/LoginPage';
@@ -17,6 +19,7 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import InvitationAcceptPage from './pages/InvitationAcceptPage';
 import NotFoundPage from './pages/NotFoundPage';
+import { LandingPage } from './pages/LandingPage';
 
 // ── Lazy imports — protected routes, loaded only when visited ─────────────
 const DashboardPage = lazy(() =>
@@ -41,6 +44,13 @@ const PatientsPage = lazy(() => import('./pages/PatientsPage'));
 const PatientDetailsPage = lazy(() => import('./pages/PatientDetailsPage'));
 const FinancePage = lazy(() => import('./pages/finance/FinancePage'));
 const ClinicPage = lazy(() => import('./pages/ClinicPage'));
+const PlanPage = lazy(() => import('./pages/PlanPage'));
+const AccessLogPage = lazy(() =>
+  import('./pages/AccessLogPage').then((m) => ({ default: m.AccessLogPage })),
+);
+const PortalPage = lazy(() =>
+  import('./pages/portal/PortalPage').then((m) => ({ default: m.PortalPage })),
+);
 
 // ── Skeleton mostrado mientras el chunk lazy se descarga ──────────────────
 function PageSkeleton() {
@@ -54,7 +64,9 @@ function PageSkeleton() {
 function RootRedirect() {
   const { isAuthenticated, user } = useAuthStore();
 
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  // Sin sesión, la raíz es la landing pública. Con sesión sigue llevando al
+  // sitio de siempre: quien ya trabaja aquí no quiere leer la portada.
+  if (!isAuthenticated) return <LandingPage />;
   if (user?.mustChangePassword) return <Navigate to="/change-password" replace />;
   if (user?.profile) return <Navigate to="/dashboard" replace />;
   return <Navigate to="/onboarding" replace />;
@@ -64,6 +76,8 @@ function App() {
   const location = useLocation();
   const syncOfflineNotes = useNoteStore((state) => state.syncOfflineNotes);
   const { isAuthenticated, fetchCurrentUser } = useAuthStore();
+
+  usePageTracking();
 
   useEffect(() => {
     if (isAuthenticated) fetchCurrentUser();
@@ -77,9 +91,13 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <Toaster position="bottom-right" richColors />
+      {/* offset: los toasts salen por encima del botón de feedback, que vive
+          fijo en la misma esquina. Sin esto el botón queda tapado cada vez que
+          se guarda algo — justo cuando alguien querría comentar. */}
+      <Toaster position="bottom-right" richColors offset={80} />
       <Omnibox />
       <TourOverlay />
+      <FeedbackWidget />
       <Suspense fallback={<PageSkeleton />}>
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
@@ -89,6 +107,10 @@ function App() {
             <Route path="/forgot-password" element={<PageTransition><ForgotPasswordPage /></PageTransition>} />
             <Route path="/reset-password" element={<PageTransition><ResetPasswordPage /></PageTransition>} />
             <Route path="/join/:token" element={<PageTransition><InvitationAcceptPage /></PageTransition>} />
+
+            {/* ── Portal del paciente — público, autenticado por token ── */}
+            <Route path="/p/:token" element={<PageTransition><PortalPage /></PageTransition>} />
+            <Route path="/p" element={<PageTransition><PortalPage /></PageTransition>} />
 
             {/* ── Protegidas — lazy ── */}
             <Route
@@ -130,6 +152,14 @@ function App() {
             <Route
               path="/clinic"
               element={<PageTransition><RequireAuth><ClinicPage /></RequireAuth></PageTransition>}
+            />
+            <Route
+              path="/plan"
+              element={<PageTransition><RequireAuth><PlanPage /></RequireAuth></PageTransition>}
+            />
+            <Route
+              path="/access-logs"
+              element={<PageTransition><RequireAuth><AccessLogPage /></RequireAuth></PageTransition>}
             />
 
             {/* ── Raíz y 404 ── */}

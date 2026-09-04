@@ -1,0 +1,35 @@
+# Finales de línea normalizados en LF.
+#
+# Sin este fichero el repo quedaba a merced de core.autocrlf de cada máquina, y
+# el resultado real era un árbol inconsistente: 114 ficheros con CRLF en el
+# índice, 58 con LF, 36 con CRLF en índice y LF en el árbol, 28 al revés, y tres
+# con finales MEZCLADOS dentro del propio fichero (.env.example de api y web, e
+# index.css). La consecuencia práctica es que cualquier herramienta que reescriba
+# un fichero entero produce un diff de reescritura completa —265 líneas borradas
+# y 265 añadidas por cambiar dos— y con ello se pierde la revisabilidad y el
+# blame justo en las superficies clínicas más delicadas.
+#
+# `text=auto eol=lf` guarda LF en el repositorio y entrega LF en el árbol de
+# trabajo en todas las plataformas. Windows no necesita CRLF: Git Bash, VS Code,
+# Node y el toolchain de Vite trabajan con LF sin problema.
+
+* text=auto eol=lf
+
+# Ficheros que Git no debe tocar nunca.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.webp  binary
+*.pdf   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.node  binary
+*.wasm  binary
+*.dll   binary
+
+# El lockfile lo gestiona npm; normalizarlo a mano solo genera ruido.
+package-lock.json -diff

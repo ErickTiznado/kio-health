@@ -3,11 +3,11 @@ import {
   Post,
   Get,
   Patch,
+  Param,
   Query,
   Body,
   Res,
   Req,
-  UseGuards,
   UnauthorizedException,
   BadRequestException,
 } from '@nestjs/common';
@@ -19,7 +19,9 @@ import { CompleteProfileDto } from './dto/complete-profile.dto';
 import { SignupDto } from './dto/signup.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { BetaRequestDto } from './dto/beta-request.dto';
+import { Public } from './decorators/public.decorator';
+import { AllowWhenTrialExpired } from './decorators/allow-when-trial-expired.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
 
 const IS_PROD = process.env.NODE_ENV === 'production';
@@ -66,6 +68,27 @@ function clearAuthCookies(res: Response) {
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
+  @Get('validate-invite/:token')
+  async validateInvite(
+    @Param('token') token: string,
+  ): Promise<{ valid: boolean; email: string }> {
+    return this.authService.validateBetaInvite(token);
+  }
+
+  /// Alta en la lista de espera de la beta, desde la landing pública.
+  /// Límite estrecho: es anónimo y escribe, así que se trata como el login.
+  @Public()
+  @Throttle({ default: { limit: 5, ttl: 15 * 60 * 1000 } })
+  @Post('beta-request')
+  async requestBetaAccess(
+    @Body() dto: BetaRequestDto,
+  ): Promise<{ received: true }> {
+    return this.authService.requestBetaAccess(dto);
+  }
+
+  @Public()
   @Throttle({ default: { limit: 20, ttl: 60000 } })
   @Get('check-email')
   async checkEmail(
@@ -77,6 +100,7 @@ export class AuthController {
     return this.authService.checkEmailAvailable(email);
   }
 
+  @Public()
   @Throttle({ default: { limit: 5, ttl: 900000 } })
   @Post('signup')
   async signup(
@@ -89,6 +113,7 @@ export class AuthController {
     return { user };
   }
 
+  @Public()
   @Throttle({ default: { limit: 5, ttl: 900000 } })
   @Post('login')
   async login(
@@ -105,6 +130,8 @@ export class AuthController {
     return { user };
   }
 
+  // Público a la fuerza: usa la refresh cookie, no el access token.
+  @Public()
   @Post('refresh')
   async refresh(
     @Req() req: Request,
@@ -121,6 +148,7 @@ export class AuthController {
     return { ok: true };
   }
 
+  @Public()
   @Post('logout')
   async logout(
     @Req() req: Request,
@@ -134,7 +162,6 @@ export class AuthController {
     return { ok: true };
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('complete-profile')
   async completeProfile(
     @CurrentUser() user: { userId: string },
@@ -150,7 +177,10 @@ export class AuthController {
     return { user: responseUser };
   }
 
-  @UseGuards(JwtAuthGuard)
+  // Con la prueba caducada en modo HARD el guard corta también las lecturas.
+  // Sin esta excepción el usuario no podría cargar su propio perfil y vería una
+  // pantalla en blanco en vez del aviso que le explica qué ha pasado.
+  @AllowWhenTrialExpired()
   @Get('me')
   async getMe(
     @CurrentUser() user: { userId: string; email: string; role: string },
@@ -158,13 +188,17 @@ export class AuthController {
     return this.authService.getCurrentUser(user.userId);
   }
 
+  @Public()
   @Throttle({ default: { limit: 3, ttl: 900000 } })
   @Post('forgot-password')
-  async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<{ ok: boolean }> {
+  async forgotPassword(
+    @Body() dto: ForgotPasswordDto,
+  ): Promise<{ ok: boolean }> {
     await this.authService.requestPasswordReset(dto.email);
     return { ok: true };
   }
 
+  @Public()
   @Throttle({ default: { limit: 3, ttl: 900000 } })
   @Post('reset-password')
   async resetPassword(@Body() dto: ResetPasswordDto): Promise<{ ok: boolean }> {
@@ -172,7 +206,9 @@ export class AuthController {
     return { ok: true };
   }
 
-  @UseGuards(JwtAuthGuard)
+  // Un usuario con `mustChangePassword` y la prueba caducada quedaría atrapado:
+  // la app le exige cambiar la contraseña y el guard le impide hacerlo.
+  @AllowWhenTrialExpired()
   @Patch('change-password')
   async changePassword(
     @CurrentUser() user: { userId: string },

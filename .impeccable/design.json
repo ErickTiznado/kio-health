@@ -1,0 +1,435 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-09T00:00:00.000Z",
+  "title": "Design System: Kio Health",
+  "extensions": {
+    "colorMeta": {
+      "lavanda-kio": {
+        "role": "primary",
+        "displayName": "Lavanda Kio",
+        "canonical": "#ae93fe",
+        "tonalRamp": [
+          "#1a1030",
+          "#2e1c56",
+          "#46297f",
+          "#6040a8",
+          "#7d5fd0",
+          "#9a7ce9",
+          "#ae93fe",
+          "#e4dbff"
+        ]
+      },
+      "purpura-kanji": {
+        "role": "primary",
+        "displayName": "Púrpura Kanji",
+        "canonical": "#8a72d1",
+        "tonalRamp": [
+          "#150e26",
+          "#241944",
+          "#372666",
+          "#4d3789",
+          "#664dab",
+          "#7a5fc2",
+          "#8a72d1",
+          "#d6ccf0"
+        ]
+      },
+      "lavanda-cruz": {
+        "role": "secondary",
+        "displayName": "Lavanda Cruz",
+        "canonical": "#ddd3fa",
+        "tonalRamp": [
+          "#211a35",
+          "#372c56",
+          "#4f4179",
+          "#6a5a9c",
+          "#8878bd",
+          "#a99cd6",
+          "#c5b9ec",
+          "#ddd3fa"
+        ]
+      },
+      "lino-calido": {
+        "role": "neutral",
+        "displayName": "Lino Cálido",
+        "canonical": "#f5f3ef",
+        "tonalRamp": [
+          "#26241f",
+          "#3d3a33",
+          "#565248",
+          "#716c60",
+          "#8f8a7d",
+          "#b0ab9e",
+          "#d4cfc3",
+          "#f5f3ef"
+        ]
+      },
+      "lino-sombra": {
+        "role": "neutral",
+        "displayName": "Lino Sombra",
+        "canonical": "#ece9e3",
+        "tonalRamp": [
+          "#232119",
+          "#3a372d",
+          "#524e42",
+          "#6d685a",
+          "#8a8475",
+          "#a9a394",
+          "#cbc6b9",
+          "#ece9e3"
+        ]
+      },
+      "pizarra-profunda": {
+        "role": "neutral",
+        "displayName": "Pizarra Profunda",
+        "canonical": "#213547",
+        "tonalRamp": [
+          "#0a1119",
+          "#131f2b",
+          "#1a2a39",
+          "#213547",
+          "#365571",
+          "#4e7899",
+          "#7ea4bf",
+          "#c3d6e3"
+        ]
+      },
+      "noche-superficie": {
+        "role": "neutral",
+        "displayName": "Noche Superficie",
+        "canonical": "#0f172a",
+        "tonalRamp": [
+          "#020617",
+          "#0f172a",
+          "#1e293b",
+          "#334155",
+          "#475569",
+          "#64748b",
+          "#94a3b8",
+          "#f8fafc"
+        ]
+      },
+      "exito": {
+        "role": "tertiary",
+        "displayName": "Éxito Esmeralda",
+        "canonical": "#10b981",
+        "tonalRamp": [
+          "#03231a",
+          "#053b2c",
+          "#065f46",
+          "#047857",
+          "#059669",
+          "#10b981",
+          "#6ee7b7",
+          "#d1fae5"
+        ]
+      },
+      "aviso": {
+        "role": "tertiary",
+        "displayName": "Aviso Ámbar",
+        "canonical": "#f59e0b",
+        "tonalRamp": [
+          "#291a03",
+          "#452b05",
+          "#78350f",
+          "#b45309",
+          "#d97706",
+          "#f59e0b",
+          "#fcd34d",
+          "#fef3c7"
+        ]
+      },
+      "peligro": {
+        "role": "tertiary",
+        "displayName": "Peligro Rosa",
+        "canonical": "#f43f5e",
+        "tonalRamp": [
+          "#2b0710",
+          "#4c0519",
+          "#881337",
+          "#be123c",
+          "#e11d48",
+          "#f43f5e",
+          "#fda4af",
+          "#ffe4e6"
+        ]
+      },
+      "purpura-kanji-hondo": {
+        "role": "primary",
+        "displayName": "Púrpura Kanji Hondo",
+        "canonical": "#5b46a8",
+        "tonalRamp": [
+          "#120d21",
+          "#1f1739",
+          "#2e2255",
+          "#3d2d73",
+          "#4c3891",
+          "#5b46a8",
+          "#8f7fc8",
+          "#d5cdea"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Títulos de página y cifras destacadas del dashboard."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Títulos de card y de sección."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Texto por defecto de toda la interfaz: text-sm font-medium."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Etiquetas de campo en versalitas espaciadas. La firma tipográfica del sistema."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Texto muted, helper y metadatos."
+      }
+    },
+    "shadows": [
+      {
+        "name": "reposo",
+        "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        "purpose": "Card quieta, avatar, punto indicador. Casi imperceptible por diseño."
+      },
+      {
+        "name": "respuesta",
+        "value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        "purpose": "Hover de card. Nunca estado base."
+      },
+      {
+        "name": "marca",
+        "value": "0 4px 6px -1px rgb(174 147 254 / 0.2)",
+        "purpose": "Exclusivo del botón primario: la única sombra teñida."
+      },
+      {
+        "name": "flotante",
+        "value": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+        "purpose": "Modales y dropdowns genuinamente despegados del plano."
+      },
+      {
+        "name": "dato-activo",
+        "value": "0 10px 15px -3px rgb(174 147 254 / 0.3)",
+        "purpose": "Punto seleccionado en una gráfica."
+      },
+      {
+        "name": "sidebar-glow",
+        "value": "0 0 10px rgba(174, 147, 254, 0.4)",
+        "purpose": "El único glow del sistema: barra indicadora del ítem de navegación activo. No replicar."
+      }
+    ],
+    "motion": [
+      {
+        "name": "estandar",
+        "value": "150ms",
+        "purpose": "Transición por defecto de la UI (transition-all duration-150)."
+      },
+      {
+        "name": "modal",
+        "value": "200ms",
+        "purpose": "Elementos más lentos: modales y paneles."
+      },
+      {
+        "name": "press",
+        "value": "scale(0.95)",
+        "purpose": "Feedback de pulsación en botones (active:scale-95)."
+      },
+      {
+        "name": "hover-card",
+        "value": "scale(1.02)",
+        "purpose": "Hover sutil de card vía Framer Motion."
+      },
+      {
+        "name": "techo",
+        "value": "500ms",
+        "purpose": "Duración máxima admitida. Nada se anima más lento."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón primario",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "La acción principal. Único elemento con sombra teñida de marca.",
+      "html": "<button class=\"ds-btn-primary\">Nuevo paciente</button>",
+      "css": ".ds-btn-primary { background: #ae93fe; color: #fff; padding: 8px 14px; border: none; border-radius: 28px; font-size: 0.875rem; font-weight: 700; box-shadow: 0 4px 6px -1px rgb(174 147 254 / 0.2); cursor: pointer; transition: all 150ms; } .ds-btn-primary:hover { background: rgba(174,147,254,0.9); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(174,147,254,0.5); } .ds-btn-primary:active { transform: scale(0.95); }"
+    },
+    {
+      "name": "Botón secundario",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Acción de apoyo. Plano; el hover solo oscurece el borde.",
+      "html": "<button class=\"ds-btn-ghost\">Cancelar</button>",
+      "css": ".ds-btn-ghost { background: #fff; color: #64748b; padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 28px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 150ms; } .ds-btn-ghost:hover { border-color: #cbd5e1; } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(174,147,254,0.5); } .ds-btn-ghost:active { transform: scale(0.95); }"
+    },
+    {
+      "name": "Botón destructivo",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Sin fondo en reposo; el rojo solo aparece al acercarse.",
+      "html": "<button class=\"ds-btn-danger\">Eliminar</button>",
+      "css": ".ds-btn-danger { background: transparent; color: #e11d48; padding: 8px 12px; border: none; border-radius: 20px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background-color 150ms, color 150ms; } .ds-btn-danger:hover { background: #fff1f2; } .ds-btn-danger:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(244,63,94,0.4); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Superficie base. Se separa por borde, no por sombra; el hover es la única elevación.",
+      "html": "<div class=\"ds-card\"><p class=\"ds-card-label\">Próxima sesión</p><h3 class=\"ds-card-title\">María Fernández</h3><p class=\"ds-card-body\">Hoy, 16:30 · Terapia individual</p></div>",
+      "css": ".ds-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px 24px; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: box-shadow 150ms; } .ds-card:hover { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); } .ds-card-label { margin: 0 0 8px; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #94a3b8; } .ds-card-title { margin: 0 0 4px; font-size: 1rem; font-weight: 700; color: #213547; } .ds-card-body { margin: 0; font-size: 0.875rem; font-weight: 500; color: #64748b; }"
+    },
+    {
+      "name": "Input de texto",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo blando (28px) con anillo de foco lavanda; sin outline nativo.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Nombre completo</span><input class=\"ds-input\" type=\"text\" placeholder=\"Nombre del paciente\" /></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 8px; } .ds-field-label { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #94a3b8; } .ds-input { background: rgba(249,250,251,0.5); border: 1px solid #e2e8f0; border-radius: 28px; padding: 10px 14px; font-size: 0.875rem; font-weight: 500; color: #213547; outline: none; transition: border-color 150ms, box-shadow 150ms; } .ds-input::placeholder { color: #9ca3af; } .ds-input:focus { border-color: #ae93fe; box-shadow: 0 0 0 2px rgba(174,147,254,0.5); }"
+    },
+    {
+      "name": "Badge de estado",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Pill semántico para estado de sesión o pago.",
+      "html": "<span class=\"ds-badge ds-badge-ok\">Completada</span> <span class=\"ds-badge ds-badge-warn\">Pendiente</span> <span class=\"ds-badge ds-badge-danger\">Cancelada</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.025em; } .ds-badge-ok { background: #d1fae5; color: #047857; } .ds-badge-warn { background: #fef3c7; color: #b45309; } .ds-badge-danger { background: #ffe4e6; color: #e11d48; }"
+    },
+    {
+      "name": "Ítem de navegación activo",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "El componente firma: velo lavanda más barra indicadora con el único glow del sistema.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item ds-nav-item-active\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"9\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"5\"/><rect x=\"14\" y=\"12\" width=\"7\" height=\"9\"/><rect x=\"3\" y=\"16\" width=\"7\" height=\"5\"/></svg>Dashboard</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/></svg>Pacientes</a></nav>",
+      "css": ".ds-nav { display: flex; flex-direction: column; gap: 2px; width: 240px; } .ds-nav-item { position: relative; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 20px; font-size: 0.875rem; font-weight: 500; color: #4b5563; text-decoration: none; transition: all 150ms; } .ds-nav-item:hover { background: rgba(245,243,239,0.8); color: #8a72d1; } .ds-nav-item-active { background: rgba(174,147,254,0.28); color: #ae93fe; } .ds-nav-item-active::before { content: \"\"; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 4px; height: 24px; background: #ae93fe; border-radius: 0 9999px 9999px 0; box-shadow: 0 0 10px rgba(174,147,254,0.4); }"
+    },
+    {
+      "name": "Avatar",
+      "kind": "custom",
+      "refersTo": "avatar",
+      "description": "El único gradiente de todo el producto. Intencional y no replicable.",
+      "html": "<div class=\"ds-avatar\"><span>MF</span></div>",
+      "css": ".ds-avatar { width: 40px; height: 40px; border-radius: 9999px; background: linear-gradient(to bottom right, #ae93fe, #8a72d1); display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05), 0 0 0 2px #f5f3ef; } .ds-avatar span { color: #fff; font-size: 0.875rem; font-weight: 600; }"
+    },
+    {
+      "name": "Skeleton",
+      "kind": "custom",
+      "refersTo": "skeleton",
+      "description": "Carga en Lavanda Cruz al 40%: el único uso del acento pálido.",
+      "html": "<div class=\"ds-skeleton\"></div>",
+      "css": ".ds-skeleton { height: 16px; width: 100%; border-radius: 28px; background: rgba(221,211,250,0.4); animation: ds-pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; } @keyframes ds-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "El Consultorio Sereno",
+    "overview": "Kio Health se diseña como la sala de terapia que representa: nada compite por atención, todo está donde debe estar. La base no es blanca sino un lino cálido (#f5f3ef) — la decisión más consecuente del sistema, porque desplaza al producto entero fuera del registro frío-sanitario y hacia algo habitable. Sobre esa base, un púrpura lavanda (#ae93fe) que aparece poco y por eso pesa mucho: marca el ítem activo, el botón que importa, el foco. El resto es slate.\n\nLas superficies son planas. La jerarquía se comunica con espacio, peso tipográfico y color, nunca con profundidad simulada: no hay gradientes (salvo un avatar), no hay glow (salvo un indicador de 4px en el sidebar), no hay blur fuera de los overlays modales. Lo que queda es una retícula estricta con esquinas muy blandas — blandos pero precisos: radios generosos de 16 a 28px sobre alineación y espaciado sin concesiones.\n\nEl modo oscuro no es una variante: es la mitad del sistema. Cada decisión de color existe en lino y en slate, y una superficie sin su par dark: está incompleta, no \"pendiente\".",
+    "keyCharacteristics": [
+      "Base lino cálido, no blanco — la calidez es la posición, no el adorno",
+      "Púrpura escaso: acento, nunca relleno",
+      "Planitud absoluta; la profundidad es un error, no un recurso",
+      "Radios blandos (16–28px) sobre retícula rígida",
+      "Dark mode como par obligatorio de toda decisión",
+      "Vocabulario de iconos único (Lucide), sin mezcla"
+    ],
+    "rules": [
+      {
+        "name": "La Regla del Acento Escaso",
+        "body": "El Lavanda Kio ocupa ≤10% de cualquier pantalla. Si dos elementos compiten en púrpura, uno de los dos está mal.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla del Lino",
+        "body": "El fondo claro nunca es #ffffff a nivel de página. El blanco puro existe solo dentro de cards y modales, y su función es despegarse del lino — invertirlo rompe el sistema.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla del Suelo Slate",
+        "body": "En oscuro, el mínimo es #0f172a. Nunca dark:bg-black.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla del Rango Medio",
+        "body": "El sistema vive entre font-medium (500) y font-bold (700). Ni font-light ni font-black existen; la jerarquía se resuelve con tamaño y color antes que con peso extremo.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla de la Versalita",
+        "body": "Toda etiqueta de campo va en text-[11px] font-bold uppercase tracking-wider. Es el único lugar donde se usan mayúsculas.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla del Umbral lg",
+        "body": "El cambio estructural ocurre una sola vez, en lg. Introducir un segundo reflow mayor en md fragmenta el shell.",
+        "section": "layout"
+      },
+      {
+        "name": "La Regla del Plano en Reposo",
+        "body": "Ninguna superficie lleva sombra mayor que shadow-sm sin que el usuario haya hecho algo. shadow-lg en una card quieta es un error.",
+        "section": "elevation"
+      },
+      {
+        "name": "La Regla de la Sombra Única",
+        "body": "Como máximo dos modificadores de sombra por elemento. Apilar box-shadows para fingir profundidad está prohibido.",
+        "section": "elevation"
+      },
+      {
+        "name": "La Regla del Púrpura Legible",
+        "body": "El Lavanda Kio nunca lleva texto encima ni se usa como color de texto sobre superficies claras. Para púrpura legible sobre claro, y para el fondo de un botón sólido de marca, el color es el Kanji Hondo.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "Do comprobar el estado de error antes de renderizar un empty state: una superficie con datos clínicos no puede decir \"no hay nada\" cuando la petición falló o quedó pausada sin conexión.",
+      "Do dar 44px de área táctil mínima a cualquier control, y un nombre accesible a todo botón que solo contenga un icono.",
+      "Do usar text-sm font-medium como texto por defecto; casi toda la interfaz vive ahí.",
+      "Do escribir el par dark: de cada color, fondo y borde en el mismo commit. Un componente sin modo oscuro está incompleto.",
+      "Do separar superficies con borde de 1px antes que con sombra.",
+      "Do reservar el Lavanda Kio para acento: activo, primario, foco.",
+      "Do usar rounded-full para todo lo circular o tipo pill, y la escala @theme para lo demás.",
+      "Do tomar los iconos de Lucide React exclusivamente, a 15–22px.",
+      "Do usar Sonner para toasts en lugar de construir notificaciones propias.",
+      "Do mantener las transiciones entre 150ms y 500ms (duration-150 es el estándar).",
+      "Do sanear con DOMPurify cualquier markdown de usuario antes de renderizarlo."
+    ],
+    "donts": [
+      "Don't añadir gradientes. La única excepción existente es el avatar.",
+      "Don't aplicar backdrop-blur fuera del overlay de modal y del omnibox.",
+      "Don't usar glow, neon ni text-shadow. La barra del sidebar es la única excepción y no se replica.",
+      "Don't usar dark:bg-black; el suelo oscuro es #0f172a.",
+      "Don't poner shadow-lg en una card en reposo, ni apilar más de dos modificadores de sombra.",
+      "Don't usar rounded (4px) ni radios menores a 6px en elementos visibles.",
+      "Don't usar font-light (300) ni font-black (900).",
+      "Don't animar la entrada de página ni añadir partículas, fondos animados o patrones decorativos.",
+      "Don't introducir una segunda librería de iconos ni fuentes display/decorativas.",
+      "Don't prometer buscar, filtrar u ordenar por diagnóstico, contexto clínico, teléfono, contacto de emergencia, medicación, alergias o contenido de notas: esos campos están cifrados y no son consultables en SQL.",
+      "Don't asumir que Inter o Roboto están aplicadas: solo hay dos usos de font-inter/font-roboto en todo src y el producto renderiza en la fuente del sistema.",
+      "Don't tratar la escala de radios como monótona: rounded-xl (28px) es mayor que rounded-2xl (16px) porque @theme redefine solo hasta xl.",
+      "Don't bajar de text-[11px]: el suelo tipográfico son 11px.",
+      "Don't dejar un dato solo en hover: en táctil y con lector de pantalla el hover no existe."
+    ]
+  }
+}

@@ -1,6 +1,12 @@
 import { api } from './api';
 import type { CreatePatientDto, UpdatePatientDto, QueryPatientsDto, Patient, PatientsResponse, PatientDocument } from '../types/patients.types';
 
+/**
+ * `QueryPatientsDto` incluye los filtros de servidor `riskFlag`, `hasBalance` y
+ * `sort`; axios omite las claves `undefined`, así que una llamada sin ellos
+ * produce exactamente la misma URL que antes. `meta.total` de la respuesta es
+ * el total YA filtrado, no el de la página.
+ */
 export const getPatients = async (params: QueryPatientsDto): Promise<PatientsResponse> => {
   const response = await api.get<PatientsResponse>('/patients', { params });
   return response.data;
@@ -54,4 +60,9 @@ export const fetchDocumentBlob = async (patientId: string, docId: string): Promi
 
 export const deletePatientDocument = async (patientId: string, docId: string): Promise<void> => {
   await api.delete(`/patients/${patientId}/documents/${docId}`);
+};
+
+export const getActiveRiskFlagsCount = async (): Promise<{ count: number }> => {
+  const response = await api.get<{ count: number }>('/patients/dashboard/active-risk-flags-count');
+  return response.data;
 };

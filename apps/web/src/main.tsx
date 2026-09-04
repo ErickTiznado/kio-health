@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MotionConfig } from 'framer-motion'
 import * as Sentry from '@sentry/react'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { initAnalytics } from './lib/analytics'
 import App from './App'
 import './lib/i18n'
 import './index.css'
@@ -19,6 +20,10 @@ Sentry.init({
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
 });
+
+// Sentry dice qué se rompe; esto dice qué se usa. Sin clave es un no-op, así
+// que en local no manda nada y los eventos salen por consola.
+initAnalytics();
 
 const queryClient = new QueryClient({
   defaultOptions: {

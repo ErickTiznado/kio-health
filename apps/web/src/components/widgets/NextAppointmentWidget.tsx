@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Play, UserPlus, Brain, Calendar, Hash, Radio, FileText } from 'lucide-react';
+import { Clock, Play, UserPlus, Brain, Calendar, Hash, Radio, FileText, Eye, EyeOff } from 'lucide-react';
+import { format, isToday, isTomorrow, parseISO } from 'date-fns';
+import { es } from 'date-fns/locale';
 import { Skeleton } from '@repo/ui/skeleton';
 import type { Appointment } from '../../types/appointments.types';
+import { WidgetError } from './WidgetError';
 
 interface NextAppointmentProps {
   appointment: Appointment | null;
   isLoading: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
 }
 
 /* ── Pure helpers ──────────────────────────────── */
@@ -20,21 +25,23 @@ function computeAge(dob: string): number {
   return age;
 }
 
+/**
+ * Un solo reloj en todo el dashboard.
+ *
+ * Esto fijaba `es-MX` con `hour12` ("2:00 p.m.") mientras la sección HOY, a
+ * doce píxeles de distancia, formatea la misma cita con `HH:mm` ("14:00"). Se
+ * unifica en 24h, que es el formato de la lista y el que no obliga a leer un
+ * sufijo para saber la hora.
+ */
 function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('es-MX', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
+  return format(parseISO(iso), 'HH:mm');
 }
 
 function formatScheduledDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('es-MX', {
-    weekday: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  });
+  const date = parseISO(iso);
+  if (isToday(date)) return `hoy a las ${format(date, 'HH:mm')}`;
+  if (isTomorrow(date)) return `mañana a las ${format(date, 'HH:mm')}`;
+  return format(date, "EEEE d 'de' MMMM 'a las' HH:mm", { locale: es });
 }
 
 function isInProgress(appointment: Appointment): boolean {
@@ -67,39 +74,127 @@ function formatCountdown(startIso: string): string {
 
 /* ── Shared sub-components ────────────────────── */
 
+/**
+ * Chip de la banda. Sobre la rampa de marca el fondo se OSCURECE, nunca se
+ * aclara: `bg-white/15` sobre el degradado baja el texto blanco por debajo de
+ * AA en todo el recorrido. Ver DESIGN.md → el deck del dashboard.
+ */
+function BandChip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-black/25 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
+      {children}
+    </span>
+  );
+}
+
+/**
+ * Nombre del paciente.
+ *
+ * Antes ocupaba `text-5xl` en un panel de 12rem de alto: la mitad del espacio
+ * muerto del dashboard salía de aquí. La banda ahora se dimensiona por su
+ * contenido, y el nombre pesa por contraste con la fila, no por tamaño bruto.
+ *
+ * El nombre va entero a un solo peso. Partirlo en nombre `font-bold` y apellido
+ * `font-medium`, ambos en blanco puro, no producía la jerarquía que buscaba:
+ * a `text-3xl` la diferencia entre 500 y 700 es casi invisible y el único
+ * contraste disponible — el color — era idéntico en las dos mitades. La
+ * jerarquía real la hace la edad, que sí baja de tamaño.
+ */
 function PatientHeader({ appointment }: { appointment: Appointment }) {
   return (
-    <div>
-      <h2 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tighter leading-none">
-        {appointment.patient.fullName.split(' ')[0]}
-        <span className="block text-xl md:text-2xl font-light opacity-60 mt-1">
-          {appointment.patient.fullName.split(' ').slice(1).join(' ')}
-          {appointment.patient.dateOfBirth && (
-            <span className="ml-2 text-base md:text-lg opacity-80">
-              · {computeAge(appointment.patient.dateOfBirth)} años
-            </span>
-          )}
+    <h3 className="text-2xl font-bold leading-tight tracking-tight text-white lg:text-3xl">
+      {appointment.patient.fullName}
+      {appointment.patient.dateOfBirth && (
+        <span className="ml-2 text-base font-medium text-white">
+          · {computeAge(appointment.patient.dateOfBirth)} años
         </span>
-      </h2>
+      )}
+    </h3>
+  );
+}
+
+/**
+ * Contexto clínico, tras una revelación explícita.
+ *
+ * `diagnosis` y `clinicalContext` son dos de los seis campos cifrados en
+ * reposo. Renderizarlos por defecto los ponía en el elemento más grande de la
+ * pantalla principal — la que queda abierta mientras el paciente entra a la
+ * sala. El clínico ya conoce el diagnóstico; la única persona para quien ese
+ * texto es nuevo es quien pasa junto al escritorio.
+ */
+function ClinicalContext({ appointment }: { appointment: Appointment }) {
+  const [revealed, setRevealed] = useState(false);
+  const { diagnosis, clinicalContext } = appointment.patient;
+
+  if (!diagnosis && !clinicalContext && !appointment.reason) return null;
+
+  if (!revealed) {
+    return (
+      <button
+        type="button"
+        onClick={() => setRevealed(true)}
+        className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-black/25 px-3 text-xs font-bold text-white transition-colors hover:bg-black/40"
+      >
+        <Eye size={14} aria-hidden="true" /> Ver contexto clínico
+      </button>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-2">
+        {diagnosis && (
+          <span className="inline-flex items-center gap-1.5 rounded-xl bg-black/30 px-3 py-1.5 text-xs font-bold text-white">
+            <Brain size={12} aria-hidden="true" />
+            {diagnosis}
+          </span>
+        )}
+        {appointment.reason && (
+          <span className="inline-flex items-center gap-1.5 rounded-xl bg-black/25 px-3 py-1.5 text-xs font-medium text-white">
+            <Calendar size={12} aria-hidden="true" />
+            {appointment.reason}
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={() => setRevealed(false)}
+          className="inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-xs font-bold text-white transition-colors hover:bg-black/25"
+        >
+          <EyeOff size={14} aria-hidden="true" /> Ocultar
+        </button>
+      </div>
+      {clinicalContext && (
+        <p className="max-w-prose text-sm font-medium leading-relaxed text-white">
+          {clinicalContext}
+        </p>
+      )}
     </div>
   );
 }
 
-function DiagnosisTags({ appointment }: { appointment: Appointment }) {
+/**
+ * Cuerpo de la banda: chips + nombre + contexto a la izquierda, acción primaria
+ * a la derecha en LA MISMA fila. Antes la acción caía debajo de un bloque de
+ * 5rem de tipografía y quedaba a media pantalla de distancia del dato que la
+ * justifica.
+ */
+function Band({
+  chips,
+  appointment,
+  action,
+}: {
+  chips: React.ReactNode;
+  appointment: Appointment;
+  action: React.ReactNode;
+}) {
   return (
-    <div className="flex items-center gap-2 flex-wrap">
-      {appointment.patient.diagnosis && (
-        <span className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white/90 px-3 py-1.5 rounded-xl text-xs font-bold">
-          <Brain size={12} className="opacity-70" />
-          {appointment.patient.diagnosis}
-        </span>
-      )}
-      {appointment.reason && (
-        <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-sm text-white/70 px-3 py-1.5 rounded-xl text-xs font-medium">
-          <Calendar size={12} className="opacity-60" />
-          {appointment.reason}
-        </span>
-      )}
+    <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+      <div className="min-w-0 space-y-3">
+        <div className="flex flex-wrap items-center gap-2">{chips}</div>
+        <PatientHeader appointment={appointment} />
+        <ClinicalContext appointment={appointment} />
+      </div>
+      <div className="shrink-0">{action}</div>
     </div>
   );
 }
@@ -113,50 +208,38 @@ function InProgressView({ appointment }: { appointment: Appointment }) {
   useEffect(() => {
     const interval = setInterval(() => {
       setElapsed(formatElapsed(appointment.startTime));
-    }, 30_000); // Update every 30s
+    }, 30_000);
     return () => clearInterval(interval);
   }, [appointment.startTime]);
 
   return (
-    <div className="space-y-5 relative z-10">
-      {/* Status badges */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <span className="inline-flex items-center gap-2 bg-emerald-400/20 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest text-emerald-100">
-          <Radio size={10} className="animate-pulse" /> EN CURSO
-        </span>
-        <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black tracking-widest">
-          <Clock size={10} /> {elapsed}
-        </span>
-        {appointment.sessionNumber && (
-          <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black tracking-widest">
-            <Hash size={10} /> SESIÓN {appointment.sessionNumber}
+    <Band
+      appointment={appointment}
+      chips={
+        <>
+          <span className="inline-flex items-center gap-2 rounded-full bg-emerald-950/50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-100">
+            <Radio size={10} className="animate-pulse" aria-hidden="true" /> En curso
           </span>
-        )}
-      </div>
-
-      <PatientHeader appointment={appointment} />
-      <DiagnosisTags appointment={appointment} />
-
-      {/* Clinical context */}
-      {appointment.patient.clinicalContext && (
-        <p className="text-sm text-purple-100/70 max-w-lg leading-relaxed line-clamp-2">
-          {appointment.patient.clinicalContext}
-        </p>
-      )}
-
-      {/* Actions — contextual for in-progress */}
-      <div className="flex items-center gap-3 mt-2">
-        <button 
+          <BandChip>
+            <Clock size={10} aria-hidden="true" /> {elapsed}
+          </BandChip>
+          {appointment.sessionNumber && (
+            <BandChip>
+              <Hash size={10} aria-hidden="true" /> Sesión {appointment.sessionNumber}
+            </BandChip>
+          )}
+        </>
+      }
+      action={
+        <button
+          type="button"
           onClick={() => navigate(`/session/${appointment.id}`)}
-          className="bg-white text-kio px-6 py-3.5 rounded-2xl font-bold flex items-center gap-3 hover:scale-105 transition-transform text-sm cursor-pointer"
+          className="inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-white px-6 text-sm font-bold text-kanji-deep transition-all duration-150 hover:bg-cruz active:scale-95 lg:w-auto"
         >
-          <FileText size={16} /> Ir a Sesión
+          <FileText size={16} aria-hidden="true" /> Ir a la sesión
         </button>
-        <button className="bg-white/10 backdrop-blur-sm text-white px-6 py-3.5 rounded-2xl font-bold flex items-center gap-2 hover:bg-white/20 transition-all text-sm cursor-pointer">
-          <Clock size={14} /> Finalizar Sesión
-        </button>
-      </div>
-    </div>
+      }
+    />
   );
 }
 
@@ -169,78 +252,84 @@ function UpcomingView({ appointment }: { appointment: Appointment }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const currentTime = Date.now();
-      setNow(currentTime);
+      setNow(Date.now());
       setCountdown(formatCountdown(appointment.startTime));
     }, 30_000);
     return () => clearInterval(interval);
   }, [appointment.startTime]);
 
-  // Logic: Allow start if within 15 mins
-  const timeUntilStart = new Date(appointment.startTime).getTime() - now;
-  const isWithinWindow = timeUntilStart <= 15 * 60 * 1000; // 15 minutes
+  // Se puede iniciar dentro de una ventana de 15 minutos antes de la hora.
+  const isWithinWindow = new Date(appointment.startTime).getTime() - now <= 15 * 60 * 1000;
 
   return (
-    <div className="space-y-5 relative z-10">
-      {/* Status badges */}
-      <div className="flex items-center gap-3 flex-wrap">
-        {appointment.sessionNumber && (
-          <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black tracking-widest">
-            <Hash size={10} /> SESIÓN {appointment.sessionNumber}
-          </span>
-        )}
-        <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black tracking-widest">
-          <Clock size={10} /> {formatTime(appointment.startTime)} · {countdown}
-        </span>
-      </div>
-
-      <PatientHeader appointment={appointment} />
-      <DiagnosisTags appointment={appointment} />
-
-      {/* Clinical context */}
-      {appointment.patient.clinicalContext && (
-        <p className="text-sm text-purple-100/70 max-w-lg leading-relaxed line-clamp-2">
-          {appointment.patient.clinicalContext}
-        </p>
-      )}
-
-      {/* Action */}
-      {isWithinWindow ? (
-        <button
-          onClick={() => navigate(`/session/${appointment.id}`)}
-          className="bg-white text-kio px-8 py-4 rounded-2xl font-bold flex items-center gap-3 hover:scale-105 transition-transform mt-2 cursor-pointer"
-        >
-          <Play fill="currentColor" size={16} /> Iniciar Consulta
-        </button>
-      ) : (
-        <button
-          onClick={() => navigate('/agenda')}
-          className="bg-white/10 backdrop-blur-sm text-white/90 px-8 py-4 rounded-2xl font-bold flex items-center gap-3 hover:bg-white/20 transition-all mt-2 cursor-pointer"
-        >
-          <Calendar size={18} className="text-white/70" />
-          <span className="opacity-90">
-            Programada: <span className="text-white">{formatScheduledDate(appointment.startTime)}</span>
-          </span>
-        </button>
-      )}
-    </div>
+    <Band
+      appointment={appointment}
+      chips={
+        <>
+          <BandChip>
+            <Clock size={10} aria-hidden="true" /> {formatTime(appointment.startTime)} · {countdown}
+          </BandChip>
+          {appointment.sessionNumber && (
+            <BandChip>
+              <Hash size={10} aria-hidden="true" /> Sesión {appointment.sessionNumber}
+            </BandChip>
+          )}
+        </>
+      }
+      action={
+        isWithinWindow ? (
+          <button
+            type="button"
+            onClick={() => navigate(`/session/${appointment.id}`)}
+            className="inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-white px-6 py-3 text-sm font-bold text-kanji-deep transition-all duration-150 hover:bg-cruz active:scale-95 lg:w-auto"
+          >
+            <Play fill="currentColor" size={16} aria-hidden="true" /> Iniciar consulta
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => navigate('/agenda')}
+            className="inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-black/25 px-5 text-left text-sm font-bold text-white transition-all duration-150 hover:bg-black/40 active:scale-95 lg:w-auto"
+          >
+            <Calendar size={16} aria-hidden="true" />
+            <span className="font-medium">
+              Programada <span className="font-bold">{formatScheduledDate(appointment.startTime)}</span>
+            </span>
+          </button>
+        )
+      }
+    />
   );
 }
 
 /* ── Empty State ──────────────────────────────── */
 
+/**
+ * Sin cita: volumen bajo.
+ *
+ * Esto gastaba la superficie más enfática del documento — la única a sangre con
+ * la rampa de marca — en anunciar ausencia de trabajo a alguien que está
+ * construyendo su consulta. La rampa se reserva para cuando hay un paciente al
+ * que atender (ver el contenedor de `NextAppointmentWidget`); aquí queda una
+ * superficie normal y un secundario, no un botón sólido de marca.
+ */
 function EmptyView() {
-  return (
-    <div className="relative z-10 h-full flex flex-col justify-center">
-      <div className="absolute -right-20 -top-20 w-96 h-96 bg-white/5 rounded-full pointer-events-none" />
-      <div className="absolute -right-10 -top-10 w-64 h-64 bg-white/5 rounded-full pointer-events-none" />
+  const navigate = useNavigate();
 
-      <h2 className="text-6xl font-black tracking-tighter mb-4">Agenda despejada.</h2>
-      <p className="text-purple-100/80 text-lg max-w-md mb-8 leading-relaxed">
-        No tienes citas digitales programadas por ahora. Tienes disponibilidad total para atender pacientes presenciales o urgencias.
-      </p>
-      <button className="bg-white text-kanji px-8 py-4 rounded-2xl font-bold flex items-center gap-3 hover:scale-105 transition-transform w-fit">
-        <UserPlus size={20} /> Registrar Visita
+  return (
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h3 className="text-base font-bold tracking-tight text-text dark:text-white">Sin próxima cita</h3>
+        <p className="mt-0.5 text-sm font-medium text-text-secondary dark:text-slate-400">
+          No tienes sesiones programadas a partir de ahora.
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={() => navigate('/agenda')}
+        className="inline-flex min-h-11 w-fit shrink-0 items-center gap-2 rounded-xl border border-border bg-surface px-5 text-sm font-bold text-kanji-deep transition-colors hover:bg-secondary active:scale-95 dark:border-slate-700 dark:bg-slate-800 dark:text-kio dark:hover:bg-slate-700"
+      >
+        <UserPlus size={16} aria-hidden="true" /> Agendar cita
       </button>
     </div>
   );
@@ -248,13 +337,39 @@ function EmptyView() {
 
 /* ── Main Widget ──────────────────────────────── */
 
-export function NextAppointmentWidget({ appointment, isLoading }: NextAppointmentProps) {
+/**
+ * La banda AHORA de la hoja de sala.
+ *
+ * Es el único elemento a sangre del documento y el único que lleva la rampa de
+ * marca — cuando hay un paciente al que atender. Ya no es una rejilla de 12
+ * columnas con un calendario incrustado a la derecha: es una banda de una sola
+ * fila que se dimensiona por su contenido, con la acción primaria a la altura
+ * del ojo del dato que la justifica.
+ */
+export function NextAppointmentWidget({ appointment, isLoading, isError, onRetry }: NextAppointmentProps) {
   const inProgress = appointment ? isInProgress(appointment) : false;
 
+  // La rampa de marca se reserva para cuando hay algo que atender. Sin cita, la
+  // banda baja a superficie normal: anunciar ausencia de trabajo no merece el
+  // único panel a sangre del documento.
+  const onBrand = isLoading || Boolean(isError) || appointment !== null;
+
   return (
-    <div data-tour="tour-next-appointment" className="col-span-12 md:col-span-7 lg:col-span-8 p-6 md:p-8 lg:p-10 xl:p-14 text-white relative overflow-hidden">
+    <div
+      data-tour="tour-next-appointment"
+      className={`relative overflow-hidden rounded-2xl px-5 py-5 sm:px-7 sm:py-6 ${
+        onBrand
+          ? 'bg-gradient-to-br from-deck-from to-deck-to text-white'
+          : 'border border-border bg-surface dark:border-slate-800 dark:bg-slate-900'
+      }`}
+    >
       {isLoading ? (
-        <Skeleton className="w-64 h-12 bg-white/20" />
+        <div className="space-y-3">
+          <Skeleton className="h-5 w-40 bg-black/20" />
+          <Skeleton className="h-8 w-64 bg-black/20" />
+        </div>
+      ) : isError ? (
+        <WidgetError what="tu próxima cita" onRetry={onRetry} tone="brand" />
       ) : appointment ? (
         inProgress ? (
           <InProgressView appointment={appointment} />
@@ -267,5 +382,3 @@ export function NextAppointmentWidget({ appointment, isLoading }: NextAppointmen
     </div>
   );
 }
-// Force refresh
-

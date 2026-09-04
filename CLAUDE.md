@@ -24,8 +24,11 @@ npm run dev          # Start all apps in parallel (API + Web)
 npm run build        # Build all apps and packages
 npm run lint         # Lint all workspaces
 npm run check-types  # Type-check all workspaces
+npm test             # Run unit tests in all workspaces
 npm run format       # Prettier format all .ts/.tsx/.md files
 ```
+
+CI (`.github/workflows/ci.yml`) runs `lint` → `check-types` → `test` → `build` on push/PR to `main`. Keep all four green.
 
 ### API (`apps/api`)
 ```bash
@@ -34,6 +37,7 @@ npm run build -w api              # Build API
 npm test -w api                   # Run Jest unit tests
 npm run test:watch -w api         # Watch mode tests
 npm run test:e2e -w api           # E2E tests (jest-e2e config)
+npm run test:integration -w api   # Integration tests — needs a real DB
 npm run test:cov -w api           # Coverage report
 npm run lint -w api               # ESLint with --fix
 ```
@@ -51,9 +55,13 @@ npm run preview -w web    # Preview production build
 cd apps/api
 npx prisma migrate dev       # Create/apply migrations
 npx prisma generate          # Regenerate client
-npx prisma db seed           # Seed database (ts-node prisma/seed.ts)
+npx prisma db seed           # Seed database (config in prisma.config.ts)
 npx prisma studio            # Visual DB browser
 ```
+
+**Schema changes go through migrations — never `prisma db push`.** `db push` was the origin of the schema drift that once left `beta_invitations` missing in production (the container runs `prisma migrate deploy` on boot). One source of truth: `schema.prisma` + `prisma/migrations/`. The seed command lives only in `prisma.config.ts` (the `package.json#prisma` block was removed; Prisma 6 deprecated it).
+
+> **Known migration debt:** three folders under `prisma/migrations/` lack a timestamp prefix (`add_medication_allergies_to_patient`, `create_addendums_table`, `create_risk_flags_table`) because they were applied by hand before being written as migrations. They sort *before* every `2026*` migration lexicographically, which works only by accident. Renaming them requires updating `_prisma_migrations` in the live DB in the same step (or `migrate deploy` sees drift), so do it only with DB access — do not rename the folders alone.
 
 ## Architecture
 
@@ -65,14 +73,17 @@ Feature-module pattern: each domain (`auth/`, `appointments/`, `patients/`, `fin
 
 **Auth & Authorization**:
 - JWT stored in **httpOnly cookies** (`access_token`, 15 min expiry; `refresh_token`, 7 days). `JwtStrategy` reads from cookie first, then falls back to Authorization header.
-- `JwtAuthGuard` protects all routes globally except `POST /auth/login`.
-- Use **`@CurrentClinician()`** decorator (not `@CurrentUser()`) — throws `UnauthorizedException` if the user has no clinician profile. Returns the full JWT payload with `clinicianId`.
-- `AppointmentOwnershipGuard` — apply via `@UseGuards(AppointmentOwnershipGuard)` on appointment endpoints that need ownership validation. Throws `ForbiddenException` if the appointment doesn't belong to the current clinician.
+- `JwtAuthGuard` is **global** — registered as `APP_GUARD` in `app.module.ts` (second, after `ThrottlerGuard`). **Every route is protected by default; a new controller is authenticated automatically.** To expose a public endpoint, add `@Public()` (`auth/decorators/public.decorator.ts`). Public today: health check, the `auth/` login/signup/refresh/logout/password/invite endpoints, `clinics/join`, the Google OAuth callback, the legacy reminder-confirmation link, and the patient-portal endpoints (`portal/actions/*` server-rendered email actions and the `portal/*` JSON API — both authenticate with the patient bearer token from `PortalTokenService`, throttled, never the clinician cookie). When adding a `@Public()` endpoint, ask whether it truly cannot require an access token — `refresh`, the OAuth callback, and the portal token layer are the load-bearing cases.
+- **Ownership is enforced at the query level, not by authentication.** The global guard only proves *who* you are; it does not prove the row is yours. The canonical pattern: service methods take `clinicianId` and pass it to `findFirst` (never `findUnique` + post-check) so a foreign row simply isn't returned. `AppointmentOwnershipGuard` is optional defense-in-depth for `:id` appointment routes — do not treat "has a guard" as the ownership mechanism.
+- **Never declare the same route path in two controllers.** Which handler wins is decided by Nest's dependency-resolution order, not the `imports` array in `AppModule` — so a controller without an ownership guard can silently shadow one that has it (this happened with `risk-flags/`). `src/route-collisions.spec.ts` boots the app and fails CI on any duplicate `method + route-shape`; keep it green.
+- Use **`@CurrentClinician()`** decorator (not `@CurrentUser()`) — throws `UnauthorizedException` if the user has no clinician profile. Returns `clinicianId` from the JWT payload.
 - `RefreshToken` model stores hashed tokens; `POST /auth/refresh` rotates both tokens.
 
 **Encryption** (`EncryptionService` at `src/lib/encryption.service.ts`):
 - AES-256-GCM (authenticated). Key: 32 bytes = 64 hex chars (`ENCRYPTION_KEY` env var).
-- Encrypted patient fields: `diagnosis`, `clinicalContext`, `contactPhone`, `emergencyContact` (JSON-stringified before encrypt). Encrypt/decrypt in `PatientsService`, not controllers.
+- Encrypted `Patient` fields (6): `diagnosis`, `clinicalContext`, `contactPhone`, `emergencyContact` (JSON-stringified before encrypt), `medicacionActual`, `alergias`. Also encrypted: `PsychNote.content` and `PsychNote.privateNotes`. Encrypt/decrypt in the service layer, not controllers.
+- Encrypted fields are **not searchable or filterable in SQL**. Anything that needs querying must stay in plaintext columns (e.g. `getClinicPatients()` selects only unencrypted fields).
+- `dateOfBirth` is **not** encrypted (it is a `DateTime`; encrypting it needs a schema change to `String`).
 - Decryption **throws** on auth tag mismatch — do not catch silently.
 
 **DTOs**: Class-based with `class-validator` decorators. `class-transformer` auto-transforms request bodies (enabled globally in `main.ts`).
@@ -89,7 +100,10 @@ Key entity chain: `User` → `ClinicianProfile` (1:1) → `Patient[]` → `Appoi
 
 ### Frontend (React + Vite)
 
-**Routing**: React Router v7 with `RequireAuth` wrapper. Routes: `/login`, `/dashboard`, `/agenda`, `/session/:appointmentId`, `/patients`, `/patients/:id`, `/onboarding`, `/settings`.
+**Routing**: React Router v7 with `RequireAuth` wrapper. Protected routes are lazy-loaded; public/auth routes are static imports on purpose.
+- Public: `/login`, `/signup`, `/forgot-password`, `/reset-password`, `/join/:token`
+- Protected: `/dashboard`, `/agenda`, `/finance`, `/session/:appointmentId`, `/patients`, `/patients/:id`, `/onboarding`, `/settings`, `/clinic`, `/change-password`
+- Plus `/` (redirects by auth state) and `*` (404)
 
 **State**:
 - Zustand (`auth.store.ts`, `notes.store.ts`) for client state. Auth store persists `user`/`isAuthenticated` to localStorage; actual session validity is determined by the httpOnly cookie. **`logout()` is async** — always `await` it before navigating.
@@ -144,4 +158,28 @@ Dark mode uses a `.dark` class with CSS custom properties (slate palette).
 - `SEED_PASSWORD` — Password used by `prisma db seed` only
 
 **Web** (`apps/web/.env`):
-- `VITE_API_URL` — Backend API base URL (default: `http://localhost:3000`)
+- `VITE_API_URL` — Backend API base URL (default: `http://localhost:3001`; the API listens on 3001 in local dev)
+
+## Dev credentials
+
+A test clinician account for driving the UI locally (Impeccable live mode, manual QA) lives in
+**`apps/web/.impeccable/live/credentials.local.md`** — gitignored, not in this file. It also
+records how to log in and which other accounts exist in the dev database.
+
+The API mounts every route under the global prefix **`api`** (`app.setGlobalPrefix('api')` in
+`main.ts`), so the login endpoint is `POST /api/auth/login`, not `/auth/login`.
+
+> **`prisma db seed` is destructive.** `prisma/seed.ts` runs `deleteMany()` on `users`,
+> `patients`, `appointments`, `psych_notes`, `finance_transactions`, `tasks`, `access_logs`
+> and `refresh_tokens` before inserting. `apps/api/.env` points at hosted Supabase, not a
+> local database — there is no local flow in this repo — so running the seed wipes that
+> database. Never run it as a convenience step.
+
+## Design system
+
+`PRODUCT.md` (product truth) and `DESIGN.md` + `.impeccable/design.json` (visual system,
+derived from the shipped code) live at the repo root. The older
+`.claude/skills/kio-design-system/SKILL.md` covers the same visual ground; where the two
+disagree, `DESIGN.md` was measured against the code and the skill was not. Two known
+divergences are documented there: the radius scale is non-monotonic (`rounded-xl` is 28px
+while `rounded-2xl` is 16px), and Inter/Roboto are loaded but essentially never applied.

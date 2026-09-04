@@ -25,7 +25,8 @@ export const SuggestionsModal: FC<SuggestionsModalProps> = ({ isOpen, onClose, s
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+          aria-hidden="true"
+          className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm dark:bg-black/60"
         />
 
         <motion.div
@@ -36,27 +37,30 @@ export const SuggestionsModal: FC<SuggestionsModalProps> = ({ isOpen, onClose, s
         >
           <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50">
             <div>
-              <h2 className="text-xl font-bold text-kanji dark:text-white">Explorar Etiquetas</h2>
+              <h2 className="text-xl font-bold text-kanji-deep dark:text-white">Explorar etiquetas</h2>
               <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Selecciona etiquetas para añadir a la sesión</p>
             </div>
             <button
+              type="button"
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:text-slate-500 dark:hover:text-slate-300 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+              aria-label="Cerrar el explorador de etiquetas"
+              className="flex size-11 shrink-0 items-center justify-center text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
             >
-              <X size={20} />
+              <X size={20} aria-hidden="true" />
             </button>
           </div>
 
           <div className="p-6">
             {/* Search Input */}
             <div className="relative mb-6">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+              <Search aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" size={16} />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar etiqueta..."
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-kio/20 outline-none transition-all"
+                aria-label="Buscar entre las etiquetas sugeridas"
+                placeholder="Buscar etiqueta…"
+                className="min-h-11 w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-kio/20 outline-none transition-all"
                 autoFocus
               />
             </div>
@@ -66,17 +70,19 @@ export const SuggestionsModal: FC<SuggestionsModalProps> = ({ isOpen, onClose, s
                 filtered.map((s) => (
                   <button
                     key={s}
+                    type="button"
                     onClick={() => {
                       onAddTag(s);
                       // Don't close modal, allow multiple selection
                     }}
-                    className="flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800/40 text-gray-700 dark:text-slate-200 rounded-2xl border border-gray-100 dark:border-slate-700 group hover:border-kio hover:bg-kio/5 transition-all text-left"
+                    aria-label={`Añadir la etiqueta ${s}`}
+                    className="flex min-h-11 items-center justify-between px-4 py-3 bg-white dark:bg-slate-800/40 text-gray-700 dark:text-slate-200 rounded-2xl border border-gray-100 dark:border-slate-700 group hover:border-kanji-deep hover:bg-kio/5 transition-colors text-left"
                   >
                     <div className="flex items-center gap-2">
-                      <Hash size={14} className="text-gray-400 group-hover:text-kio" />
+                      <Hash size={14} aria-hidden="true" className="text-gray-500 group-hover:text-kanji-deep dark:text-slate-400 dark:group-hover:text-kio" />
                       <span className="font-bold text-sm">{s}</span>
                     </div>
-                    <Plus size={16} className="text-gray-300 group-hover:text-kio" />
+                    <Plus size={16} aria-hidden="true" className="text-gray-500 group-hover:text-kanji-deep dark:text-slate-400 dark:group-hover:text-kio" />
                   </button>
                 ))
               ) : (
@@ -89,8 +95,9 @@ export const SuggestionsModal: FC<SuggestionsModalProps> = ({ isOpen, onClose, s
 
           <div className="px-6 py-5 bg-gray-50 dark:bg-slate-900/50 border-t border-gray-100 dark:border-slate-800 flex justify-end">
             <button
+              type="button"
               onClick={onClose}
-              className="px-8 py-2.5 bg-kio text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-kio/20"
+              className="flex min-h-11 items-center rounded-xl bg-kanji-deep px-8 text-sm font-bold text-white shadow-md shadow-kanji-deep/20 transition-all duration-150 hover:bg-kanji-deep/90 active:scale-95"
             >
               Finalizar
             </button>

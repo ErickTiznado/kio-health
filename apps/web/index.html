@@ -3,8 +3,59 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/x-icon" href="/KioLogo.ico" />
+    <link rel="apple-touch-icon" href="/LogoFavi.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Plataforma integral de gestión para profesionales de la salud mental." />
+
+    <!-- Base. El <title> y la descripción describen la landing porque es la
+         única ruta que un desconocido alcanza sin sesión; el resto de la SPA
+         va tras autenticación y no se comparte por enlace. -->
+    <title>Kio Health — Gestión clínica para psicólogos</title>
+    <meta
+      name="description"
+      content="Agenda, sesión, nota clínica y cobro en un solo recorrido. Las notas y los datos de contacto del paciente se guardan cifrados con AES-256-GCM. En beta cerrada."
+    />
+    <link rel="canonical" href="https://kioind.com/" />
+
+    <!-- La barra del navegador acompaña al tema, en vez de quedarse en blanco
+         sobre el suelo slate. Los valores son los de DESIGN.md: lino cálido en
+         claro, noche base en oscuro. -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f5f3ef" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020617" />
+
+    <!-- Open Graph. Sin esto, la invitación a la beta se comparte por WhatsApp
+         o LinkedIn como una tarjeta vacía: el enlace es el canal principal de
+         una beta cerrada, así que la vista previa es parte del producto.
+         og:image tiene que ser absoluta — los scrapers no resuelven rutas. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Kio Health" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:url" content="https://kioind.com/" />
+    <meta property="og:title" content="Kio Health — Gestión clínica para psicólogos" />
+    <meta
+      property="og:description"
+      content="Agenda, sesión, nota clínica y cobro en un solo recorrido. Las notas y los datos de contacto del paciente se guardan cifrados con AES-256-GCM. En beta cerrada."
+    />
+    <meta property="og:image" content="https://kioind.com/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Kio Health. Agenda, sesión, nota y cobro son un solo recorrido."
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Kio Health — Gestión clínica para psicólogos" />
+    <meta
+      name="twitter:description"
+      content="Agenda, sesión, nota clínica y cobro en un solo recorrido. Las notas y los datos de contacto del paciente se guardan cifrados con AES-256-GCM. En beta cerrada."
+    />
+    <meta name="twitter:image" content="https://kioind.com/og.png" />
+    <meta
+      name="twitter:image:alt"
+      content="Kio Health. Agenda, sesión, nota y cobro son un solo recorrido."
+    />
+
     <!-- Fuentes: preconnect para performance, luego carga de Inter y Roboto -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,9 +63,23 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <title>Kio Health | Gestión Clínica Moderna</title>
   </head>
   <body>
+    <!--
+    THESIS: la landing no ilustra el producto, lo conduce. Rechaza el hero con
+    rejilla de features y capturas decorativas: el visor de la app ES el primer
+    viewport, y la copy cuelga de cada paso del ciclo de sesión.
+    OWN-WORLD: el sistema de Kio sin cambios — lino cálido #f5f3ef y suelo slate
+    #020617, púrpura escaso, superficies planas separadas por borde de 1px,
+    radios blandos, versalitas espaciadas como etiqueta, iconos Lucide.
+    STORY: un psicólogo entiende que agenda, sesión, nota y cobro son un solo
+    recorrido, ve que las notas van cifradas, y pide acceso a la beta.
+    FIRST VIEWPORT: a la izquierda titular, subtítulo y formulario de lista de
+    espera; a la derecha el visor con la captura real y el riel de cuatro pasos
+    bajo él. Acción primaria visible sin desplazar.
+    FORM: demo conducida, candidato 3 de la lista ordenada; seed 40bc9d8e.
+    FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+    -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

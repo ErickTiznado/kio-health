@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "gray-on-color",
+        "value": "text-slate-400 on bg-emerald-50",
+        "createdAt": "2026-08-14T21:39:19.257Z",
+        "reason": "Claude: falso positivo — el gris es el color en reposo sobre superficie neutra y el hover fija a la vez el fondo y el texto de color (patron de boton destructivo/exito de DESIGN.md). Barrido de contraste en navegador, claro y oscuro: 0 fallos."
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "text-slate-400 on bg-rose-50",
+        "createdAt": "2026-08-14T21:39:19.488Z",
+        "reason": "Claude: falso positivo — el gris es el color en reposo sobre superficie neutra y el hover fija a la vez el fondo y el texto de color (patron de boton destructivo/exito de DESIGN.md). Barrido de contraste en navegador, claro y oscuro: 0 fallos."
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "text-slate-600 on bg-rose-50",
+        "createdAt": "2026-08-14T21:39:19.708Z",
+        "reason": "Claude: falso positivo — el gris es el color en reposo sobre superficie neutra y el hover fija a la vez el fondo y el texto de color (patron de boton destructivo/exito de DESIGN.md). Barrido de contraste en navegador, claro y oscuro: 0 fallos."
+      }
+    ]
+  }
+}

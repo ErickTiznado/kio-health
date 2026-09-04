@@ -63,6 +63,35 @@
     margin: 0;
   }
 
+  /* Global keyboard focus. The dashboard shell shipped with no focus rules at
+     all and relied on the browser default, which is inconsistent with the rest
+     of the app and low-contrast over the brand surfaces. */
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-kio);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  /* Browser surfaces that ship with no design system of their own. */
+  ::selection {
+    background-color: var(--color-cruz);
+    color: #213547;
+  }
+
+  .dark ::selection {
+    background-color: var(--color-kanji);
+    color: #f8fafc;
+  }
+
+  :root {
+    accent-color: var(--color-kio);
+    caret-color: var(--color-kanji);
+  }
+
+  .dark {
+    caret-color: var(--color-kio);
+  }
+
   body {
     background-color: var(--color-bg);
     color: var(--color-text);
@@ -91,6 +120,17 @@
   --color-kanji: #8a72d1;
   --color-cruz: #ddd3fa;
 
+  /* Accesible brand purple. `kio` (#ae93fe) reaches only ~2.2:1 on the warm
+     linen surface and `kanji` only 3.88:1 — neither clears WCAG AA for normal
+     text. Use this for purple TEXT on light surfaces, and as the background of
+     solid brand buttons carrying white text (7.3:1). */
+  --color-kanji-deep: #5b46a8;
+
+  /* Rampa del deck del dashboard. Oscurecida respecto a kanji→kio para que el
+     texto blanco supere 4.5:1 en todo el recorrido (medido 9.95 → 5.96). */
+  --color-deck-from: #45348a;
+  --color-deck-to: #6b52b8;
+
   --font-roboto: Roboto, sans-serif;
   --font-inter: Inter, sans-serif;
 
@@ -103,13 +143,46 @@
   --radius-hero: 40px;  /* único uso: dashboard liquid card */
 }
 
-/* Guided tour highlight — backdrop via box-shadow spread trick */
+/* Guided tour highlight.
+   `box-shadow` lost against Tailwind v4's shadow custom properties and computed
+   transparent, so the ring never painted. `outline` cannot be composed away by
+   a utility. The inset offset also keeps the ring visible inside containers
+   with `overflow-hidden`, which would have clipped an outward ring. The dimming
+   is the tour's own backdrop now, so the 9999px spread trick is gone. */
 .tour-highlight {
   position: relative !important;
   z-index: 9001 !important;
-  box-shadow:
-    0 0 0 4px #ae93fe,
-    0 0 0 9999px rgba(0, 0, 0, 0.55) !important;
-  border-radius: 8px;
-  transition: box-shadow 0.25s ease;
+  /* Color as its own declaration: inside the `outline` shorthand the custom
+     property was being dropped, and outline-color fell back to `currentColor`,
+     painting the ring in whatever text colour the target happened to have. */
+  outline: 4px solid !important;
+  outline-color: #ae93fe !important;
+  outline-offset: -4px !important;
+  border-radius: var(--radius-lg);
 }
+/* Carril horizontal de las capturas de la landing.
+   La barra de desplazamiento aparece a tamaño móvil, encima de una superficie
+   de marca, y por defecto se pinta con los grises del sistema operativo — que
+   no pertenecen a ningún sistema de diseño.
+   El pulgar va en Kanji en ambos modos, no en Cruz: sobre la card blanca el
+   Cruz mide 1.2:1 y es la única señal de que la captura se desliza. Un
+   control esencial por debajo de 3:1 no se ve en un móvil a plena luz. */
+.shot-rail {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-kanji) transparent;
+}
+
+
+.shot-rail::-webkit-scrollbar {
+  height: 8px;
+}
+
+.shot-rail::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.shot-rail::-webkit-scrollbar-thumb {
+  background-color: var(--color-kanji);
+  border-radius: var(--radius-full, 9999px);
+}
+

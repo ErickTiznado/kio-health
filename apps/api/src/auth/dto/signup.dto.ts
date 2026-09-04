@@ -1,4 +1,10 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, Matches } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  MinLength,
+  Matches,
+} from 'class-validator';
 
 export class SignupDto {
   @IsEmail({}, { message: 'El email debe ser válido' })
@@ -17,4 +23,7 @@ export class SignupDto {
   @IsNotEmpty({ message: 'El nombre completo es requerido' })
   fullName!: string;
 
+  @IsString({ message: 'El token de invitación debe ser una cadena de texto' })
+  @IsNotEmpty({ message: 'Se requiere un token de invitación válido' })
+  inviteToken!: string;
 }

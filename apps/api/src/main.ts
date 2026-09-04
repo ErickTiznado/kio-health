@@ -1,9 +1,8 @@
 import './instrument'; // Must be imported before anything else
-import { NestFactory, BaseExceptionFilter } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
-import * as Sentry from '@sentry/nestjs';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const cookieParser = require('cookie-parser');
 
@@ -19,7 +18,10 @@ async function bootstrap() {
     : ['http://localhost:5173'];
 
   app.enableCors({
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
       // Allow requests with no origin (mobile apps, curl, server-to-server)
       if (!origin) return callback(null, true);
       // Allow exact matches from ALLOWED_ORIGINS

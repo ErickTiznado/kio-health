@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type { PsychNoteAddendum } from '../types/patients.types';
 import { addendumKeys } from '../lib/query-keys';
+import { getErrorMessage } from '../lib/errors';
 import { toast } from 'sonner';
 
 const fetchAddendums = async (appointmentId: string): Promise<PsychNoteAddendum[]> => {
@@ -46,8 +47,8 @@ export const useCreateAddendum = () => {
       });
       toast.success('Anexo agregado correctamente');
     },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || 'Error al crear anexo';
+    onError: (error: unknown) => {
+      const message = getErrorMessage(error, 'Error al crear anexo');
       if (message.includes('30 days')) {
         toast.error('No se pueden crear anexos después de 30 días');
       } else {

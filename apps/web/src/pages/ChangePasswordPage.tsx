@@ -56,7 +56,7 @@ export function ChangePasswordPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-bg via-bg to-kio/5 dark:from-slate-950 dark:via-slate-950 dark:to-kio/10 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-bg dark:bg-slate-950 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
 
         {/* Logo */}
@@ -68,26 +68,26 @@ export function ChangePasswordPage() {
 
         {/* Banner */}
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-2xl p-4 mb-6 flex items-start gap-3">
-          <ShieldCheck size={20} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+          <ShieldCheck size={20} className="text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
           <div>
-            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+            <p className="text-sm font-bold text-amber-800 dark:text-amber-300">
               Debes cambiar tu contraseña
             </p>
-            <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+            <p className="text-xs font-medium text-amber-800 dark:text-amber-400 mt-0.5">
               Tu cuenta fue configurada con una contraseña temporal. Por seguridad, elige una nueva antes de continuar.
             </p>
           </div>
         </div>
 
         {/* Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-cruz dark:border-slate-800 shadow-xl p-8">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-cruz dark:border-slate-800 shadow-sm p-8">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-br from-kio to-kanji rounded-xl flex items-center justify-center shrink-0">
-              <KeyRound size={18} className="text-white" />
+            <div className="w-10 h-10 bg-secondary dark:bg-slate-800 rounded-xl flex items-center justify-center shrink-0">
+              <KeyRound size={18} className="text-kanji-deep dark:text-kio" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-kanji dark:text-white">Nueva contraseña</h2>
-              <p className="text-xs text-text/50 dark:text-slate-400">{user?.email}</p>
+              <h2 className="text-lg font-bold text-kanji-deep dark:text-white">Nueva contraseña</h2>
+              <p className="text-xs font-medium text-text-secondary">{user?.email}</p>
             </div>
           </div>
 
@@ -95,90 +95,123 @@ export function ChangePasswordPage() {
 
             {/* Current password */}
             <div>
-              <label className="block text-sm font-medium text-kanji dark:text-slate-200 mb-1.5">
+              <label
+                htmlFor="currentPassword"
+                className="block text-sm font-medium text-text dark:text-slate-200 mb-1.5"
+              >
                 Contraseña temporal
               </label>
               <div className="relative">
                 <input
+                  id="currentPassword"
                   type={showCurrent ? 'text' : 'password'}
                   placeholder="••••••••"
+                  autoComplete="current-password"
+                  aria-invalid={errors.currentPassword ? true : undefined}
+                  aria-describedby={errors.currentPassword ? 'currentPassword-error' : undefined}
                   {...register('currentPassword', { required: 'Ingresa tu contraseña temporal' })}
-                  className={`w-full px-4 py-2.5 pr-10 rounded-xl border text-sm bg-bg dark:bg-slate-800 text-kanji dark:text-white focus:outline-none focus:ring-2 focus:ring-kio/50 placeholder:text-text/30 dark:placeholder:text-slate-600 ${
+                  className={`w-full min-h-11 px-4 py-2.5 pr-12 rounded-xl border text-sm bg-bg dark:bg-slate-800 text-text dark:text-white focus:outline-none focus:ring-2 focus:ring-kio/50 placeholder:text-text-muted dark:placeholder:text-slate-600 ${
                     errors.currentPassword ? 'border-red-400' : 'border-cruz dark:border-slate-700'
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowCurrent((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-kanji dark:hover:text-kio"
+                  aria-label={
+                    showCurrent ? 'Ocultar contraseña temporal' : 'Mostrar contraseña temporal'
+                  }
+                  aria-pressed={showCurrent}
+                  className="absolute right-0.5 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-xl text-text-secondary transition-colors hover:text-kanji-deep dark:hover:text-kio"
                 >
-                  {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showCurrent ? <EyeOff size={16} aria-hidden="true" /> : <Eye size={16} aria-hidden="true" />}
                 </button>
               </div>
               {errors.currentPassword && (
-                <p className="text-xs text-red-500 mt-1">{errors.currentPassword.message}</p>
+                <p id="currentPassword-error" className="text-xs font-medium text-red-600 dark:text-red-400 mt-1">
+                  {errors.currentPassword.message}
+                </p>
               )}
             </div>
 
             {/* New password */}
             <div>
-              <label className="block text-sm font-medium text-kanji dark:text-slate-200 mb-1.5">
+              <label
+                htmlFor="newPassword"
+                className="block text-sm font-medium text-text dark:text-slate-200 mb-1.5"
+              >
                 Nueva contraseña
               </label>
               <div className="relative">
                 <input
+                  id="newPassword"
                   type={showNew ? 'text' : 'password'}
                   placeholder="Mínimo 8 caracteres"
+                  autoComplete="new-password"
+                  aria-invalid={errors.newPassword ? true : undefined}
+                  aria-describedby={errors.newPassword ? 'newPassword-error' : undefined}
                   {...register('newPassword', {
                     required: 'Ingresa una nueva contraseña',
                     minLength: { value: 8, message: 'Mínimo 8 caracteres' },
                   })}
-                  className={`w-full px-4 py-2.5 pr-10 rounded-xl border text-sm bg-bg dark:bg-slate-800 text-kanji dark:text-white focus:outline-none focus:ring-2 focus:ring-kio/50 placeholder:text-text/30 dark:placeholder:text-slate-600 ${
+                  className={`w-full min-h-11 px-4 py-2.5 pr-12 rounded-xl border text-sm bg-bg dark:bg-slate-800 text-text dark:text-white focus:outline-none focus:ring-2 focus:ring-kio/50 placeholder:text-text-muted dark:placeholder:text-slate-600 ${
                     errors.newPassword ? 'border-red-400' : 'border-cruz dark:border-slate-700'
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowNew((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-kanji dark:hover:text-kio"
+                  aria-label={showNew ? 'Ocultar nueva contraseña' : 'Mostrar nueva contraseña'}
+                  aria-pressed={showNew}
+                  className="absolute right-0.5 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-xl text-text-secondary transition-colors hover:text-kanji-deep dark:hover:text-kio"
                 >
-                  {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showNew ? <EyeOff size={16} aria-hidden="true" /> : <Eye size={16} aria-hidden="true" />}
                 </button>
               </div>
               {errors.newPassword && (
-                <p className="text-xs text-red-500 mt-1">{errors.newPassword.message}</p>
+                <p id="newPassword-error" className="text-xs font-medium text-red-600 dark:text-red-400 mt-1">
+                  {errors.newPassword.message}
+                </p>
               )}
             </div>
 
             {/* Confirm password */}
             <div>
-              <label className="block text-sm font-medium text-kanji dark:text-slate-200 mb-1.5">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-text dark:text-slate-200 mb-1.5"
+              >
                 Confirmar contraseña
               </label>
               <input
+                id="confirmPassword"
                 type="password"
                 placeholder="••••••••"
+                autoComplete="new-password"
+                aria-invalid={errors.confirmPassword ? true : undefined}
+                aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
                 {...register('confirmPassword', {
                   required: 'Confirma tu contraseña',
                   validate: (val) => val === watch('newPassword') || 'Las contraseñas no coinciden',
                 })}
-                className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-bg dark:bg-slate-800 text-kanji dark:text-white focus:outline-none focus:ring-2 focus:ring-kio/50 placeholder:text-text/30 dark:placeholder:text-slate-600 ${
+                className={`w-full min-h-11 px-4 py-2.5 rounded-xl border text-sm bg-bg dark:bg-slate-800 text-text dark:text-white focus:outline-none focus:ring-2 focus:ring-kio/50 placeholder:text-text-muted dark:placeholder:text-slate-600 ${
                   errors.confirmPassword ? 'border-red-400' : 'border-cruz dark:border-slate-700'
                 }`}
               />
               {errors.confirmPassword && (
-                <p className="text-xs text-red-500 mt-1">{errors.confirmPassword.message}</p>
+                <p id="confirmPassword-error" className="text-xs font-medium text-red-600 dark:text-red-400 mt-1">
+                  {errors.confirmPassword.message}
+                </p>
               )}
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full mt-2 flex items-center justify-center gap-2 px-5 py-3 bg-kio text-white rounded-xl text-sm font-semibold hover:bg-kio/90 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full mt-2 flex min-h-11 items-center justify-center gap-2 px-5 py-3 bg-kanji-deep text-white rounded-xl text-sm font-bold shadow-md shadow-kanji-deep/20 hover:bg-kanji-deep/90 transition-colors duration-150 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 size={15} className="animate-spin" />
+                  <Loader2 size={15} className="animate-spin" aria-hidden="true" />
                   Guardando...
                 </>
               ) : (
@@ -190,8 +223,9 @@ export function ChangePasswordPage() {
 
         <div className="text-center mt-6">
           <button
+            type="button"
             onClick={handleLogout}
-            className="text-text/40 dark:text-slate-600 hover:text-text/70 dark:hover:text-slate-400 text-xs font-medium transition-colors"
+            className="inline-flex min-h-11 items-center rounded-xl px-3 text-xs font-medium text-text-secondary hover:text-text dark:hover:text-slate-200 transition-colors"
           >
             Cerrar sesión
           </button>

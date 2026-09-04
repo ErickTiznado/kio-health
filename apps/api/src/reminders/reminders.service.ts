@@ -1,8 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../lib/email.service';
-import { ReminderStatus } from '#generated/prisma';
-import { v4 as uuidv4 } from 'uuid';
+import { PortalTokenService } from '../portal/portal-token.service';
+import { ReminderKind, ReminderStatus } from '#generated/prisma';
+
+/** Aviso mínimo para la regla same-day: si falta menos, no enviamos nada. */
+const MIN_SAME_DAY_NOTICE_MS = 60 * 60 * 1000; // 1 hora
 
 @Injectable()
 export class RemindersService {
@@ -11,6 +14,7 @@ export class RemindersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly emailService: EmailService,
+    private readonly portalTokens: PortalTokenService,
   ) {}
 
   async processReminders(): Promise<void> {
@@ -36,11 +40,15 @@ export class RemindersService {
     });
 
     for (const reminder of pendingReminders) {
-      const confirmationToken = uuidv4();
       const apiUrl = process.env.API_URL ?? 'https://kioind.com';
-      const confirmationUrl = `${apiUrl}/api/reminders/confirm/${confirmationToken}`;
 
       try {
+        // Un token fresco por envío — misma capa que usará el portal SPA.
+        const token = await this.portalTokens.issueToken(
+          reminder.appointment.patient.id,
+        );
+        const base = `${apiUrl}/api/portal/actions/${token}/appointments/${reminder.appointmentId}`;
+
         await this.emailService.sendAppointmentReminder({
           to: reminder.patientEmail,
           patientName: reminder.appointment.patient.fullName,
@@ -49,7 +57,13 @@ export class RemindersService {
           appointmentDate: reminder.appointment.startTime,
           appointmentType: reminder.appointment.type,
           timezone: reminder.appointment.clinician.timezone,
-          confirmationUrl,
+          dayLabel: this.relativeDayLabel(
+            reminder.appointment.startTime,
+            reminder.appointment.clinician.timezone,
+          ),
+          confirmUrl: `${base}/confirm`,
+          cancelUrl: `${base}/cancel`,
+          rescheduleUrl: `${base}/reschedule`,
         });
 
         await this.prisma.appointmentReminder.update({
@@ -57,12 +71,11 @@ export class RemindersService {
           data: {
             status: ReminderStatus.SENT,
             sentAt: new Date(),
-            confirmationToken,
           },
         });
 
         this.logger.log(
-          `Reminder sent for appointment ${reminder.appointmentId}`,
+          `Reminder (${reminder.kind}) sent for appointment ${reminder.appointmentId}`,
         );
       } catch (error) {
         const message =
@@ -83,34 +96,96 @@ export class RemindersService {
     }
   }
 
+  /**
+   * Programa (o reprograma) los recordatorios de una cita según la
+   * configuración del clínico: toque principal + segundo toque opcional.
+   *
+   * Regla same-day: si el lead ya quedó en el pasado pero la cita está a
+   * ≥1 hora, el recordatorio se agenda para AHORA con la variante "hoy"
+   * (antes: skip silencioso y el paciente no recibía nada).
+   */
   async scheduleReminder(appointmentId: string): Promise<void> {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: appointmentId },
       include: {
         patient: { select: { contactEmail: true } },
+        clinician: {
+          select: {
+            remindersEnabled: true,
+            reminderLeadHours: true,
+            reminderSecondLeadHours: true,
+          },
+        },
       },
     });
 
     if (!appointment) return;
-    if (!appointment.patient.contactEmail) return;
     if (appointment.status !== 'SCHEDULED') return;
+    if (!appointment.patient.contactEmail) return;
 
-    const scheduledFor = new Date(
-      appointment.startTime.getTime() - 24 * 60 * 60 * 1000,
-    );
+    if (!appointment.clinician.remindersEnabled) {
+      await this.cancelReminder(appointmentId);
+      return;
+    }
 
-    // Don't schedule if less than 24h away
-    if (scheduledFor <= new Date()) return;
+    const now = Date.now();
+    const start = appointment.startTime.getTime();
+    if (start <= now) return;
 
-    await this.prisma.appointmentReminder.upsert({
-      where: { appointmentId },
-      create: {
+    const email = appointment.patient.contactEmail;
+    const leadMs = appointment.clinician.reminderLeadHours * 60 * 60 * 1000;
+
+    // ── Toque principal ────────────────────────────────────────────────
+    let primaryFor: Date | null = new Date(start - leadMs);
+    if (primaryFor.getTime() <= now) {
+      primaryFor = start - now >= MIN_SAME_DAY_NOTICE_MS ? new Date() : null;
+    }
+
+    if (primaryFor) {
+      await this.upsertReminder(
         appointmentId,
-        patientEmail: appointment.patient.contactEmail,
-        scheduledFor,
-      },
+        ReminderKind.PRIMARY,
+        email,
+        primaryFor,
+      );
+    } else {
+      await this.cancelReminderKind(appointmentId, ReminderKind.PRIMARY);
+    }
+
+    // ── Segundo toque (opcional) ───────────────────────────────────────
+    const secondLeadHours = appointment.clinician.reminderSecondLeadHours;
+    const secondValid =
+      secondLeadHours !== null &&
+      secondLeadHours > 0 &&
+      secondLeadHours < appointment.clinician.reminderLeadHours;
+
+    if (secondValid) {
+      const secondFor = new Date(start - secondLeadHours * 60 * 60 * 1000);
+      if (secondFor.getTime() > now) {
+        await this.upsertReminder(
+          appointmentId,
+          ReminderKind.SECOND_TOUCH,
+          email,
+          secondFor,
+        );
+        return;
+      }
+    }
+
+    await this.cancelReminderKind(appointmentId, ReminderKind.SECOND_TOUCH);
+  }
+
+  private async upsertReminder(
+    appointmentId: string,
+    kind: ReminderKind,
+    patientEmail: string,
+    scheduledFor: Date,
+  ): Promise<void> {
+    await this.prisma.appointmentReminder.upsert({
+      where: { appointmentId_kind: { appointmentId, kind } },
+      create: { appointmentId, kind, patientEmail, scheduledFor },
       update: {
-        patientEmail: appointment.patient.contactEmail,
+        patientEmail,
         scheduledFor,
         status: ReminderStatus.PENDING,
         sentAt: null,
@@ -118,6 +193,16 @@ export class RemindersService {
         confirmationToken: null,
         confirmedAt: null,
       },
+    });
+  }
+
+  private async cancelReminderKind(
+    appointmentId: string,
+    kind: ReminderKind,
+  ): Promise<void> {
+    await this.prisma.appointmentReminder.updateMany({
+      where: { appointmentId, kind, status: ReminderStatus.PENDING },
+      data: { status: ReminderStatus.CANCELLED },
     });
   }
 
@@ -131,9 +216,31 @@ export class RemindersService {
     });
   }
 
-  async confirmAttendance(
-    token: string,
-  ): Promise<{
+  /** 'hoy' | 'mañana' | null (null ⇒ usar la fecha completa en el email). */
+  private relativeDayLabel(
+    startTime: Date,
+    timezone: string,
+  ): 'hoy' | 'mañana' | null {
+    const fmt = new Intl.DateTimeFormat('en-CA', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    const target = fmt.format(startTime);
+    if (fmt.format(new Date()) === target) return 'hoy';
+    if (fmt.format(new Date(Date.now() + 24 * 60 * 60 * 1000)) === target) {
+      return 'mañana';
+    }
+    return null;
+  }
+
+  /**
+   * Flujo LEGACY: confirmación con el token uuid guardado en el reminder.
+   * Se mantiene una release para los emails ya enviados; los nuevos envíos
+   * usan la capa de tokens del portal (PortalController).
+   */
+  async confirmAttendance(token: string): Promise<{
     success: boolean;
     message: string;
     appointmentDate?: Date;

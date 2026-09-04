@@ -87,7 +87,9 @@ export function makeRefreshToken(overrides: Record<string, unknown> = {}) {
   };
 }
 
-export function makeFinanceTransaction(overrides: Record<string, unknown> = {}) {
+export function makeFinanceTransaction(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     id: randomUUID(),
     clinicianId: randomUUID(),

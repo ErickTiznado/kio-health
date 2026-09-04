@@ -54,17 +54,32 @@ describe('usePatients', () => {
 
   // ── usePatients ───────────────────────────────────────────────────────────
 
-  it('calls GET /patients with page, search, limit params', async () => {
+  it('calls GET /patients with page, search, status, limit params', async () => {
     mockApi.get.mockResolvedValue({ data: mockPatientsResponse });
 
-    const { result } = renderHook(() => usePatients(2, 'Ana', 20), {
+    // Firma: usePatients(page, search, status, limit)
+    const { result } = renderHook(() => usePatients(2, 'Ana', 'ACTIVE', 20), {
       wrapper: createWrapper(),
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(mockApi.get).toHaveBeenCalledWith('/patients', {
-      params: { page: 2, search: 'Ana', limit: 20 },
+      params: { page: 2, search: 'Ana', status: 'ACTIVE', limit: 20 },
+    });
+  });
+
+  it('omite el filtro de status cuando no se especifica', async () => {
+    mockApi.get.mockResolvedValue({ data: mockPatientsResponse });
+
+    const { result } = renderHook(() => usePatients(1, ''), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(mockApi.get).toHaveBeenCalledWith('/patients', {
+      params: { page: 1, search: '', status: undefined, limit: 10 },
     });
   });
 

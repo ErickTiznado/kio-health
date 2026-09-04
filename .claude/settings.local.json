@@ -46,7 +46,10 @@
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''version:'''', d[''''version'''']\\)\")",
       "Bash(python3 -c \":*)",
       "mcp__Claude_Preview__preview_start",
-      "Bash(tasklist)"
+      "Bash(tasklist)",
+      "Bash(wc -l /c/Users/50370/Documents/GitHub/kio-health/apps/api/src/*/*.ts)",
+      "Bash(wc -l /c/Users/50370/Documents/GitHub/kio-health/apps/web/src/pages/*.tsx)",
+      "mcp__obsidian__list_notes"
     ]
   }
 }

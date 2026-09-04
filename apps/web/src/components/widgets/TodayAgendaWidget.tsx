@@ -1,190 +1,249 @@
-import { CalendarClock, Coffee, ChevronRight } from 'lucide-react';
+import { Coffee, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { format, isWithinInterval, parseISO, differenceInMinutes } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { Skeleton } from '@repo/ui/skeleton';
+import { isSameDay, isWithinInterval, parseISO, differenceInMinutes, format } from 'date-fns';
 import type { Appointment } from '../../types/appointments.types';
+import { WidgetError } from './WidgetError';
+import { GUTTER } from './SheetSection';
+import { SheetSkeletonRows } from './WidgetSkeleton';
 
 interface TodayAgendaWidgetProps {
   appointments: Appointment[];
   isLoading: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
 }
 
 const STATUS_COLORS: Record<Appointment['status'], string> = {
   SCHEDULED: 'bg-blue-500',
   IN_PROGRESS: 'bg-kio',
-  COMPLETED: 'bg-green-500',
+  COMPLETED: 'bg-emerald-500',
   CANCELLED: 'bg-gray-400',
-  NO_SHOW: 'bg-red-500',
+  NO_SHOW: 'bg-rose-500',
 };
 
-const STATUS_RING: Record<Appointment['status'], string> = {
-  SCHEDULED: 'ring-blue-200 dark:ring-blue-500/30',
-  IN_PROGRESS: 'ring-kio/40',
-  COMPLETED: 'ring-green-200 dark:ring-green-500/30',
-  CANCELLED: 'ring-gray-200 dark:ring-gray-500/30',
-  NO_SHOW: 'ring-red-200 dark:ring-red-500/30',
+/**
+ * El estado, escrito.
+ *
+ * El punto de 8px no puede ser el único portador: a esa escala un ausente y una
+ * cita programada se distinguían solo por rosa contra azul, lo que falla para
+ * daltonismo y desaparece del todo para un lector de pantalla — el punto es
+ * decorativo dentro de un enlace cuyo nombre accesible era solo el del paciente.
+ * Ahora el punto es refuerzo redundante de esta palabra.
+ *
+ * `SCHEDULED` no lleva palabra porque es el estado por defecto de una fila de
+ * agenda: la ausencia de marca es el dato. `IN_PROGRESS` tampoco, porque ya
+ * lleva la píldora "Ahora" visible en la misma fila.
+ */
+const STATUS_LABEL: Partial<Record<Appointment['status'], string>> = {
+  COMPLETED: 'Completada',
+  CANCELLED: 'Cancelada',
+  NO_SHOW: 'No asistió',
 };
 
-const TYPE_SHORT: Record<Appointment['type'], string> = {
-  CONSULTATION: 'CON',
-  EVALUATION: 'EVA',
-  FOLLOW_UP: 'SEG',
+const STATUS_TEXT: Partial<Record<Appointment['status'], string>> = {
+  COMPLETED: 'text-emerald-700 dark:text-emerald-300',
+  CANCELLED: 'text-text-secondary dark:text-slate-400',
+  NO_SHOW: 'text-rose-700 dark:text-rose-300',
 };
 
+/**
+ * El tipo, entero. Antes era `CON` / `EVA` / `SEG` con la etiqueta real solo en
+ * `title=`: en táctil, que es donde se usa este producto entre sesiones, `title`
+ * no existe, así que era un código indescifrable y puro ruido de escaneo.
+ */
+const TYPE_LABEL: Record<Appointment['type'], string> = {
+  CONSULTATION: 'Consulta',
+  EVALUATION: 'Evaluación',
+  FOLLOW_UP: 'Seguimiento',
+};
 
-
+/**
+ * Cuerpo de la sección HOY.
+ *
+ * Ya no lleva chrome propio: ni tarjeta blanca, ni borde, ni encabezado. La
+ * sección la anuncia `SheetSection`, y estas filas se alinean sobre el mismo
+ * canal izquierdo que el resto del documento — la hora ocupa el canal, el punto
+ * de estado marca su borde, y la línea vertical del timeline cae exactamente
+ * sobre esa vertical.
+ */
 export function TodayAgendaWidget({
   appointments,
   isLoading,
+  isError,
+  onRetry,
 }: TodayAgendaWidgetProps) {
   const now = new Date();
 
-  const sorted = [...appointments].sort(
+  // Defensa en profundidad, independiente de la API. Esta sección se titula
+  // "Hoy", así que pinta el día local de hoy y nada más: antes confiaba en el
+  // parámetro `date` que había enviado y formateaba con 'HH:mm', que descarta
+  // el día, de modo que las sesiones de ayer por la tarde aparecían como de hoy.
+  const todays = appointments.filter((a) => isSameDay(parseISO(a.startTime), now));
+  const hidden = appointments.length - todays.length;
+
+  const sorted = [...todays].sort(
     (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
   );
 
-  const completed = sorted.filter(a => a.status === 'COMPLETED').length;
+  if (isLoading) {
+    return <SheetSkeletonRows count={5} label="tu agenda de hoy" mark="dot" />;
+  }
+
+  // Nunca caer al empty state con la petición fallida: "Día libre" ante un
+  // error 500 es una afirmación falsa sobre la agenda de un paciente.
+  if (isError) return <WidgetError what="tu agenda de hoy" onRetry={onRetry} />;
+
+  if (sorted.length === 0) {
+    return (
+      <div className="flex items-center gap-3 py-4">
+        <span className={`${GUTTER} flex shrink-0 justify-end`}>
+          <Coffee size={18} className="text-text-muted dark:text-slate-500" aria-hidden="true" />
+        </span>
+        <div>
+          <p className="text-sm font-bold text-text dark:text-white">Día libre</p>
+          <p className="mt-0.5 text-xs font-medium text-text-secondary dark:text-slate-400">
+            No hay citas programadas para hoy.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full h-full">
-      <div className="bg-surface dark:bg-slate-900 rounded-[40px] p-5 shadow-sm border border-gray-100 dark:border-slate-800 h-full flex flex-col transition-colors duration-200">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4 shrink-0">
-          <div className="flex flex-col gap-0.5">
-            <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2 text-base transition-colors">
-              <CalendarClock size={18} className="text-kio" />
-              Agenda de Hoy
-            </h3>
-            <p className="text-[10px] text-gray-400 dark:text-kanji font-medium ml-7 capitalize">
-              {format(now, "EEEE d 'de' MMMM", { locale: es })}
-            </p>
-          </div>
-          {!isLoading && sorted.length > 0 && (
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-bold text-kio bg-kio-light dark:bg-kio/20 px-2.5 py-1 rounded-full">
-                {completed}/{sorted.length}
-              </span>
-            </div>
-          )}
-        </div>
+    <div>
+      <ol className="relative">
+        {/* Espina del timeline: cae sobre el borde derecho del canal izquierdo. */}
+        <span
+          aria-hidden="true"
+          className="absolute bottom-3 left-[73px] top-3 w-px bg-border dark:bg-slate-800"
+        />
 
-        {/* Loading */}
-        {isLoading && (
-          <div className="space-y-1.5">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-3 py-1.5 px-2">
-                <Skeleton className="w-9 h-3.5 dark:bg-slate-700" />
-                <Skeleton className="w-1.5 h-1.5 rounded-full dark:bg-slate-700" />
-                <div className="flex-1">
-                  <Skeleton className="w-28 h-3.5 dark:bg-slate-700" />
-                </div>
-                <Skeleton className="w-8 h-3 dark:bg-slate-700" />
-              </div>
-            ))}
-          </div>
-        )}
+        {sorted.map((apt) => {
+          const startTime = parseISO(apt.startTime);
+          const endTime = parseISO(apt.endTime);
+          const duration = differenceInMinutes(endTime, startTime);
 
-        {/* Empty */}
-        {!isLoading && sorted.length === 0 && (
-          <div className="flex flex-col items-center justify-center flex-1 text-center bg-surface/60 dark:bg-slate-800/50 rounded-3xl border border-dashed border-gray-200 dark:border-slate-700 p-8 transition-colors">
-            <div className="w-12 h-12 bg-surface dark:bg-slate-700 rounded-2xl shadow-sm flex items-center justify-center mb-3 transition-colors">
-              <Coffee size={20} className="text-kio/60" />
-            </div>
-            <p className="font-bold text-gray-900 dark:text-white text-sm mb-1">
-              Día libre
-            </p>
-            <p className="text-xs text-gray-400 dark:text-kio max-w-[150px]">
-              No hay citas programadas para hoy.
-            </p>
-          </div>
-        )}
+          // Un ausente no está "en curso" aunque el reloj caiga dentro de su
+          // franja: sin excluirlo, la fila mostraba a la vez la píldora "Ahora"
+          // y la palabra "No asistió".
+          const isNow =
+            isWithinInterval(now, { start: startTime, end: endTime }) &&
+            apt.status !== 'COMPLETED' &&
+            apt.status !== 'CANCELLED' &&
+            apt.status !== 'NO_SHOW';
+          const isPast = endTime < now && apt.status !== 'IN_PROGRESS';
+          const isCancelled = apt.status === 'CANCELLED';
+          const statusLabel = STATUS_LABEL[apt.status];
 
-        {/* Compact List */}
-        {!isLoading && sorted.length > 0 && (
-          <div className="relative flex-1 overflow-y-auto min-h-0 pr-1 -mr-1">
-            {/* Vertical timeline line */}
-            <div className="absolute left-[2.65rem] top-1 bottom-1 w-px bg-gray-100 dark:bg-slate-800" />
+          return (
+            <li key={apt.id}>
+              {/* La fila cancelada ya NO se atenúa entera.
+                  `opacity-60` sobre el enlace completo componía el texto
+                  secundario contra el lino a 2.19:1 — por debajo incluso del
+                  2.40:1 que esta misma sección corrigió en la hora del pasado,
+                  y anulándolo: una fila cancelada Y pasada mostraba su hora
+                  (el dato que la identifica) a 2.19:1 en vez de a 4.30:1.
+                  La cancelación ya viaja en tres portadores redundantes que no
+                  dependen del contraste: el tachado del nombre, el punto gris
+                  y la palabra "Cancelada" en el grupo de meta. */}
+              <Link
+                to={`/session/${apt.id}`}
+                className={`group relative flex min-h-11 items-center gap-3 rounded-xl py-2 pr-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kio ${
+                  isNow ? 'bg-kio-light dark:bg-kio/10' : 'hover:bg-secondary dark:hover:bg-slate-800/60'
+                }`}
+              >
+                {/* Canal izquierdo: la hora.
+                    La hora de una sesión pasada sigue siendo el dato que
+                    identifica la fila. En `text-muted` medía 2.40:1 sobre el
+                    lino: apagada hasta desaparecer, no apagada. El tono
+                    secundario la deja por debajo del presente (4.30:1 frente a
+                    los 10.8:1 del futuro) sin dejar de leerse.
+                    Es una mejora, no un aprobado: 4.30:1 sigue por debajo de
+                    4.5:1. El suelo lo pone el token `--text-secondary`
+                    (#64748b sobre #f5f3ef) y afecta a todo el producto, así
+                    que subirlo es un cambio de token, no de esta fila. Hoy no
+                    hay estándar de accesibilidad acordado (PRODUCT.md, sección
+                    "Accessibility & Inclusion": decisión abierta). */}
+                <span
+                  className={`${GUTTER} shrink-0 text-right text-xs font-bold tabular-nums ${
+                    isNow
+                      ? 'text-kanji-deep dark:text-kio'
+                      : isPast
+                        ? 'text-text-secondary dark:text-slate-400'
+                        : 'text-text dark:text-white'
+                  }`}
+                >
+                  {format(startTime, 'HH:mm')}
+                </span>
 
-            <div className="space-y-px">
-              {sorted.map((apt) => {
-                const startTime = parseISO(apt.startTime);
-                const endTime = parseISO(apt.endTime);
-                const duration = differenceInMinutes(endTime, startTime);
+                {/* Punto de estado, sobre la espina. Decorativo: el estado que
+                    no es "programada" va escrito en el grupo de meta. */}
+                <span
+                  aria-hidden="true"
+                  className="relative z-10 flex w-2.5 shrink-0 items-center justify-center"
+                >
+                  <span
+                    className={`h-2 w-2 rounded-full transition-transform ${
+                      isNow
+                        ? 'scale-125 bg-kio'
+                        : `${STATUS_COLORS[apt.status]} ${isPast ? 'opacity-60' : ''}`
+                    }`}
+                  />
+                  {isNow && (
+                    <span className="absolute h-3.5 w-3.5 rounded-full ring-2 ring-kio/40" />
+                  )}
+                </span>
 
-                const isNow = isWithinInterval(now, {
-                  start: startTime,
-                  end: endTime,
-                }) && apt.status !== 'COMPLETED' && apt.status !== 'CANCELLED';
-
-                const isPast = endTime < now && apt.status !== 'IN_PROGRESS';
-                const isCancelled = apt.status === 'CANCELLED';
-
-                return (
-                  <Link
-                    key={apt.id}
-                    to={`/session/${apt.id}`}
-                    className={`group relative flex items-center gap-2.5 py-2 px-2 rounded-xl transition-all ${isNow
-                      ? 'bg-kio/5 dark:bg-kio/10'
-                      : 'hover:bg-surface dark:hover:bg-slate-800/50'
-                      } ${isCancelled ? 'opacity-40' : ''}`}
+                {/* Paciente + meta. Envuelven a dos líneas cuando la fila se
+                    estrecha, en vez de exprimir el nombre hasta la elipsis. */}
+                <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+                  <span
+                    className={`min-w-[7rem] flex-1 truncate text-sm font-bold transition-colors group-hover:text-kanji-deep dark:group-hover:text-kio ${
+                      isPast && !isNow ? 'text-text-secondary dark:text-slate-400' : 'text-text dark:text-white'
+                    } ${isCancelled ? 'line-through' : ''}`}
                   >
-                    {/* Time */}
-                    <div className={`w-[2.2rem] text-right shrink-0 pr-3 ${isPast && !isNow ? 'opacity-50' : ''}`}>
-                      <span className={`text-[11px] font-bold tabular-nums leading-none ${isNow ? 'text-kio' : 'text-gray-900 dark:text-white'
-                        }`}>
-                        {format(startTime, 'HH:mm')}
+                    {apt.patient.fullName}
+                  </span>
+
+                  <span className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
+                    {isNow && (
+                      <span className="rounded-full bg-kanji-deep px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">
+                        Ahora
                       </span>
-                    </div>
-
-                    {/* Dot */}
-                    <div className="relative z-10 shrink-0 flex items-center justify-center w-2.5">
-                      <div className={`w-2 h-2 rounded-full transition-all ${isNow
-                        ? 'bg-kio ring-[3px] ring-kio/30 scale-125'
-                        : `${STATUS_COLORS[apt.status]} ${isPast ? '' : `ring-2 ${STATUS_RING[apt.status]}`}`
-                        }`} />
-                    </div>
-
-                    {/* Content */}
-                    <div className={`flex-1 min-w-0 flex items-center gap-2 ${isPast && !isNow ? 'opacity-60' : ''}`}>
-                      {/* Patient name */}
-                      <span className={`font-semibold text-xs text-gray-900 dark:text-white truncate group-hover:text-kio transition-colors ${isCancelled ? 'line-through' : ''
-                        }`}>
-                        {apt.patient.fullName}
+                    )}
+                    {statusLabel && (
+                      <span className={`text-[11px] font-bold ${STATUS_TEXT[apt.status] ?? ''}`}>
+                        {statusLabel}
                       </span>
+                    )}
+                    <span className="text-[11px] font-bold text-text-secondary dark:text-slate-400">
+                      {TYPE_LABEL[apt.type]}
+                    </span>
+                    <span className="w-12 text-right text-[11px] font-medium tabular-nums text-text-secondary dark:text-slate-400">
+                      {duration} min
+                    </span>
+                  </span>
+                </span>
 
-                      {/* Now badge */}
-                      {isNow && (
-                        <span className="shrink-0 text-[8px] font-black text-white bg-kio px-1.5 py-px rounded-md uppercase tracking-wider leading-tight">
-                          Ahora
-                        </span>
-                      )}
-                    </div>
+                <ChevronRight
+                  size={14}
+                  aria-hidden="true"
+                  className="shrink-0 text-text-muted transition-transform duration-150 group-hover:translate-x-0.5 dark:text-slate-500"
+                />
+              </Link>
+            </li>
+          );
+        })}
+      </ol>
 
-                    {/* Right meta */}
-                    <div className={`flex items-center gap-1.5 shrink-0 ${isPast && !isNow ? 'opacity-50' : ''}`}>
-                      {/* Type tag */}
-                      <span className="text-[9px] font-bold text-gray-400 dark:text-kanji bg-surface dark:bg-slate-800 px-1.5 py-0.5 rounded-md">
-                        {TYPE_SHORT[apt.type]}
-                      </span>
-                      {/* Duration */}
-                      <span className="text-[9px] text-gray-400 dark:text-kanji tabular-nums">
-                        {duration}m
-                      </span>
-                    </div>
-
-                    {/* Hover arrow */}
-                    <ChevronRight
-                      size={12}
-                      className="text-gray-300 dark:text-slate-600 opacity-0 group-hover:opacity-100 transition-all shrink-0"
-                    />
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Si la API vuelve a devolver otro día, decirlo en vez de tirar filas. */}
+      {hidden > 0 && (
+        <p className="mt-3 pl-[4.25rem] text-[11px] font-medium text-text-secondary dark:text-slate-400">
+          {hidden === 1
+            ? 'Se ocultó 1 cita que no corresponde a hoy.'
+            : `Se ocultaron ${hidden} citas que no corresponden a hoy.`}
+        </p>
+      )}
     </div>
   );
 }

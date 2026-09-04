@@ -11,12 +11,12 @@ import {
   Res,
   Req,
 } from '@nestjs/common';
-import { Request } from 'express';
+import type { Request, Response } from 'express';
 import { AppointmentsService } from './appointments.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentClinician } from '../auth/decorators/current-clinician.decorator';
 import { QueryAppointmentsDto } from './dto/query-appointments.dto';
 import { QueryDaySummaryDto } from './dto/query-day-summary.dto';
+import { QueryPendingNotesDto } from './dto/query-pending-notes.dto';
 import { CompleteCheckoutDto } from './dto/complete-checkout.dto';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { RescheduleAppointmentDto } from './dto/reschedule-appointment.dto';
@@ -30,9 +30,11 @@ import { AddendumService } from '../addendums/addendums.service';
 import { CreateAddendumDto } from '../addendums/dto/create-addendum.dto';
 import { RiskFlagsService } from '../risk-flags/risk-flags.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { RequestUser } from '../auth/interfaces/request-user.interface';
 
+// Autenticación por el JwtAuthGuard global; los endpoints con :id añaden
+// AppointmentOwnershipGuard para validar propiedad (ver app.module.ts).
 @Controller('appointments')
-@UseGuards(JwtAuthGuard)
 export class AppointmentsController {
   constructor(
     private readonly appointmentsService: AppointmentsService,
@@ -69,6 +71,7 @@ export class AppointmentsController {
       query.date,
       query.from,
       query.to,
+      query.tz,
     );
   }
 
@@ -86,6 +89,7 @@ export class AppointmentsController {
       clinicianId,
       query.from,
       query.to,
+      query.tz,
     );
   }
 
@@ -94,9 +98,20 @@ export class AppointmentsController {
     return this.appointmentsService.getNextUpcoming(clinicianId);
   }
 
+  // `from`/`to`/`tz` son opcionales: sin ellos el conteo sigue siendo el
+  // historico total (lo que el dashboard llama hoy). Con ellos comparte techo
+  // temporal con `GET /appointments`.
   @Get('pending-notes-count')
-  async getPendingNotesCount(@CurrentClinician() clinicianId: string) {
-    return this.appointmentsService.getPendingNotesCount(clinicianId);
+  async getPendingNotesCount(
+    @CurrentClinician() clinicianId: string,
+    @Query() query: QueryPendingNotesDto,
+  ) {
+    return this.appointmentsService.getPendingNotesCount(
+      clinicianId,
+      query.from,
+      query.to,
+      query.tz,
+    );
   }
 
   @Get('tags')
@@ -107,9 +122,10 @@ export class AppointmentsController {
   @UseGuards(AppointmentOwnershipGuard)
   @Get(':id/context')
   async getSessionContext(
+    @CurrentUser() user: RequestUser,
     @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
-    @Req() req: any,
+    @Req() req: Request,
   ) {
     const result = await this.appointmentsService.getSessionContext(
       clinicianId,
@@ -118,7 +134,7 @@ export class AppointmentsController {
 
     // Log access
     await this.accessLogService.logAccess(
-      req.user.userId,
+      user.userId,
       'VIEW_SESSION_CONTEXT',
       `Appointment:${appointmentId}`,
       result?.patient?.id,
@@ -133,11 +149,12 @@ export class AppointmentsController {
   @UseGuards(AppointmentOwnershipGuard)
   @Get(':id/export/pdf')
   async exportPdf(
+    @CurrentUser() user: RequestUser,
     @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Query('includePrivate') includePrivate: string,
-    @Res() res: any,
-    @Req() req: any,
+    @Res() res: Response,
+    @Req() req: Request,
   ) {
     const { buffer, patientId } = await this.appointmentsService.exportPdf(
       clinicianId,
@@ -147,7 +164,7 @@ export class AppointmentsController {
 
     // Log access with patientId for HIPAA audit trail
     await this.accessLogService.logAccess(
-      req.user.userId,
+      user.userId,
       'EXPORT_PDF',
       `Appointment:${appointmentId}`,
       patientId,
@@ -212,9 +229,10 @@ export class AppointmentsController {
   @UseGuards(AppointmentOwnershipGuard)
   @Get(':id/notes')
   async getPsychNote(
+    @CurrentUser() user: RequestUser,
     @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
-    @Req() req: any,
+    @Req() req: Request,
   ) {
     const result = await this.appointmentsService.getPsychNote(
       clinicianId,
@@ -223,7 +241,7 @@ export class AppointmentsController {
 
     // Log access
     await this.accessLogService.logAccess(
-      req.user.userId,
+      user.userId,
       'VIEW_PSYCH_NOTE',
       `PsychNote:${result?.id || 'Unknown'}`,
       result?.patientId,
@@ -238,10 +256,11 @@ export class AppointmentsController {
   @UseGuards(AppointmentOwnershipGuard)
   @Post(':id/notes')
   async upsertPsychNote(
+    @CurrentUser() user: RequestUser,
     @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Body() dto: CreatePsychNoteDto,
-    @Req() req: any,
+    @Req() req: Request,
   ) {
     const result = await this.appointmentsService.upsertPsychNote(
       clinicianId,
@@ -251,7 +270,7 @@ export class AppointmentsController {
 
     // Log access
     await this.accessLogService.logAccess(
-      req.user.userId,
+      user.userId,
       'UPSERT_PSYCH_NOTE',
       `PsychNote:${result.id}`,
       result.patientId,
@@ -333,12 +352,14 @@ export class AppointmentsController {
   @UseGuards(AppointmentOwnershipGuard)
   @Post(':id/addendum')
   async createAddendum(
-    @CurrentUser() user: any,
+    @CurrentUser() user: RequestUser,
+    @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
     @Body() dto: CreateAddendumDto,
-    @Req() req: any,
+    @Req() req: Request,
   ) {
     const result = await this.addendumService.createAddendum(
+      clinicianId,
       appointmentId,
       user.userId,
       dto,
@@ -360,8 +381,9 @@ export class AppointmentsController {
   @UseGuards(AppointmentOwnershipGuard)
   @Get(':id/addendums')
   async getAddendums(
+    @CurrentClinician() clinicianId: string,
     @Param('id', ParseUUIDPipe) appointmentId: string,
   ) {
-    return this.addendumService.getAddendums(appointmentId);
+    return this.addendumService.getAddendums(clinicianId, appointmentId);
   }
 }

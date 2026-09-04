@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { usePatient, useUpdatePatient, usePatientScales, type ScaleHistoryPoint } from '../hooks/use-patients';
+import { useEffect } from 'react';
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { usePatient, usePatientScales, type ScaleHistoryPoint } from '../hooks/use-patients';
 import { addRecentPatientToStorage } from '../lib/recent-patients.storage';
 import {
     ArrowLeft,
@@ -8,54 +8,84 @@ import {
     MessageCircle,
     FileClock,
     User,
-    AlertTriangle,
     Edit,
     BarChart2,
     CalendarDays,
     Activity,
     FolderOpen,
+    SearchX,
+    ShieldCheck,
 } from 'lucide-react';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { TimelineContainer } from '../components/patient/timeline/TimelineContainer';
 import { MoodChart } from '../components/patient/insights/MoodChart';
-import { PatientModal } from '../components/patients/PatientModal';
+import { AttendanceStatsCards } from '../components/patient/AttendanceStatsCards';
 import { DocumentUpload } from '../components/patients/DocumentUpload';
 import { DocumentViewer } from '../components/patients/DocumentViewer';
-import { PatientProfileEditor } from '../components/patients/PatientProfileEditor';
+import {
+    PatientProfileEditor,
+    type ProfileSectionId,
+} from '../components/patients/PatientProfileEditor';
+import { PatientBalancePill } from '../components/patients/PatientBalancePill';
+import { PatientContinuityActions } from '../components/patients/PatientContinuityActions';
 import { RiskFlagBanner } from '../components/patient/RiskFlagBanner';
-import { motion, AnimatePresence } from 'framer-motion';
+import { WidgetError } from '../components/widgets/WidgetError';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useQuery } from '@tanstack/react-query';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { api } from '../lib/api';
 import type { TimelineResponse, Patient } from '../types/patients.types';
-import type { PatientFormValues } from '../schemas/patients.schema';
 
 const TABS = [
-    { id: 'history', label: 'Historia Clínica', icon: FileClock },
-    { id: 'profile', label: 'Perfil Clínico', icon: User },
+    { id: 'history', label: 'Historia clínica', icon: FileClock },
+    { id: 'profile', label: 'Perfil clínico', icon: User },
     { id: 'stats', label: 'Estadísticas', icon: BarChart2 },
     { id: 'documents', label: 'Documentos', icon: FolderOpen },
 ];
+
+const getInitials = (name: string) =>
+    name.trim().split(/\s+/).map(n => n[0]).slice(0, 2).join('').toUpperCase();
 
 export default function PatientDetailsPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
-    const { data: patient, isLoading, error } = usePatient(id || '');
-    const updatePatientMutation = useUpdatePatient();
+    const { data: patient, isLoading, isError, error, refetch } = usePatient(id || '');
     const activeTab = searchParams.get('tab') ?? 'history';
-    const setActiveTab = (tab: string) => setSearchParams({ tab }, { replace: true });
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
+    // El lápiz de la cabecera abre la sección correspondiente de "Perfil
+    // clínico" en edición. Se consume una vez y se limpia de la URL, para que
+    // recargar o compartir el enlace no vuelva a abrir un formulario.
+    const focusParam = searchParams.get('focus');
+    const focusSection: ProfileSectionId | null =
+        focusParam === 'personal' || focusParam === 'clinical' ? focusParam : null;
+    const clearFocusParam = () =>
+        setSearchParams(
+            (prev) => {
+                const next = new URLSearchParams(prev);
+                next.delete('focus');
+                return next;
+            },
+            { replace: true },
+        );
+    // Forma funcional: `setSearchParams({ tab })` borraba cualquier otro query
+    // param de la URL (el mismo fallo que ya se había corregido en el listado).
+    const setActiveTab = (tab: string) =>
+        setSearchParams(
+            (prev) => {
+                const next = new URLSearchParams(prev);
+                next.set('tab', tab);
+                return next;
+            },
+            { replace: true },
+        );
     useEffect(() => {
         if (patient?.id) {
             addRecentPatientToStorage(patient.id);
         }
     }, [patient?.id]);
 
-    const { data: scalesHistory = [] } = usePatientScales(id || '');
+    const scales = usePatientScales(id || '');
 
     const { data: timelineMeta } = useQuery({
         queryKey: ['patient-timeline-meta', patient?.id],
@@ -68,251 +98,270 @@ export default function PatientDetailsPage() {
         enabled: !!patient?.id,
     });
 
-    const handleEditSubmit = (data: PatientFormValues) => {
-        if (!patient) return;
-        updatePatientMutation.mutate({ id: patient.id, data }, {
-            onSuccess: () => setIsEditModalOpen(false),
-        });
-    };
-
     if (isLoading) {
         return (
             <DashboardLayout>
-                <div className="flex flex-col h-[calc(100vh-64px)] -m-4 sm:-m-6 bg-bg dark:bg-slate-950 p-4 sm:p-6 md:p-8">
-                    <div className="h-32 bg-gray-100 dark:bg-slate-800 rounded-2xl animate-pulse mb-8"></div>
-                    <div className="grid grid-cols-3 gap-6">
-                        <div className="col-span-2 h-96 bg-gray-100 dark:bg-slate-800 rounded-2xl animate-pulse"></div>
-                        <div className="h-96 bg-gray-100 dark:bg-slate-800 rounded-2xl animate-pulse"></div>
+                <div className="-m-4 flex h-[calc(100vh-64px)] flex-col p-4 sm:-m-6 sm:p-6 md:p-8" aria-busy="true">
+                    <span className="sr-only">Cargando expediente…</span>
+                    <div className="mb-8 h-32 animate-pulse rounded-2xl bg-cruz/30 dark:bg-slate-800" />
+                    <div className="grid gap-6 lg:grid-cols-3">
+                        <div className="h-96 animate-pulse rounded-2xl bg-cruz/30 lg:col-span-2 dark:bg-slate-800" />
+                        <div className="hidden h-96 animate-pulse rounded-2xl bg-cruz/30 lg:block dark:bg-slate-800" />
                     </div>
                 </div>
             </DashboardLayout>
         );
     }
 
-    if (error || !patient) {
+    // Un 404 y una caída de red no son el mismo hecho: uno dice "este
+    // expediente no existe", el otro "no pudimos leerlo". Confundirlos hacía
+    // que un fallo de red pareciera un paciente borrado.
+    if (isError || !patient) {
+        const status = (error as { response?: { status?: number } } | null)?.response?.status;
+        const isNotFound = status === 404 || status === 403;
+
         return (
             <DashboardLayout>
-                <div className="flex flex-col items-center justify-center h-full text-center">
-                    <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-full mb-4">
-                        <AlertTriangle size={32} className="text-red-500" />
-                    </div>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">Error al cargar paciente</h2>
-                    <p className="text-gray-500 dark:text-slate-400 mb-6">No se pudo encontrar la información solicitada.</p>
-                    <button onClick={() => navigate('/patients')} className="text-[var(--color-kanji)] dark:text-kio hover:underline font-medium">
-                        Volver a la lista
+                <div className="mx-auto flex h-full max-w-md flex-col items-center justify-center px-4 text-center">
+                    {isNotFound ? (
+                        <>
+                            <span className="mb-4 grid h-14 w-14 place-items-center rounded-full bg-secondary text-text-secondary dark:bg-slate-800 dark:text-slate-400">
+                                <SearchX size={24} aria-hidden="true" />
+                            </span>
+                            <h2 className="text-xl font-bold text-text dark:text-white">Expediente no disponible</h2>
+                            <p className="mt-1.5 text-sm font-medium text-slate-600 dark:text-slate-400">
+                                No existe o no está en tu lista de pacientes.
+                            </p>
+                        </>
+                    ) : (
+                        <WidgetError what="este expediente" onRetry={() => refetch()} className="text-left" />
+                    )}
+                    <button
+                        type="button"
+                        onClick={() => navigate('/patients')}
+                        className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl border border-border bg-white px-5 text-sm font-bold text-text transition-colors duration-150 hover:border-kanji/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-kio/40"
+                    >
+                        <ArrowLeft size={16} aria-hidden="true" />
+                        Volver a pacientes
                     </button>
                 </div>
             </DashboardLayout>
         );
     }
 
-    const getInitials = (name: string) =>
-        name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
-
-    const sinceDate = format(new Date(patient.createdAt), "MMM yyyy", { locale: es });
+    const sinceDate = format(new Date(patient.createdAt), 'MMM yyyy', { locale: es });
 
     return (
         <DashboardLayout>
-            <div className="flex flex-col h-[calc(100vh-64px)] -m-4 sm:-m-6 bg-bg dark:bg-slate-950 overflow-hidden">
+            <div className="-m-4 flex h-[calc(100vh-64px)] flex-col overflow-hidden bg-bg sm:-m-6 dark:bg-slate-950">
                 <RiskFlagBanner patientId={patient.id} />
-                {/* Sticky Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="sticky top-0 z-30 bg-surface/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-[var(--color-cruz)] dark:border-slate-800 shadow-sm"
-                >
-                    <div className="px-4 pt-4 pb-2 sm:px-6 sm:pt-5 md:px-8 md:pt-6">
-                        {/* Top Row: Back & Actions */}
-                        <div className="flex justify-between items-start mb-4">
+
+                {/* Encabezado fijo */}
+                <div className="sticky top-0 z-30 border-b border-border bg-surface dark:border-slate-800 dark:bg-slate-900">
+                    <div className="px-4 pb-2 pt-4 sm:px-6 sm:pt-5 md:px-8 md:pt-6">
+                        {/* Volver + acciones */}
+                        <div className="mb-4 flex items-start justify-between gap-3">
                             <button
+                                type="button"
                                 onClick={() => navigate('/patients')}
-                                className="flex items-center gap-2 text-sm text-[var(--color-text)] dark:text-slate-400 opacity-60 hover:opacity-100 transition-opacity group"
+                                className="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-xl px-2 text-sm font-bold text-text-secondary transition-colors duration-150 hover:bg-secondary hover:text-text dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                             >
-                                <div className="p-1 rounded-full bg-transparent group-hover:bg-gray-100 dark:group-hover:bg-slate-800 transition-colors">
-                                    <ArrowLeft size={18} />
-                                </div>
-                                <span>Volver</span>
+                                <ArrowLeft size={18} aria-hidden="true" />
+                                Volver
                             </button>
 
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-1">
                                 {patient.contactPhone && (
                                     <>
                                         <a
                                             href={`https://wa.me/${patient.contactPhone.replace(/\D/g, '')}`}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="p-2 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 rounded-full transition-colors"
-                                            title="WhatsApp"
+                                            aria-label={`Escribir a ${patient.fullName} por WhatsApp`}
+                                            className="grid h-11 w-11 place-items-center rounded-full text-text-secondary transition-colors duration-150 hover:bg-emerald-50 hover:text-emerald-700 dark:text-slate-400 dark:hover:bg-emerald-900/25 dark:hover:text-emerald-400"
                                         >
-                                            <MessageCircle size={18} />
+                                            <MessageCircle size={18} aria-hidden="true" />
                                         </a>
                                         <a
                                             href={`tel:${patient.contactPhone}`}
-                                            className="p-2 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-full transition-colors"
-                                            title="Llamar"
+                                            aria-label={`Llamar a ${patient.fullName}`}
+                                            className="grid h-11 w-11 place-items-center rounded-full text-text-secondary transition-colors duration-150 hover:bg-secondary hover:text-kanji-deep dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-kio"
                                         >
-                                            <Phone size={18} />
+                                            <Phone size={18} aria-hidden="true" />
                                         </a>
+                                        <span aria-hidden="true" className="mx-1 h-6 w-px bg-border dark:bg-slate-700" />
                                     </>
                                 )}
-                                <div className="h-6 w-px bg-gray-200 dark:bg-slate-700 mx-1"></div>
+                                {/* Antes este lápiz abría el asistente de ALTA de 3 pasos
+                                    sobre un paciente que ya existe, con un esquema Zod
+                                    distinto del que usa "Perfil clínico" y escribiendo los
+                                    mismos campos. Ahora lleva a la única superficie de
+                                    edición del módulo. */}
                                 <button
-                                    onClick={() => setIsEditModalOpen(true)}
-                                    className="p-2 text-gray-400 dark:text-slate-500 hover:text-[var(--color-kanji)] dark:hover:text-white rounded-full hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
-                                    title="Editar expediente"
+                                    type="button"
+                                    onClick={() =>
+                                        setSearchParams(
+                                            (prev) => {
+                                                const next = new URLSearchParams(prev);
+                                                next.set('tab', 'profile');
+                                                next.set('focus', 'personal');
+                                                return next;
+                                            },
+                                            { replace: true },
+                                        )
+                                    }
+                                    aria-label="Editar datos personales en el perfil clínico"
+                                    className="grid h-11 w-11 place-items-center rounded-full text-text-secondary transition-colors duration-150 hover:bg-secondary hover:text-kanji-deep dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-kio"
                                 >
-                                    <Edit size={18} />
+                                    <Edit size={18} aria-hidden="true" />
                                 </button>
                             </div>
                         </div>
 
-                        {/* Patient Info Row */}
-                        <div className="flex items-center gap-6 mb-3">
-                            <motion.div
-                                layoutId={`avatar-${patient.id}`}
-                                className="w-16 h-16 rounded-2xl bg-[var(--color-kanji)] text-white flex items-center justify-center text-xl font-bold shadow-lg shadow-kio/20"
+                        {/* Identidad */}
+                        <div className="mb-3 flex flex-wrap items-center gap-4 sm:gap-5">
+                            <span
+                                aria-hidden="true"
+                                className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-gradient-to-br from-kio to-kanji text-xl font-bold text-white ring-2 ring-surface dark:ring-slate-900"
                             >
                                 {getInitials(patient.fullName)}
-                            </motion.div>
+                            </span>
 
-                            <div>
-                                <h1 className="text-3xl font-bold text-[var(--color-kanji)] dark:text-white tracking-tight flex items-center gap-3">
-                                    {patient.fullName}
+                            {/* `basis-56` y no `flex-1` a secas: con `flex-basis: 0` este
+                                bloque se comprime hasta cero antes de que la fila decida
+                                envolver, y en móvil el nombre del paciente se estrujaba en
+                                vez de que las acciones bajaran a su propia línea. */}
+                            <div className="min-w-0 flex-1 basis-56">
+                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                                    <h1 className="text-2xl font-bold tracking-tight text-text sm:text-3xl dark:text-white">
+                                        {patient.fullName}
+                                    </h1>
                                     <StatusBadge status={patient.status} />
-                                </h1>
-                                <div className="flex items-center gap-4 mt-1.5 text-sm text-[var(--color-text)] dark:text-slate-400 flex-wrap">
-                                    {patient.diagnosis && (
-                                        <span className="opacity-60">{patient.diagnosis}</span>
-                                    )}
-                                    <span className="flex items-center gap-1.5 text-xs opacity-50">
-                                        <CalendarDays size={13} />
+                                    {/* El saldo pendiente vivía SOLO en Finanzas, y "Por
+                                        cobrar" enlazaba aquí: se hacía clic en una deuda
+                                        para aterrizar en la única pantalla que no sabía
+                                        decirla. Ámbar porque es "pendiente", no peligro. */}
+                                    <PatientBalancePill patientId={patient.id} patientName={patient.fullName} />
+                                    {/* Principio 1 de PRODUCT.md: la confidencialidad se ve, no
+                                        sólo se cumple. Abrir esta ficha ya escribió un
+                                        VIEW_PROFILE en el registro de accesos y sus campos
+                                        sensibles viajan cifrados; hasta ahora la cabecera no lo
+                                        decía en ninguna parte. */}
+                                    <Link
+                                        to="/access-logs"
+                                        className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-1 text-[11px] font-bold text-slate-600 underline-offset-4 transition-colors duration-150 hover:text-kanji-deep hover:underline dark:text-slate-400 dark:hover:text-kio"
+                                    >
+                                        <ShieldCheck size={15} aria-hidden="true" />
+                                        Expediente cifrado · accesos registrados
+                                    </Link>
+                                </div>
+                                <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium text-slate-600 dark:text-slate-400">
+                                    {patient.diagnosis && <span className="truncate">{patient.diagnosis}</span>}
+                                    <span className="flex items-center gap-1.5 text-xs">
+                                        <CalendarDays size={13} aria-hidden="true" />
                                         Desde {sinceDate}
                                     </span>
                                     {timelineMeta && timelineMeta.total > 0 && (
-                                        <span className="flex items-center gap-1.5 text-xs opacity-50">
-                                            <Activity size={13} />
+                                        <span className="flex items-center gap-1.5 text-xs tabular-nums">
+                                            <Activity size={13} aria-hidden="true" />
                                             {timelineMeta.total} {timelineMeta.total === 1 ? 'sesión' : 'sesiones'}
                                         </span>
                                     )}
                                 </div>
                             </div>
+
+                            {/* Continuidad: desde aquí se agenda la siguiente cita y se
+                                entra a la sesión de hoy. Antes había que volver a la
+                                agenda y buscar al mismo paciente otra vez. */}
+                            <PatientContinuityActions patientId={patient.id} patientName={patient.fullName} />
                         </div>
 
-                        {/* Tabs */}
-                        <div className="flex items-center gap-4 sm:gap-6 md:gap-8 overflow-x-auto whitespace-nowrap">
-                            {TABS.map((tab) => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`pb-3 text-sm font-medium transition-all relative flex items-center gap-2 ${activeTab === tab.id
-                                        ? 'text-[var(--color-kanji)] dark:text-kio'
-                                        : 'text-[var(--color-text)] dark:text-slate-400 opacity-50 hover:opacity-100'
+                        {/* Pestañas */}
+                        <div
+                            role="tablist"
+                            aria-label="Secciones del expediente"
+                            className="no-scrollbar flex items-center gap-4 overflow-x-auto whitespace-nowrap sm:gap-6 md:gap-8"
+                        >
+                            {TABS.map((tab) => {
+                                const isActive = activeTab === tab.id;
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        type="button"
+                                        role="tab"
+                                        aria-selected={isActive}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`relative flex min-h-11 items-center gap-2 pb-3 pt-2 text-sm font-bold transition-colors duration-150 ${
+                                            isActive
+                                                ? 'text-kanji-deep dark:text-kio'
+                                                : 'text-slate-600 hover:text-kanji-deep dark:text-slate-400 dark:hover:text-kio'
                                         }`}
-                                >
-                                    <tab.icon size={16} />
-                                    {tab.label}
-                                    {activeTab === tab.id && (
-                                        <motion.div
-                                            layoutId="activeTabDetails"
-                                            className="absolute bottom-0 left-0 w-full h-[2px] bg-[var(--color-kanji)] dark:bg-kio rounded-t-full"
-                                        />
-                                    )}
-                                </button>
-                            ))}
+                                    >
+                                        <tab.icon size={16} aria-hidden="true" />
+                                        {tab.label}
+                                        {isActive && (
+                                            <span
+                                                aria-hidden="true"
+                                                className="absolute bottom-0 left-0 h-[2px] w-full rounded-t-full bg-kanji-deep dark:bg-kio"
+                                            />
+                                        )}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
-                </motion.div>
+                </div>
 
-                {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-slate-950 p-4 sm:p-6 md:p-8">
-                    <AnimatePresence mode="wait">
-
-                        {/* TAB: Historia Clínica */}
-                        {activeTab === 'history' && (
-                            <motion.div
-                                key="history"
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{ duration: 0.2 }}
-                                className="max-w-4xl mx-auto"
-                            >
-                                <TimelineContainer patientId={patient.id} />
-                            </motion.div>
-                        )}
-
-                        {/* TAB: Perfil Clínico */}
-                        {activeTab === 'profile' && (
-                            <motion.div
-                                key="profile"
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{ duration: 0.2 }}
-                            >
-                                <PatientProfileEditor patient={patient} />
-                            </motion.div>
-                        )}
-
-                        {/* TAB: Estadísticas */}
-                        {activeTab === 'stats' && (
-                            <motion.div
-                                key="stats"
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{ duration: 0.2 }}
-                                className="max-w-5xl mx-auto space-y-6"
-                            >
-                                {timelineMeta && (
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                        <div className="bg-surface dark:bg-slate-900 rounded-2xl p-5 border border-[var(--color-cruz)] dark:border-slate-800 shadow-sm">
-                                            <p className="text-xs text-gray-400 dark:text-slate-500 uppercase font-bold tracking-wider mb-1">Sesiones</p>
-                                            <p className="text-3xl font-bold text-[var(--color-kanji)] dark:text-white">{timelineMeta.total}</p>
-                                            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">registradas en total</p>
-                                        </div>
-                                        <div className="bg-surface dark:bg-slate-900 rounded-2xl p-5 border border-[var(--color-cruz)] dark:border-slate-800 shadow-sm">
-                                            <p className="text-xs text-gray-400 dark:text-slate-500 uppercase font-bold tracking-wider mb-1">Inicio</p>
-                                            <p className="text-2xl font-bold text-[var(--color-kanji)] dark:text-white capitalize">{sinceDate}</p>
-                                            <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">primer registro</p>
-                                        </div>
-                                    </div>
-                                )}
-
-                                <MoodChart patientId={patient.id} />
-                                <ScalesHistoryChart data={scalesHistory} />
-                            </motion.div>
-                        )}
-
-                        {/* TAB: Documentos */}
-                        {activeTab === 'documents' && (
-                            <motion.div
-                                key="documents"
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{ duration: 0.2 }}
-                                className="max-w-3xl mx-auto"
-                            >
-                                <div className="bg-surface dark:bg-slate-900 rounded-2xl shadow-sm border border-[var(--color-cruz)] dark:border-slate-800 p-6 space-y-8">
-                                    <DocumentUpload patientId={patient.id} />
-                                    <hr className="border-gray-100 dark:border-slate-800" />
-                                    <DocumentViewer patientId={patient.id} />
+                {/* Contenido */}
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
+                    {/* Sin `AnimatePresence`: se quedaba esperando una salida que nunca
+                        resolvía y el panel anterior no se sustituía — la pestaña y la URL
+                        cambiaban pero el contenido no. Un cross-fade entre pestañas de un
+                        expediente no aporta nada que compense ese riesgo. */}
+                    <div>
+                            {activeTab === 'history' && (
+                                <div className="mx-auto max-w-4xl">
+                                    <TimelineContainer patientId={patient.id} />
                                 </div>
-                            </motion.div>
-                        )}
+                            )}
 
-                    </AnimatePresence>
+                            {activeTab === 'profile' && (
+                                <PatientProfileEditor
+                                    patient={patient}
+                                    focusSection={focusSection}
+                                    onFocusHandled={clearFocusParam}
+                                />
+                            )}
+
+                            {activeTab === 'stats' && (
+                                <div className="mx-auto max-w-5xl space-y-6">
+                                    {/* Las tarjetas "Sesiones" e "Inicio" repetían literalmente
+                                        los dos datos que ya están en el encabezado, dos veces en
+                                        la misma pantalla. Aquí quedan sólo las que no están. */}
+                                    <AttendanceStatsCards patientId={patient.id} />
+                                    <MoodChart patientId={patient.id} />
+                                    <ScalesHistoryChart
+                                        data={scales.data ?? []}
+                                        isLoading={scales.isLoading}
+                                        isError={scales.isError}
+                                        onRetry={() => scales.refetch()}
+                                    />
+                                </div>
+                            )}
+
+                            {activeTab === 'documents' && (
+                                <div className="mx-auto max-w-3xl space-y-6">
+                                    <div className="rounded-2xl border border-border bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                                        <DocumentUpload patientId={patient.id} />
+                                    </div>
+                                    <div className="rounded-2xl border border-border bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                                        <DocumentViewer patientId={patient.id} />
+                                    </div>
+                                </div>
+                            )}
+                    </div>
                 </div>
             </div>
-
-            <PatientModal
-                isOpen={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-                initialData={patient}
-                onSubmit={handleEditSubmit}
-                isLoading={updatePatientMutation.isPending}
-            />
         </DashboardLayout>
     );
 }
@@ -321,77 +370,151 @@ const RISK_LABELS: Record<string, string> = {
     MINIMAL: 'Mínimo',
     MILD: 'Leve',
     MODERATE: 'Moderado',
-    MODERATELY_SEVERE: 'Mod. Severo',
+    MODERATELY_SEVERE: 'Mod. severo',
     SEVERE: 'Severo',
 };
 
 const SCALE_MAX: Record<string, number> = { PHQ9: 27, GAD7: 21 };
 
-function ScalesHistoryChart({ data }: { data: ScaleHistoryPoint[] }) {
-    const phq9 = data.filter(d => d.scaleType === 'PHQ9');
-    const gad7 = data.filter(d => d.scaleType === 'GAD7');
+const CARD = 'rounded-2xl border border-border bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900';
 
-    if (data.length === 0) {
+function ScalesHistoryChart({
+    data,
+    isLoading,
+    isError,
+    onRetry,
+}: {
+    data: ScaleHistoryPoint[];
+    isLoading?: boolean;
+    isError?: boolean;
+    onRetry?: () => void;
+}) {
+    // Igual que en el resto de superficies clínicas: el error va antes que el
+    // vacío. "Sin escalas registradas" ante un 500 afirma algo que no sabemos.
+    if (isError) {
+        return <WidgetError what="el historial de escalas clínicas" onRetry={onRetry} />;
+    }
+
+    if (isLoading) {
         return (
-            <div className="bg-surface dark:bg-slate-900 rounded-2xl border border-[var(--color-cruz)] dark:border-slate-800 shadow-sm p-6 flex flex-col items-center justify-center text-center min-h-[200px]">
-                <BarChart2 size={28} className="text-gray-300 dark:text-slate-600 mb-3" />
-                <p className="text-sm text-gray-400 dark:text-slate-500 font-medium">Sin escalas registradas</p>
-                <p className="text-xs text-gray-400 dark:text-slate-600 mt-1">Los resultados de PHQ-9 y GAD-7 aparecerán aquí.</p>
+            <div className={CARD} aria-busy="true">
+                <div className="h-4 w-56 animate-pulse rounded-xs bg-cruz/40 dark:bg-slate-800" />
+                <div className="mt-5 h-28 animate-pulse rounded-md bg-cruz/30 dark:bg-slate-800/70" />
             </div>
         );
     }
 
+    if (data.length === 0) {
+        return (
+            <div className={`${CARD} flex min-h-[200px] flex-col items-center justify-center text-center`}>
+                <span className="mb-3 grid h-12 w-12 place-items-center rounded-full bg-secondary text-kanji-deep dark:bg-slate-800 dark:text-kio">
+                    <BarChart2 size={22} aria-hidden="true" />
+                </span>
+                <p className="text-sm font-bold text-text dark:text-slate-200">Sin escalas registradas</p>
+                <p className="mt-1 text-xs font-medium text-slate-600 dark:text-slate-400">
+                    Los resultados de PHQ-9 y GAD-7 aparecerán aquí tras aplicarlos en sesión.
+                </p>
+            </div>
+        );
+    }
+
+    const series = [
+        { label: 'PHQ-9 — Depresión', key: 'PHQ9', color: '#5b46a8', points: data.filter(d => d.scaleType === 'PHQ9') },
+        { label: 'GAD-7 — Ansiedad', key: 'GAD7', color: '#8a72d1', points: data.filter(d => d.scaleType === 'GAD7') },
+    ];
+
     return (
-        <div className="bg-surface dark:bg-slate-900 rounded-2xl border border-[var(--color-cruz)] dark:border-slate-800 shadow-sm p-6 space-y-6">
-            <h3 className="text-lg font-bold text-[var(--color-kanji)] dark:text-white flex items-center gap-2">
-                <BarChart2 size={18} />
-                Evolución de Escalas Clínicas
+        <div className={`${CARD} space-y-6`}>
+            <h3 className="flex items-center gap-2 text-base font-bold text-text dark:text-white">
+                <BarChart2 size={18} aria-hidden="true" className="text-kanji-deep dark:text-kio" />
+                Evolución de escalas clínicas
             </h3>
 
-            {[{ label: 'PHQ-9 — Depresión', key: 'PHQ9', color: '#8a72d1', points: phq9 }, { label: 'GAD-7 — Ansiedad', key: 'GAD7', color: '#ae93fe', points: gad7 }].map(({ label, key, color, points }) => (
-                points.length > 0 && (
+            {series.map(({ label, key, color, points }) =>
+                points.length > 0 ? (
                     <div key={key}>
-                        <div className="flex items-center justify-between mb-3">
-                            <p className="text-sm font-bold text-gray-700 dark:text-slate-300">{label}</p>
-                            <div className="flex items-center gap-2">
-                                <span className="text-2xl font-black" style={{ color }}>{points[points.length - 1].totalScore}</span>
-                                <span className="text-xs text-gray-400 dark:text-slate-500">/ {SCALE_MAX[key]}</span>
-                                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 font-semibold">
+                        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                            <p className="text-sm font-bold text-text dark:text-slate-200">{label}</p>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-2xl font-bold tabular-nums text-kanji-deep dark:text-kio">
+                                    {points[points.length - 1].totalScore}
+                                </span>
+                                <span className="text-xs font-medium tabular-nums text-slate-600 dark:text-slate-400">
+                                    de {SCALE_MAX[key]}
+                                </span>
+                                <span className="rounded-full bg-secondary px-2.5 py-0.5 text-[11px] font-bold text-text dark:bg-slate-800 dark:text-slate-300">
                                     {RISK_LABELS[points[points.length - 1].riskLevel]}
                                 </span>
                             </div>
                         </div>
                         {points.length >= 2 ? (
-                            <ResponsiveContainer width="100%" height={120}>
-                                <LineChart data={points.map(p => ({ fecha: format(new Date(p.appointment.startTime), 'd MMM', { locale: es }), score: p.totalScore }))}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
-                                    <XAxis dataKey="fecha" tick={{ fontSize: 11 }} />
-                                    <YAxis domain={[0, SCALE_MAX[key]]} tick={{ fontSize: 11 }} width={28} />
-                                    <Tooltip />
-                                    <Line type="monotone" dataKey="score" stroke={color} strokeWidth={2} dot={{ r: 4, fill: color }} />
+                            <ResponsiveContainer width="100%" height={130}>
+                                <LineChart
+                                    data={points.map(p => ({
+                                        fecha: format(new Date(p.appointment.startTime), 'd MMM', { locale: es }),
+                                        score: p.totalScore,
+                                    }))}
+                                    margin={{ top: 4, right: 8, bottom: 0, left: 0 }}
+                                >
+                                    {/* La rejilla y el tooltip venían con los valores por defecto
+                                        de Recharts: invisibles y en blanco puro en modo oscuro. */}
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                                    <XAxis
+                                        dataKey="fecha"
+                                        tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }}
+                                        stroke="var(--color-border)"
+                                    />
+                                    <YAxis
+                                        domain={[0, SCALE_MAX[key]]}
+                                        tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }}
+                                        stroke="var(--color-border)"
+                                        width={28}
+                                    />
+                                    <Tooltip
+                                        cursor={{ stroke: 'var(--color-border)' }}
+                                        contentStyle={{
+                                            backgroundColor: 'var(--color-tooltip-bg)',
+                                            border: '1px solid var(--color-tooltip-border)',
+                                            borderRadius: 14,
+                                            fontSize: 12,
+                                            fontWeight: 500,
+                                            color: 'var(--color-text)',
+                                        }}
+                                        labelStyle={{ color: 'var(--color-text-secondary)' }}
+                                        formatter={(value) => [`${value ?? '—'} de ${SCALE_MAX[key]}`, 'Puntaje']}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="score"
+                                        stroke={color}
+                                        strokeWidth={2}
+                                        dot={{ r: 4, fill: color }}
+                                    />
                                 </LineChart>
                             </ResponsiveContainer>
                         ) : (
-                            <p className="text-xs text-gray-400 dark:text-slate-500 italic">Solo 1 registro. Se necesitan al menos 2 para mostrar la evolución.</p>
+                            <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                                Sólo hay 1 registro. Se necesitan al menos 2 para dibujar la evolución.
+                            </p>
                         )}
                     </div>
-                )
-            ))}
+                ) : null,
+            )}
         </div>
     );
 }
 
 function StatusBadge({ status }: { status: Patient['status'] }) {
     const styles: Record<Patient['status'], string> = {
-        ACTIVE: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
-        ARCHIVED: 'bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border-gray-200 dark:border-slate-700',
+        ACTIVE: 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/25',
+        ARCHIVED: 'bg-secondary text-text-secondary ring-1 ring-border dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700',
     };
     const labels: Record<Patient['status'], string> = {
         ACTIVE: 'Activo',
         ARCHIVED: 'Archivado',
     };
     return (
-        <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${styles[status]}`}>
+        <span className={`rounded-full px-3 py-1 text-[11px] font-bold tracking-wide ${styles[status]}`}>
             {labels[status]}
         </span>
     );

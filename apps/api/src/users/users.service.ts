@@ -37,6 +37,31 @@ export class UsersService {
       updateData.currency = data.currency;
     }
 
+    if (data.remindersEnabled !== undefined) {
+      updateData.remindersEnabled = data.remindersEnabled;
+    }
+
+    if (data.reminderLeadHours !== undefined) {
+      updateData.reminderLeadHours = data.reminderLeadHours;
+    }
+
+    if (data.reminderSecondLeadHours !== undefined) {
+      // null = desactivar el segundo toque
+      updateData.reminderSecondLeadHours = data.reminderSecondLeadHours;
+    }
+
+    // Coherencia: el segundo toque debe ser menor que el principal.
+    const nextLead =
+      (updateData.reminderLeadHours as number | undefined) ??
+      profile.reminderLeadHours;
+    const nextSecond =
+      updateData.reminderSecondLeadHours !== undefined
+        ? (updateData.reminderSecondLeadHours as number | null)
+        : profile.reminderSecondLeadHours;
+    if (nextSecond !== null && nextSecond >= nextLead) {
+      updateData.reminderSecondLeadHours = null;
+    }
+
     // Update the profile
     const updatedProfile = await this.prisma.clinicianProfile.update({
       where: { id: profile.id },

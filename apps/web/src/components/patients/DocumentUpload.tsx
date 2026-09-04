@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { Upload, X, FileText } from 'lucide-react';
+import { Upload, X, FileText, ShieldAlert } from 'lucide-react';
 import { useUploadDocument } from '../../hooks/use-patients';
 import type { DocumentCategory } from '../../types/patients.types';
 
@@ -76,30 +76,50 @@ export function DocumentUpload({ patientId }: Props) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-bold text-[var(--color-kanji)] dark:text-white uppercase tracking-wider">
+      <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
         Subir documento
       </h3>
 
-      {/* Drop zone */}
-      <div
-        role="button"
-        tabIndex={0}
+      {/* El manejo de almacenamiento se declara ANTES del selector, no después
+          de subir: los documentos van a un bucket privado con enlaces
+          temporales, no a la capa de cifrado de campo (AES-GCM) que protege
+          diagnóstico, notas y contacto. Es una asimetría real y el clínico no
+          tenía forma de percibirla. */}
+      <p className="flex items-start gap-2.5 rounded-xl border border-border bg-secondary px-3.5 py-3 text-xs font-medium leading-relaxed text-text dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+        <ShieldAlert size={15} aria-hidden="true" className="mt-0.5 shrink-0 text-slate-600 dark:text-slate-400" />
+        <span>
+          Los archivos se guardan en almacenamiento privado y sólo se abren con enlaces
+          temporales. A diferencia del diagnóstico o las notas, <strong className="font-bold">no pasan
+          por el cifrado de campo del expediente</strong>: sube sólo lo necesario.
+        </span>
+      </p>
+
+      {/* Zona de arrastre. Es un botón real: se alcanza con tabulador y responde
+          a Enter y a Espacio, no sólo a Enter. */}
+      <button
+        type="button"
+        aria-label="Elegir un archivo para subir al expediente"
         onClick={() => inputRef.current?.click()}
-        onKeyDown={(e) => e.key === 'Enter' && inputRef.current?.click()}
-        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
+        className={`w-full rounded-2xl border-2 border-dashed p-6 text-center transition-colors duration-150 ${
           isDragging
-            ? 'border-[var(--color-kanji)] bg-[var(--color-cruz)]/20 dark:bg-kio/10'
-            : 'border-gray-200 dark:border-slate-700 hover:border-[var(--color-kanji)] dark:hover:border-kio'
+            ? 'border-kanji-deep bg-cruz/25 dark:border-kio dark:bg-kio/10'
+            : 'border-border hover:border-kanji-deep dark:border-slate-700 dark:hover:border-kio'
         }`}
       >
-        <Upload size={24} className="mx-auto mb-2 text-gray-400 dark:text-slate-500" />
-        <p className="text-sm text-gray-500 dark:text-slate-400">
-          Arrastra un archivo o <span className="text-[var(--color-kanji)] dark:text-kio font-medium">haz clic</span>
-        </p>
-        <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">JPG, PNG, WebP, PDF, DOCX — máx. 10 MB</p>
+        <Upload size={22} aria-hidden="true" className="mx-auto mb-2 text-slate-600 dark:text-slate-400" />
+        <span className="block text-sm font-medium text-text dark:text-slate-300">
+          Arrastra un archivo o{' '}
+          <span className="font-bold text-kanji-deep dark:text-kio">haz clic para elegirlo</span>
+        </span>
+        <span className="mt-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+          JPG, PNG, WebP, PDF o DOCX — máx. 10 MB
+        </span>
         <input
           ref={inputRef}
           type="file"
@@ -107,43 +127,59 @@ export function DocumentUpload({ patientId }: Props) {
           accept=".jpg,.jpeg,.png,.webp,.pdf,.docx"
           onChange={handleInputChange}
         />
-      </div>
+      </button>
 
-      {/* Selected file preview */}
+      {/* Archivo seleccionado */}
       {selectedFile && (
-        <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-100 dark:border-slate-700">
-          <FileText size={18} className="text-[var(--color-kanji)] dark:text-kio shrink-0" />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-700 dark:text-slate-300 truncate">{selectedFile.name}</p>
-            <p className="text-xs text-gray-400 dark:text-slate-500">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-secondary p-2.5 dark:border-slate-700 dark:bg-slate-800">
+          <FileText size={18} aria-hidden="true" className="shrink-0 text-kanji-deep dark:text-kio" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-bold text-text dark:text-slate-200">{selectedFile.name}</p>
+            <p className="text-xs font-medium tabular-nums text-slate-600 dark:text-slate-400">
+              {(selectedFile.size / 1024).toFixed(1)} KB
+            </p>
           </div>
           <button
+            type="button"
             onClick={() => setSelectedFile(null)}
-            className="p-1 text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+            aria-label={`Quitar ${selectedFile.name}`}
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-text-secondary transition-colors duration-150 hover:bg-white hover:text-rose-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-rose-400"
           >
-            <X size={16} />
+            <X size={16} aria-hidden="true" />
           </button>
         </div>
       )}
 
-      {/* Category selector */}
-      <select
-        value={category}
-        onChange={(e) => setCategory(e.target.value as DocumentCategory | '')}
-        className="w-full text-sm border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-kanji)]/40"
-      >
-        <option value="">Sin categoría</option>
-        {(Object.keys(CATEGORY_LABELS) as DocumentCategory[]).map((cat) => (
-          <option key={cat} value={cat}>{CATEGORY_LABELS[cat]}</option>
-        ))}
-      </select>
+      {/* Categoría */}
+      <div>
+        <label
+          htmlFor="document-category"
+          className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400"
+        >
+          Categoría
+        </label>
+        <select
+          id="document-category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value as DocumentCategory | '')}
+          className="h-11 w-full rounded-xl border border-border bg-white px-3 text-sm font-medium text-text focus:border-kio focus:outline-none focus:ring-2 focus:ring-kio/50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+        >
+          <option value="">Sin categoría</option>
+          {(Object.keys(CATEGORY_LABELS) as DocumentCategory[]).map((cat) => (
+            <option key={cat} value={cat}>
+              {CATEGORY_LABELS[cat]}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <button
+        type="button"
         onClick={handleSubmit}
         disabled={!selectedFile || uploadMutation.isPending}
-        className="w-full py-2 px-4 rounded-lg bg-[var(--color-kanji)] dark:bg-kio text-white dark:text-slate-900 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+        className="min-h-11 w-full rounded-xl bg-kanji-deep px-4 text-sm font-bold text-white shadow-sm shadow-kio/20 transition-colors duration-150 hover:bg-kanji hover:shadow-md hover:shadow-kio/20 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-kio dark:text-slate-900 dark:hover:bg-cruz"
       >
-        {uploadMutation.isPending ? 'Subiendo...' : 'Subir documento'}
+        {uploadMutation.isPending ? 'Subiendo…' : 'Subir documento'}
       </button>
     </div>
   );

@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancela ejecuciones anteriores del mismo branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # Valores dummy: ningún job de este workflow toca la base de datos.
+      # Existen porque varios módulos validan el formato de estas variables
+      # al importarse (JWT_SECRET >= 32 chars, ENCRYPTION_KEY = 64 hex chars).
+      DATABASE_URL: postgresql://user:pass@localhost:5432/kio_ci
+      DIRECT_URL: postgresql://user:pass@localhost:5432/kio_ci
+      JWT_SECRET: ci-jwt-secret-con-mas-de-32-caracteres-para-pasar-la-validacion
+      ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      NODE_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # El cliente de Prisma no se versiona (ver .gitignore), así que hay que
+      # generarlo antes de type-check / test / build. No requiere conexión a BD.
+      - name: Generate Prisma client
+        run: npx prisma generate
+        working-directory: apps/api
+
+      # Estrategia de trinquete: `web` está limpio (0 errores) y se bloquea para
+      # que no vuelva a ensuciarse. `api` arrastra ~300 errores pre-existentes
+      # de reglas type-aware (`no-unsafe-*` sobre valores `any`) repartidos por
+      # 39 archivos; se reporta sin bloquear hasta que se salde esa deuda.
+      # Cuando `api` llegue a 0, junta ambos en `npm run lint` y quita el flag.
+      # Dos utilidades de Tailwind pegadas sin espacio (`text-[11px]font-bold`)
+      # producen una clase que no existe: Tailwind no genera nada, el estilo se
+      # pierde en silencio y ni ESLint ni `tsc` ni el build lo ven. Pasó de
+      # verdad: cuatro elementos quedaron a 16px en vez de 11px e invirtieron la
+      # jerarquía de la fila de agenda. Este grep es el único que lo atrapa.
+      - name: Clases Tailwind concatenadas
+        run: |
+          if grep -rnE 'text-\[[0-9]+px\][a-zA-Z]|(^|[" ])(p|m|gap|w|h)-\[[0-9a-z.%]+\][a-zA-Z-]' apps/web/src --include='*.tsx' --include='*.ts'; then
+            echo "::error::Utilidades de Tailwind concatenadas sin espacio (arriba). La clase resultante no existe."
+            exit 1
+          fi
+
+      - name: Lint (web) — bloqueante
+        run: npm run lint -w web
+
+      - name: Lint (api) — informativo
+        run: npm run lint -w api
+        continue-on-error: true
+
+      - name: Type check
+        run: npm run check-types
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  # Los tests de integración necesitan una Postgres real. Se ejecutan sólo bajo
+  # demanda (workflow_dispatch) o cuando se toca el flujo de invitación beta,
+  # para no bloquear cada PR con el arranque de un servicio.
+  #
+  # Los E2E de Playwright NO están cableados aquí a propósito: hoy varios specs
+  # dependen de un usuario seed inexistente y de selectores que no matchean
+  # (searchbox / data-testid). Añadirlos ahora dejaría CI en rojo permanente.
+  # Ver la nota "Estado actual y deuda técnica" antes de activarlos.

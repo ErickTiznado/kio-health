@@ -18,10 +18,16 @@ export function MoodIndicator({ rating, size = 'md' }: MoodIndicatorProps) {
     }
   };
 
+  // El dato vivía sólo en el color y en un `title`: en escala de grises, con
+  // daltonismo o en táctil, un punto ámbar y uno rojo eran el mismo punto. El
+  // número va ahora como texto visible y el punto sólo lo acompaña.
   return (
-    <div
-      className={`${getSize()} rounded-full ${getColor(rating)} shadow-sm ring-2 ring-white dark:ring-slate-900`}
-      title={`Ánimo: ${rating}/10`}
-    />
+    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold tabular-nums text-slate-600 dark:text-slate-400">
+      <span
+        aria-hidden="true"
+        className={`${getSize()} shrink-0 rounded-full ${getColor(rating)} ring-2 ring-white dark:ring-slate-900`}
+      />
+      Ánimo {rating}/10
+    </span>
   );
 }

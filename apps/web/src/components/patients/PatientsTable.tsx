@@ -1,48 +1,84 @@
-import { useState, useRef, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Link } from 'react-router-dom';
 import type { Patient } from '../../types/patients.types';
-import { MoreVertical, Edit, FileText, Trash2, Calendar, RotateCcw } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { MoreVertical, Edit, FileText, Archive, RotateCcw, UserPlus, SearchX } from 'lucide-react';
 import { RiskFlagBadge } from '../patient/RiskFlagBadge';
+import { WidgetError } from '../widgets/WidgetError';
 
 interface PatientsTableProps {
   patients: Patient[];
   isLoading: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
+  /** True cuando hay búsqueda o filtro activo: cambia el empty state. */
+  isFiltered?: boolean;
+  onClearFilters?: () => void;
+  onCreate?: () => void;
   onEdit: (patient: Patient) => void;
   onArchive: (patient: Patient) => void;
   onUnarchive: (patient: Patient) => void;
   onView: (patient: Patient) => void;
 }
 
-const getInitials = (name: string) => {
-  return name
-    .split(' ')
+/**
+ * Una sola plantilla de rejilla para el encabezado y para cada fila. Antes el
+ * encabezado usaba `px-6` y las filas `p-4`, así que las columnas nunca
+ * llegaban a alinearse.
+ *
+ * NO HAY COLUMNA DE "PRÓXIMA CITA" — y su ausencia es deliberada. `GET
+ * /patients` (`PatientsService.findAll`, en sus dos caminos: el normal y
+ * `findAllByBalanceDesc`) hace `include: { riskFlag: true }` y nunca incluye
+ * `appointments`, así que `patient.appointments` llega SIEMPRE `undefined`.
+ * Mientras existió, la columna pintaba «Sin agendar» —y el plegado móvil «Sin
+ * cita agendada»— en el 100% de las filas: un psicólogo abría Pacientes y leía
+ * que ninguno de sus pacientes tenía cita. Es el Don't literal de DESIGN.md,
+ * «no afirmar un hecho clínico que la interfaz no puede sostener». Para
+ * devolverla hace falta que el endpoint de listado traiga la cita SIGUIENTE
+ * (`where: { status: 'SCHEDULED', startTime: { gte: ahora } }`,
+ * `orderBy: { startTime: 'asc' }`, `take: 1`) — y no el `include` de
+ * `findOne`, que ordena `startTime: 'desc'` y da la cita más RECIENTE.
+ */
+const ROW_GRID =
+  'grid grid-cols-[minmax(0,1fr)_44px] sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_44px] items-center gap-x-4 px-4 sm:px-5';
+
+const getInitials = (name: string) =>
+  name
+    .trim()
+    .split(/\s+/)
     .map((n) => n[0])
     .slice(0, 2)
     .join('')
     .toUpperCase();
+
+const currency = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+
+const STATUS_LABEL: Record<string, string> = { ACTIVE: 'Activo', ARCHIVED: 'Archivado' };
+
+const MENU_WIDTH = 208;
+// 3 ítems de 44px + separador + padding vertical del panel.
+const MENU_HEIGHT = 160;
+
+const STATUS_STYLE: Record<string, string> = {
+  ACTIVE:
+    'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/25',
+  ARCHIVED:
+    'bg-secondary text-text-secondary ring-1 ring-border dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700',
 };
 
-const translateStatus = (status: string) => {
-  switch (status) {
-    case 'ACTIVE':
-      return 'Activo';
-    case 'ARCHIVED':
-      return 'Archivado';
-    default:
-      return status;
-  }
-};
+const BALANCE_STYLE =
+  'bg-amber-50 text-amber-800 ring-1 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/25';
 
-const translateStatusColor = (status: string) => {
-  switch (status) {
-    case 'ACTIVE':
-      return 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-600/20 dark:ring-emerald-500/20';
-    default:
-      return 'bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-400 ring-1 ring-gray-200 dark:ring-slate-700';
-  }
-};
-
-function ActionMenu({ patient, onEdit, onArchive, onUnarchive, onView }: {
+// ── Menú de acciones ────────────────────────────────────────────────────────
+// Se renderiza por portal (DESIGN.md → Dropdowns): el contenedor de la lista
+// tiene `overflow-y-auto` y recortaba el menú de las últimas filas.
+function ActionMenu({
+  patient,
+  onEdit,
+  onArchive,
+  onUnarchive,
+  onView,
+}: {
   patient: Patient;
   onEdit: (p: Patient) => void;
   onArchive: (p: Patient) => void;
@@ -50,228 +86,369 @@ function ActionMenu({ patient, onEdit, onArchive, onUnarchive, onView }: {
   onView: (p: Patient) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // La posición se calcula al abrir, no en un efecto: el menú vive en un portal
+  // y su ancla es la fila, que puede estar en cualquier punto del scroll. Si no
+  // cabe por debajo, se abre hacia arriba — las últimas filas de la lista son
+  // justo donde el menú se salía de la ventana.
+  const toggle = useCallback(() => {
+    setIsOpen((open) => {
+      if (open) return false;
+      const rect = triggerRef.current?.getBoundingClientRect();
+      if (rect) {
+        const fitsBelow = rect.bottom + 8 + MENU_HEIGHT <= window.innerHeight - 8;
+        setCoords({
+          top: fitsBelow
+            ? rect.bottom + 8
+            : Math.max(8, rect.top - 8 - MENU_HEIGHT),
+          left: Math.max(8, Math.min(rect.right - MENU_WIDTH, window.innerWidth - MENU_WIDTH - 8)),
+        });
+      }
+      return true;
+    });
+  }, []);
+
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+    if (!isOpen) return;
+    const close = () => setIsOpen(false);
+    const onPointerDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (!menuRef.current?.contains(t) && !triggerRef.current?.contains(t)) setIsOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
         setIsOpen(false);
+        triggerRef.current?.focus();
       }
     };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('keydown', onKey);
+    window.addEventListener('scroll', close, true);
+    window.addEventListener('resize', close);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('keydown', onKey);
+      window.removeEventListener('scroll', close, true);
+      window.removeEventListener('resize', close);
     };
   }, [isOpen]);
 
-  return (
-    <div className="relative" ref={menuRef}>
-      <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsOpen(!isOpen);
-        }}
-        className="p-2 text-gray-400 hover:text-kanji dark:hover:text-kio rounded-full transition-colors opacity-40 group-hover:opacity-100 duration-200 hover:bg-gray-100 dark:hover:bg-slate-800"
-      >
-        <MoreVertical size={18} />
-      </motion.button>
+  const item =
+    'w-full text-left px-4 py-2.5 min-h-11 text-sm font-medium flex items-center gap-3 transition-colors duration-150';
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -5 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -5 }}
-            transition={{ duration: 0.1, ease: "easeOut" }}
-            className="absolute right-0 top-full mt-2 w-48 bg-surface dark:bg-slate-900 rounded-xl shadow-xl border border-gray-100 dark:border-slate-800 z-50 py-2 overflow-hidden ring-1 ring-black/5"
+  const run = (fn: (p: Patient) => void) => () => {
+    setIsOpen(false);
+    fn(patient);
+  };
+
+  return (
+    <>
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        aria-label={`Acciones de ${patient.fullName}`}
+        onClick={toggle}
+        className="relative z-10 grid h-11 w-11 place-items-center rounded-full text-text-secondary transition-colors duration-150 hover:bg-secondary hover:text-kanji dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-kio"
+      >
+        <MoreVertical size={18} aria-hidden="true" />
+      </button>
+
+      {isOpen &&
+        createPortal(
+          <div
+            ref={menuRef}
+            role="menu"
+            aria-label={`Acciones de ${patient.fullName}`}
+            style={{ top: coords.top, left: coords.left, width: MENU_WIDTH }}
+            className="fixed z-50 overflow-hidden rounded-2xl border border-border bg-white py-2 shadow-xl shadow-black/10 dark:border-slate-700 dark:bg-slate-900 dark:shadow-black/40"
           >
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(patient);
-                setIsOpen(false);
-              }}
-              className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 flex items-center gap-3 transition-colors font-medium"
+              role="menuitem"
+              onClick={run(onView)}
+              className={`${item} text-text hover:bg-secondary dark:text-slate-200 dark:hover:bg-slate-800`}
             >
-              <Edit size={16} className="text-gray-400 dark:text-slate-500" />
-              Editar
+              <FileText size={16} aria-hidden="true" className="text-slate-600 dark:text-slate-400" />
+              Ver expediente
             </button>
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onView(patient);
-                setIsOpen(false);
-              }}
-              className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 flex items-center gap-3 transition-colors font-medium"
+              role="menuitem"
+              onClick={run(onEdit)}
+              className={`${item} text-text hover:bg-secondary dark:text-slate-200 dark:hover:bg-slate-800`}
             >
-              <FileText size={16} className="text-gray-400 dark:text-slate-500" />
-              Ver Expediente
+              <Edit size={16} aria-hidden="true" className="text-slate-600 dark:text-slate-400" />
+              Editar perfil clínico
             </button>
-            <div className="h-px bg-gray-100 dark:bg-slate-800 my-1 mx-4"></div>
+            <div className="mx-4 my-1 h-px bg-border dark:bg-slate-800" role="separator" />
             {patient.status === 'ARCHIVED' ? (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onUnarchive(patient);
-                  setIsOpen(false);
-                }}
-                className="w-full text-left px-4 py-2.5 text-sm text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 flex items-center gap-3 transition-colors font-medium"
+                role="menuitem"
+                onClick={run(onUnarchive)}
+                className={`${item} text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20`}
               >
-                <RotateCcw size={16} className="text-emerald-400" />
+                <RotateCcw size={16} aria-hidden="true" />
                 Reactivar
               </button>
             ) : (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onArchive(patient);
-                  setIsOpen(false);
-                }}
-                className="w-full text-left px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 flex items-center gap-3 transition-colors font-medium"
+                role="menuitem"
+                onClick={run(onArchive)}
+                className={`${item} text-rose-700 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-900/20`}
               >
-                <Trash2 size={16} className="text-rose-400" />
+                <Archive size={16} aria-hidden="true" />
                 Archivar
               </button>
             )}
-          </motion.div>
+          </div>,
+          document.body,
         )}
-      </AnimatePresence>
+    </>
+  );
+}
+
+// ── Estados ─────────────────────────────────────────────────────────────────
+function TableShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      {children}
     </div>
   );
 }
 
-export function PatientsTable({ patients, isLoading, onEdit, onArchive, onUnarchive, onView }: PatientsTableProps) {
+function ColumnHeader() {
+  return (
+    <div
+      className={`${ROW_GRID} border-b border-border bg-secondary/60 py-2.5 text-[11px] font-bold uppercase tracking-wider text-text-secondary dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-400`}
+    >
+      <div>Paciente</div>
+      <div className="hidden sm:block">Estado</div>
+      <div>
+        <span className="sr-only">Acciones</span>
+      </div>
+    </div>
+  );
+}
+
+function EmptyState({
+  isFiltered,
+  onClearFilters,
+  onCreate,
+}: {
+  isFiltered?: boolean;
+  onClearFilters?: () => void;
+  onCreate?: () => void;
+}) {
+  const Icon = isFiltered ? SearchX : UserPlus;
+  return (
+    <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+      <span className="mb-4 grid h-14 w-14 place-items-center rounded-full bg-secondary text-kanji dark:bg-slate-800 dark:text-kio">
+        <Icon size={24} aria-hidden="true" />
+      </span>
+      <h3 className="text-base font-bold text-text dark:text-white">
+        {isFiltered ? 'Ningún paciente coincide' : 'Aún no hay pacientes'}
+      </h3>
+      <p className="mt-1.5 max-w-sm text-sm font-medium text-slate-600 dark:text-slate-400">
+        {isFiltered
+          ? 'Prueba con otro nombre o quita los filtros para ver la lista completa.'
+          : 'Crea el primer expediente para empezar a agendar sesiones y registrar notas.'}
+      </p>
+      {isFiltered
+        ? onClearFilters && (
+            <button
+              type="button"
+              onClick={onClearFilters}
+              className="mt-5 inline-flex min-h-11 items-center rounded-xl border border-border bg-white px-5 text-sm font-bold text-text transition-colors duration-150 hover:border-kanji/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-kio/40"
+            >
+              Quitar filtros
+            </button>
+          )
+        : onCreate && (
+            <button
+              type="button"
+              onClick={onCreate}
+              className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl bg-kanji-deep px-5 text-sm font-bold text-white shadow-sm shadow-kio/20 transition-colors duration-150 hover:bg-kanji hover:shadow-md hover:shadow-kio/20 dark:bg-kio dark:text-slate-900 dark:hover:bg-cruz"
+            >
+              <UserPlus size={16} aria-hidden="true" />
+              Nuevo paciente
+            </button>
+          )}
+    </div>
+  );
+}
+
+function LoadingRows() {
+  return (
+    <div aria-busy="true" aria-live="polite">
+      <span className="sr-only">Cargando pacientes…</span>
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className={`${ROW_GRID} border-b border-border py-4 last:border-b-0 dark:border-slate-800`}>
+          <div className="flex items-center gap-3">
+            <div className="h-11 w-11 shrink-0 animate-pulse rounded-full bg-cruz/40 dark:bg-slate-800" />
+            <div className="min-w-0 flex-1 space-y-2">
+              <div className="h-3.5 w-40 max-w-full animate-pulse rounded-xs bg-cruz/40 dark:bg-slate-800" />
+              <div className="h-3 w-24 max-w-full animate-pulse rounded-xs bg-cruz/30 dark:bg-slate-800/70" />
+            </div>
+          </div>
+          <div className="hidden sm:block">
+            <div className="h-5 w-20 animate-pulse rounded-full bg-cruz/40 dark:bg-slate-800" />
+          </div>
+          <div />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Fila ────────────────────────────────────────────────────────────────────
+function PatientRow({
+  patient,
+  onEdit,
+  onArchive,
+  onUnarchive,
+  onView,
+}: {
+  patient: Patient;
+  onEdit: (p: Patient) => void;
+  onArchive: (p: Patient) => void;
+  onUnarchive: (p: Patient) => void;
+  onView: (p: Patient) => void;
+}) {
+  const flags = patient.riskFlag?.flagTypes ?? [];
+  const balance = patient.pendingBalance ?? 0;
+
+  return (
+    <li
+      className={`${ROW_GRID} group relative border-b border-border py-3 transition-colors duration-150 last:border-b-0 hover:bg-secondary/50 focus-within:bg-secondary/50 dark:border-slate-800 dark:hover:bg-slate-800/40 dark:focus-within:bg-slate-800/40`}
+    >
+      {/* Paciente */}
+      <div className="flex min-w-0 items-center gap-3">
+        <span
+          aria-hidden="true"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-kio to-kanji text-sm font-bold text-white ring-2 ring-white dark:ring-slate-900"
+        >
+          {getInitials(patient.fullName)}
+        </span>
+        <div className="min-w-0">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+            {/* Enlace estirado: toda la fila navega, pero sigue siendo un enlace
+                real — enfocable, con menú contextual y "abrir en pestaña nueva". */}
+            <Link
+              to={`/patients/${patient.id}`}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                e.preventDefault();
+                onView(patient);
+              }}
+              className="truncate text-sm font-bold text-text after:absolute after:inset-0 after:content-[''] dark:text-white"
+            >
+              {patient.fullName}
+            </Link>
+            {flags.length > 0 && <RiskFlagBadge flags={flags} size="sm" />}
+          </div>
+          <p className="mt-0.5 truncate text-xs font-medium text-slate-600 dark:text-slate-400">
+            {patient.contactPhone || 'Sin teléfono registrado'}
+          </p>
+          {/* Bajo sm la columna de estado se pliega aquí en vez de desaparecer.
+              El saldo pendiente venía quedándose fuera: en móvil el dato de
+              deuda simplemente no existía. Sólo se pliega lo que el endpoint
+              devuelve de verdad — ver el comentario de ROW_GRID. */}
+          <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium sm:hidden">
+            <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${STATUS_STYLE[patient.status]}`}>
+              {STATUS_LABEL[patient.status] ?? patient.status}
+            </span>
+            {balance > 0 && (
+              <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${BALANCE_STYLE}`}>
+                Debe {currency.format(balance)}
+              </span>
+            )}
+          </p>
+        </div>
+      </div>
+
+      {/* Estado */}
+      <div className="hidden flex-wrap items-center gap-1.5 sm:flex">
+        <span
+          className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-bold tracking-wide ${STATUS_STYLE[patient.status]}`}
+        >
+          {STATUS_LABEL[patient.status] ?? patient.status}
+        </span>
+        {balance > 0 && (
+          <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wide ${BALANCE_STYLE}`}>
+            Debe {currency.format(balance)}
+          </span>
+        )}
+      </div>
+
+      {/* Acciones */}
+      <div className="flex justify-end">
+        <ActionMenu
+          patient={patient}
+          onEdit={onEdit}
+          onArchive={onArchive}
+          onUnarchive={onUnarchive}
+          onView={onView}
+        />
+      </div>
+    </li>
+  );
+}
+
+// ── Export ──────────────────────────────────────────────────────────────────
+export function PatientsTable({
+  patients,
+  isLoading,
+  isError,
+  onRetry,
+  isFiltered,
+  onClearFilters,
+  onCreate,
+  onEdit,
+  onArchive,
+  onUnarchive,
+  onView,
+}: PatientsTableProps) {
+  // El error se comprueba ANTES que el vacío: decir "no hay pacientes" cuando
+  // la petición falló es afirmar algo falso sobre un expediente clínico.
+  if (isError) {
+    return <WidgetError what="la lista de pacientes" onRetry={onRetry} />;
+  }
+
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-20 bg-surface dark:bg-slate-900 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-800"></div>
-        ))}
-      </div>
+      <TableShell>
+        <ColumnHeader />
+        <LoadingRows />
+      </TableShell>
     );
   }
 
   if (patients.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex flex-col items-center justify-center py-20 text-center"
-      >
-        <div className="w-16 h-16 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4 text-gray-300 dark:text-slate-600">
-          <FileText size={32} />
-        </div>
-        <h3 className="text-lg font-bold text-kanji dark:text-kio">Sin pacientes</h3>
-        <p className="text-gray-500 dark:text-slate-400 opacity-60 mt-1 max-w-sm">
-          No hay expedientes en esta categoría. Comienza añadiendo un nuevo paciente.
-        </p>
-      </motion.div>
+      <TableShell>
+        <EmptyState isFiltered={isFiltered} onClearFilters={onClearFilters} onCreate={onCreate} />
+      </TableShell>
     );
   }
 
   return (
-    <div className="space-y-3">
-      {/* Table Header - Sutil y Minimalista */}
-      <div className="grid grid-cols-[2fr_1fr_48px] md:grid-cols-[2fr_1fr_1fr_48px] px-6 py-2 text-xs font-bold text-gray-500 dark:text-slate-500 opacity-50 uppercase tracking-widest">
-        <div>Paciente</div>
-        <div>Estado</div>
-        <div className="hidden md:block">Próxima Cita</div>
-        <div></div>
-      </div>
-
-      <AnimatePresence mode="popLayout">
-        {patients.map((patient, index) => (
-          <motion.div
+    <TableShell>
+      <ColumnHeader />
+      <ul>
+        {patients.map((patient) => (
+          <PatientRow
             key={patient.id}
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.4, delay: index * 0.05, ease: "easeOut" }}
-            className="group bg-surface dark:bg-slate-900 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all border border-transparent dark:border-slate-800 hover:border-kio/40 dark:hover:border-kio/40 cursor-pointer flex items-center justify-between"
-            onClick={() => onView(patient)}
-          >
-            {/* Columns Grid */}
-            <div className="grid grid-cols-[2fr_1fr_48px] md:grid-cols-[2fr_1fr_1fr_48px] items-center w-full gap-4">
-
-              {/* Name & Avatar */}
-              <div className="flex items-center gap-4">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className="w-12 h-12 rounded-full bg-kanji dark:bg-kio flex items-center justify-center text-white dark:text-slate-900 font-bold text-sm shadow-md shadow-kio/20"
-                >
-                  {getInitials(patient.fullName)}
-                </motion.div>
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-kanji dark:text-kio text-base leading-tight">{patient.fullName}</span>
-                    {patient.riskFlag && patient.riskFlag.flagTypes && patient.riskFlag.flagTypes.length > 0 && (
-                      <RiskFlagBadge flags={patient.riskFlag.flagTypes} size="sm" showLabel={true} />
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-sm text-gray-500 dark:text-slate-400 font-medium">
-                      {patient.contactPhone || 'Sin contacto'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Status Badge */}
-              <div>
-                <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide ${translateStatusColor(
-                    patient.status
-                  )}`}
-                >
-                  {translateStatus(patient.status)}
-                </span>
-              </div>
-
-              {/* Next Appointment */}
-              <div className="hidden md:flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400 font-medium">
-                {patient.appointments && patient.appointments.length > 0 ? (
-                  <>
-                    <Calendar size={14} className="text-kanji dark:text-kio opacity-60" />
-                    <span className="text-kanji dark:text-kio">
-                      {new Date(patient.appointments[0].startTime).toLocaleDateString('es-MX', {
-                        day: 'numeric',
-                        month: 'short',
-                      })}
-                    </span>
-                    <span className="text-gray-300 dark:text-slate-600 mx-1">|</span>
-                    <span className="text-gray-500 dark:text-slate-500">
-                      {new Date(patient.appointments[0].startTime).toLocaleTimeString('es-MX', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-gray-400 dark:text-slate-600 italic font-normal text-xs">Sin agendar</span>
-                )}
-              </div>
-
-              {/* Action Menu */}
-              <div className="flex justify-end">
-                <ActionMenu
-                  patient={patient}
-                  onEdit={onEdit}
-                  onArchive={onArchive}
-                  onUnarchive={onUnarchive}
-                  onView={onView}
-                />
-              </div>
-
-            </div>
-          </motion.div>
+            patient={patient}
+            onEdit={onEdit}
+            onArchive={onArchive}
+            onUnarchive={onUnarchive}
+            onView={onView}
+          />
         ))}
-      </AnimatePresence>
-    </div>
+      </ul>
+    </TableShell>
   );
 }

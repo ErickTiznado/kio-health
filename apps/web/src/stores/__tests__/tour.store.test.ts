@@ -36,7 +36,8 @@ describe('useTourStore', () => {
     });
 
     it('mantiene isActive=true mientras no sea el último paso', () => {
-      useTourStore.setState({ isActive: true, currentStepIndex: 3 });
+      // Penúltimo paso: avanzar no debe cerrar el tour.
+      useTourStore.setState({ isActive: true, currentStepIndex: TOUR_STEPS.length - 2 });
       useTourStore.getState().nextStep();
       expect(useTourStore.getState().isActive).toBe(true);
     });
@@ -117,8 +118,16 @@ describe('useTourStore', () => {
   });
 
   describe('TOUR_STEPS', () => {
-    it('tiene exactamente 9 pasos', () => {
-      expect(TOUR_STEPS).toHaveLength(9);
+    it('tiene exactamente 4 pasos', () => {
+      // Se redujo de 9 a 4. Los nueve pasos arrastraban al usuario por cuatro
+      // rutas distintas a mitad del recorrido.
+      expect(TOUR_STEPS).toHaveLength(4);
+    });
+
+    it('ningún paso obliga a cambiar de ruta', () => {
+      for (const step of TOUR_STEPS) {
+        expect(step.route).toBe('/dashboard');
+      }
     });
 
     it('cada paso tiene los campos obligatorios', () => {

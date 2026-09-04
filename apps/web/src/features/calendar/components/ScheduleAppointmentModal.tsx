@@ -4,10 +4,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import {
   X, Search, Calendar, User, FileText, Banknote, Loader2, Clock,
-  UserPlus, ArrowLeft, ArrowRight, Check,
+  UserPlus, ArrowLeft, ArrowRight, Check, Repeat, ChevronDown,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { createAppointment } from '../../../lib/appointments.api';
+import { createAppointment, createAppointmentSeries } from '../../../lib/appointments.api';
+import { capture } from '../../../lib/analytics';
 import { createPatient } from '../../../lib/patients.api';
 import { usePatients } from '../../../hooks/use-patients';
 import { useDebounce } from '../../../hooks/use-debounce';
@@ -61,6 +62,12 @@ export function ScheduleAppointmentModal({
     const [reason, setReason] = useState('');
     const [price, setPrice] = useState<string>(String(defaultPrice));
 
+    // Recurrencia (solo modo nuevo)
+    const [recurrence, setRecurrence] = useState<'NONE' | 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY'>('NONE');
+    const [endMode, setEndMode] = useState<'never' | 'count' | 'until'>('never');
+    const [occurrenceCount, setOccurrenceCount] = useState('12');
+    const [untilDate, setUntilDate] = useState('');
+
     // New patient mode
     const [patientMode, setPatientMode] = useState<'search' | 'new'>('search');
     const [newPatientName, setNewPatientName] = useState('');
@@ -73,7 +80,7 @@ export function ScheduleAppointmentModal({
     const isNewMode = !isRescheduleMode && !isEditMode;
     const WIZARD_STEPS = isNewMode
         ? [{ label: 'Paciente' }, { label: 'Sesión' }]
-        : [{ label: isRescheduleMode ? 'Nueva Fecha' : 'Detalles' }];
+        : [{ label: isRescheduleMode ? 'Nueva fecha' : 'Detalles' }];
 
     useEffect(() => {
         if (!isOpen) return;
@@ -92,6 +99,10 @@ export function ScheduleAppointmentModal({
                 setType('CONSULTATION');
                 setReason('');
                 setPrice(String(defaultPrice));
+                setRecurrence('NONE');
+                setEndMode('never');
+                setOccurrenceCount('12');
+                setUntilDate('');
                 setPatientMode('search');
                 setNewPatientName('');
                 setNewPatientPhone('');
@@ -116,11 +127,35 @@ export function ScheduleAppointmentModal({
     const createMutation = useMutation({
         mutationFn: createAppointment,
         onSuccess: () => {
+            capture('appointment_created', { is_series: false, series_count: 1 });
             toast.success(wasNewPatient.current ? 'Paciente registrado y cita agendada' : 'Cita agendada correctamente');
             queryClient.invalidateQueries({ queryKey: ['appointments'] });
             onClose();
         },
         onError: (error: unknown) => toast.error(getErrorMessage(error, 'Error al agendar la cita')),
+    });
+    const createSeriesMutation = useMutation({
+        mutationFn: createAppointmentSeries,
+        onSuccess: (result) => {
+            capture('appointment_created', {
+                is_series: true,
+                series_count: result.created.length,
+            });
+            toast.success(`Serie creada: ${result.created.length} sesiones agendadas`);
+            if (result.conflicts.length > 0) {
+                const dates = result.conflicts
+                    .slice(0, 3)
+                    .map((iso) => format(parseISO(iso), 'dd/MM/yyyy'))
+                    .join(', ');
+                toast.warning(
+                    `${result.conflicts.length} fecha(s) se saltaron por conflicto de horario: ${dates}${result.conflicts.length > 3 ? '…' : ''}`,
+                    { duration: 8000 },
+                );
+            }
+            queryClient.invalidateQueries({ queryKey: ['appointments'] });
+            onClose();
+        },
+        onError: (error: unknown) => toast.error(getErrorMessage(error, 'Error al crear la serie')),
     });
 
     const handlePatientSelect = (patient: { id: string; fullName: string }) => {
@@ -184,6 +219,29 @@ export function ScheduleAppointmentModal({
 
         if (!resolvedPatientId) { toast.error('Selecciona un paciente'); return; }
 
+        if (recurrence !== 'NONE') {
+            if (endMode === 'count' && (Number(occurrenceCount) < 1 || Number(occurrenceCount) > 104)) {
+                toast.error('El número de sesiones debe estar entre 1 y 104');
+                return;
+            }
+            if (endMode === 'until' && !untilDate) {
+                toast.error('Selecciona la fecha de fin de la serie');
+                return;
+            }
+            createSeriesMutation.mutate({
+                patientId: resolvedPatientId,
+                startTime: parsedDate.toISOString(),
+                frequency: recurrence,
+                type,
+                reason: reason || undefined,
+                price: price !== '' ? parseFloat(price) : undefined,
+                duration: Number(duration),
+                ...(endMode === 'count' ? { maxOccurrences: Number(occurrenceCount) } : {}),
+                ...(endMode === 'until' ? { until: new Date(`${untilDate}T23:59:59`).toISOString() } : {}),
+            });
+            return;
+        }
+
         createMutation.mutate({
             patientId: resolvedPatientId,
             startTime: parsedDate.toISOString(),
@@ -195,14 +253,15 @@ export function ScheduleAppointmentModal({
     };
 
     const isPending =
-        updateMutation.isPending || createMutation.isPending || createPatientMutation.isPending;
+        updateMutation.isPending || createMutation.isPending ||
+        createSeriesMutation.isPending || createPatientMutation.isPending;
 
     const inputClass =
-        'w-full px-4 py-3 bg-gray-50 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-kio/30 focus:border-kio transition-all';
+        'w-full px-4 py-3 bg-gray-50 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-kio/50 focus:border-kio transition-all';
     const labelClass =
-        'block text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-1.5';
+        'block text-[11px] font-bold text-gray-600 dark:text-slate-400 uppercase tracking-wider mb-1.5';
 
-    const modalTitle = isEditMode ? 'Editar Cita' : isRescheduleMode ? 'Reagendar Cita' : 'Nueva Cita';
+    const modalTitle = isEditMode ? 'Editar cita' : isRescheduleMode ? 'Reagendar cita' : 'Nueva cita';
     const currentStepLabel = isNewMode
         ? (wizardStep === 1 ? 'Paciente' : 'Sesión')
         : WIZARD_STEPS[0].label;
@@ -228,8 +287,12 @@ export function ScheduleAppointmentModal({
                 <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 dark:border-slate-800 shrink-0 rounded-t-3xl bg-white dark:bg-slate-900">
                     <img src="/LogoFavi.png" alt="Kio" className="h-7 w-7 object-contain shrink-0" />
                     <div className="flex-1 min-w-0">
-                        <h2 className="text-sm font-bold text-kanji dark:text-white leading-tight">{modalTitle}</h2>
-                        <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
+                        {/* `kanji-deep` y no `kanji`: el título va a `text-sm`
+                            sobre blanco, donde `kanji` mide 3.88:1. La Regla
+                            del Púrpura Legible reserva `kanji` para texto
+                            grande. */}
+                        <h2 className="text-sm font-bold text-kanji-deep dark:text-white leading-tight">{modalTitle}</h2>
+                        <p className="text-xs text-gray-600 dark:text-slate-400 mt-0.5">
                             {currentStepLabel}
                             {isNewMode && ` · Paso ${wizardStep} de ${WIZARD_STEPS.length}`}
                         </p>
@@ -238,7 +301,7 @@ export function ScheduleAppointmentModal({
                     {isNewMode && (
                         <div className="flex items-center gap-1">
                             {WIZARD_STEPS.map((_, i) => (
-                                <div key={i} className={`h-1.5 rounded-full transition-all duration-300 ${
+                                <div key={i} aria-hidden="true" className={`h-1.5 rounded-full transition-all duration-300 ${
                                     i === wizardStep - 1 ? 'w-6 bg-kio' : i < wizardStep - 1 ? 'w-3 bg-kio/40' : 'w-3 bg-gray-200 dark:bg-slate-700'
                                 }`} />
                             ))}
@@ -246,9 +309,10 @@ export function ScheduleAppointmentModal({
                     )}
                     <button
                         type="button" onClick={onClose}
-                        className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition-colors shrink-0"
+                        aria-label="Cerrar sin guardar"
+                        className="min-h-11 min-w-11 grid place-items-center rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200 transition-colors shrink-0"
                     >
-                        <X size={17} />
+                        <X size={17} aria-hidden="true" />
                     </button>
                 </div>
 
@@ -267,30 +331,34 @@ export function ScheduleAppointmentModal({
                                 >
                                     {/* Toggle: buscar vs nuevo */}
                                     <div className="flex items-center justify-between mb-1">
-                                        <label className={labelClass + ' mb-0 flex items-center gap-2'}>
-                                            <User size={13} /> Paciente
+                                        <label
+                                            htmlFor={patientMode === 'search' ? 'appointment-patient-search' : 'appointment-new-patient-name'}
+                                            className={labelClass + ' mb-0 flex items-center gap-2'}
+                                        >
+                                            <User size={13} aria-hidden="true" /> Paciente
                                         </label>
                                         {patientMode === 'search' ? (
                                             <button type="button"
                                                 onClick={() => { setPatientMode('new'); setNewPatientName(''); setNewPatientPhone(''); setNewPatientEmail(''); }}
-                                                className="flex items-center gap-1 text-xs font-bold text-kio hover:text-kio/80 transition-colors"
+                                                className="inline-flex min-h-11 items-center gap-1 px-2 text-xs font-bold text-kanji-deep dark:text-kio hover:underline transition-colors"
                                             >
-                                                <UserPlus size={13} /> Nuevo paciente
+                                                <UserPlus size={13} aria-hidden="true" /> Nuevo paciente
                                             </button>
                                         ) : (
                                             <button type="button"
                                                 onClick={() => setPatientMode('search')}
-                                                className="flex items-center gap-1 text-xs font-bold text-gray-400 dark:text-slate-500 hover:text-gray-600 transition-colors"
+                                                className="inline-flex min-h-11 items-center gap-1 px-2 text-xs font-bold text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200 transition-colors"
                                             >
-                                                <ArrowLeft size={13} /> Buscar existente
+                                                <ArrowLeft size={13} aria-hidden="true" /> Buscar existente
                                             </button>
                                         )}
                                     </div>
 
                                     {patientMode === 'search' ? (
                                         <div className="relative">
-                                            <Search className="absolute left-4 top-3.5 text-gray-400 dark:text-slate-500" size={16} />
+                                            <Search aria-hidden="true" className="absolute left-4 top-3.5 text-gray-600 dark:text-slate-400" size={16} />
                                             <input
+                                                id="appointment-patient-search"
                                                 type="text" value={patientSearch}
                                                 onChange={(e) => { setPatientSearch(e.target.value); if (selectedPatientId) setSelectedPatientId(null); }}
                                                 onFocus={() => setIsSearchFocused(true)}
@@ -304,7 +372,7 @@ export function ScheduleAppointmentModal({
                                                 }`}
                                             />
                                             {isLoadingPatients && (
-                                                <Loader2 size={16} className="absolute right-4 top-3.5 animate-spin text-gray-400" />
+                                                <Loader2 size={16} aria-hidden="true" className="absolute right-4 top-3.5 animate-spin text-gray-600 dark:text-slate-400" />
                                             )}
                                             {/* Dropdown results */}
                                             {isSearchFocused && !selectedPatientId && patients.length > 0 && (
@@ -322,14 +390,14 @@ export function ScheduleAppointmentModal({
                                             {/* No results */}
                                             {isSearchFocused && debouncedSearch && !isLoadingPatients && !selectedPatientId && patients.length === 0 && (
                                                 <div className="absolute z-50 left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl shadow-xl p-4">
-                                                    <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">
+                                                    <p className="text-xs text-gray-600 dark:text-slate-400 mb-3">
                                                         Sin resultados para <span className="font-bold text-gray-600 dark:text-slate-300">"{debouncedSearch}"</span>
                                                     </p>
                                                     <button type="button"
                                                         onClick={() => { setNewPatientName(debouncedSearch); setPatientMode('new'); }}
-                                                        className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-kio/10 hover:bg-kio/20 dark:bg-kio/20 dark:hover:bg-kio/30 text-kio font-bold text-sm rounded-xl transition-colors border border-kio/20"
+                                                        className="w-full flex min-h-11 items-center justify-center gap-2 px-4 bg-kio/10 hover:bg-kio/20 dark:bg-kio/20 dark:hover:bg-kio/30 text-kanji-deep dark:text-kio font-bold text-sm rounded-xl transition-colors border border-kio/20"
                                                     >
-                                                        <UserPlus size={14} />
+                                                        <UserPlus size={14} aria-hidden="true" />
                                                         Registrar "{debouncedSearch}" como nuevo
                                                     </button>
                                                 </div>
@@ -338,27 +406,35 @@ export function ScheduleAppointmentModal({
                                     ) : (
                                         <div className="bg-kio/5 dark:bg-kio/10 border border-kio/20 rounded-xl p-4 space-y-3">
                                             <div>
-                                                <label className={labelClass}>Nombre completo <span className="text-rose-400">*</span></label>
-                                                <input type="text" value={newPatientName}
+                                                <label htmlFor="appointment-new-patient-name" className={labelClass}>Nombre completo <span className="text-rose-600 dark:text-rose-400">*</span></label>
+                                                {/* `aria-required` y no `required`: el asterisco es
+                                                    solo visual, pero la validación sigue siendo la
+                                                    del `handleSubmit`, no la nativa. */}
+                                                <input id="appointment-new-patient-name" aria-required="true" type="text" value={newPatientName}
                                                     onChange={(e) => setNewPatientName(e.target.value)}
                                                     placeholder="Ej. Juan García" autoFocus className={inputClass}
                                                 />
                                             </div>
                                             <div>
-                                                <label className={labelClass}>Teléfono <span className="text-gray-400 font-normal normal-case">(opcional)</span></label>
-                                                <PhoneInput
-                                                    value={newPatientPhone}
-                                                    onChange={setNewPatientPhone}
-                                                />
+                                                {/* `role="group"` + `aria-labelledby` en vez de `htmlFor`:
+                                                    `PhoneInput` es prefijo + número y no acepta `id`,
+                                                    así que no habría a qué apuntar. */}
+                                                <p id="appointment-new-patient-phone-label" className={labelClass}>Teléfono <span className="text-gray-600 dark:text-slate-400 font-normal normal-case">(opcional)</span></p>
+                                                <div role="group" aria-labelledby="appointment-new-patient-phone-label">
+                                                    <PhoneInput
+                                                        value={newPatientPhone}
+                                                        onChange={setNewPatientPhone}
+                                                    />
+                                                </div>
                                             </div>
                                             <div>
-                                                <label className={labelClass}>Email <span className="text-gray-400 font-normal normal-case">(para recordatorios)</span></label>
-                                                <input type="email" value={newPatientEmail}
+                                                <label htmlFor="appointment-new-patient-email" className={labelClass}>Email <span className="text-gray-600 dark:text-slate-400 font-normal normal-case">(para recordatorios)</span></label>
+                                                <input id="appointment-new-patient-email" type="email" value={newPatientEmail}
                                                     onChange={(e) => setNewPatientEmail(e.target.value)}
                                                     placeholder="paciente@email.com" className={inputClass}
                                                 />
                                             </div>
-                                            <p className="text-[11px] text-gray-400 dark:text-slate-500">
+                                            <p className="text-[11px] text-gray-600 dark:text-slate-400">
                                                 El expediente completo se puede completar después desde la ficha del paciente.
                                             </p>
                                         </div>
@@ -376,54 +452,116 @@ export function ScheduleAppointmentModal({
                                 >
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="col-span-2">
-                                            <label className={labelClass + ' flex items-center gap-1.5'}><Calendar size={12} /> Fecha y hora</label>
-                                            <input type="datetime-local" value={startTime}
+                                            <label htmlFor="appointment-start-time" className={labelClass + ' flex items-center gap-1.5'}><Calendar size={12} aria-hidden="true" /> Fecha y hora</label>
+                                            <input id="appointment-start-time" type="datetime-local" value={startTime}
                                                 onChange={(e) => setStartTime(e.target.value)}
                                                 className={inputClass} autoFocus required
                                             />
                                         </div>
                                         <div>
-                                            <label className={labelClass + ' flex items-center gap-1.5'}><Clock size={12} /> Duración</label>
+                                            <label htmlFor="appointment-duration" className={labelClass + ' flex items-center gap-1.5'}><Clock size={12} aria-hidden="true" /> Duración</label>
                                             <div className="relative">
-                                                <input type="number" value={duration}
+                                                <input id="appointment-duration" type="number" value={duration} aria-describedby="appointment-duration-unit"
                                                     onChange={(e) => setDuration(e.target.value)}
                                                     min="15" max="90" step="1" className={`${inputClass} pr-14`}
                                                 />
-                                                <span className="absolute right-4 top-3.5 text-gray-400 text-xs font-bold pointer-events-none">MIN</span>
+                                                <span id="appointment-duration-unit" className="absolute right-4 top-3.5 text-gray-600 dark:text-slate-400 text-xs font-bold pointer-events-none">MIN</span>
                                             </div>
                                         </div>
                                         <div>
-                                            <label className={labelClass + ' flex items-center gap-1.5'}><FileText size={12} /> Tipo</label>
+                                            <label htmlFor="appointment-type" className={labelClass + ' flex items-center gap-1.5'}><FileText size={12} aria-hidden="true" /> Tipo</label>
                                             <div className="relative">
-                                                <select value={type} onChange={(e) => setType(e.target.value as AppointmentType)}
+                                                <select id="appointment-type" value={type} onChange={(e) => setType(e.target.value as AppointmentType)}
                                                     className={`${inputClass} appearance-none pr-8 cursor-pointer`}
                                                 >
                                                     <option value="CONSULTATION">Consulta</option>
                                                     <option value="EVALUATION">Evaluación</option>
                                                     <option value="FOLLOW_UP">Seguimiento</option>
                                                 </select>
-                                                <svg className="absolute right-3 top-3.5 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                                                <ChevronDown size={16} aria-hidden="true" className="absolute right-3 top-3.5 text-gray-600 dark:text-slate-400 pointer-events-none" />
                                             </div>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className={labelClass + ' flex items-center gap-1.5'}><Banknote size={12} /> Precio</label>
+                                        <label htmlFor="appointment-price" className={labelClass + ' flex items-center gap-1.5'}><Banknote size={12} aria-hidden="true" /> Precio</label>
                                         <div className="relative">
-                                            <span className="absolute left-4 top-3.5 text-gray-400 text-sm font-medium">$</span>
-                                            <input type="number" value={price}
+                                            <span aria-hidden="true" className="absolute left-4 top-3.5 text-gray-600 dark:text-slate-400 text-sm font-medium">$</span>
+                                            <input id="appointment-price" type="number" value={price}
                                                 onChange={(e) => setPrice(e.target.value)}
+                                                aria-describedby="appointment-price-currency"
                                                 min="0" step="0.01" className={`${inputClass} pl-8 pr-16`}
                                             />
-                                            <span className="absolute right-4 top-3.5 text-gray-400 text-xs font-bold pointer-events-none">{currency}</span>
+                                            <span id="appointment-price-currency" className="absolute right-4 top-3.5 text-gray-600 dark:text-slate-400 text-xs font-bold pointer-events-none">{currency}</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className={labelClass}>Motivo <span className="text-gray-400 font-normal normal-case">(opcional)</span></label>
-                                        <textarea value={reason} onChange={(e) => setReason(e.target.value)}
+                                        <label htmlFor="appointment-reason" className={labelClass}>Motivo <span className="text-gray-600 dark:text-slate-400 font-normal normal-case">(opcional)</span></label>
+                                        <textarea id="appointment-reason" value={reason} onChange={(e) => setReason(e.target.value)}
                                             placeholder="Detalles adicionales sobre la sesión..."
                                             rows={2} className={`${inputClass} resize-none`}
                                         />
                                     </div>
+
+                                    {/* ─ Recurrencia ─ */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className={recurrence === 'NONE' ? 'col-span-2' : ''}>
+                                            <label htmlFor="appointment-recurrence" className={labelClass + ' flex items-center gap-1.5'}>
+                                                <Repeat size={12} aria-hidden="true" /> Repetir
+                                            </label>
+                                            <div className="relative">
+                                                <select id="appointment-recurrence" value={recurrence}
+                                                    onChange={(e) => setRecurrence(e.target.value as typeof recurrence)}
+                                                    className={`${inputClass} appearance-none pr-8 cursor-pointer`}
+                                                >
+                                                    <option value="NONE">No se repite</option>
+                                                    <option value="WEEKLY">Semanal</option>
+                                                    <option value="BIWEEKLY">Cada 2 semanas</option>
+                                                    <option value="MONTHLY">Cada 4 semanas</option>
+                                                </select>
+                                                <ChevronDown size={16} aria-hidden="true" className="absolute right-3 top-3.5 text-gray-600 dark:text-slate-400 pointer-events-none" />
+                                            </div>
+                                        </div>
+                                        {recurrence !== 'NONE' && (
+                                            <div>
+                                                <label htmlFor="appointment-end-mode" className={labelClass}>Termina</label>
+                                                <div className="relative">
+                                                    <select id="appointment-end-mode" value={endMode}
+                                                        onChange={(e) => setEndMode(e.target.value as typeof endMode)}
+                                                        className={`${inputClass} appearance-none pr-8 cursor-pointer`}
+                                                    >
+                                                        <option value="never">Sin fecha de fin</option>
+                                                        <option value="count">Tras N sesiones</option>
+                                                        <option value="until">En una fecha</option>
+                                                    </select>
+                                                    <ChevronDown size={16} aria-hidden="true" className="absolute right-3 top-3.5 text-gray-600 dark:text-slate-400 pointer-events-none" />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    {recurrence !== 'NONE' && endMode === 'count' && (
+                                        <div>
+                                            <label htmlFor="appointment-occurrence-count" className={labelClass}>Número de sesiones</label>
+                                            <input id="appointment-occurrence-count" type="number" value={occurrenceCount}
+                                                onChange={(e) => setOccurrenceCount(e.target.value)}
+                                                min="1" max="104" className={inputClass}
+                                            />
+                                        </div>
+                                    )}
+                                    {recurrence !== 'NONE' && endMode === 'until' && (
+                                        <div>
+                                            <label htmlFor="appointment-until-date" className={labelClass}>Última sesión (inclusive)</label>
+                                            <input id="appointment-until-date" type="date" value={untilDate}
+                                                onChange={(e) => setUntilDate(e.target.value)}
+                                                className={inputClass}
+                                            />
+                                        </div>
+                                    )}
+                                    {recurrence !== 'NONE' && (
+                                        <p className="text-[11px] text-gray-600 dark:text-slate-400 -mt-2">
+                                            Se agendan las próximas 12 semanas; el resto se crea automáticamente.
+                                            Las fechas con conflicto de horario se saltan y se te avisará.
+                                        </p>
+                                    )}
                                 </motion.div>
                             )}
 
@@ -434,20 +572,20 @@ export function ScheduleAppointmentModal({
                                     className="space-y-5 pb-4"
                                 >
                                     <div>
-                                        <label className={labelClass + ' flex items-center gap-1.5'}><Calendar size={12} /> Nueva fecha y hora</label>
-                                        <input type="datetime-local" value={startTime}
+                                        <label htmlFor="reschedule-start-time" className={labelClass + ' flex items-center gap-1.5'}><Calendar size={12} aria-hidden="true" /> Nueva fecha y hora</label>
+                                        <input id="reschedule-start-time" type="datetime-local" value={startTime}
                                             onChange={(e) => setStartTime(e.target.value)}
                                             className={inputClass} autoFocus required
                                         />
                                     </div>
                                     <div>
-                                        <label className={labelClass + ' flex items-center gap-1.5'}><Clock size={12} /> Duración</label>
+                                        <label htmlFor="reschedule-duration" className={labelClass + ' flex items-center gap-1.5'}><Clock size={12} aria-hidden="true" /> Duración</label>
                                         <div className="relative">
-                                            <input type="number" value={duration}
+                                            <input id="reschedule-duration" type="number" value={duration} aria-describedby="reschedule-duration-unit"
                                                 onChange={(e) => setDuration(e.target.value)}
                                                 min="15" max="90" step="1" className={`${inputClass} pr-14`}
                                             />
-                                            <span className="absolute right-4 top-3.5 text-gray-400 text-xs font-bold pointer-events-none">MIN</span>
+                                            <span id="reschedule-duration-unit" className="absolute right-4 top-3.5 text-gray-600 dark:text-slate-400 text-xs font-bold pointer-events-none">MIN</span>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -460,32 +598,33 @@ export function ScheduleAppointmentModal({
                                     className="space-y-5 pb-4"
                                 >
                                     <div>
-                                        <label className={labelClass + ' flex items-center gap-1.5'}><FileText size={12} /> Tipo de cita</label>
+                                        <label htmlFor="edit-appointment-type" className={labelClass + ' flex items-center gap-1.5'}><FileText size={12} aria-hidden="true" /> Tipo de cita</label>
                                         <div className="relative">
-                                            <select value={type} onChange={(e) => setType(e.target.value as AppointmentType)}
+                                            <select id="edit-appointment-type" value={type} onChange={(e) => setType(e.target.value as AppointmentType)}
                                                 className={`${inputClass} appearance-none pr-8 cursor-pointer`}
                                             >
                                                 <option value="CONSULTATION">Consulta</option>
                                                 <option value="EVALUATION">Evaluación</option>
                                                 <option value="FOLLOW_UP">Seguimiento</option>
                                             </select>
-                                            <svg className="absolute right-3 top-3.5 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                                            <ChevronDown size={16} aria-hidden="true" className="absolute right-3 top-3.5 text-gray-600 dark:text-slate-400 pointer-events-none" />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className={labelClass + ' flex items-center gap-1.5'}><Banknote size={12} /> Precio</label>
+                                        <label htmlFor="edit-appointment-price" className={labelClass + ' flex items-center gap-1.5'}><Banknote size={12} aria-hidden="true" /> Precio</label>
                                         <div className="relative">
-                                            <span className="absolute left-4 top-3.5 text-gray-400 text-sm font-medium">$</span>
-                                            <input type="number" value={price}
+                                            <span aria-hidden="true" className="absolute left-4 top-3.5 text-gray-600 dark:text-slate-400 text-sm font-medium">$</span>
+                                            <input id="edit-appointment-price" type="number" value={price}
                                                 onChange={(e) => setPrice(e.target.value)}
+                                                aria-describedby="edit-appointment-price-currency"
                                                 min="0" step="0.01" className={`${inputClass} pl-8 pr-16`}
                                             />
-                                            <span className="absolute right-4 top-3.5 text-gray-400 text-xs font-bold pointer-events-none">{currency}</span>
+                                            <span id="edit-appointment-price-currency" className="absolute right-4 top-3.5 text-gray-600 dark:text-slate-400 text-xs font-bold pointer-events-none">{currency}</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className={labelClass}>Motivo <span className="text-gray-400 font-normal normal-case">(opcional)</span></label>
-                                        <textarea value={reason} onChange={(e) => setReason(e.target.value)}
+                                        <label htmlFor="edit-appointment-reason" className={labelClass}>Motivo <span className="text-gray-600 dark:text-slate-400 font-normal normal-case">(opcional)</span></label>
+                                        <textarea id="edit-appointment-reason" value={reason} onChange={(e) => setReason(e.target.value)}
                                             placeholder="Detalles adicionales..." rows={2}
                                             className={`${inputClass} resize-none`}
                                         />
@@ -496,35 +635,39 @@ export function ScheduleAppointmentModal({
                         </AnimatePresence>
                     </div>
 
-                    {/* ── Footer nav ───────────────────────────────── */}
+                    {/* ── Footer nav ─────────────────────────────────
+                        El hover de los sólidos de marca es `kanji-deep/90`
+                        (5.8:1 con blanco) y no `kanji` (3.88:1), que es el
+                        mismo hover del CTA del shell en `DashboardLayout.tsx`.
+                        El estado hover no está exento de AA. */}
                     <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-slate-800 shrink-0">
                         <button
                             type="button"
                             onClick={isNewMode && wizardStep === 2 ? goToStep1 : onClose}
-                            className="flex items-center gap-1.5 text-sm font-semibold text-gray-400 dark:text-slate-500 hover:text-gray-700 dark:hover:text-slate-300 transition-colors px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800"
+                            className="flex min-h-11 items-center gap-1.5 text-sm font-semibold text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200 transition-colors px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800"
                         >
-                            <ArrowLeft size={15} />
+                            <ArrowLeft size={15} aria-hidden="true" />
                             {isNewMode && wizardStep === 2 ? 'Anterior' : 'Cancelar'}
                         </button>
 
                         {/* Next button — step 1 in new mode */}
                         {isNewMode && wizardStep === 1 && (
                             <button type="button" onClick={goToStep2}
-                                className="flex items-center gap-2 px-5 py-2.5 bg-kio text-white rounded-xl text-sm font-semibold hover:bg-kio/90 active:scale-95 transition-all shadow-sm shadow-kio/20"
+                                className="flex min-h-11 items-center gap-2 px-5 bg-kanji-deep hover:bg-kanji-deep/90 text-white rounded-xl text-sm font-bold active:scale-95 transition-all shadow-sm"
                             >
-                                Siguiente <ArrowRight size={15} />
+                                Siguiente <ArrowRight size={15} aria-hidden="true" />
                             </button>
                         )}
 
                         {/* Confirm button — step 2 or single-step modes */}
                         {(!isNewMode || wizardStep === 2) && (
                             <button type="submit" disabled={isPending}
-                                className="flex items-center gap-2 px-5 py-2.5 bg-kio text-white rounded-xl text-sm font-semibold hover:bg-kio/90 active:scale-95 transition-all shadow-sm shadow-kio/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex min-h-11 items-center gap-2 px-5 bg-kanji-deep hover:bg-kanji-deep/90 text-white rounded-xl text-sm font-bold active:scale-95 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isPending ? (
-                                    <><Loader2 size={15} className="animate-spin" /> Guardando...</>
+                                    <><Loader2 size={15} className="animate-spin" aria-hidden="true" /> Guardando…</>
                                 ) : (
-                                    <><Check size={15} /> {isEditMode ? 'Guardar Cambios' : isRescheduleMode ? 'Confirmar Cambio' : 'Confirmar Cita'}</>
+                                    <><Check size={15} aria-hidden="true" /> {isEditMode ? 'Guardar cambios' : isRescheduleMode ? 'Confirmar cambio' : 'Confirmar cita'}</>
                                 )}
                             </button>
                         )}

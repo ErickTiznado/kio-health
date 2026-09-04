@@ -2,7 +2,10 @@ import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { AppointmentOwnershipGuard } from './appointment-ownership.guard';
 import { createPrismaMock } from '../../test/prisma-mock';
 
-function makeContext(params: Record<string, string>, user?: Record<string, string>) {
+function makeContext(
+  params: Record<string, string>,
+  user?: Record<string, string>,
+) {
   return {
     switchToHttp: () => ({
       getRequest: () => ({ params, user }),
@@ -36,20 +39,31 @@ describe('AppointmentOwnershipGuard', () => {
 
   it('throws NotFoundException when appointment does not exist', async () => {
     prisma.appointment.findUnique.mockResolvedValue(null);
-    const ctx = makeContext({ id: 'nonexistent' }, { clinicianId: 'clinician-1' });
+    const ctx = makeContext(
+      { id: 'nonexistent' },
+      { clinicianId: 'clinician-1' },
+    );
 
-    await expect(guard.canActivate(ctx as any)).rejects.toThrow(NotFoundException);
+    await expect(guard.canActivate(ctx as any)).rejects.toThrow(
+      NotFoundException,
+    );
   });
 
   it('throws ForbiddenException when appointment belongs to different clinician', async () => {
-    prisma.appointment.findUnique.mockResolvedValue({ clinicianId: 'other-clinician' });
+    prisma.appointment.findUnique.mockResolvedValue({
+      clinicianId: 'other-clinician',
+    });
     const ctx = makeContext({ id: 'apt-1' }, { clinicianId: 'clinician-1' });
 
-    await expect(guard.canActivate(ctx as any)).rejects.toThrow(ForbiddenException);
+    await expect(guard.canActivate(ctx as any)).rejects.toThrow(
+      ForbiddenException,
+    );
   });
 
   it('returns true when ownership is valid', async () => {
-    prisma.appointment.findUnique.mockResolvedValue({ clinicianId: 'clinician-1' });
+    prisma.appointment.findUnique.mockResolvedValue({
+      clinicianId: 'clinician-1',
+    });
     const ctx = makeContext({ id: 'apt-1' }, { clinicianId: 'clinician-1' });
 
     const result = await guard.canActivate(ctx as any);

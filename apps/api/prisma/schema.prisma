@@ -78,6 +78,7 @@ enum ClinicianPlan {
 enum SubscriptionStatus {
   TRIALING
   ACTIVE
+  ACTIVE_MANUAL
   PAST_DUE
   CANCELED
   UNPAID
@@ -110,6 +111,39 @@ enum ReminderStatus {
   SENT
   FAILED
   CANCELLED
+}
+
+enum ReminderKind {
+  PRIMARY
+  SECOND_TOUCH
+}
+
+enum CancelledBy {
+  CLINICIAN
+  PATIENT
+}
+
+enum RecurrenceFrequency {
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+}
+
+enum SeriesStatus {
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+enum ScaleAssignmentStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum ScaleSource {
+  CLINICIAN
+  PATIENT
 }
 
 // ============================================
@@ -168,12 +202,23 @@ model ClinicianProfile {
   sessionDefaultPrice    Decimal       @default(0.00) @map("session_default_price") @db.Decimal(10, 2)
   timezone               String        @default("America/Mexico_City")
   plan                   ClinicianPlan @default(INDIVIDUAL) @map("plan")
+
+  /// Fin del periodo de prueba de 15 días, fijado al completar el perfil.
+  /// Es la única fuente de verdad del trial: nulo significa "sin límite"
+  /// (cuentas internas), no "caducado". Se lee desde el JWT en `TrialGuard`,
+  /// así que ampliar la prueba de alguien es un UPDATE aquí y surte efecto
+  /// en cuanto rota su access token (15 min como mucho).
+  trialEndsAt            DateTime?     @map("trial_ends_at")
+  remindersEnabled        Boolean @default(true) @map("reminders_enabled")
+  reminderLeadHours       Int     @default(24) @map("reminder_lead_hours")
+  reminderSecondLeadHours Int?    @map("reminder_second_lead_hours")
   createdAt              DateTime      @default(now()) @map("created_at")
   updatedAt              DateTime      @updatedAt @map("updated_at")
 
   user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   patients        Patient[]
   appointments    Appointment[]
+  appointmentSeries AppointmentSeries[]
   transactions    FinanceTransaction[]
   patientDocuments PatientDocument[]
   clinicMemberships  ClinicMember[]
@@ -209,6 +254,9 @@ model Patient {
   documents       PatientDocument[]
   riskFlag        RiskFlag?
   addendums       PsychNoteAddendum[]
+  portalTokens    PatientPortalToken[]
+  appointmentSeries AppointmentSeries[]
+  scaleAssignments  ScaleAssignment[]
 
   @@index([fullName])
   @@map("patients")
@@ -228,22 +276,55 @@ model Appointment {
   price         Decimal           @db.Decimal(10, 2)
   notes         String?
   googleEventId String?           @unique @map("google_event_id")
+  cancelledBy           CancelledBy? @map("cancelled_by")
+  rescheduleRequestedAt DateTime?    @map("reschedule_requested_at")
+  seriesId      String?           @map("series_id") @db.Uuid
   createdAt     DateTime          @default(now()) @map("created_at")
   updatedAt     DateTime          @updatedAt @map("updated_at")
 
   patient     Patient              @relation(fields: [patientId], references: [id], onDelete: Cascade)
   clinician   ClinicianProfile     @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
+  series      AppointmentSeries?   @relation(fields: [seriesId], references: [id], onDelete: SetNull)
   psychNote      PsychNote?
   transaction    FinanceTransaction?
   clinicalScales ClinicalScale[]
-  reminder       AppointmentReminder?
+  reminders      AppointmentReminder[]
+  scaleAssignments ScaleAssignment[]
 
+  @@index([seriesId])
   @@map("appointments")
+}
+
+model AppointmentSeries {
+  id                 String              @id @default(uuid()) @db.Uuid
+  clinicianId        String              @map("clinician_id") @db.Uuid
+  patientId          String              @map("patient_id") @db.Uuid
+  frequency          RecurrenceFrequency
+  anchorStart        DateTime            @map("anchor_start")
+  durationMinutes    Int                 @map("duration_minutes")
+  type               AppointmentType     @default(CONSULTATION)
+  price              Decimal             @db.Decimal(10, 2)
+  reason             String?
+  until              DateTime?
+  maxOccurrences     Int?                @map("max_occurrences")
+  occurrencesCreated Int                 @default(0) @map("occurrences_created")
+  status             SeriesStatus        @default(ACTIVE)
+  materializedUntil  DateTime            @map("materialized_until")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+
+  clinician    ClinicianProfile @relation(fields: [clinicianId], references: [id], onDelete: Cascade)
+  patient      Patient          @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+
+  @@index([clinicianId, status])
+  @@map("appointment_series")
 }
 
 model AppointmentReminder {
   id                String         @id @default(uuid()) @db.Uuid
-  appointmentId     String         @unique @map("appointment_id") @db.Uuid
+  appointmentId     String         @map("appointment_id") @db.Uuid
+  kind              ReminderKind   @default(PRIMARY)
   patientEmail      String         @map("patient_email")
   status            ReminderStatus @default(PENDING)
   scheduledFor      DateTime       @map("scheduled_for")
@@ -255,8 +336,24 @@ model AppointmentReminder {
 
   appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
 
+  @@unique([appointmentId, kind])
   @@index([status, scheduledFor])
   @@map("appointment_reminders")
+}
+
+model PatientPortalToken {
+  id         String    @id @default(uuid()) @db.Uuid
+  patientId  String    @map("patient_id") @db.Uuid
+  tokenHash  String    @unique @map("token_hash")
+  expiresAt  DateTime  @map("expires_at")
+  revokedAt  DateTime? @map("revoked_at")
+  lastUsedAt DateTime? @map("last_used_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId])
+  @@map("patient_portal_tokens")
 }
 
 model PsychNote {
@@ -294,7 +391,8 @@ model Task {
 
 model AccessLog {
   id          String   @id @default(uuid()) @db.Uuid
-  userId      String   @map("user_id") @db.Uuid
+  // Nullable: permite auditar intentos de login con email desconocido.
+  userId      String?  @map("user_id") @db.Uuid
   patientId   String?  @map("patient_id") @db.Uuid
   action      String
   resource    String
@@ -303,9 +401,11 @@ model AccessLog {
   userAgent   String?  @map("user_agent")
   createdAt   DateTime @default(now()) @map("created_at")
 
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   patient Patient? @relation(fields: [patientId], references: [id], onDelete: SetNull)
 
+  @@index([patientId, createdAt])
+  @@index([userId, createdAt])
   @@map("access_logs")
 }
 
@@ -335,6 +435,7 @@ model ClinicalScale {
   scores        Int[]
   totalScore    Int            @map("total_score")
   riskLevel     ScaleRiskLevel @map("risk_level")
+  source        ScaleSource    @default(CLINICIAN)
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
 
@@ -343,6 +444,24 @@ model ClinicalScale {
 
   @@unique([appointmentId, scaleType])
   @@map("clinical_scales")
+}
+
+model ScaleAssignment {
+  id            String                @id @default(uuid()) @db.Uuid
+  patientId     String                @map("patient_id") @db.Uuid
+  appointmentId String                @map("appointment_id") @db.Uuid
+  scaleType     ScaleType             @map("scale_type")
+  status        ScaleAssignmentStatus @default(PENDING)
+  completedAt   DateTime?             @map("completed_at")
+  createdAt     DateTime              @default(now()) @map("created_at")
+  updatedAt     DateTime              @updatedAt @map("updated_at")
+
+  patient     Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@unique([appointmentId, scaleType])
+  @@index([patientId, status])
+  @@map("scale_assignments")
 }
 
 model PatientDocument {
@@ -390,6 +509,30 @@ model ClinicMember {
   @@map("clinic_members")
 }
 
+/// Solicitud de acceso a la beta enviada desde la landing pública.
+/// No concede nada por sí sola: un `BetaInvitation` se crea a mano después.
+model BetaRequest {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
+  fullName     String?  @map("full_name")
+  practiceKind String?  @map("practice_kind")
+  invitedAt    DateTime? @map("invited_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("beta_requests")
+}
+
+model BetaInvitation {
+  id           String    @id @default(uuid()) @db.Uuid
+  invitedEmail String    @unique @map("invited_email")
+  token        String    @unique @default(uuid())
+  expiresAt    DateTime  @map("expires_at")
+  acceptedAt   DateTime? @map("accepted_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@map("beta_invitations")
+}
+
 model ClinicInvitation {
   id           String     @id @default(uuid()) @db.Uuid
   clinicId     String     @map("clinic_id") @db.Uuid
@@ -408,31 +551,34 @@ model ClinicInvitation {
 }
 
 model SubscriptionPlan {
-  id              String               @id @default(uuid()) @db.Uuid
-  name            String
-  price           Decimal              @db.Decimal(10, 2)
-  // stripePriceId removed — Stripe integration removed
-  features        String[]             @default([])
-  createdAt       DateTime             @default(now()) @map("created_at")
-  updatedAt       DateTime             @updatedAt @map("updated_at")
+  id               String               @id @default(uuid()) @db.Uuid
+  name             String
+  price            Decimal              @db.Decimal(10, 2)
+  gatewayProductId String?              @unique @map("gateway_product_id")
+  features         String[]             @default([])
+  createdAt        DateTime             @default(now()) @map("created_at")
+  updatedAt        DateTime             @updatedAt @map("updated_at")
 
-  subscriptions   ClinicSubscription[]
+  subscriptions    ClinicSubscription[]
 
   @@map("subscription_plans")
 }
 
 model ClinicSubscription {
-  id               String             @id @default(uuid()) @db.Uuid
-  clinicId         String             @unique @map("clinic_id") @db.Uuid
-  planId           String?            @map("plan_id") @db.Uuid
-  status           SubscriptionStatus @default(TRIALING)
-  // stripeCustomerId and stripeSubscriptionId removed — Stripe integration removed
-  currentPeriodEnd DateTime?          @map("current_period_end")
-  createdAt        DateTime           @default(now()) @map("created_at")
-  updatedAt        DateTime           @updatedAt @map("updated_at")
+  id                    String             @id @default(uuid()) @db.Uuid
+  clinicId              String             @unique @map("clinic_id") @db.Uuid
+  planId                String?            @map("plan_id") @db.Uuid
+  status                SubscriptionStatus @default(TRIALING)
+  gatewayProvider       String             @default("N1CO") @map("gateway_provider")
+  gatewayCustomerId     String?            @map("gateway_customer_id")
+  gatewaySubscriptionId String?            @unique @map("gateway_subscription_id")
+  paymentUrl            String?            @map("payment_url")
+  currentPeriodEnd      DateTime?          @map("current_period_end")
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
 
-  clinic           Clinic             @relation(fields: [clinicId], references: [id], onDelete: Cascade)
-  plan             SubscriptionPlan?  @relation(fields: [planId], references: [id], onDelete: Restrict)
+  clinic                Clinic             @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  plan                  SubscriptionPlan?  @relation(fields: [planId], references: [id], onDelete: Restrict)
 
   @@map("clinic_subscriptions")
 }

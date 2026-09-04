@@ -1,4 +1,4 @@
-import { addDays, format, startOfMonth } from 'date-fns';
+import { addDays, format, getDay, getDaysInMonth, startOfMonth } from 'date-fns';
 import type { Appointment, RecentPatient, DaySummary } from '../types/appointments.types';
 
 /* ── Date / Greeting ────────────────────────────── */
@@ -14,12 +14,26 @@ export function formatDateHeader(): string {
     return dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
 }
 
+/**
+ * Hour from which the product treats the clinical day as closed.
+ *
+ * Shared on purpose: the greeting used to switch to "Buenas noches" at 18:00
+ * while every widget below it still spoke as if the day were ahead ("Día
+ * libre", "Sin próxima cita"). One threshold, one story.
+ */
+export const END_OF_DAY_HOUR = 18;
+
 /** Return a time-of-day greeting in Spanish. */
 export function getGreeting(): string {
     const hour = new Date().getHours();
     if (hour < 12) return 'Buenos días';
-    if (hour < 18) return 'Buenas tardes';
+    if (hour < END_OF_DAY_HOUR) return 'Buenas tardes';
     return 'Buenas noches';
+}
+
+/** True once the clinical day is over, in the clinician's local time. */
+export function isAfterHours(now: Date = new Date()): boolean {
+    return now.getHours() >= END_OF_DAY_HOUR;
 }
 
 /* ── Appointment selectors ──────────────────────── */
@@ -49,17 +63,44 @@ const PATIENT_COLORS = [
     'bg-cyan-100 text-cyan-600 dark:bg-cyan-900/50 dark:text-cyan-200',
 ] as const;
 
+/**
+ * FNV-1a de 32 bits. Barato, determinista y sin dependencias.
+ *
+ * Existe para que el color del avatar salga del id del paciente y no de su
+ * posición en la lista de recientes: indexar por `i` hacía que el color de una
+ * persona cambiara cada vez que cambiaba el orden, y una identidad cromática
+ * inestable es peor que no tener ninguna — enseña a no fiarse de ella.
+ */
+function hashId(id: string): number {
+    let hash = 0x811c9dc5;
+    for (let i = 0; i < id.length; i++) {
+        hash ^= id.charCodeAt(i);
+        hash = Math.imul(hash, 0x01000193);
+    }
+    return hash >>> 0;
+}
+
+/** Color de avatar estable para un paciente, derivado de su id. */
+export function getPatientColor(id: string): string {
+    return PATIENT_COLORS[hashId(id) % PATIENT_COLORS.length];
+}
+
 export interface MappedRecentPatient {
     id: string;
     name: string;
-    reason: string;
+    /**
+     * Free-text context for the visit. Deliberately NOT the patient's diagnosis:
+     * that field is encrypted at rest and must not be surfaced on the main
+     * dashboard, where anyone glancing at the clinician's screen can read it.
+     */
+    reason: string | null;
     time: string;
     color: string;
 }
 
 /** Map raw `RecentPatient[]` from the API to the shape the widget expects. */
 export function mapRecentPatients(patients: RecentPatient[]): MappedRecentPatient[] {
-    return patients.map((p, i) => {
+    return patients.map((p) => {
         const hoursAgo = Math.floor(
             (Date.now() - new Date(p.lastAppointmentTime).getTime()) / 3_600_000,
         );
@@ -73,54 +114,63 @@ export function mapRecentPatients(patients: RecentPatient[]): MappedRecentPatien
         return {
             id: p.id,
             name: p.name,
-            reason: p.reason ?? 'Sin motivo registrado',
+            reason: p.reason ?? null,
             time,
-            color: PATIENT_COLORS[i % PATIENT_COLORS.length],
+            color: getPatientColor(p.id),
         };
     });
 }
 
 export interface CalendarDay {
     day: number;
+    /** ISO date (yyyy-MM-dd), so the cell can label itself accessibly. */
+    date: string;
+    /** Full accessible label, e.g. "sábado 1 de agosto". */
+    label: string;
     density: string;
     status: string;
-    freeHours: string[];
     appointmentCount: number;
+    isToday: boolean;
+    isPast: boolean;
 }
 
-/** Build 28 calendar day objects from a day-summary map for the AvailabilityWidget. */
-export function buildCalendarDays(daySummary: DaySummary | undefined): CalendarDay[] {
-    const monthStart = startOfMonth(new Date());
+/**
+ * A cell in the availability grid. `null` is a leading blank: the days of the
+ * week before the 1st falls, without which every date sits under the wrong
+ * weekday column.
+ */
+export type CalendarCell = CalendarDay | null;
 
-    return Array.from({ length: 28 }, (_, i) => {
+/**
+ * Build the availability grid for the current month.
+ *
+ * Two things this must get right, both of which it previously got wrong:
+ * 1. The month is padded with leading blanks so each date lands under its real
+ *    weekday (week starts Monday, matching the `L M X J V S D` header).
+ * 2. Every day of the month is included, not a fixed 28 — otherwise the 29th
+ *    through 31st silently do not exist.
+ *
+ * It deliberately does NOT compute free hours. That used to be derived from a
+ * hardcoded 09:00–18:00 workday, shipped on every cell of every month, and
+ * never rendered — because the product has no way for a clinician to configure
+ * their hours, so any figure built on those bounds is a claim the interface
+ * cannot support. Dead weight that invites someone to surface it: removed.
+ */
+export function buildCalendarDays(daySummary: DaySummary | undefined): CalendarCell[] {
+    const monthStart = startOfMonth(new Date());
+    const daysInMonth = getDaysInMonth(monthStart);
+    const todayKey = format(new Date(), 'yyyy-MM-dd');
+
+    // getDay(): 0 = Sunday. Shift so Monday = 0, matching the header row.
+    const leadingBlanks = (getDay(monthStart) + 6) % 7;
+
+    const cells: CalendarCell[] = Array.from({ length: leadingBlanks }, () => null);
+
+    for (let i = 0; i < daysInMonth; i++) {
         const dayDate = addDays(monthStart, i);
         const dateKey = format(dayDate, 'yyyy-MM-dd');
         const summary = daySummary?.[dateKey];
         const count = summary?.count ?? 0;
-
-        // Calculate free hours logic
-        // Office hours: 09:00 - 18:00 (9 hours total)
-        const OFFICE_START = 9;
-        const OFFICE_END = 18;
-        const allSlots = Array.from({ length: OFFICE_END - OFFICE_START }, (_, k) => k + OFFICE_START); // [9, 10, ... 17]
-
-        // Get busy hours from appointments (simple hour extraction)
-        // This is a naive implementation; for real production we'd check full ranges.
-        // But for this widget, integer start hours are sufficient.
-        const busyHours = new Set<number>();
-        if (summary?.appointments) {
-            summary.appointments.forEach(apt => {
-                const hour = new Date(apt.startTime).getHours();
-                busyHours.add(hour);
-                // If duration > 60, block next hour too
-                if (apt.duration > 60) busyHours.add(hour + 1);
-            });
-        }
-
-        const freeHours = allSlots
-            .filter(h => !busyHours.has(h))
-            .map(h => `${h}:00`);
-
 
         let density = 'free';
         let status = 'Disponible';
@@ -139,12 +189,21 @@ export function buildCalendarDays(daySummary: DaySummary | undefined): CalendarD
             status = 'Poca demanda';
         }
 
-        return {
+        cells.push({
             day: dayDate.getDate(),
+            date: dateKey,
+            label: dayDate.toLocaleDateString('es-MX', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+            }),
             density,
             status,
-            freeHours: freeHours,
-            appointmentCount: count
-        };
-    });
+            appointmentCount: count,
+            isToday: dateKey === todayKey,
+            isPast: dateKey < todayKey,
+        });
+    }
+
+    return cells;
 }

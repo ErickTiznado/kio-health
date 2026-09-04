@@ -4,6 +4,11 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Permite levantar una segunda instancia de dev en paralelo (p. ej. una
+  // sesión de QA mientras otra ya ocupa el 5173) sin editar la config.
+  server: {
+    port: Number(process.env.PORT) || 5173,
+  },
   plugins: [
     react(),
     VitePWA({
