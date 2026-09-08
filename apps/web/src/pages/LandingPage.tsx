@@ -20,6 +20,10 @@ import {
 import { ThemeToggle } from '../components/common/ThemeToggle';
 import { useIsDark } from '../hooks/use-is-dark';
 import { requestBetaAccess } from '../lib/beta.api';
+import {
+  SECTION_ATTR,
+  useLandingAnalytics,
+} from '../hooks/use-landing-analytics';
 
 // Las capturas son del producto real, tomadas con la cuenta de desarrollo.
 // Los nombres, diagnósticos y notas que aparecen son datos sembrados, no
@@ -96,7 +100,16 @@ const waitlistSchema = z.object({
 
 type WaitlistValues = z.infer<typeof waitlistSchema>;
 
-function WaitlistForm({ id, compact = false }: { id: string; compact?: boolean }) {
+function WaitlistForm({
+  id,
+  compact = false,
+  onSubmitted,
+}: {
+  id: string;
+  compact?: boolean;
+  /** Se dispara al registrar el correo. Lo usa la analítica de la landing. */
+  onSubmitted?: () => void;
+}) {
   const [sent, setSent] = useState(false);
   const [failed, setFailed] = useState<string | null>(null);
 
@@ -115,6 +128,7 @@ function WaitlistForm({ id, compact = false }: { id: string; compact?: boolean }
         practiceKind: values.practiceKind,
       });
       setSent(true);
+      onSubmitted?.();
     } catch (error) {
       const status = (error as { response?: { status?: number } })?.response
         ?.status;
@@ -449,6 +463,8 @@ function ShotSection({
    ──────────────────────────────────────────────────────────────────────── */
 
 export function LandingPage() {
+  const { markWaitlist } = useLandingAnalytics();
+
   return (
     <div className="min-h-screen bg-bg text-text dark:bg-slate-950 dark:text-slate-100">
       <a
@@ -492,7 +508,10 @@ export function LandingPage() {
 
       <main id="contenido">
         {/* ── Primer viewport: el visor conduce la página ──────────────── */}
-        <section className="mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-6 sm:pt-16">
+        <section
+          {...{ [SECTION_ATTR]: 'hero' }}
+          className="mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-6 sm:pt-16"
+        >
           <div className="grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-14">
             <div className="min-w-0 self-center">
               <h1 className="max-w-[16ch] text-4xl font-bold leading-[1.08] tracking-[-0.03em] sm:text-5xl">
@@ -507,7 +526,7 @@ export function LandingPage() {
                 sitio — y lo que escribes sobre un paciente se guarda cifrado.
               </p>
               <div className="mt-7">
-                <WaitlistForm id="hero" compact />
+                <WaitlistForm id="hero" compact onSubmitted={markWaitlist} />
               </div>
               <p className="mt-6 flex items-center gap-2 text-xs font-medium text-text-secondary">
                 <Lock size={14} aria-hidden="true" />
@@ -522,7 +541,10 @@ export function LandingPage() {
         </section>
 
         {/* ── Confidencialidad ─────────────────────────────────────────── */}
-        <section className="border-t border-gray-200 dark:border-slate-800">
+        <section
+          {...{ [SECTION_ATTR]: 'pacientes' }}
+          className="border-t border-gray-200 dark:border-slate-800"
+        >
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
             <ShotSection
               shot="patients"
@@ -571,7 +593,10 @@ export function LandingPage() {
         </section>
 
         {/* ── El día ───────────────────────────────────────────────────── */}
-        <section className="border-t border-gray-200 dark:border-slate-800">
+        <section
+          {...{ [SECTION_ATTR]: 'dashboard' }}
+          className="border-t border-gray-200 dark:border-slate-800"
+        >
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
             <ShotSection
               reversed
@@ -598,7 +623,10 @@ export function LandingPage() {
         </section>
 
         {/* ── Hecho para psicología ────────────────────────────────────── */}
-        <section className="border-t border-gray-200 dark:border-slate-800">
+        <section
+          {...{ [SECTION_ATTR]: 'diferencia' }}
+          className="border-t border-gray-200 dark:border-slate-800"
+        >
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
             <div className="max-w-[62ch]">
               <h2 className="text-2xl font-bold tracking-tight">
@@ -656,6 +684,7 @@ export function LandingPage() {
         {/* ── Cierre ───────────────────────────────────────────────────── */}
         <section
           id="lista-de-espera"
+          {...{ [SECTION_ATTR]: 'lista-de-espera' }}
           className="scroll-mt-20 border-t border-gray-200 dark:border-slate-800"
         >
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
@@ -677,7 +706,7 @@ export function LandingPage() {
                 </p>
               </div>
               <div className="mt-8 max-w-2xl">
-                <WaitlistForm id="cierre" />
+                <WaitlistForm id="cierre" onSubmitted={markWaitlist} />
               </div>
             </div>
           </div>

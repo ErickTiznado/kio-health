@@ -633,3 +633,35 @@ model PsychNoteAddendum {
   @@index([patientId])
   @@map("psych_note_addendums")
 }
+
+/// Analítica propia de la landing pública.
+///
+/// Una fila por visita, no una fila por evento: a esta escala responde todas
+/// las preguntas que la landing tiene que contestar (cuánta gente entra, de
+/// dónde, qué secciones ve, cuánto se queda) sin que la tabla crezca sin
+/// control. El cliente manda beacons y el servicio hace upsert por `visitId`.
+///
+/// No se guarda IP ni user-agent crudo — solo `device` e `inAppBrowser`, ya
+/// derivados en el cliente. Sin identificador persistente: `visitId` vive en
+/// `sessionStorage`, así que no es una cookie y no sigue a nadie entre días.
+model LandingVisit {
+  id           String   @id @default(uuid()) @db.Uuid
+  visitId      String   @unique @map("visit_id")
+  source       String
+  utmSource    String?  @map("utm_source")
+  utmMedium    String?  @map("utm_medium")
+  utmCampaign  String?  @map("utm_campaign")
+  referrerHost String?  @map("referrer_host")
+  device       String
+  inAppBrowser Boolean  @default(false) @map("in_app_browser")
+  sectionsSeen String[] @map("sections_seen")
+  maxScrollPct Int      @default(0) @map("max_scroll_pct")
+  dwellMs      Int      @default(0) @map("dwell_ms")
+  waitlist     Boolean  @default(false)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([createdAt])
+  @@index([source, createdAt])
+  @@map("landing_visits")
+}

@@ -26,6 +26,7 @@ import { AddendumsModule } from './addendums/addendums.module';
 import { RiskFlagsModule } from './risk-flags/risk-flags.module';
 import { RemindersModule } from './reminders/reminders.module';
 import { PortalModule } from './portal/portal.module';
+import { LandingAnalyticsModule } from './landing-analytics/landing-analytics.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { TrialGuard } from './auth/guards/trial.guard';
 
@@ -60,6 +61,7 @@ import { TrialGuard } from './auth/guards/trial.guard';
     RiskFlagsModule,
     RemindersModule,
     PortalModule,
+    LandingAnalyticsModule,
   ],
   controllers: [AppController],
   providers: [
