@@ -26,6 +26,14 @@ import { requestBetaAccess } from '../lib/beta.api';
 // pacientes reales — por eso el visor lo dice en pantalla.
 const SHOT_W = 2000;
 const SHOT_H = 1250;
+/* Medido sobre las propias capturas: el borde de la barra lateral cae en x=356
+   de 2000 (17.8%), que a 760 de ancho son 135px. En móvil solo caben ~342px:
+   dejar la barra dentro gastaba el 40% del hueco visible en el menú de la
+   aplicación, y la agenda quedaba cortada a mitad de semana. Se desplaza 140
+   —cinco de más para que no asome la costura— y lo primero que se ve es el
+   contenido. Si se regeneran las capturas a otro ancho, hay que volver a
+   medir este número. */
+const SHOT_ASIDE = '-ml-[140px]';
 
 interface Step {
   id: string;
@@ -304,18 +312,22 @@ function Visor() {
       onTouchStart={() => setInteracted(true)}
     >
       {/* En móvil la captura se reduciría a un cuarto de su tamaño y el texto
-          de la aplicación sería ilegible: por debajo de `sm` se muestra a
-          tamaño usable y se desplaza en horizontal. */}
+          de la aplicación sería ilegible, así que se mantiene a 760px. Pero a
+          ese tamaño solo cabe el 45% del ancho, y ese 45% era la barra lateral:
+          medido en un móvil real, el visitante veía el menú y media agenda.
+          Por debajo de `sm` se desplaza la captura para saltarse el chrome
+          (`SHOT_ASIDE`) y se recorta la altura, en vez de pedir que deslice
+          en horizontal — nadie desliza una imagen en una landing. */}
       {/* No es un tablist: el riel va visualmente ENTRE la captura y su texto,
           y un tabpanel no puede partirse en dos. Botones con `aria-pressed`
           sobre una región `live` describen lo que de verdad ocurre. */}
       <div
         id="visor-panel"
         aria-live="polite"
-        className="overflow-x-auto overflow-y-hidden rounded-2xl border border-gray-200 bg-white shadow-sm shot-rail dark:border-slate-800 dark:bg-slate-900"
+        className="max-h-[360px] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:max-h-none"
       >
         <div
-          className="relative w-[760px] max-w-none sm:w-full"
+          className={`relative w-[760px] max-w-none ${SHOT_ASIDE} sm:ml-0 sm:w-full`}
           style={{ aspectRatio: `${SHOT_W} / ${SHOT_H}` }}
         >
           <AnimatePresence mode="sync">
@@ -341,7 +353,6 @@ function Visor() {
 
       <p className="mt-2 text-[11px] font-bold uppercase tracking-wider text-text-secondary">
         Captura real · datos de demostración
-        <span className="sm:hidden"> · desliza para verla completa</span>
       </p>
 
       <div
@@ -409,7 +420,9 @@ function ShotSection({
     <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
       <div className={reversed ? 'lg:order-2' : undefined}>{children}</div>
       <div className={`min-w-0 ${reversed ? 'lg:order-1' : ''}`}>
-        <div className="shot-rail overflow-x-auto overflow-y-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        {/* Mismo criterio que el visor del hero: en móvil se recorta el chrome
+            en vez de pedir un deslizamiento horizontal. */}
+        <div className="max-h-[360px] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:max-h-none">
           <img
             src={`/landing/${shot}-${isDark ? 'dark' : 'light'}.webp`}
             alt={alt}
@@ -420,7 +433,7 @@ function ShotSection({
             // justo lo contrario de lo que promete. Con `decoding="async"` la
             // imagen llegaba completa pero sin pintar. Pesan ~60 KB en WebP.
             decoding="sync"
-            className="w-[760px] max-w-none sm:w-full"
+            className={`w-[760px] max-w-none ${SHOT_ASIDE} sm:ml-0 sm:w-full`}
           />
         </div>
         <p className="mt-2 text-[11px] font-bold uppercase tracking-wider text-text-secondary">

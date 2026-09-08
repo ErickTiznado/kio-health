@@ -160,29 +160,8 @@
   outline-offset: -4px !important;
   border-radius: var(--radius-lg);
 }
-/* Carril horizontal de las capturas de la landing.
-   La barra de desplazamiento aparece a tamaño móvil, encima de una superficie
-   de marca, y por defecto se pinta con los grises del sistema operativo — que
-   no pertenecen a ningún sistema de diseño.
-   El pulgar va en Kanji en ambos modos, no en Cruz: sobre la card blanca el
-   Cruz mide 1.2:1 y es la única señal de que la captura se desliza. Un
-   control esencial por debajo de 3:1 no se ve en un móvil a plena luz. */
-.shot-rail {
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-kanji) transparent;
-}
-
-
-.shot-rail::-webkit-scrollbar {
-  height: 8px;
-}
-
-.shot-rail::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.shot-rail::-webkit-scrollbar-thumb {
-  background-color: var(--color-kanji);
-  border-radius: var(--radius-full, 9999px);
-}
+/* El carril horizontal de las capturas de la landing (`.shot-rail`) se retiró:
+   medido en un móvil real solo quedaba visible el 45% de la captura, y ese 45%
+   era la barra lateral de la aplicación. Ahora la captura se recorta para
+   mostrar el contenido en vez de pedir un deslizamiento que nadie hacía. */
 
