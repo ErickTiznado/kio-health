@@ -3,6 +3,7 @@ import {
   detectSource,
   getVisitId,
   LandingVisitTracker,
+  medirCarga,
   sendVisit,
   type LandingSection,
 } from '../lib/landing-analytics';
@@ -55,10 +56,14 @@ export function useLandingAnalytics(): {
         utmCampaign: params.get('utm_campaign') ?? undefined,
       },
       window.matchMedia('(max-width: 767px)').matches ? 'movil' : 'escritorio',
+      medirCarga(),
     );
     trackerRef.current = tracker;
 
-    tracker.startVisible();
+    // Solo se cuenta como tiempo de lectura si la pestaña está de verdad
+    // delante. El navegador embebido de Instagram puede montar la página en
+    // segundo plano, y arrancar el reloj ahí inflaría el tiempo de todos.
+    if (document.visibilityState === 'visible') tracker.startVisible();
     sendVisit(tracker.payload());
 
     /* ── Secciones vistas ──────────────────────────────────────────────── */

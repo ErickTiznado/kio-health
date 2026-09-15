@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import * as Sentry from '@sentry/react';
 import { toast } from 'sonner';
 import { MessageSquarePlus, X, Send, HelpCircle, Bug, Lightbulb, Heart } from 'lucide-react';
 import { useAuthStore } from '../../stores/auth.store';
@@ -117,6 +116,10 @@ export function FeedbackWidget() {
       });
 
       // Bandeja legible, con el texto y con a quién responder.
+      // Import dinámico: este widget se monta también en la landing pública, y
+      // con `import` estático arrastraba Sentry entero al bundle de arranque de
+      // cualquier visitante. Aquí ya hay una interacción deliberada detrás.
+      const Sentry = await import('@sentry/react');
       Sentry.captureMessage(`[feedback] ${sentiment} — ${route}`, {
         level: 'info',
         tags: { source: 'feedback_widget', sentiment, route },

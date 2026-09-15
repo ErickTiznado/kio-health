@@ -65,6 +65,7 @@ describe('LandingVisitTracker', () => {
       { source: 'instagram', inAppBrowser: true },
       { utmSource: 'instagram' },
       'movil',
+      { loadMs: 1200, fcpMs: 900, netType: '4g' },
       () => clock.t,
     );
 
@@ -88,6 +89,11 @@ describe('LandingVisitTracker', () => {
     tracker.markScroll(80);
     tracker.markScroll(20); // volvió arriba
     expect(tracker.payload().maxScrollPct).toBe(80);
+  });
+
+  it('la medida de carga viaja en el payload', () => {
+    const p = build({ t: 0 }).payload();
+    expect(p).toMatchObject({ loadMs: 1200, fcpMs: 900, netType: '4g' });
   });
 
   it('las secciones no se repiten', () => {

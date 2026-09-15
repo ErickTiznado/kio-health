@@ -30,6 +30,11 @@ export const LANDING_SECTIONS = [
 
 export type LandingSection = (typeof LANDING_SECTIONS)[number];
 
+export const NET_TYPES = ['slow-2g', '2g', '3g', '4g'] as const;
+
+/** Dos minutos. Por encima de eso no es una carga, es un reloj desajustado. */
+const MAX_LOAD_MS = 2 * 60 * 1000;
+
 /** Cuatro horas. Por encima de eso es una pestaña olvidada, no una lectura. */
 const MAX_DWELL_MS = 4 * 60 * 60 * 1000;
 
@@ -90,4 +95,28 @@ export class TrackLandingVisitDto {
   @IsOptional()
   @IsBoolean()
   waitlist?: boolean;
+
+  /**
+   * Cuanto tardo la pagina en ser utilizable, y en pintar por primera vez.
+   *
+   * Sin esto `dwellMs` miente por omision: empieza a contar cuando React monta,
+   * asi que la espera previa —que es donde se pierde a la gente— era invisible.
+   * El tope de dos minutos descarta lecturas absurdas de relojes desajustados.
+   */
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(MAX_LOAD_MS)
+  loadMs?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(MAX_LOAD_MS)
+  fcpMs?: number;
+
+  /** Lista cerrada: es lo que declara la Network Information API. */
+  @IsOptional()
+  @IsIn(NET_TYPES)
+  netType?: (typeof NET_TYPES)[number];
 }

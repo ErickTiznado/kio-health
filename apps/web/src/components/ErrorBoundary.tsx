@@ -1,6 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { RefreshCcw, AlertTriangle } from 'lucide-react';
-import * as Sentry from '@sentry/react';
 
 interface Props {
   children?: ReactNode;
@@ -23,7 +22,13 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
-    Sentry.captureException(error, { extra: { errorInfo } });
+    // Import dinámico y no estático: este componente envuelve toda la app, así
+    // que un `import` arriba metía los 252 KB de Sentry en el bundle de
+    // arranque de cualquiera que abriese la landing. El reporte solo hace falta
+    // cuando ya ha explotado algo, y entonces sobra tiempo para bajarlo.
+    void import('@sentry/react').then((Sentry) =>
+      Sentry.captureException(error, { extra: { errorInfo } }),
+    );
   }
 
   public render() {

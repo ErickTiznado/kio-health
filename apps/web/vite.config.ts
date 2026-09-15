@@ -29,6 +29,22 @@ export default defineConfig({
   build: {
     target: 'es2020',
     chunkSizeWarningLimit: 1000,
+    modulePreload: {
+      /**
+       * Los graficos no se precargan.
+       *
+       * Vite marcaba `recharts` (365 KB de recharts + d3) como modulepreload
+       * del entry, asi que todo el que abria la landing se descargaba la
+       * libreria de graficas antes de ver nada — y las graficas solo existen
+       * dentro de PatientDetailsPage y FinancePage, que son rutas lazy tras
+       * login. Un visitante anonimo no vera una grafica jamas.
+       *
+       * Quitarlo del preload no lo rompe: cuando una de esas rutas se abre, su
+       * import dinamico lo baja igual. Solo deja de pagarlo quien no lo usa.
+       */
+      resolveDependencies: (_url, deps) =>
+        deps.filter((d) => !d.includes('recharts')),
+    },
     rollupOptions: {
       output: {
         manualChunks(id) {

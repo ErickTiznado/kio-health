@@ -657,6 +657,16 @@ model LandingVisit {
   sectionsSeen String[] @map("sections_seen")
   maxScrollPct Int      @default(0) @map("max_scroll_pct")
   dwellMs      Int      @default(0) @map("dwell_ms")
+  /// Milisegundos desde que arranca la navegacion hasta que la pagina es
+  /// utilizable, y hasta el primer pintado. Sin esto `dwellMs` enganaba: el
+  /// contador arranca cuando React monta, asi que alguien que espera cuatro
+  /// segundos en blanco y se va harto figuraba como una visita de medio
+  /// segundo. El tiempo de espera es justo el que no se veia.
+  loadMs       Int?     @map("load_ms")
+  fcpMs        Int?     @map("fcp_ms")
+  /// Calidad de red declarada por el navegador (4g, 3g, slow-2g). Distingue
+  /// "la pagina pesa demasiado" de "esta persona esta en una red mala".
+  netType      String?  @map("net_type")
   waitlist     Boolean  @default(false)
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")

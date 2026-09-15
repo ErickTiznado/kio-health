@@ -52,6 +52,9 @@ export interface VisitPayload {
   maxScrollPct: number;
   dwellMs: number;
   waitlist: boolean;
+  loadMs?: number;
+  fcpMs?: number;
+  netType?: string;
 }
 
 /* ── Identidad de la visita ──────────────────────────────────────────────── */
@@ -150,6 +153,55 @@ function normalize(value: string): string {
   return value.trim().toLowerCase().slice(0, 80);
 }
 
+/* -- Rendimiento de carga -------------------------------------------------- */
+
+export interface CargaMedida {
+  loadMs?: number;
+  fcpMs?: number;
+  netType?: string;
+}
+
+/**
+ * Cuanto esperó esta persona antes de poder usar la pagina.
+ *
+ * Esto existe porque `dwellMs` solo empieza a contar cuando React monta, y esa
+ * omision distorsionaba la lectura entera: alguien que aguanta cuatro segundos
+ * de pantalla en blanco y se marcha figuraba como una visita de medio segundo,
+ * indistinguible de quien vio la pagina y no le interesó. Son dos problemas
+ * opuestos y se arreglan de forma opuesta.
+ *
+ * `domInteractive` y no `loadEventEnd`: importa cuando el visitante puede leer
+ * y tocar, no cuando termina de bajar la ultima imagen del pie.
+ */
+export function medirCarga(): CargaMedida {
+  const medida: CargaMedida = {};
+
+  try {
+    const [nav] = performance.getEntriesByType(
+      'navigation',
+    ) as PerformanceNavigationTiming[];
+    if (nav && nav.domInteractive > 0) {
+      medida.loadMs = Math.round(nav.domInteractive);
+    }
+
+    const fcp = performance
+      .getEntriesByType('paint')
+      .find((e) => e.name === 'first-contentful-paint');
+    if (fcp) medida.fcpMs = Math.round(fcp.startTime);
+  } catch {
+    // Navegador sin Navigation Timing: la visita vale igual, sin estos campos.
+  }
+
+  // Network Information API: solo Chromium, y el navegador embebido de
+  // Instagram en Android lo es — justo el caso que hay que poder distinguir.
+  const conexion = (
+    navigator as Navigator & { connection?: { effectiveType?: string } }
+  ).connection;
+  if (conexion?.effectiveType) medida.netType = conexion.effectiveType;
+
+  return medida;
+}
+
 /* ── Acumulador de la visita ─────────────────────────────────────────────── */
 
 /**
@@ -174,6 +226,7 @@ export class LandingVisitTracker {
     utmCampaign?: string;
   };
   private readonly device: 'movil' | 'escritorio';
+  private readonly carga: CargaMedida;
   private readonly now: () => number;
 
   constructor(
@@ -181,12 +234,14 @@ export class LandingVisitTracker {
     origin: DetectedOrigin,
     utm: { utmSource?: string; utmMedium?: string; utmCampaign?: string },
     device: 'movil' | 'escritorio',
+    carga: CargaMedida = {},
     now: () => number = () => Date.now(),
   ) {
     this.visitId = visitId;
     this.origin = origin;
     this.utm = utm;
     this.device = device;
+    this.carga = carga;
     this.now = now;
   }
 
@@ -231,6 +286,7 @@ export class LandingVisitTracker {
       maxScrollPct: this.maxScrollPct,
       dwellMs: this.dwellMs(),
       waitlist: this.waitlist,
+      ...this.carga,
     };
   }
 }

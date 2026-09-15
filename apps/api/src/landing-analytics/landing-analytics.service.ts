@@ -17,6 +17,18 @@ export interface LandingStats {
     dwellMedianoSeg: number;
     rebotes: number;
   };
+  /**
+   * Cuanto se espera antes de ver la pagina. Va separado de `dwellMs` porque
+   * responde otra pregunta: no si el mensaje convence, sino si llega a leerse.
+   */
+  carga: {
+    medidas: number;
+    loadMedianoMs: number;
+    loadP75Ms: number;
+    fcpMedianoMs: number;
+    lentas: number;
+    porRed: Array<{ red: string; visitas: number; loadMedianoMs: number }>;
+  };
   porFuente: Array<{
     source: string;
     visitas: number;
@@ -52,6 +64,7 @@ export class LandingAnalyticsService {
         maxScrollPct: true,
         dwellMs: true,
         waitlist: true,
+        loadMs: true,
       },
     });
 
@@ -70,6 +83,9 @@ export class LandingAnalyticsService {
           maxScrollPct: dto.maxScrollPct ?? 0,
           dwellMs: dto.dwellMs ?? 0,
           waitlist: dto.waitlist ?? false,
+          loadMs: dto.loadMs ?? null,
+          fcpMs: dto.fcpMs ?? null,
+          netType: dto.netType ?? null,
         },
       });
       return;
@@ -82,6 +98,15 @@ export class LandingAnalyticsService {
         maxScrollPct: Math.max(existing.maxScrollPct, dto.maxScrollPct ?? 0),
         dwellMs: Math.max(existing.dwellMs, dto.dwellMs ?? 0),
         waitlist: existing.waitlist || (dto.waitlist ?? false),
+        // La carga ocurre una sola vez por visita: el primer beacon que la
+        // trae es el bueno, y los siguientes no deben pisarla.
+        ...(existing.loadMs === null && dto.loadMs !== undefined
+          ? {
+              loadMs: dto.loadMs,
+              fcpMs: dto.fcpMs ?? null,
+              netType: dto.netType ?? null,
+            }
+          : {}),
       },
     });
   }
@@ -104,6 +129,9 @@ export class LandingAnalyticsService {
         waitlist: true,
         sectionsSeen: true,
         createdAt: true,
+        loadMs: true,
+        fcpMs: true,
+        netType: true,
       },
       orderBy: { createdAt: 'asc' },
     });
@@ -161,6 +189,7 @@ export class LandingAnalyticsService {
         ),
         rebotes: ratio(rebotes, total),
       },
+      carga: resumenDeCarga(visitas),
       porFuente: [...porFuenteMap.entries()]
         .map(([source, f]) => ({
           source,
@@ -185,6 +214,65 @@ export class LandingAnalyticsService {
       },
     };
   }
+}
+
+/** Por encima de esto la pagina llega tarde para alguien que viene de un anuncio. */
+const CARGA_LENTA_MS = 2500;
+
+interface FilaDeCarga {
+  loadMs: number | null;
+  fcpMs: number | null;
+  netType: string | null;
+}
+
+function resumenDeCarga(visitas: FilaDeCarga[]): LandingStats['carga'] {
+  const conCarga = visitas.filter(
+    (v): v is FilaDeCarga & { loadMs: number } => v.loadMs !== null,
+  );
+  const loads = conCarga.map((v) => v.loadMs);
+
+  const porRedMap = new Map<string, number[]>();
+  for (const v of conCarga) {
+    const red = v.netType ?? 'desconocida';
+    porRedMap.set(red, [...(porRedMap.get(red) ?? []), v.loadMs]);
+  }
+
+  return {
+    medidas: conCarga.length,
+    loadMedianoMs: Math.round(median(loads)),
+    loadP75Ms: Math.round(percentile(loads, 75)),
+    fcpMedianoMs: Math.round(
+      median(
+        conCarga.filter((v) => v.fcpMs !== null).map((v) => v.fcpMs as number),
+      ),
+    ),
+    lentas: ratio(
+      loads.filter((ms) => ms > CARGA_LENTA_MS).length,
+      conCarga.length,
+    ),
+    porRed: [...porRedMap.entries()]
+      .map(([red, ms]) => ({
+        red,
+        visitas: ms.length,
+        loadMedianoMs: Math.round(median(ms)),
+      }))
+      .sort((a, b) => b.visitas - a.visitas),
+  };
+}
+
+/**
+ * El percentil 75 acompana a la mediana a proposito: la mediana dice como le va
+ * al visitante tipico, y el p75 a quien tiene el movil o la red peores — que es
+ * justo el publico de un anuncio en el navegador de Instagram.
+ */
+function percentile(values: number[], p: number): number {
+  if (!values.length) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const index = Math.min(
+    sorted.length - 1,
+    Math.floor((p / 100) * sorted.length),
+  );
+  return sorted[index];
 }
 
 function dedupe(values: string[]): string[] {
