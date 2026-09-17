@@ -14,6 +14,76 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['logo.png'],
+      /**
+       * QUE SE GUARDA EN CACHE Y QUE NO.
+       *
+       * Sin esta seccion, vite-plugin-pwa precacheaba el build entero: 39
+       * ficheros, 2.590 KB. Un desconocido que abria la landing desde un
+       * anuncio se descargaba en segundo plano Sentry, la libreria de
+       * graficas y las pantallas de sesion, pacientes y finanzas — pantallas
+       * que estan detras del login y que no vera nunca. En movil con datos eso
+       * compite por el ancho de banda justo despues de cargar.
+       *
+       * Lo que se excluye NO deja de funcionar: se descarga cuando la ruta que
+       * lo necesita se abre de verdad, y ahi el service worker ya lo cachea.
+       * Solo deja de pagarlo por adelantado quien no lo usa.
+       */
+      workbox: {
+        // Sin `webp`: las capturas de la landing son 701 KB y solo la primera
+        // se ve sin desplazar. Las carga el navegador cuando tocan, con su
+        // cache HTTP de siempre.
+        globPatterns: ['**/*.{js,css,ico,svg,webmanifest}', 'logo.png'],
+        globIgnores: [
+          // Instrumentacion y graficas: nunca en el primer viewport.
+          '**/sentry-*.js',
+          '**/recharts-*.js',
+          // Rutas privadas: solo existen tras iniciar sesion.
+          '**/SessionPage-*.js',
+          '**/PatientDetailsPage-*.js',
+          '**/PatientsPage-*.js',
+          '**/FinancePage-*.js',
+          '**/AgendaPage-*.js',
+          '**/DashboardPage-*.js',
+          '**/DashboardLayout-*.js',
+          '**/SettingsPage-*.js',
+          '**/ClinicPage-*.js',
+          '**/PlanPage-*.js',
+          '**/AccessLogPage-*.js',
+          '**/AddendumModal-*.js',
+          // El HTML se sirve por red (ver navigateFallback abajo).
+          'index.html',
+          // 246 KB para un icono. Ya no lo referencia el HTML; que tampoco
+          // viaje en el precache.
+          'LogoFavi.png',
+        ],
+        // Borra los precaches de despliegues anteriores en vez de acumularlos.
+        cleanupOutdatedCaches: true,
+        /**
+         * El documento se pide SIEMPRE a la red primero.
+         *
+         * El 17-09-2026 el service worker me sirvio un index.html de un
+         * despliegue anterior mientras diagnosticaba por que la landing no
+         * mejoraba: el servidor tenia la version nueva y el navegador la
+         * vieja. Para una landing que recibe trafico de campanas, servir el
+         * despliegue de ayer no es una optimizacion, es un error silencioso.
+         *
+         * Con tres segundos de espera y respaldo en cache, quien no tenga red
+         * sigue abriendo la aplicacion; quien la tenga ve siempre lo ultimo.
+         */
+        navigateFallback: null,
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }: { request: Request }) =>
+              request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'kio-documentos',
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 8, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            },
+          },
+        ],
+      },
       manifest: {
         name: 'Kio Health',
         short_name: 'Kio',
